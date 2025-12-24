@@ -3,6 +3,7 @@ FROM oven/bun:1-alpine AS frontend-builder
 WORKDIR /app
 
 # Copy package files
+# Pattern bun.lockb* copies the lockfile if it exists, or skips if not present
 COPY package.json bun.lockb* ./
 
 # Install dependencies using bunx

@@ -26,6 +26,7 @@ COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
+# Copy package.json and optionally bun.lockb if it exists
 COPY package.json bun.lockb* ./
 COPY prisma/ ./prisma/
 

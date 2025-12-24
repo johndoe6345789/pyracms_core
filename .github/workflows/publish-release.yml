@@ -214,8 +214,8 @@ jobs:
           # Install dependencies with bunx
           bun install --frozen-lockfile
 
-          # Build the frontend
-          bun run build
+          # Build the frontend using bunx
+          bunx next build
 
       - name: Create release package
         run: |
@@ -227,8 +227,13 @@ jobs:
           PACKAGE_NAME="pyracms-cpp-port-${VERSION}-${{ matrix.arch }}"
           mkdir -p "${PACKAGE_NAME}"
 
-          # Copy backend binary
-          cp pyracms-cpp-port/backend/build/pyracms_server "${PACKAGE_NAME}/"
+          # Copy backend binary (verify it exists)
+          if [ -f pyracms-cpp-port/backend/build/pyracms_server ]; then
+            cp pyracms-cpp-port/backend/build/pyracms_server "${PACKAGE_NAME}/"
+          else
+            echo "Warning: pyracms_server binary not found"
+            ls -la pyracms-cpp-port/backend/build/ || true
+          fi
 
           # Copy frontend build
           mkdir -p "${PACKAGE_NAME}/frontend"
@@ -236,9 +241,13 @@ jobs:
           cp -r pyracms-cpp-port/frontend/public "${PACKAGE_NAME}/frontend/"
           cp pyracms-cpp-port/frontend/package.json "${PACKAGE_NAME}/frontend/"
 
-          # Copy configuration files
-          cp pyracms-cpp-port/backend/prisma "${PACKAGE_NAME}/" -r || true
-          cp pyracms-cpp-port/docker-compose.yml "${PACKAGE_NAME}/" || true
+          # Copy configuration files if they exist
+          if [ -d pyracms-cpp-port/backend/prisma ]; then
+            cp -r pyracms-cpp-port/backend/prisma "${PACKAGE_NAME}/"
+          fi
+          if [ -f pyracms-cpp-port/docker-compose.yml ]; then
+            cp pyracms-cpp-port/docker-compose.yml "${PACKAGE_NAME}/"
+          fi
 
           # Create README for the release
           cat > "${PACKAGE_NAME}/README.md" << EOF
