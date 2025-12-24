@@ -2,13 +2,13 @@ name: Multi-Architecture Docker Build
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master ]
     paths:
       - 'pyracms-cpp-port/backend/**'
       - 'pyracms-cpp-port/frontend/**'
       - '.github/workflows/docker-multiarch.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master ]
     paths:
       - 'pyracms-cpp-port/backend/**'
       - 'pyracms-cpp-port/frontend/**'
