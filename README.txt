@@ -12,3 +12,9 @@ Getting Started
 
 - $venv/bin/pserve development.ini
 
+CI Workflow Diagnostics
+-----------------------
+
+- Run `python tools/workflow_diagnose.py` to generate a summary of GitHub Actions workflows,
+  including triggers, runners, permission notes, and action pinning warnings.
+

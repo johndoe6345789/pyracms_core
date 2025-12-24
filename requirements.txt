@@ -9,6 +9,7 @@ Markdown
 moviepy
 postmarkup
 Pygments
+PyYAML
 pyramid
 pyramid_mailer
 pyramid_sqlalchemy
