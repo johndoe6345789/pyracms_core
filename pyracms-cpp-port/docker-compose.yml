@@ -1,5 +1,11 @@
 version: '3.8'
 
+# NOTE: This docker-compose.yml is for DEVELOPMENT ONLY
+# For production:
+# - Use Docker secrets or external environment files for credentials
+# - Never commit production credentials to version control
+# - Use strong, randomly generated passwords
+
 services:
   postgres:
     image: postgres:15-alpine
