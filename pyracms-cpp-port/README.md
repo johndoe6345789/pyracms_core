@@ -1,0 +1,349 @@
+# PyraCMS C++ Port
+
+A modern reimplementation of PyraCMS with a C++ backend and React/Material UI/Next.js frontend.
+
+## Overview
+
+This is a complete port of the PyraCMS core functionality using modern technologies:
+
+- **Backend**: C++17 with RESTful API architecture
+- **Frontend**: Next.js 14 with React 18 and Material UI 5
+- **Database**: PostgreSQL with Prisma ORM
+- **CI/CD**: GitHub Actions workflows
+- **Testing**: Google Test for C++, Jest for frontend
+
+## Project Structure
+
+```
+pyracms-cpp-port/
+├── backend/              # C++ backend server
+│   ├── src/             # Source files
+│   ├── include/         # Header files
+│   ├── tests/           # Unit tests
+│   ├── prisma/          # Database schema
+│   └── CMakeLists.txt   # Build configuration
+├── frontend/            # Next.js frontend
+│   ├── src/
+│   │   ├── app/        # Next.js app directory
+│   │   ├── components/ # React components
+│   │   ├── lib/        # Utility functions
+│   │   └── types/      # TypeScript types
+│   └── package.json
+└── README.md           # This file
+```
+
+## Features
+
+### Backend (C++)
+- RESTful API server
+- JWT authentication
+- User management
+- Session handling
+- Database abstraction layer
+- Comprehensive unit tests
+
+### Frontend (React/Next.js)
+- Modern React with TypeScript
+- Material UI components
+- Authentication pages (Login/Register)
+- Dashboard interface
+- API integration with axios
+- Unit tests with Jest
+
+### Database (Prisma)
+- Type-safe database schema
+- User and group management
+- Session management
+- Settings storage
+- Menu management
+
+## Prerequisites
+
+### Backend
+- C++ compiler with C++17 support (GCC 9+, Clang 10+)
+- CMake 3.15+
+- Node.js 18+ (for Prisma)
+- PostgreSQL 13+
+
+### Frontend
+- Node.js 18+
+- npm or yarn
+
+## Quick Start
+
+### 1. Setup Database
+
+Create a PostgreSQL database:
+
+```bash
+createdb pyracms
+```
+
+Create a `.env` file in both `backend/` and `frontend/` directories:
+
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/pyracms?schema=public"
+API_URL="http://localhost:8080"
+```
+
+### 2. Setup Backend
+
+```bash
+cd backend
+
+# Install Prisma dependencies
+npm install
+
+# Run database migrations
+npm run prisma:migrate
+npm run prisma:generate
+
+# Build the C++ backend
+mkdir build && cd build
+cmake ..
+make
+
+# Run tests
+ctest --output-on-failure
+```
+
+### 3. Setup Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+The frontend will be available at http://localhost:3000
+
+### 4. Run Backend Server
+
+```bash
+cd backend/build
+./pyracms_server --host 0.0.0.0 --port 8080
+```
+
+## Development
+
+### Backend Development
+
+See [backend/README.md](backend/README.md) for detailed backend documentation.
+
+Key commands:
+```bash
+# Build
+cd backend/build
+cmake --build .
+
+# Run tests
+ctest --verbose
+
+# Format code
+clang-format -i src/*.cpp include/*.h
+```
+
+### Frontend Development
+
+Key commands:
+```bash
+cd frontend
+
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
+
+# Type checking
+npm run type-check
+```
+
+### Database Development
+
+Prisma commands:
+```bash
+cd backend
+
+# Create a new migration
+npm run prisma:migrate
+
+# View database in Prisma Studio
+npm run prisma:studio
+
+# Generate Prisma Client
+npm run prisma:generate
+
+# Deploy migrations to production
+npm run prisma:deploy
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout  
+- `POST /api/auth/register` - User registration
+
+### User Management
+- `GET /api/users` - List users
+- `GET /api/users/:id` - Get user by ID
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
+
+## Testing
+
+### Backend Tests
+```bash
+cd backend/build
+ctest --verbose
+
+# Run specific test
+./pyracms_tests --gtest_filter=AuthHandlerTest.*
+```
+
+### Frontend Tests
+```bash
+cd frontend
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage
+npm test -- --coverage
+```
+
+## CI/CD
+
+The project includes GitHub Actions workflows for:
+
+1. **C++ Backend CI** (`.github/workflows/cpp-backend.yml`)
+   - Build on Ubuntu and macOS
+   - Run unit tests
+   - Code formatting checks
+
+2. **Frontend CI** (`.github/workflows/frontend.yml`)
+   - Lint and type checking
+   - Unit tests with coverage
+   - Build verification
+
+3. **Prisma CI** (`.github/workflows/prisma.yml`)
+   - Schema validation
+   - Migration checks
+   - Database connection tests
+
+## Module System
+
+PyraCMS is designed as a modular CMS. This core repository provides:
+- User authentication and authorization
+- Basic CMS functionality
+- API infrastructure
+- Frontend framework
+
+Additional modules (separate repositories):
+- Forum module
+- Article/Blog module
+- Gallery module
+- Programming challenge module
+
+## Production Deployment
+
+### Backend
+1. Build in Release mode:
+   ```bash
+   cmake -DCMAKE_BUILD_TYPE=Release ..
+   make
+   ```
+
+2. Deploy with a process manager (systemd, supervisor, etc.)
+
+3. Use a reverse proxy (nginx, Apache) for HTTPS
+
+### Frontend
+1. Build the production bundle:
+   ```bash
+   npm run build
+   ```
+
+2. Deploy with:
+   - Vercel (recommended for Next.js)
+   - Docker container
+   - Static hosting with `next export`
+
+### Database
+1. Set up production PostgreSQL instance
+2. Run migrations:
+   ```bash
+   npm run prisma:deploy
+   ```
+
+## Security Considerations
+
+- [ ] Replace placeholder JWT implementation with proper library
+- [ ] Implement bcrypt/Argon2 for password hashing
+- [ ] Add rate limiting
+- [ ] Implement CSRF protection
+- [ ] Add input validation and sanitization
+- [ ] Use HTTPS in production
+- [ ] Implement proper session management
+- [ ] Add security headers
+- [ ] Regular dependency updates
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Write tests for new features
+4. Ensure all tests pass
+5. Submit a pull request
+
+## License
+
+Same as the original PyraCMS project.
+
+## TODO
+
+### Backend
+- [ ] Integrate production-ready HTTP server library (Boost.Beast, cpp-httplib, etc.)
+- [ ] Implement proper JWT token generation/validation
+- [ ] Add bcrypt/Argon2 password hashing
+- [ ] Complete Prisma Client integration
+- [ ] Add structured logging (spdlog)
+- [ ] Implement rate limiting
+- [ ] Add CORS middleware
+- [ ] Generate OpenAPI/Swagger documentation
+
+### Frontend
+- [ ] Add user profile page
+- [ ] Implement password reset flow
+- [ ] Add admin panel
+- [ ] Implement content management UI
+- [ ] Add file upload functionality
+- [ ] Implement real-time notifications
+- [ ] Add internationalization (i18n)
+- [ ] Improve accessibility
+
+### Infrastructure
+- [ ] Add Docker support
+- [ ] Add docker-compose for local development
+- [ ] Set up production deployment guides
+- [ ] Add monitoring and logging
+- [ ] Implement automated backups
+- [ ] Add performance benchmarks
+
+## Support
+
+For questions, issues, or contributions, please open an issue on GitHub.

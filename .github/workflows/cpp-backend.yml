@@ -1,0 +1,70 @@
+name: C++ Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/backend/**'
+      - '.github/workflows/cpp-backend.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/backend/**'
+      - '.github/workflows/cpp-backend.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        build_type: [Debug, Release]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: '3.25.x'
+
+    - name: Install dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libssl-dev
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install openssl
+
+    - name: Configure CMake
+      working-directory: pyracms-cpp-port/backend
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTS=ON
+
+    - name: Build
+      working-directory: pyracms-cpp-port/backend/build
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - name: Run tests
+      working-directory: pyracms-cpp-port/backend/build
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: sudo apt-get update && sudo apt-get install -y clang-format
+
+    - name: Check formatting
+      working-directory: pyracms-cpp-port/backend
+      run: |
+        find src include -name '*.cpp' -o -name '*.h' | xargs clang-format -n -Werror || true

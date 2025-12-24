@@ -1,0 +1,78 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: pyracms-cpp-port/frontend/package-lock.json
+
+    - name: Install dependencies
+      working-directory: pyracms-cpp-port/frontend
+      run: npm ci
+
+    - name: Run linter
+      working-directory: pyracms-cpp-port/frontend
+      run: npm run lint
+
+    - name: Run type checking
+      working-directory: pyracms-cpp-port/frontend
+      run: npm run type-check
+
+    - name: Run tests
+      working-directory: pyracms-cpp-port/frontend
+      run: npm test -- --ci --coverage
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: pyracms-cpp-port/frontend/coverage
+        flags: frontend
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: pyracms-cpp-port/frontend/package-lock.json
+
+    - name: Install dependencies
+      working-directory: pyracms-cpp-port/frontend
+      run: npm ci
+
+    - name: Build application
+      working-directory: pyracms-cpp-port/frontend
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: pyracms-cpp-port/frontend/.next

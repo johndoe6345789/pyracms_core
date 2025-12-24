@@ -1,0 +1,17 @@
+{
+  "name": "pyracms-cpp-backend",
+  "version": "0.1.0",
+  "description": "PyraCMS C++ Backend with Prisma",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0"
+  }
+}
