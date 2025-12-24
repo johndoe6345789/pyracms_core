@@ -250,6 +250,72 @@ The project includes GitHub Actions workflows for:
    - Automated testing across architectures
    - Docker layer caching for faster builds
 
+## Plugin System
+
+PyraCMS features a powerful plugin architecture that allows addon packages to seamlessly integrate with the core:
+
+### Plugin Capabilities
+
+✅ **Custom Routes** - Define new pages and views
+✅ **Data Models** - Create database models with full CRUD support
+✅ **Navigation Integration** - Add menu items automatically
+✅ **API Extensions** - Extend the REST API with custom endpoints
+✅ **Lifecycle Hooks** - React to install, activate, deactivate events
+✅ **Settings Management** - Configurable plugin settings
+
+### Plugin Structure
+
+```typescript
+import { createPlugin } from '@/plugins/registry'
+
+export const myPlugin = createPlugin({
+  metadata: {
+    id: 'my-plugin',
+    name: 'My Plugin',
+    version: '1.0.0',
+    description: 'Plugin description',
+  },
+  routes: [...],        // Custom routes
+  navigation: [...],    // Menu items
+  dataModels: [...],    // Database models
+  apiExtensions: [...], // API endpoints
+})
+```
+
+### Example Plugins
+
+The repository includes examples for:
+- **Forum Module** - Discussion boards with topics and posts
+- **Article Module** - Blog/article publishing system
+- **Gallery Module** - Image gallery and media management
+- **Challenge Module** - Programming challenges and submissions
+
+### Documentation
+
+See [`frontend/src/plugins/README.md`](frontend/src/plugins/README.md) for:
+- Complete plugin API reference
+- Step-by-step guide to creating plugins
+- Best practices and patterns
+- Backend integration examples
+
+### Plugin Distribution
+
+Plugins can be distributed as npm packages:
+
+```bash
+bun add @pyracms/plugin-forum
+```
+
+Then registered in your application:
+
+```typescript
+import { pluginRegistry } from '@/plugins/registry'
+import { forumPlugin } from '@pyracms/plugin-forum'
+
+pluginRegistry.register(forumPlugin)
+await pluginRegistry.activate('forum')
+```
+
 ## Module System
 
 PyraCMS is designed as a modular CMS. This core repository provides:
@@ -257,6 +323,7 @@ PyraCMS is designed as a modular CMS. This core repository provides:
 - Basic CMS functionality
 - API infrastructure
 - Frontend framework
+- **Plugin system for extensibility**
 
 Additional modules (separate repositories):
 - Forum module
