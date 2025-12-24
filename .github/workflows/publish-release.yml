@@ -124,6 +124,8 @@ jobs:
 
   build-release-artifacts:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         arch: [x86_64, aarch64]
@@ -352,6 +354,8 @@ jobs:
   test-published-images:
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
     strategy:
       matrix:
         platform: [linux/amd64, linux/arm64]
