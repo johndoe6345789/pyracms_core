@@ -1,0 +1,61 @@
+name: Prisma CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/backend/prisma/**'
+      - '.github/workflows/prisma.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'pyracms-cpp-port/backend/prisma/**'
+      - '.github/workflows/prisma.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: pyracms_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      working-directory: pyracms-cpp-port/backend
+      run: bun install --frozen-lockfile
+
+    - name: Validate Prisma schema
+      working-directory: pyracms-cpp-port/backend
+      run: bunx prisma validate
+
+    - name: Check Prisma format
+      working-directory: pyracms-cpp-port/backend
+      run: bunx prisma format --check
+
+    - name: Run migrations
+      working-directory: pyracms-cpp-port/backend
+      env:
+        DATABASE_URL: postgresql://test:test@localhost:5432/pyracms_test
+      run: |
+        bunx prisma migrate deploy
+        bunx prisma generate

@@ -1,0 +1,60 @@
+version: '3.8'
+
+# NOTE: This docker-compose.yml is for DEVELOPMENT ONLY
+# For production:
+# - Use Docker secrets or external environment files for credentials
+# - Never commit production credentials to version control
+# - Use strong, randomly generated passwords
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: pyracms
+      POSTGRES_PASSWORD: pyracms
+      POSTGRES_DB: pyracms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pyracms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql://pyracms:pyracms@postgres:5432/pyracms?schema=public
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: /app/build/pyracms_server --host 0.0.0.0 --port 8080
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      API_URL: http://backend:8080
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: bun run dev
+
+volumes:
+  postgres_data:
