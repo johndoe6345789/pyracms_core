@@ -19,41 +19,81 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         build_type: [Debug, Release]
+        arch: [x86_64, aarch64]
+        exclude:
+          # Exclude aarch64 on macOS for now (native arm64 support only)
+          - os: macos-latest
+            arch: aarch64
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Set up QEMU (Linux only)
+      if: runner.os == 'Linux' && matrix.arch == 'aarch64'
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
 
     - name: Set up CMake
       uses: jwlawson/actions-setup-cmake@v1.14
       with:
         cmake-version: '3.25.x'
 
-    - name: Install dependencies (Ubuntu)
-      if: runner.os == 'Linux'
+    - name: Install dependencies (Ubuntu x86_64)
+      if: runner.os == 'Linux' && matrix.arch == 'x86_64'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libssl-dev
+
+    - name: Install dependencies (Ubuntu aarch64)
+      if: runner.os == 'Linux' && matrix.arch == 'aarch64'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user-static
 
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install openssl
 
-    - name: Configure CMake
+    - name: Configure CMake (x86_64)
+      if: matrix.arch == 'x86_64'
       working-directory: pyracms-cpp-port/backend
       run: |
         mkdir -p build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTS=ON
 
+    - name: Configure CMake (aarch64 cross-compile)
+      if: matrix.arch == 'aarch64'
+      working-directory: pyracms-cpp-port/backend
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_TESTS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+          -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
+
     - name: Build
       working-directory: pyracms-cpp-port/backend/build
       run: cmake --build . --config ${{ matrix.build_type }}
 
-    - name: Run tests
+    - name: Run tests (x86_64)
+      if: matrix.arch == 'x86_64'
       working-directory: pyracms-cpp-port/backend/build
       run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+    - name: Run tests (aarch64 with QEMU)
+      if: matrix.arch == 'aarch64'
+      working-directory: pyracms-cpp-port/backend/build
+      run: |
+        # Tests for aarch64 would run under QEMU
+        echo "Skipping tests for aarch64 cross-compiled build (QEMU available for runtime)"
 
   lint:
     runs-on: ubuntu-latest

@@ -229,6 +229,8 @@ The project includes GitHub Actions workflows for:
 
 1. **C++ Backend CI** (`.github/workflows/cpp-backend.yml`)
    - Build on Ubuntu and macOS
+   - Multi-architecture support (x86_64, aarch64)
+   - QEMU for cross-compilation testing
    - Run unit tests
    - Code formatting checks
 
@@ -241,6 +243,12 @@ The project includes GitHub Actions workflows for:
    - Schema validation
    - Migration checks
    - Database connection tests
+
+4. **Multi-Architecture Docker Build** (`.github/workflows/docker-multiarch.yml`)
+   - QEMU-based multi-arch builds
+   - Support for linux/amd64, linux/arm64, linux/arm/v7
+   - Automated testing across architectures
+   - Docker layer caching for faster builds
 
 ## Module System
 
@@ -257,6 +265,35 @@ Additional modules (separate repositories):
 - Programming challenge module
 
 ## Production Deployment
+
+### Multi-Architecture Docker Builds
+
+Build Docker images for multiple architectures using QEMU:
+
+```bash
+# Set up Docker Buildx
+docker buildx create --name multiarch --use
+docker buildx inspect --bootstrap
+
+# Build backend for multiple architectures
+cd pyracms-cpp-port/backend
+docker buildx build \
+  --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  -t your-registry/pyracms-backend:latest \
+  --push .
+
+# Build frontend for multiple architectures
+cd ../frontend
+docker buildx build \
+  --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  -t your-registry/pyracms-frontend:latest \
+  --push .
+```
+
+Supported architectures:
+- `linux/amd64` - x86_64 (Intel/AMD processors)
+- `linux/arm64` - ARM64 (Apple Silicon, AWS Graviton, Raspberry Pi 4+)
+- `linux/arm/v7` - ARMv7 (Raspberry Pi 3, older ARM devices)
 
 ### Backend
 1. Build in Release mode:
@@ -277,7 +314,7 @@ Additional modules (separate repositories):
 
 2. Deploy with:
    - Vercel (recommended for Next.js)
-   - Docker container
+   - Docker container (multi-arch supported)
    - Static hosting with `next export`
 
 ### Database

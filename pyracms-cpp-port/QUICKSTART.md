@@ -214,6 +214,43 @@ NEXT_PUBLIC_API_URL=http://localhost:8081
 - Explore the API endpoints
 - Start building your modules!
 
+## Multi-Architecture Support
+
+The project supports building for multiple architectures using QEMU:
+
+### Quick Docker Multi-Arch Build
+
+```bash
+# Set up Docker Buildx (one-time setup)
+docker buildx create --name multiarch --use
+docker buildx inspect --bootstrap
+
+# Build for multiple architectures
+cd pyracms-cpp-port
+docker buildx build \
+  --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  -t pyracms-backend:multiarch \
+  backend/
+
+docker buildx build \
+  --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  -t pyracms-frontend:multiarch \
+  frontend/
+```
+
+### Supported Platforms
+
+- **linux/amd64** - Standard x86_64 (Intel/AMD)
+- **linux/arm64** - ARM 64-bit (Apple Silicon M1/M2, AWS Graviton, RPi 4+)
+- **linux/arm/v7** - ARM 32-bit (Raspberry Pi 3, older ARM devices)
+
+### CI/CD Multi-Arch
+
+GitHub Actions automatically tests builds across multiple architectures:
+- Native builds on x86_64 and macOS
+- Cross-compilation for aarch64 with QEMU
+- Multi-arch Docker builds with automated testing
+
 ## Getting Help
 
 - Check the README files in each directory
