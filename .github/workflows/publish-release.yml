@@ -211,7 +211,7 @@ jobs:
       - name: Build frontend
         working-directory: pyracms-cpp-port/frontend
         run: |
-          # Install dependencies with bunx
+          # Install dependencies
           bun install --frozen-lockfile
 
           # Build the frontend using bunx
