@@ -6,7 +6,7 @@ This guide will help you get the PyraCMS C++ port running quickly.
 
 - **C++ Compiler**: GCC 9+ or Clang 10+
 - **CMake**: 3.15+
-- **Node.js**: 18+
+- **Bun**: Latest
 - **PostgreSQL**: 13+
 - **Docker** (optional, for containerized setup)
 
@@ -73,11 +73,11 @@ cp .env.example .env.local
 cd pyracms-cpp-port/backend
 
 # Install Prisma dependencies
-npm install
+bun install
 
 # Run database migrations
-npx prisma migrate dev
-npx prisma generate
+bunx prisma migrate dev
+bunx prisma generate
 
 # Build the C++ backend
 mkdir build && cd build
@@ -94,10 +94,10 @@ ctest --output-on-failure
 cd pyracms-cpp-port/frontend
 
 # Install dependencies
-npm install
+bun install
 
 # Optional: Run tests
-npm test
+bun test
 ```
 
 ### Step 5: Start the Servers
@@ -111,7 +111,7 @@ cd pyracms-cpp-port/backend/build
 Terminal 2 - Frontend:
 ```bash
 cd pyracms-cpp-port/frontend
-npm run dev
+bun run dev
 ```
 
 ### Step 6: Access the Application
@@ -142,7 +142,7 @@ The Next.js development server supports hot reload, so changes are reflected aut
 To run tests:
 ```bash
 cd frontend
-npm test
+bun test
 ```
 
 ### Database Changes
@@ -151,7 +151,7 @@ npm test
 2. Create migration:
    ```bash
    cd backend
-   npx prisma migrate dev --name your_migration_name
+   bunx prisma migrate dev --name your_migration_name
    ```
 3. The migration will be applied automatically
 
@@ -170,10 +170,10 @@ npm test
 
 - Delete `node_modules` and reinstall:
   ```bash
-  rm -rf node_modules package-lock.json
-  npm install
+  rm -rf node_modules bun.lockb
+  bun install
   ```
-- Check Node.js version: `node --version` (should be 18+)
+- Check Bun version: `bun --version`
 
 ### Database Connection Errors
 
@@ -198,7 +198,7 @@ Backend:
 
 Frontend:
 ```bash
-PORT=3001 npm run dev
+PORT=3001 bun run dev
 ```
 
 Don't forget to update the API URL in frontend `.env.local`:

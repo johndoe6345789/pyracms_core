@@ -16,19 +16,19 @@ A modern Next.js frontend for PyraCMS with React, TypeScript, and Material UI.
 
 ### Prerequisites
 
-- Node.js 18 or higher
-- npm or yarn
+- Bun (latest version)
+- bun
 
 ### Installation
 
 ```bash
-npm install
+bun install
 ```
 
 ### Development
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -36,33 +36,33 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Building
 
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-npm test
+bun test
 
 # Watch mode
-npm run test:watch
+bun run test:watch
 
 # With coverage
-npm test -- --coverage
+bun test -- --coverage
 ```
 
 ### Linting
 
 ```bash
-npm run lint
+bun run lint
 ```
 
 ### Type Checking
 
 ```bash
-npm run type-check
+bun run type-check
 ```
 
 ## Project Structure
@@ -193,7 +193,7 @@ For static hosting:
 output: 'export'
 
 # Build
-npm run build
+bun run build
 ```
 
 ## Contributing

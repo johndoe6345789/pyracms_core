@@ -9,9 +9,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js for Prisma
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+# Install Bun for Prisma
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
 
 WORKDIR /app
 
@@ -20,11 +20,11 @@ COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
-COPY package*.json ./
+COPY package.json bun.lockb ./
 COPY prisma/ ./prisma/
 
 # Install Prisma
-RUN npm install
+RUN bun install --frozen-lockfile
 
 # Build the application
 RUN mkdir build && cd build \

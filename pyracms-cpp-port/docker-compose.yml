@@ -54,7 +54,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: npm run dev
+    command: bun run dev
 
 volumes:
   postgres_data:

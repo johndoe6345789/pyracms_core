@@ -66,8 +66,7 @@ pyracms-cpp-port/
 - PostgreSQL 13+
 
 ### Frontend
-- Node.js 18+
-- npm or yarn
+- Bun (latest version)
 
 ## Quick Start
 
@@ -92,11 +91,11 @@ API_URL="http://localhost:8080"
 cd backend
 
 # Install Prisma dependencies
-npm install
+bun install
 
 # Run database migrations
-npm run prisma:migrate
-npm run prisma:generate
+bun run prisma:migrate
+bun run prisma:generate
 
 # Build the C++ backend
 mkdir build && cd build
@@ -113,10 +112,10 @@ ctest --output-on-failure
 cd frontend
 
 # Install dependencies
-npm install
+bun install
 
 # Run development server
-npm run dev
+bun run dev
 ```
 
 The frontend will be available at http://localhost:3000
@@ -154,19 +153,19 @@ Key commands:
 cd frontend
 
 # Development server
-npm run dev
+bun run dev
 
 # Build for production
-npm run build
+bun run build
 
 # Run tests
-npm test
+bun test
 
 # Lint code
-npm run lint
+bun run lint
 
 # Type checking
-npm run type-check
+bun run type-check
 ```
 
 ### Database Development
@@ -176,16 +175,16 @@ Prisma commands:
 cd backend
 
 # Create a new migration
-npm run prisma:migrate
+bun run prisma:migrate
 
 # View database in Prisma Studio
-npm run prisma:studio
+bun run prisma:studio
 
 # Generate Prisma Client
-npm run prisma:generate
+bun run prisma:generate
 
 # Deploy migrations to production
-npm run prisma:deploy
+bun run prisma:deploy
 ```
 
 ## API Endpoints
@@ -215,13 +214,13 @@ ctest --verbose
 ### Frontend Tests
 ```bash
 cd frontend
-npm test
+bun test
 
 # Watch mode
-npm run test:watch
+bun run test:watch
 
 # Coverage
-npm test -- --coverage
+bun test -- --coverage
 ```
 
 ## CI/CD
@@ -273,7 +272,7 @@ Additional modules (separate repositories):
 ### Frontend
 1. Build the production bundle:
    ```bash
-   npm run build
+   bun run build
    ```
 
 2. Deploy with:
@@ -285,7 +284,7 @@ Additional modules (separate repositories):
 1. Set up production PostgreSQL instance
 2. Run migrations:
    ```bash
-   npm run prisma:deploy
+   bun run prisma:deploy
    ```
 
 ## Security Considerations

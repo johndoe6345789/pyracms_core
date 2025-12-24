@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "PyraCMS C++ Backend with Prisma",
   "scripts": {
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:generate": "bunx prisma generate",
+    "prisma:migrate": "bunx prisma migrate dev",
+    "prisma:studio": "bunx prisma studio",
+    "prisma:deploy": "bunx prisma migrate deploy"
   },
   "devDependencies": {
     "prisma": "^5.7.0"

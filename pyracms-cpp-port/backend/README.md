@@ -69,7 +69,7 @@ The project requires the following libraries:
 
 ```bash
 cd backend
-npm install
+bun install
 ```
 
 ### 2. Configure Database
@@ -83,8 +83,8 @@ DATABASE_URL="postgresql://user:password@localhost:5432/pyracms?schema=public"
 ### 3. Run Database Migrations
 
 ```bash
-npm run prisma:migrate
-npm run prisma:generate
+bun run prisma:migrate
+bun run prisma:generate
 ```
 
 ### 4. Build the Backend
@@ -149,13 +149,13 @@ Options:
 To create a new migration:
 
 ```bash
-npm run prisma:migrate
+bun run prisma:migrate
 ```
 
 To view the database in Prisma Studio:
 
 ```bash
-npm run prisma:studio
+bun run prisma:studio
 ```
 
 ## Production Deployment
@@ -170,7 +170,7 @@ make
 ### Deploy Migrations
 
 ```bash
-npm run prisma:deploy
+bun run prisma:deploy
 ```
 
 ## TODO

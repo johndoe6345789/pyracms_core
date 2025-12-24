@@ -35,29 +35,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: pyracms-cpp-port/backend/package-lock.json
+        bun-version: latest
 
     - name: Install dependencies
       working-directory: pyracms-cpp-port/backend
-      run: npm ci
+      run: bun install --frozen-lockfile
 
     - name: Validate Prisma schema
       working-directory: pyracms-cpp-port/backend
-      run: npx prisma validate
+      run: bunx prisma validate
 
     - name: Check Prisma format
       working-directory: pyracms-cpp-port/backend
-      run: npx prisma format --check
+      run: bunx prisma format --check
 
     - name: Run migrations
       working-directory: pyracms-cpp-port/backend
       env:
         DATABASE_URL: postgresql://test:test@localhost:5432/pyracms_test
       run: |
-        npx prisma migrate deploy
-        npx prisma generate
+        bunx prisma migrate deploy
+        bunx prisma generate
