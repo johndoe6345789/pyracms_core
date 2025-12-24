@@ -1,0 +1,388 @@
+name: Publish CPP Port to GHCR and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'cpp-port-v*.*.*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: true
+        default: 'v0.1.0'
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE_NAME: ${{ github.repository }}/pyracms-cpp-backend
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}/pyracms-cpp-frontend
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pyracms-cpp-port/backend
+          file: ./pyracms-cpp-port/backend/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pyracms-cpp-port/frontend
+          file: ./pyracms-cpp-port/frontend/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-release-artifacts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            python3 \
+            python3-pip \
+            libssl-dev
+
+      - name: Install Conan
+        run: |
+          pip3 install conan
+          conan --version
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install cross-compilation tools (aarch64)
+        if: matrix.arch == 'aarch64'
+        run: |
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            qemu-user-static
+
+      - name: Build backend (x86_64)
+        if: matrix.arch == 'x86_64'
+        working-directory: pyracms-cpp-port/backend
+        run: |
+          # Install Prisma dependencies
+          bun install --frozen-lockfile
+          bunx prisma generate
+
+          # Configure with CMake and Ninja
+          mkdir -p build
+          cd build
+          cmake -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            ..
+
+          # Build
+          ninja
+
+      - name: Build backend (aarch64)
+        if: matrix.arch == 'aarch64'
+        working-directory: pyracms-cpp-port/backend
+        run: |
+          # Install Prisma dependencies
+          bun install --frozen-lockfile
+          bunx prisma generate
+
+          # Configure with CMake and Ninja for cross-compilation
+          mkdir -p build
+          cd build
+          cmake -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DCMAKE_SYSTEM_NAME=Linux \
+            -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+            -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+            -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+            ..
+
+          # Build
+          ninja
+
+      - name: Build frontend
+        working-directory: pyracms-cpp-port/frontend
+        run: |
+          # Install dependencies with bunx
+          bun install --frozen-lockfile
+
+          # Build the frontend
+          bun run build
+
+      - name: Create release package
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+
+          PACKAGE_NAME="pyracms-cpp-port-${VERSION}-${{ matrix.arch }}"
+          mkdir -p "${PACKAGE_NAME}"
+
+          # Copy backend binary
+          cp pyracms-cpp-port/backend/build/pyracms_server "${PACKAGE_NAME}/"
+
+          # Copy frontend build
+          mkdir -p "${PACKAGE_NAME}/frontend"
+          cp -r pyracms-cpp-port/frontend/.next "${PACKAGE_NAME}/frontend/"
+          cp -r pyracms-cpp-port/frontend/public "${PACKAGE_NAME}/frontend/"
+          cp pyracms-cpp-port/frontend/package.json "${PACKAGE_NAME}/frontend/"
+
+          # Copy configuration files
+          cp pyracms-cpp-port/backend/prisma "${PACKAGE_NAME}/" -r || true
+          cp pyracms-cpp-port/docker-compose.yml "${PACKAGE_NAME}/" || true
+
+          # Create README for the release
+          cat > "${PACKAGE_NAME}/README.md" << EOF
+          # PyraCMS C++ Port - ${VERSION}
+
+          Architecture: ${{ matrix.arch }}
+
+          ## Contents
+          - pyracms_server: Backend C++ server executable
+          - frontend/: Built Next.js frontend application
+          - prisma/: Database schema and migrations
+
+          ## Running
+
+          ### Backend
+          \`\`\`bash
+          ./pyracms_server --host 0.0.0.0 --port 8080
+          \`\`\`
+
+          ### Frontend
+          \`\`\`bash
+          cd frontend
+          bun start
+          \`\`\`
+
+          ## Docker Images
+
+          Pull the Docker images from GitHub Container Registry:
+
+          \`\`\`bash
+          docker pull ghcr.io/${{ github.repository }}/pyracms-cpp-backend:${VERSION}
+          docker pull ghcr.io/${{ github.repository }}/pyracms-cpp-frontend:${VERSION}
+          \`\`\`
+
+          EOF
+
+          # Create zip archive
+          zip -r "${PACKAGE_NAME}.zip" "${PACKAGE_NAME}"
+
+          # Create checksums
+          sha256sum "${PACKAGE_NAME}.zip" > "${PACKAGE_NAME}.zip.sha256"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyracms-cpp-port-${{ matrix.arch }}
+          path: |
+            pyracms-cpp-port-*.zip
+            pyracms-cpp-port-*.zip.sha256
+
+  create-release:
+    needs: [build-backend, build-frontend, build-release-artifacts]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.sha256
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## PyraCMS C++ Port Release
+
+            This release includes:
+            - Multi-architecture Docker images published to GHCR
+            - Pre-built binaries for x86_64 and aarch64
+            - Frontend build artifacts
+
+            ### Docker Images
+
+            Pull the images:
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}/pyracms-cpp-backend:${{ github.ref_name }}
+            docker pull ghcr.io/${{ github.repository }}/pyracms-cpp-frontend:${{ github.ref_name }}
+            ```
+
+            ### Build Tools Used
+            - **C++ Backend**: CMake, Ninja, Conan
+            - **TypeScript Frontend**: Bun (bunx)
+            - **Multi-arch**: QEMU for ARM builds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-published-images:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test backend image on ${{ matrix.platform }}
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="latest"
+          fi
+
+          docker pull --platform ${{ matrix.platform }} \
+            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${VERSION}
+
+          echo "✓ Backend image pulled successfully for ${{ matrix.platform }}"
+
+      - name: Test frontend image on ${{ matrix.platform }}
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="latest"
+          fi
+
+          docker pull --platform ${{ matrix.platform }} \
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${VERSION}
+
+          echo "✓ Frontend image pulled successfully for ${{ matrix.platform }}"
