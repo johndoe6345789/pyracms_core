@@ -1,15 +1,21 @@
 FROM ubuntu:22.04 AS builder
 
-# Install build dependencies
+# Install build dependencies including Ninja and Conan
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
+    ninja-build \
     git \
     libssl-dev \
     curl \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Bun for Prisma
+# Install Conan package manager
+RUN pip3 install conan && conan --version
+
+# Install Bun for Prisma and TypeScript tooling
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:$PATH"
 
@@ -20,16 +26,18 @@ COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
-COPY package.json bun.lockb ./
+# Copy package.json and optionally bun.lockb if it exists
+COPY package.json bun.lockb* ./
 COPY prisma/ ./prisma/
 
-# Install Prisma
+# Install Prisma using bunx
 RUN bun install --frozen-lockfile
+RUN bunx prisma generate
 
-# Build the application
+# Build the application with Ninja
 RUN mkdir build && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF .. \
-    && make
+    && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF .. \
+    && ninja
 
 # Production stage
 FROM ubuntu:22.04

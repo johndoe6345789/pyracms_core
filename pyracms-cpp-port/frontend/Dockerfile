@@ -3,16 +3,17 @@ FROM oven/bun:1-alpine AS frontend-builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lockb ./
+# Pattern bun.lockb* copies the lockfile if it exists, or skips if not present
+COPY package.json bun.lockb* ./
 
-# Install dependencies
+# Install dependencies using bunx
 RUN bun install --frozen-lockfile
 
 # Copy source files
 COPY . .
 
-# Build the application
-RUN bun run build
+# Build the application using bunx
+RUN bunx next build
 
 # Production stage
 FROM oven/bun:1-alpine AS runner
