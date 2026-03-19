@@ -2,6 +2,7 @@
 drogon/1.9.8
 jwt-cpp/0.7.0
 libcurl/[>=8.0 <9]
+libpq/[>=15.0 <17]
 
 [generators]
 CMakeDeps
@@ -10,3 +11,4 @@ CMakeToolchain
 [options]
 drogon/*:with_postgresql=True
 drogon/*:with_orm=True
+drogon/*:with_boost=True
