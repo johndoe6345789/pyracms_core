@@ -1,6 +1,7 @@
 [requires]
 drogon/1.9.8
 jwt-cpp/0.7.0
+libcurl/8.7.1
 
 [generators]
 CMakeDeps

@@ -55,5 +55,15 @@ services:
     depends_on:
       - backend
 
+# To build code snippet runners:
+# docker build -t pyracms-runner-python docker/python/
+# docker build -t pyracms-runner-node docker/node/
+# docker build -t pyracms-runner-cpp docker/cpp/
+# docker build -t pyracms-runner-rust docker/rust/
+# docker build -t pyracms-runner-go docker/go/
+# docker build -t pyracms-runner-java docker/java/
+# docker build -t pyracms-runner-ruby docker/ruby/
+# Or use: python cli.py build --docker
+
 volumes:
   postgres_data:

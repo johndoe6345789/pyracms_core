@@ -14,7 +14,7 @@ if(NOT GTest_FOUND)
     FetchContent_MakeAvailable(googletest)
 endif()
 
-# Auto-generated test sources — run `python generate_cmake.py` to update
+# Auto-generated test sources â€” run `python generate_cmake.py` to update
 set(TEST_SOURCES
 
     test_auth_service.cpp

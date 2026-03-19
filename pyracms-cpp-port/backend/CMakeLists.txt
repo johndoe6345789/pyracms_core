@@ -16,17 +16,20 @@ option(BUILD_TESTS "Build tests" ON)
 # Find dependencies
 find_package(Drogon REQUIRED)
 find_package(jwt-cpp REQUIRED)
+find_package(CURL REQUIRED)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Backend library (shared between server and tests)
-# Auto-generated from source files — run `python generate_cmake.py` to update
+# Auto-generated from source files â€” run `python generate_cmake.py` to update
 set(LIB_SOURCES
 
     src/controllers/ArticleController.cpp
 
     src/controllers/AuthController.cpp
+
+    src/controllers/CommentController.cpp
 
     src/controllers/FileController.cpp
 
@@ -37,6 +40,8 @@ set(LIB_SOURCES
     src/controllers/GameDepController.cpp
 
     src/controllers/MenuController.cpp
+
+    src/controllers/NotificationController.cpp
 
     src/controllers/SettingsController.cpp
 
@@ -50,6 +55,10 @@ set(LIB_SOURCES
 
     src/services/AuthService.cpp
 
+    src/services/CommentService.cpp
+
+    src/services/EmailService.cpp
+
     src/services/FileService.cpp
 
     src/services/ForumService.cpp
@@ -59,6 +68,8 @@ set(LIB_SOURCES
     src/services/GameDepService.cpp
 
     src/services/MenuService.cpp
+
+    src/services/NotificationService.cpp
 
     src/services/SettingsService.cpp
 
@@ -73,6 +84,7 @@ target_link_libraries(pyracms_lib
     PUBLIC
     Drogon::Drogon
     jwt-cpp::jwt-cpp
+    CURL::libcurl
 )
 target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
