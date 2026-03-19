@@ -40,8 +40,12 @@ export default function AlbumViewPage() {
             A curated collection of photographs. {pictures.length} pictures in this album.
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<UploadOutlined />} size="large">
+        <Button variant="contained" startIcon={<UploadOutlined />} size="large"
+          component="label">
           Upload
+          <input type="file" hidden accept="image/*" multiple onChange={(e) => {
+            // TODO: wire to gallery upload API when picture upload endpoint accepts file
+          }} />
         </Button>
       </Box>
 

@@ -17,14 +17,16 @@ import type { Revision } from '@/hooks/useGameDepDetail'
 
 interface EditRevisionTableProps {
   revisions: Revision[]
+  onCreateRevision?: () => void
+  onDeleteRevision?: (version: string) => void
 }
 
-export default function EditRevisionTable({ revisions }: EditRevisionTableProps) {
+export default function EditRevisionTable({ revisions, onCreateRevision, onDeleteRevision }: EditRevisionTableProps) {
   return (
     <Paper variant="outlined" sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5">Revisions</Typography>
-        <Button variant="outlined" startIcon={<AddOutlined />} size="small">
+        <Button variant="outlined" startIcon={<AddOutlined />} size="small" onClick={onCreateRevision}>
           Create Revision
         </Button>
       </Box>
@@ -49,7 +51,7 @@ export default function EditRevisionTable({ revisions }: EditRevisionTableProps)
                   <Switch defaultChecked={rev.published} size="small" />
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton size="small" color="error">
+                  <IconButton size="small" color="error" onClick={() => onDeleteRevision?.(rev.version)}>
                     <DeleteOutlined fontSize="small" />
                   </IconButton>
                 </TableCell>

@@ -7,8 +7,9 @@ export default function SourceUpload() {
       <Typography variant="h5" gutterBottom>
         Upload Source
       </Typography>
-      <Button variant="outlined" startIcon={<UploadOutlined />}>
+      <Button variant="outlined" startIcon={<UploadOutlined />} component="label">
         Select Source Archive
+        <input type="file" hidden accept=".zip,.tar.gz,.tar.bz2,.7z" />
       </Button>
     </Paper>
   )

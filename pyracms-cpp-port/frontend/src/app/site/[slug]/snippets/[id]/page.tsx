@@ -112,7 +112,14 @@ export default function ViewSnippetPage() {
 
       <Paper variant="outlined" sx={{ p: 2, borderColor: 'divider' }}>
         <TextField fullWidth multiline minRows={2} maxRows={6} placeholder="Write a comment..." value={commentText} onChange={(e) => setCommentText(e.target.value)} sx={{ mb: 1 }} />
-        <Button variant="contained" size="small" endIcon={<SendOutlined />} disabled={!commentText}>Post Comment</Button>
+        <Button variant="contained" size="small" endIcon={<SendOutlined />} disabled={!commentText}
+          onClick={() => {
+            api.post(`/api/comments`, { contentType: 'snippet', contentId: Number(snippetId), content: commentText })
+              .then(() => setCommentText(''))
+              .catch(() => {})
+          }}>
+          Post Comment
+        </Button>
       </Paper>
     </Container>
   )

@@ -45,8 +45,9 @@ export default function BinaryUpload({
             <MenuItem value="arm64">arm64</MenuItem>
           </Select>
         </FormControl>
-        <Button variant="outlined" startIcon={<UploadOutlined />}>
+        <Button variant="outlined" startIcon={<UploadOutlined />} component="label">
           Select Binary
+          <input type="file" hidden />
         </Button>
       </Box>
     </Paper>
