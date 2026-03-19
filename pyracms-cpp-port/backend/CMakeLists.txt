@@ -25,11 +25,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Auto-generated from source files — run `python generate_cmake.py` to update
 set(LIB_SOURCES
 
+    src/controllers/AnalyticsController.cpp
+
     src/controllers/ArticleController.cpp
 
     src/controllers/AuthController.cpp
 
+    src/controllers/CodeSnippetController.cpp
+
     src/controllers/CommentController.cpp
+
+    src/controllers/DocsController.cpp
 
     src/controllers/FileController.cpp
 
@@ -43,19 +49,41 @@ set(LIB_SOURCES
 
     src/controllers/NotificationController.cpp
 
+    src/controllers/SearchController.cpp
+
+    src/controllers/SeoController.cpp
+
     src/controllers/SettingsController.cpp
+
+    src/controllers/SocialController.cpp
 
     src/controllers/TenantController.cpp
 
     src/controllers/UserController.cpp
 
+    src/controllers/WebSocketCollabController.cpp
+
+    src/controllers/WebSocketNotificationController.cpp
+
+    src/controllers/WebhookController.cpp
+
     src/filters/JwtAuthFilter.cpp
+
+    src/services/AnalyticsService.cpp
 
     src/services/ArticleService.cpp
 
     src/services/AuthService.cpp
 
+    src/services/CacheService.cpp
+
+    src/services/CodeSnippetService.cpp
+
     src/services/CommentService.cpp
+
+    src/services/DockerExecutionService.cpp
+
+    src/services/ElasticsearchService.cpp
 
     src/services/EmailService.cpp
 
@@ -71,11 +99,21 @@ set(LIB_SOURCES
 
     src/services/NotificationService.cpp
 
+    src/services/OAuthService.cpp
+
+    src/services/SearchService.cpp
+
+    src/services/SeoService.cpp
+
     src/services/SettingsService.cpp
+
+    src/services/SocialService.cpp
 
     src/services/TenantService.cpp
 
     src/services/UserService.cpp
+
+    src/services/WebhookService.cpp
 
 )
 
