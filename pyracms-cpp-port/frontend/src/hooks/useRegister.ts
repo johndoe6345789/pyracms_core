@@ -36,7 +36,7 @@ export function useRegister() {
       if (token) {
         localStorage.setItem('token', token)
         dispatch(setCredentials({ user, token }))
-        router.push('/dashboard')
+        router.push('/admin')
       } else {
         setError(response.data.error || 'Registration failed')
       }
