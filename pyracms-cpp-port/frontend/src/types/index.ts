@@ -31,3 +31,31 @@ export interface AuthResponse {
   user?: User
   error?: string
 }
+
+export interface Tenant {
+  id: number
+  name: string
+  slug: string
+  domain?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTenantRequest {
+  name: string
+  slug: string
+  domain?: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}
+
+export interface FlashMessage {
+  id: string
+  message: string
+  severity: 'success' | 'error' | 'warning' | 'info'
+  timestamp: number
+}

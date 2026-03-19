@@ -4,6 +4,11 @@ backend/node_modules/
 backend/.env
 backend/auth_uuid.txt
 backend/sess_uuid.txt
+backend/CMakeUserPresets.json
+backend/cmake_config.json
+
+# Conan
+CMakeUserPresets.json
 
 # Frontend
 frontend/node_modules/
@@ -32,3 +37,6 @@ yarn-error.log*
 # Testing
 coverage/
 *.coveragerc
+
+# TypeScript
+*.tsbuildinfo

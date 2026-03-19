@@ -1,75 +1,55 @@
-#include "server.h"
-#include "database.h"
-#include "auth_handler.h"
-#include "user_handler.h"
+#include <drogon/drogon.h>
 #include <iostream>
-#include <memory>
 
-int main(int argc, char* argv[]) {
-    std::cout << "PyraCMS C++ Server Starting..." << std::endl;
+int main() {
+    // Load config from json file if it exists, otherwise use defaults
+    auto &app = drogon::app();
 
-    // Configuration
-    std::string host = "0.0.0.0";
-    int port = 8080;
-    std::string db_connection = "postgresql://localhost:5432/pyracms";
+    // Server config
+    const char *host = std::getenv("SERVER_HOST");
+    const char *port_str = std::getenv("SERVER_PORT");
 
-    // Parse command line arguments
-    for (int i = 1; i < argc; i++) {
-        std::string arg = argv[i];
-        if (arg == "--host" && i + 1 < argc) {
-            host = argv[++i];
-        } else if (arg == "--port" && i + 1 < argc) {
-            port = std::stoi(argv[++i]);
-        } else if (arg == "--db" && i + 1 < argc) {
-            db_connection = argv[++i];
-        }
-    }
+    app.setLogLevel(trantor::Logger::kInfo);
+    app.addListener(host ? host : "0.0.0.0",
+                    port_str ? std::stoi(port_str) : 8080);
+    app.setThreadNum(std::thread::hardware_concurrency());
 
-    try {
-        // Initialize components
-        auto db = std::make_shared<pyracms::Database>(db_connection);
-        auto auth = std::make_shared<pyracms::AuthHandler>();
-        auto user_handler = std::make_shared<pyracms::UserHandler>(db, auth);
+    // Enable CORS for frontend
+    app.registerPostHandlingAdvice(
+        [](const drogon::HttpRequestPtr &req,
+           const drogon::HttpResponsePtr &resp) {
+            resp->addHeader("Access-Control-Allow-Origin", "*");
+            resp->addHeader("Access-Control-Allow-Methods",
+                            "GET, POST, PUT, DELETE, OPTIONS");
+            resp->addHeader("Access-Control-Allow-Headers",
+                            "Content-Type, Authorization");
+        });
 
-        // Connect to database
-        if (!db->connect()) {
-            std::cerr << "Failed to connect to database" << std::endl;
-            return 1;
-        }
-        std::cout << "Database connected successfully" << std::endl;
+    // PostgreSQL database client
+    const char *db_host = std::getenv("DB_HOST");
+    const char *db_port_s = std::getenv("DB_PORT");
+    const char *db_name = std::getenv("DB_NAME");
+    const char *db_user = std::getenv("DB_USER");
+    const char *db_pass = std::getenv("DB_PASSWORD");
 
-        // Run migrations
-        if (!db->migrate()) {
-            std::cerr << "Failed to run database migrations" << std::endl;
-            return 1;
-        }
+    drogon::app().createDbClient(
+        "postgresql",                           // dbType
+        db_host ? db_host : "127.0.0.1",        // host
+        db_port_s ? std::stoi(db_port_s) : 5432,// port
+        db_name ? db_name : "pyracms",          // databaseName
+        db_user ? db_user : "pyracms",          // userName
+        db_pass ? db_pass : "pyracms",          // password
+        1,                                      // connectionNum
+        "",                                     // filename
+        "default",                              // name
+        false,                                  // isFast
+        "utf8"                                  // characterSet
+    );
 
-        // Create and configure server
-        pyracms::Server server(host, port);
+    std::cout << "PyraCMS Server starting on "
+              << (host ? host : "0.0.0.0") << ":"
+              << (port_str ? port_str : "8080") << std::endl;
 
-        // Register routes
-        server.addRoute("POST", "/api/auth/login", 
-            [user_handler](const std::string& body) {
-                return user_handler->handleLogin(body);
-            });
-        
-        server.addRoute("POST", "/api/auth/logout",
-            [user_handler](const std::string& body) {
-                return user_handler->handleLogout(body);
-            });
-        
-        server.addRoute("POST", "/api/auth/register",
-            [user_handler](const std::string& body) {
-                return user_handler->handleRegister(body);
-            });
-
-        std::cout << "Server starting on " << host << ":" << port << std::endl;
-        server.start();
-
-    } catch (const std::exception& e) {
-        std::cerr << "Fatal error: " << e.what() << std::endl;
-        return 1;
-    }
-
+    app.run();
     return 0;
 }
