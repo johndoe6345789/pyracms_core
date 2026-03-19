@@ -16,7 +16,14 @@ option(BUILD_TESTS "Build tests" ON)
 # Find dependencies
 find_package(Drogon REQUIRED)
 find_package(jwt-cpp REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(CURL REQUIRED)
+
+# Bridge: Conan exports jsoncpp_lib (lowercase) but Homebrew Drogon's
+# DrogonTargets.cmake references Jsoncpp_lib (capital J). Create an alias.
+if(TARGET jsoncpp_lib AND NOT TARGET Jsoncpp_lib)
+    add_library(Jsoncpp_lib ALIAS jsoncpp_lib)
+endif()
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -122,6 +129,7 @@ target_link_libraries(pyracms_lib
     PUBLIC
     Drogon::Drogon
     jwt-cpp::jwt-cpp
+    nlohmann_json::nlohmann_json
     CURL::libcurl
 )
 target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

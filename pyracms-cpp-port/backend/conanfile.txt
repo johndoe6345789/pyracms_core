@@ -1,6 +1,7 @@
 [requires]
 drogon/1.9.8
 jwt-cpp/0.7.0
+nlohmann_json/[>=3.11]
 libcurl/[>=8.0 <9]
 libpq/[>=15.0 <17]
 
