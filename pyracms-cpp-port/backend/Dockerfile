@@ -52,9 +52,14 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy binary and migrations
+# Copy binary, migrations, and openapi spec
 COPY --from=builder /app/build/pyracms_server /app/
 COPY --from=builder /app/sql/ /app/sql/
+COPY openapi.yaml /app/
+
+# Copy Conan shared libraries needed at runtime
+COPY --from=builder /root/.conan2/p/*/p/lib/*.so* /usr/local/lib/
+RUN ldconfig
 
 # Init script to run migrations then start server
 COPY docker-entrypoint.sh /app/
