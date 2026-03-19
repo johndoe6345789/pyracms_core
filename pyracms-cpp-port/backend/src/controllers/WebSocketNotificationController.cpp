@@ -25,8 +25,7 @@ int WebSocketNotificationController::authenticateFromToken(const std::string &to
             .with_issuer("pyracms");
         verifier.verify(decoded);
 
-        auto userIdClaim = decoded.get_payload_claim("userId");
-        return userIdClaim.as_int();
+        return std::stoi(decoded.get_subject());
     } catch (const std::exception &) {
         return -1;
     }

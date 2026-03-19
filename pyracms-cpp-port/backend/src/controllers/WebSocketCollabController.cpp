@@ -21,7 +21,7 @@ int WebSocketCollabController::authenticateFromToken(const std::string &token) {
             .with_issuer("pyracms");
         verifier.verify(decoded);
 
-        return decoded.get_payload_claim("userId").as_int();
+        return std::stoi(decoded.get_subject());
     } catch (const std::exception &) {
         return -1;
     }
