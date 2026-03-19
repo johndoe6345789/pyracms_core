@@ -14,6 +14,11 @@ import {
   FolderOutlined, BackupOutlined, AdminPanelSettingsOutlined,
   BarChartOutlined, PaletteOutlined, CodeOutlined,
 } from '@mui/icons-material'
+import NotificationBell from '@/components/common/NotificationBell'
+import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
+import ThemeToggle from '@/components/common/ThemeToggle'
+import LanguageSelect from '@/components/common/LanguageSelect'
+import UserBubble from '@/components/common/UserBubble'
 
 const DRAWER_WIDTH = 260
 
@@ -96,12 +101,21 @@ export default function TenantAdminLayout({ children }: { children: React.ReactN
             <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, flexGrow: 1 }}>
               {slug} Admin
             </Typography>
-            <Button component={Link} href={`/site/${slug}`} startIcon={<ArrowBackOutlined />} sx={{ color: 'text.secondary' }}>
-              Site
-            </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}>
+              <LanguageSelect />
+              <ThemeToggle />
+              <NotificationBell />
+              <UserBubble />
+              <Button component={Link} href={`/site/${slug}`} startIcon={<ArrowBackOutlined />} sx={{ color: 'text.secondary', ml: 1 }}>
+                Site
+              </Button>
+            </Box>
           </Toolbar>
         </AppBar>
-        <Box sx={{ p: { xs: 2, md: 4 }, flexGrow: 1 }}>{children}</Box>
+        <Box sx={{ p: { xs: 2, md: 4 }, flexGrow: 1 }}>
+          <TenantBreadcrumbs />
+          {children}
+        </Box>
       </Box>
     </Box>
   )
