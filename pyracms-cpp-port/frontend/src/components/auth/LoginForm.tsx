@@ -1,65 +1,25 @@
 'use client'
 
-import {
-  TextField, Button, Typography, Box, Alert,
-} from '@mui/material'
-import { LoginOutlined } from '@mui/icons-material'
+import { TextField, Button, Typography, Box } from '@mui/material'
 import Link from 'next/link'
 import PasswordField from './PasswordField'
+import LoginHeader from './LoginHeader'
 import { useLogin } from '@/hooks/useLogin'
 
-export default function LoginForm() {
+interface Props {
+  /** Where to redirect after successful login. Defaults to '/'. */
+  redirectTo?: string
+}
+
+/** Login form with username/password fields and post-login redirect. */
+export default function LoginForm({ redirectTo }: Props) {
   const {
     formData, updateField, error, loading, handleSubmit,
-  } = useLogin()
+  } = useLogin(redirectTo)
 
   return (
     <>
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <LoginOutlined
-          sx={{
-            fontSize: 48,
-            color: 'primary.main',
-            mb: 2,
-          }}
-        />
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{ fontWeight: 700 }}
-        >
-          Welcome Back
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
-          Sign in to continue to PyraCMS
-        </Typography>
-      </Box>
-
-      {error && (
-        <Alert
-          severity="error"
-          role="alert"
-          data-testid="login-error"
-          aria-live="assertive"
-          sx={{ mb: 3, borderRadius: 2 }}
-        >
-          {error}
-        </Alert>
-      )}
-
-      <Alert
-        severity="info"
-        sx={{ mb: 3, borderRadius: 2 }}
-        data-testid="login-info"
-      >
-        Test credentials:{' '}
-        <strong>admin</strong> /{' '}
-        <strong>password123</strong>
-      </Alert>
+      <LoginHeader error={error} />
 
       <form
         onSubmit={handleSubmit}
@@ -99,21 +59,17 @@ export default function LoginForm() {
           disabled={loading}
           size="large"
           data-testid="login-submit"
-          aria-label={
-            loading ? 'Signing in' : 'Sign in'
-          }
+          aria-label={loading ? 'Signing in' : 'Sign in'}
           sx={{
             py: 1.5,
             mb: 2,
             background:
-              'linear-gradient('
-              + '135deg, #667eea 0%, '
-              + '#764ba2 100%)',
+              'linear-gradient(135deg, #667eea 0%,'
+              + ' #764ba2 100%)',
             '&:hover': {
               background:
-                'linear-gradient('
-                + '135deg, #5568d3 0%, '
-                + '#63408a 100%)',
+                'linear-gradient(135deg, #5568d3 0%,'
+                + ' #63408a 100%)',
             },
           }}
         >
@@ -122,10 +78,7 @@ export default function LoginForm() {
       </form>
 
       <Box sx={{ textAlign: 'center', mt: 3 }}>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
+        <Typography variant="body2" color="text.secondary">
           Don&apos;t have an account?{' '}
           <Link
             href="/auth/register"

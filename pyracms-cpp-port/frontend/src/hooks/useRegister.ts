@@ -7,7 +7,7 @@ import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
 import type { RegisterRequest } from '@/types'
 
-export function useRegister() {
+export function useRegister(redirectTo = '/') {
   const router = useRouter()
   const dispatch = useDispatch()
   const [formData, setFormData] = useState<RegisterRequest>({
@@ -36,7 +36,7 @@ export function useRegister() {
       if (token) {
         localStorage.setItem('token', token)
         dispatch(setCredentials({ user, token }))
-        router.push('/admin')
+        router.push(redirectTo)
       } else {
         setError(response.data.error || 'Registration failed')
       }

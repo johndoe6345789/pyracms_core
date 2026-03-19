@@ -5,10 +5,11 @@ import AuthPageShell
 import RegisterForm
   from '@/components/auth/RegisterForm'
 
-export default function RegisterPage() {
+/** Register page that redirects to /create-site on success. */
+export default function RegisterCreateSitePage() {
   return (
     <AuthPageShell>
-      <RegisterForm />
+      <RegisterForm redirectTo="/create-site" />
     </AuthPageShell>
   )
 }
