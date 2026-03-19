@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
   env: {
     API_URL: process.env.API_URL || 'http://localhost:8080',
   },
+  async redirects() {
+    return [
+      { source: '/dashboard', destination: '/admin', permanent: true },
+    ]
+  },
 }
 
 export default withNextIntl(nextConfig)
