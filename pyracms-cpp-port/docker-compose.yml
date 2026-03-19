@@ -1,5 +1,3 @@
-version: '3.8'
-
 # NOTE: This docker-compose.yml is for DEVELOPMENT ONLY
 # For production:
 # - Use Docker secrets or external environment files for credentials
