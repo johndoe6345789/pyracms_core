@@ -25,14 +25,41 @@ export default function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel}>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      data-testid="confirm-dialog"
+      aria-labelledby={
+        'confirm-dialog-title'
+      }
+    >
+      <DialogTitle
+        id="confirm-dialog-title"
+      >
+        {title}
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
+        <DialogContentText>
+          {message}
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button onClick={onConfirm} color="error" variant="contained">
+        <Button
+          onClick={onCancel}
+          data-testid={
+            'confirm-cancel-btn'
+          }
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={onConfirm}
+          color="error"
+          variant="contained"
+          data-testid={
+            'confirm-submit-btn'
+          }
+        >
           {confirmLabel}
         </Button>
       </DialogActions>

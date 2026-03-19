@@ -1,10 +1,16 @@
-import { Box, Typography, Divider } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Divider,
+} from '@mui/material'
 
 interface CodeResultProps {
   result: string
 }
 
-export default function CodeResult({ result }: CodeResultProps) {
+export default function CodeResult(
+  { result }: CodeResultProps,
+) {
   return (
     <>
       <Divider />
@@ -16,13 +22,15 @@ export default function CodeResult({ result }: CodeResultProps) {
           borderTop: '2px solid',
           borderColor: '#86efac',
         }}
+        data-testid="code-result-header"
       >
         <Typography
           variant="caption"
           sx={{
             color: '#166534',
             fontWeight: 600,
-            textTransform: 'uppercase',
+            textTransform:
+              'uppercase',
             letterSpacing: '0.05em',
           }}
         >
@@ -31,13 +39,18 @@ export default function CodeResult({ result }: CodeResultProps) {
       </Box>
       <Box
         component="pre"
+        data-testid="code-result-output"
         sx={{
           m: 0,
           px: 3,
           py: 2,
           bgcolor: '#f0fdf4',
           color: '#166534',
-          fontFamily: '"Fira Code", "JetBrains Mono", "Cascadia Code", monospace',
+          fontFamily:
+            '"Fira Code", '
+            + '"JetBrains Mono", '
+            + '"Cascadia Code", '
+            + 'monospace',
           fontSize: '0.875rem',
           lineHeight: 1.7,
           overflow: 'auto',

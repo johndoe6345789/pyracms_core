@@ -5,44 +5,93 @@ import {
   Box,
   TextField,
   MenuItem,
-  Paper,
-  Divider,
-  Typography,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material'
-import { EditOutlined, PreviewOutlined } from '@mui/icons-material'
-import DOMPurify from 'dompurify'
 import { ArticleTagChips } from './ArticleTagChips'
-import { RENDERERS, type ArticleEditorState } from '@/hooks/useArticleEditor'
-import { EditorModeSelector, type EditorMode } from './EditorModeSelector'
-import { MonacoEditorComponent } from './MonacoEditor'
+import {
+  RENDERERS,
+  type ArticleEditorState,
+} from '@/hooks/useArticleEditor'
+import {
+  EditorModeSelector,
+  type EditorMode,
+} from './EditorModeSelector'
+import {
+  MonacoEditorComponent,
+} from './MonacoEditor'
 import { RichTextEditor } from './RichTextEditor'
 import { BBCodeEditor } from './BBCodeEditor'
 import { MarkdownEditor } from './MarkdownEditor'
+import { ViewModeToggle } from './ViewModeToggle'
+import { ContentPreview } from './ContentPreview'
 
 interface ArticleEditorFormProps {
   editor: ArticleEditorState
   contentPlaceholder?: string
 }
 
-export function ArticleEditorForm({ editor, contentPlaceholder }: ArticleEditorFormProps) {
-  const [editorMode, setEditorMode] = useState<EditorMode>('monaco')
+export function ArticleEditorForm({
+  editor,
+}: ArticleEditorFormProps) {
+  const [editorMode, setEditorMode] =
+    useState<EditorMode>('monaco')
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <TextField label="Title" value={editor.title} onChange={(e) => editor.setTitle(e.target.value)} fullWidth placeholder="Enter a title for your article..." />
+    <Box
+      component="form"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+      }}
+      data-testid="article-editor-form"
+    >
+      <TextField
+        label="Title"
+        value={editor.title}
+        onChange={(e) =>
+          editor.setTitle(e.target.value)
+        }
+        fullWidth
+        placeholder="Enter a title..."
+        data-testid="article-title-input"
+      />
 
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-        <TextField label="Renderer" select value={editor.renderer} onChange={(e) => editor.setRenderer(e.target.value)} sx={{ maxWidth: 200 }}>
-          {RENDERERS.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        <TextField
+          label="Renderer"
+          select
+          value={editor.renderer}
+          onChange={(e) =>
+            editor.setRenderer(e.target.value)
+          }
+          sx={{ maxWidth: 200 }}
+          data-testid="renderer-select"
+        >
+          {RENDERERS.map((r) => (
+            <MenuItem key={r} value={r}>
+              {r}
+            </MenuItem>
+          ))}
         </TextField>
-        <EditorModeSelector mode={editorMode} onModeChange={setEditorMode} />
+        <EditorModeSelector
+          mode={editorMode}
+          onModeChange={setEditorMode}
+        />
       </Box>
 
       {editorMode === 'monaco' && (
         <>
-          <ViewModeToggle viewMode={editor.viewMode} setViewMode={editor.setViewMode} />
+          <ViewModeToggle
+            viewMode={editor.viewMode}
+            setViewMode={editor.setViewMode}
+          />
           {editor.viewMode === 'edit' ? (
             <MonacoEditorComponent
               value={editor.content}
@@ -51,53 +100,62 @@ export function ArticleEditorForm({ editor, contentPlaceholder }: ArticleEditorF
               autoSaveKey="article-editor"
             />
           ) : (
-            <ContentPreview content={editor.content} renderer={editor.renderer} />
+            <ContentPreview
+              content={editor.content}
+              renderer={editor.renderer}
+            />
           )}
         </>
       )}
 
       {editorMode === 'wysiwyg' && (
-        <RichTextEditor value={editor.content} onChange={editor.setContent} />
+        <RichTextEditor
+          value={editor.content}
+          onChange={editor.setContent}
+        />
       )}
 
       {editorMode === 'bbcode' && (
-        <BBCodeEditor value={editor.content} onChange={editor.setContent} />
+        <BBCodeEditor
+          value={editor.content}
+          onChange={editor.setContent}
+        />
       )}
 
       {editorMode === 'markdown' && (
-        <MarkdownEditor value={editor.content} onChange={editor.setContent} />
+        <MarkdownEditor
+          value={editor.content}
+          onChange={editor.setContent}
+        />
       )}
 
-      <TextField label="Tags (comma-separated)" value={editor.tagsInput} onChange={(e) => editor.setTagsInput(e.target.value)} fullWidth helperText="Separate tags with commas" />
-      {editor.parsedTags.length > 0 && <ArticleTagChips tags={editor.parsedTags} color="primary" />}
-
-      <TextField label="Revision Summary" value={editor.summary} onChange={(e) => editor.setSummary(e.target.value)} fullWidth placeholder="Briefly describe your changes..." />
-    </Box>
-  )
-}
-
-function ViewModeToggle({ viewMode, setViewMode }: { viewMode: 'edit' | 'preview'; setViewMode: (v: 'edit' | 'preview') => void }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      <ToggleButtonGroup value={viewMode} exclusive onChange={(_, val) => val && setViewMode(val)} size="small">
-        <ToggleButton value="edit"><EditOutlined sx={{ mr: 0.5, fontSize: 18 }} />Edit</ToggleButton>
-        <ToggleButton value="preview"><PreviewOutlined sx={{ mr: 0.5, fontSize: 18 }} />Preview</ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
-  )
-}
-
-function ContentPreview({ content, renderer }: { content: string; renderer: string }) {
-  const sanitized = DOMPurify.sanitize(content)
-  return (
-    <Paper variant="outlined" sx={{ p: 3, minHeight: 300, borderColor: 'divider' }}>
-      <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>Preview ({renderer})</Typography>
-      <Divider sx={{ mb: 2 }} />
-      {content ? (
-        <Box sx={{ '& h2': { mt: 2, mb: 1, fontWeight: 600, fontSize: '1.5rem' }, '& p': { mb: 2, lineHeight: 1.8 } }} dangerouslySetInnerHTML={{ __html: sanitized }} />
-      ) : (
-        <Typography variant="body2" color="text.secondary">Nothing to preview yet. Start writing in the editor.</Typography>
+      <TextField
+        label="Tags (comma-separated)"
+        value={editor.tagsInput}
+        onChange={(e) =>
+          editor.setTagsInput(e.target.value)
+        }
+        fullWidth
+        helperText="Separate tags with commas"
+        data-testid="tags-input"
+      />
+      {editor.parsedTags.length > 0 && (
+        <ArticleTagChips
+          tags={editor.parsedTags}
+          color="primary"
+        />
       )}
-    </Paper>
+
+      <TextField
+        label="Revision Summary"
+        value={editor.summary}
+        onChange={(e) =>
+          editor.setSummary(e.target.value)
+        }
+        fullWidth
+        placeholder="Describe your changes..."
+        data-testid="summary-input"
+      />
+    </Box>
   )
 }

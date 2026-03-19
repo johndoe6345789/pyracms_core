@@ -15,6 +15,7 @@ export default function PictureViewer({
   return (
     <Paper
       variant="outlined"
+      data-testid="picture-viewer"
       sx={{
         borderColor: 'divider',
         borderRadius: 3,
@@ -29,7 +30,10 @@ export default function PictureViewer({
           component="img"
           src={src}
           alt={title}
-          sx={{ width: '100%', display: 'block' }}
+          sx={{
+            width: '100%',
+            display: 'block',
+          }}
         />
       )}
     </Paper>

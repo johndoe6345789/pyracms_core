@@ -15,20 +15,83 @@ interface ArticleMetadataProps {
   views: number
 }
 
-export function ArticleMetadata({ author, date, renderer, views }: ArticleMetadataProps) {
+export function ArticleMetadata(
+  {
+    author,
+    date,
+    renderer,
+    views,
+  }: ArticleMetadataProps
+) {
   const items = [
-    { icon: <PersonOutlined sx={{ fontSize: 20 }} />, label: author },
-    { icon: <CalendarTodayOutlined sx={{ fontSize: 20 }} />, label: date },
-    { icon: <CodeOutlined sx={{ fontSize: 20 }} />, label: renderer },
-    { icon: <VisibilityOutlined sx={{ fontSize: 20 }} />, label: `${views} views` },
+    {
+      icon: (
+        <PersonOutlined
+          sx={{ fontSize: 20 }}
+          aria-hidden="true"
+        />
+      ),
+      label: author,
+      testId: 'meta-author',
+    },
+    {
+      icon: (
+        <CalendarTodayOutlined
+          sx={{ fontSize: 20 }}
+          aria-hidden="true"
+        />
+      ),
+      label: date,
+      testId: 'meta-date',
+    },
+    {
+      icon: (
+        <CodeOutlined
+          sx={{ fontSize: 20 }}
+          aria-hidden="true"
+        />
+      ),
+      label: renderer,
+      testId: 'meta-renderer',
+    },
+    {
+      icon: (
+        <VisibilityOutlined
+          sx={{ fontSize: 20 }}
+          aria-hidden="true"
+        />
+      ),
+      label: `${views} views`,
+      testId: 'meta-views',
+    },
   ]
 
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3, mb: 3, color: 'text.secondary' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 3,
+        mb: 3,
+        color: 'text.secondary',
+      }}
+      data-testid="article-metadata"
+    >
       {items.map((item) => (
-        <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box
+          key={item.testId}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+          data-testid={item.testId}
+        >
           {item.icon}
-          <Typography variant="body2">{item.label}</Typography>
+          <Typography variant="body2">
+            {item.label}
+          </Typography>
         </Box>
       ))}
     </Box>

@@ -2,29 +2,29 @@
 
 import { useState, useRef, useCallback } from 'react'
 import {
-  TextField, Paper, List, ListItem, ListItemIcon, ListItemText,
+  TextField, Paper, List, ListItem,
+  ListItemIcon, ListItemText,
   Popper, InputAdornment, Chip,
 } from '@mui/material'
 import {
-  SearchOutlined, ArticleOutlined, ForumOutlined, CodeOutlined,
+  SearchOutlined, ArticleOutlined,
+  ForumOutlined, CodeOutlined,
   SportsEsportsOutlined,
 } from '@mui/icons-material'
 import api from '@/lib/api'
 
-interface AutocompleteResult {
-  text: string
-  type: string
-  url: string
+interface Result {
+  text: string; type: string; url: string
 }
-
-const TYPE_ICONS: Record<string, React.ReactNode> = {
+const ICONS: Record<string, React.ReactNode> = {
   article: <ArticleOutlined fontSize="small" />,
   forum_post: <ForumOutlined fontSize="small" />,
   snippet: <CodeOutlined fontSize="small" />,
-  gamedep: <SportsEsportsOutlined fontSize="small" />,
+  gamedep: (
+    <SportsEsportsOutlined fontSize="small" />),
 }
 
-interface SearchAutocompleteProps {
+interface Props {
   tenantId?: number
   onSelect?: (url: string) => void
   onSearch?: (query: string) => void
@@ -32,92 +32,88 @@ interface SearchAutocompleteProps {
 }
 
 export default function SearchAutocomplete({
-  tenantId = 1,
-  onSelect,
-  onSearch,
+  tenantId = 1, onSelect, onSearch,
   placeholder = 'Search...',
-}: SearchAutocompleteProps) {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<AutocompleteResult[]>([])
+}: Props) {
+  const [q, setQ] = useState('')
+  const [results, setResults] =
+    useState<Result[]>([])
   const [open, setOpen] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout>(null)
+  const ref = useRef<HTMLInputElement>(null)
+  const timer = useRef<NodeJS.Timeout>(null)
 
-  const handleChange = useCallback((value: string) => {
-    setQuery(value)
-
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-
-    if (value.length < 2) {
-      setResults([])
-      setOpen(false)
-      return
+  const onChange = useCallback((v: string) => {
+    setQ(v)
+    if (timer.current) clearTimeout(timer.current)
+    if (v.length < 2) {
+      setResults([]); setOpen(false); return
     }
-
-    debounceRef.current = setTimeout(async () => {
+    timer.current = setTimeout(async () => {
       try {
-        const res = await api.get(`/api/search/autocomplete?q=${encodeURIComponent(value)}&tenant_id=${tenantId}&limit=8`)
-        setResults(res.data || [])
-        setOpen((res.data || []).length > 0)
+        const u = '/api/search/autocomplete?q='
+          + encodeURIComponent(v)
+          + `&tenant_id=${tenantId}&limit=8`
+        const r = await api.get(u)
+        setResults(r.data || [])
+        setOpen((r.data || []).length > 0)
       } catch {
-        setResults([])
-        setOpen(false)
+        setResults([]); setOpen(false)
       }
     }, 200)
   }, [tenantId])
 
-  const handleSelect = (result: AutocompleteResult) => {
-    setQuery(result.text)
-    setOpen(false)
-    onSelect?.(result.url)
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setOpen(false)
-      onSearch?.(query)
-    }
-  }
-
   return (
     <div style={{ position: 'relative' }}>
-      <TextField
-        inputRef={inputRef}
-        fullWidth
-        size="small"
-        placeholder={placeholder}
-        value={query}
-        onChange={(e) => handleChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onFocus={() => results.length > 0 && setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 200)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start"><SearchOutlined /></InputAdornment>
-          ),
+      <TextField inputRef={ref} fullWidth
+        size="small" placeholder={placeholder}
+        value={q}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            setOpen(false); onSearch?.(q)
+          }
         }}
-      />
-      <Popper
-        open={open}
-        anchorEl={inputRef.current}
+        onFocus={() =>
+          results.length > 0 && setOpen(true)}
+        onBlur={() => setTimeout(
+          () => setOpen(false), 200)}
+        data-testid="search-autocomplete-input"
+        InputProps={{ startAdornment: (
+          <InputAdornment position="start">
+            <SearchOutlined />
+          </InputAdornment>) }} />
+      <Popper open={open} anchorEl={ref.current}
         placement="bottom-start"
-        sx={{ zIndex: 1300, width: inputRef.current?.offsetWidth }}
-      >
-        <Paper elevation={8} sx={{ maxHeight: 300, overflow: 'auto' }}>
+        sx={{ zIndex: 1300,
+          width: ref.current?.offsetWidth }}>
+        <Paper elevation={8}
+          sx={{ maxHeight: 300,
+            overflow: 'auto' }}>
           <List dense>
             {results.map((r, i) => (
-              <ListItem
-                key={i}
-                onClick={() => handleSelect(r)}
-                sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-              >
-                <ListItemIcon sx={{ minWidth: 32 }}>
-                  {TYPE_ICONS[r.type] || <SearchOutlined fontSize="small" />}
+              <ListItem key={i}
+                onClick={() => {
+                  setQ(r.text); setOpen(false)
+                  onSelect?.(r.url)
+                }}
+                data-testid={
+                  `autocomplete-item-${i}`}
+                sx={{ cursor: 'pointer',
+                  '&:hover': {
+                    bgcolor: 'action.hover' } }}>
+                <ListItemIcon
+                  sx={{ minWidth: 32 }}>
+                  {ICONS[r.type] || (
+                    <SearchOutlined
+                      fontSize="small" />)}
                 </ListItemIcon>
-                <ListItemText primary={r.text} />
-                <Chip label={r.type} size="small" sx={{ height: 20, fontSize: '0.6rem' }} />
-              </ListItem>
-            ))}
+                <ListItemText
+                  primary={r.text} />
+                <Chip label={r.type}
+                  size="small"
+                  sx={{ height: 20,
+                    fontSize: '0.6rem' }} />
+              </ListItem>))}
           </List>
         </Paper>
       </Popper>

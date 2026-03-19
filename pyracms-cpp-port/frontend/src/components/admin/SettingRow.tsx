@@ -1,18 +1,11 @@
 import {
-  TableRow,
-  TableCell,
-  TextField,
-  IconButton,
-  Tooltip,
-  Typography,
+  TableRow, TableCell,
+  TextField, Typography,
 } from '@mui/material'
-import {
-  EditOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  DeleteOutlined,
-} from '@mui/icons-material'
 import { Setting } from '@/hooks/useAdminSettings'
+import {
+  SettingEditActions, SettingViewActions,
+} from './SettingRowActions'
 
 interface SettingRowProps {
   setting: Setting
@@ -26,57 +19,60 @@ interface SettingRowProps {
 }
 
 export default function SettingRow({
-  setting, isEditing, editValue, onEditValueChange,
-  onStartEdit, onSaveEdit, onCancelEdit, onDelete,
+  setting, isEditing, editValue,
+  onEditValueChange, onStartEdit,
+  onSaveEdit, onCancelEdit, onDelete,
 }: SettingRowProps) {
   return (
     <TableRow hover>
-      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+      <TableCell sx={{
+        fontFamily: 'monospace',
+        fontWeight: 600,
+      }}>
         {setting.key}
       </TableCell>
       <TableCell>
         {isEditing ? (
           <TextField
-            size="small" value={editValue} autoFocus fullWidth
-            onChange={(e) => onEditValueChange(e.target.value)}
+            size="small"
+            value={editValue}
+            autoFocus
+            fullWidth
+            data-testid="setting-value-input"
+            onChange={(e) =>
+              onEditValueChange(
+                e.target.value,
+              )}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') onSaveEdit(setting.id)
-              if (e.key === 'Escape') onCancelEdit()
+              if (e.key === 'Enter')
+                onSaveEdit(setting.id)
+              if (e.key === 'Escape')
+                onCancelEdit()
             }}
           />
         ) : (
-          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+          <Typography
+            variant="body1"
+            sx={{ fontFamily: 'monospace' }}
+          >
             {setting.value}
           </Typography>
         )}
       </TableCell>
       <TableCell align="right">
         {isEditing ? (
-          <>
-            <Tooltip title="Save">
-              <IconButton size="small" color="success" onClick={() => onSaveEdit(setting.id)}>
-                <CheckOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <IconButton size="small" color="default" onClick={onCancelEdit}>
-                <CloseOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </>
+          <SettingEditActions
+            onSave={() =>
+              onSaveEdit(setting.id)}
+            onCancel={onCancelEdit}
+          />
         ) : (
-          <>
-            <Tooltip title="Edit">
-              <IconButton size="small" color="primary" onClick={() => onStartEdit(setting)}>
-                <EditOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton size="small" color="error" onClick={() => onDelete(setting.id)}>
-                <DeleteOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </>
+          <SettingViewActions
+            onEdit={() =>
+              onStartEdit(setting)}
+            onDelete={() =>
+              onDelete(setting.id)}
+          />
         )}
       </TableCell>
     </TableRow>

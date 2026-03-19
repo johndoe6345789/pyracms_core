@@ -8,8 +8,19 @@ interface SnackbarState {
   severity: 'success' | 'warning'
 }
 
-function downloadJson(data: object, filename: string) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+/**
+ * Downloads an object as a formatted JSON file.
+ * @param data - The data to serialize.
+ * @param filename - The download file name.
+ */
+function downloadJson(
+  data: object,
+  filename: string
+) {
+  const json = JSON.stringify(data, null, 2)
+  const blob = new Blob([json], {
+    type: 'application/json',
+  })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -20,81 +31,169 @@ function downloadJson(data: object, filename: string) {
   URL.revokeObjectURL(url)
 }
 
-export function useBackupRestore() {
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: '',
-    severity: 'success',
-  })
-  const fileInputRef = useRef<HTMLInputElement>(null)
+/**
+ * Builds the stub settings export payload.
+ * @returns An object ready for JSON download.
+ */
+function buildSettingsPayload() {
+  return {
+    exportType: 'settings',
+    exportedAt: new Date().toISOString(),
+    data: {
+      site_name: 'PyraCMS',
+      site_description:
+        'A modern multi-tenant CMS',
+      max_upload_size: '10485760',
+      default_language: 'en',
+      smtp_host: 'smtp.example.com',
+      smtp_port: '587',
+      registration_enabled: 'true',
+    },
+  }
+}
 
-  const handleExportSettings = () => {
-    const settingsData = {
-      exportType: 'settings',
-      exportedAt: new Date().toISOString(),
-      data: {
-        site_name: 'PyraCMS',
-        site_description: 'A modern multi-tenant CMS',
-        max_upload_size: '10485760',
-        default_language: 'en',
-        smtp_host: 'smtp.example.com',
-        smtp_port: '587',
-        registration_enabled: 'true',
+/**
+ * Builds the stub menus export payload.
+ * @returns An object ready for JSON download.
+ */
+function buildMenusPayload() {
+  return {
+    exportType: 'menus',
+    exportedAt: new Date().toISOString(),
+    data: [
+      {
+        name: 'main',
+        items: [
+          {
+            name: 'Home',
+            route: '/',
+            position: 0,
+            permissions: 'public',
+          },
+          {
+            name: 'Articles',
+            route: '/articles',
+            position: 1,
+            permissions: 'public',
+          },
+          {
+            name: 'Forum',
+            route: '/forum',
+            position: 2,
+            permissions: 'authenticated',
+          },
+        ],
       },
-    }
-    downloadJson(settingsData, 'pyracms-settings-export.json')
-    setSnackbar({ open: true, message: 'Settings exported successfully.', severity: 'success' })
+      {
+        name: 'footer',
+        items: [
+          {
+            name: 'About',
+            route: '/about',
+            position: 0,
+            permissions: 'public',
+          },
+          {
+            name: 'Contact',
+            route: '/contact',
+            position: 1,
+            permissions: 'public',
+          },
+        ],
+      },
+    ],
+  }
+}
+
+/**
+ * Hook that manages backup export and import
+ * operations, including snackbar feedback and
+ * hidden file input handling.
+ * @returns State values and handler functions
+ *   for the backup/restore UI.
+ */
+export function useBackupRestore() {
+  const [snackbar, setSnackbar] =
+    useState<SnackbarState>({
+      open: false,
+      message: '',
+      severity: 'success',
+    })
+  const fileInputRef =
+    useRef<HTMLInputElement>(null)
+
+  /**
+   * Exports site settings as a JSON file
+   * download.
+   */
+  const handleExportSettings = () => {
+    const payload = buildSettingsPayload()
+    downloadJson(
+      payload,
+      'pyracms-settings-export.json'
+    )
+    setSnackbar({
+      open: true,
+      message: 'Settings exported successfully.',
+      severity: 'success',
+    })
   }
 
+  /**
+   * Exports menu structure as a JSON file
+   * download.
+   */
   const handleExportMenus = () => {
-    const menusData = {
-      exportType: 'menus',
-      exportedAt: new Date().toISOString(),
-      data: [
-        {
-          name: 'main',
-          items: [
-            { name: 'Home', route: '/', position: 0, permissions: 'public' },
-            { name: 'Articles', route: '/articles', position: 1, permissions: 'public' },
-            { name: 'Forum', route: '/forum', position: 2, permissions: 'authenticated' },
-          ],
-        },
-        {
-          name: 'footer',
-          items: [
-            { name: 'About', route: '/about', position: 0, permissions: 'public' },
-            { name: 'Contact', route: '/contact', position: 1, permissions: 'public' },
-          ],
-        },
-      ],
-    }
-    downloadJson(menusData, 'pyracms-menus-export.json')
-    setSnackbar({ open: true, message: 'Menus exported successfully.', severity: 'success' })
+    const payload = buildMenusPayload()
+    downloadJson(
+      payload,
+      'pyracms-menus-export.json'
+    )
+    setSnackbar({
+      open: true,
+      message: 'Menus exported successfully.',
+      severity: 'success',
+    })
   }
 
+  /** Triggers the hidden file input click. */
   const handleImportClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Reads and validates a selected JSON import
+   * file, showing success or error feedback.
+   * @param e - The file input change event.
+   */
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
     reader.onload = (event) => {
       try {
-        const parsed = JSON.parse(event.target?.result as string)
+        const parsed = JSON.parse(
+          event.target?.result as string
+        )
         if (!parsed.exportType || !parsed.data) {
           throw new Error('Invalid format')
         }
+        const msg =
+          `Successfully imported ` +
+          `${parsed.exportType} data.`
         setSnackbar({
           open: true,
-          message: `Successfully imported ${parsed.exportType} data.`,
+          message: msg,
           severity: 'success',
         })
       } catch {
         setSnackbar({
           open: true,
-          message: 'Invalid JSON file. Please use a PyraCMS export file.',
+          message:
+            'Invalid JSON file. ' +
+            'Please use a PyraCMS export file.',
           severity: 'warning',
         })
       }
@@ -103,8 +202,12 @@ export function useBackupRestore() {
     e.target.value = ''
   }
 
+  /** Closes the snackbar notification. */
   const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }))
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }))
   }
 
   return {

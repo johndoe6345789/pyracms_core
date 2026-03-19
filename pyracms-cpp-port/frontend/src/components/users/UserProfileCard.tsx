@@ -1,139 +1,99 @@
 'use client'
-
 import { useState } from 'react'
 import {
-  Paper, Box, Avatar, Typography, Button, Chip, Divider, IconButton, Tooltip, Link as MuiLink,
+  Paper, Box, Avatar, Typography,
+  Button, Chip, Divider,
 } from '@mui/material'
 import {
-  LocationOnOutlined, LanguageOutlined, CalendarTodayOutlined,
-  ForumOutlined, StarOutlined, PersonAddOutlined, PersonRemoveOutlined,
-  GitHub, Twitter,
+  PersonAddOutlined, PersonRemoveOutlined,
 } from '@mui/icons-material'
+import { ProfileInfo } from './ProfileInfo'
+import { ProfileStats } from './ProfileStats'
+import { ProfileActions } from './ProfileActions'
 
 interface UserProfileCardProps {
-  username: string
-  avatarUrl?: string
-  bio: string
-  location?: string
-  website?: string
-  githubUrl?: string
-  twitterUrl?: string
-  joinDate: string
-  postCount: number
-  reputation: number
+  username: string; avatarUrl?: string
+  bio: string; location?: string
+  website?: string; githubUrl?: string
+  twitterUrl?: string; joinDate: string
+  postCount: number; reputation: number
   badges: { label: string; color: string }[]
-  isFollowing?: boolean
-  onFollow?: () => void
+  isFollowing?: boolean; onFollow?: () => void
 }
 
 export function UserProfileCard({
-  username,
-  avatarUrl,
-  bio,
-  location,
-  website,
-  githubUrl,
-  twitterUrl,
-  joinDate,
-  postCount,
-  reputation,
-  badges,
-  isFollowing: initialFollowing = false,
-  onFollow,
+  username, avatarUrl, bio, location,
+  website, githubUrl, twitterUrl, joinDate,
+  postCount, reputation, badges,
+  isFollowing: init = false, onFollow,
 }: UserProfileCardProps) {
-  const [following, setFollowing] = useState(initialFollowing)
-
-  const handleFollow = () => {
-    setFollowing(!following)
-    onFollow?.()
+  const [fol, setFol] = useState(init)
+  const toggle = () => {
+    setFol(!fol); onFollow?.()
   }
-
   return (
-    <Paper variant="outlined" sx={{ borderColor: 'divider', overflow: 'hidden' }}>
-      <Box sx={{ bgcolor: 'primary.main', height: 80 }} />
+    <Paper variant="outlined" sx={{
+      borderColor: 'divider', overflow: 'hidden',
+    }} data-testid="user-profile-card">
+      <Box sx={{
+        bgcolor: 'primary.main', height: 80,
+      }} />
       <Box sx={{ px: 3, pb: 3, mt: -5 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-          <Avatar
-            src={avatarUrl}
-            sx={{ width: 96, height: 96, border: 4, borderColor: 'background.paper', bgcolor: 'primary.dark', fontSize: '2rem' }}
-          >
+        <Box sx={{
+          display: 'flex', mb: 2,
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+        }}>
+          <Avatar src={avatarUrl} sx={{
+            width: 96, height: 96, border: 4,
+            borderColor: 'background.paper',
+            bgcolor: 'primary.dark',
+            fontSize: '2rem',
+          }}>
             {username.charAt(0).toUpperCase()}
           </Avatar>
-          <Button
-            variant={following ? 'outlined' : 'contained'}
-            startIcon={following ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
-            onClick={handleFollow}
-            size="small"
-          >
-            {following ? 'Unfollow' : 'Follow'}
+          <Button size="small"
+            variant={fol ? 'outlined' : 'contained'}
+            startIcon={fol
+              ? <PersonRemoveOutlined />
+              : <PersonAddOutlined />}
+            onClick={toggle}
+            data-testid="follow-button">
+            {fol ? 'Unfollow' : 'Follow'}
           </Button>
         </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>{username}</Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, mb: 2, lineHeight: 1.6 }}>
+        <Typography variant="h5"
+          sx={{ fontWeight: 700 }}>
+          {username}
+        </Typography>
+        <Typography variant="body1"
+          color="text.secondary"
+          sx={{ mt: 0.5, mb: 2, lineHeight: 1.6 }}>
           {bio}
         </Typography>
-
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-          {location && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <LocationOnOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
-              <Typography variant="body2" color="text.secondary">{location}</Typography>
-            </Box>
-          )}
-          {website && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <LanguageOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
-              <MuiLink href={website} target="_blank" rel="noopener" variant="body2">{website}</MuiLink>
-            </Box>
-          )}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <CalendarTodayOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
-            <Typography variant="body2" color="text.secondary">Joined {joinDate}</Typography>
+        <ProfileInfo location={location}
+          website={website} joinDate={joinDate} />
+        <ProfileStats postCount={postCount}
+          reputation={reputation} />
+        <ProfileActions githubUrl={githubUrl}
+          twitterUrl={twitterUrl} />
+        {badges.length > 0 && (<>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant="subtitle2"
+            gutterBottom>Badges</Typography>
+          <Box sx={{
+            display: 'flex', gap: 0.5,
+            flexWrap: 'wrap',
+          }}>
+            {badges.map((b) => (
+              <Chip key={b.label}
+                label={b.label} size="small"
+                sx={{ bgcolor: b.color + '20',
+                  color: b.color,
+                  fontWeight: 600 }} />
+            ))}
           </Box>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ForumOutlined sx={{ fontSize: 18 }} />
-            <Typography variant="body2"><strong>{postCount.toLocaleString()}</strong> posts</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <StarOutlined sx={{ fontSize: 18, color: '#FFD700' }} />
-            <Typography variant="body2"><strong>{reputation.toLocaleString()}</strong> reputation</Typography>
-          </Box>
-        </Box>
-
-        {(githubUrl || twitterUrl) && (
-          <Box sx={{ display: 'flex', gap: 0.5, mb: 2 }}>
-            {githubUrl && (
-              <Tooltip title="GitHub">
-                <IconButton size="small" component="a" href={githubUrl} target="_blank" rel="noopener">
-                  <GitHub fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-            {twitterUrl && (
-              <Tooltip title="Twitter/X">
-                <IconButton size="small" component="a" href={twitterUrl} target="_blank" rel="noopener">
-                  <Twitter fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-        )}
-
-        {badges.length > 0 && (
-          <>
-            <Divider sx={{ mb: 2 }} />
-            <Typography variant="subtitle2" gutterBottom>Badges</Typography>
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {badges.map((badge) => (
-                <Chip key={badge.label} label={badge.label} size="small" sx={{ bgcolor: badge.color + '20', color: badge.color, fontWeight: 600 }} />
-              ))}
-            </Box>
-          </>
-        )}
+        </>)}
       </Box>
     </Paper>
   )

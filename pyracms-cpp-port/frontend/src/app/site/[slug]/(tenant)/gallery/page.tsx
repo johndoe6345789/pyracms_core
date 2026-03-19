@@ -1,10 +1,19 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { Container, Typography, Box, Button } from '@mui/material'
-import { AddPhotoAlternateOutlined } from '@mui/icons-material'
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+} from '@mui/material'
+import {
+  AddPhotoAlternateOutlined,
+} from '@mui/icons-material'
 import AlbumGrid from '@/components/gallery/AlbumGrid'
-import { useGalleryAlbums } from '@/hooks/useGalleryAlbums'
+import {
+  useGalleryAlbums,
+} from '@/hooks/useGalleryAlbums'
 import { useTenantId } from '@/hooks/useTenantId'
 
 export default function GalleryPage() {
@@ -14,7 +23,11 @@ export default function GalleryPage() {
   const { albums } = useGalleryAlbums(tenantId)
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container
+      maxWidth="lg"
+      sx={{ py: 6 }}
+      data-testid="gallery-page"
+    >
       <Box
         sx={{
           display: 'flex',
@@ -24,17 +37,28 @@ export default function GalleryPage() {
         }}
       >
         <Box>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+          >
             Gallery
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            color="text.secondary"
+          >
             Browse photo albums and collections.
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<AddPhotoAlternateOutlined />}
+          startIcon={
+            <AddPhotoAlternateOutlined />
+          }
           size="large"
+          data-testid="create-album-btn"
+          aria-label="Create album"
         >
           Create Album
         </Button>
