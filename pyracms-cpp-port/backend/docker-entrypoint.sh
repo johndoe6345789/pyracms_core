@@ -31,7 +31,7 @@ for i in $(seq 1 30); do
     if curl -sf http://localhost:8080/api/tenants > /dev/null 2>&1; then
         echo "Server is ready."
         if [ -f /app/seed.sh ]; then
-            bash /app/seed.sh
+            bash /app/seed.sh || echo "Seed script failed (non-fatal)"
         fi
         break
     fi

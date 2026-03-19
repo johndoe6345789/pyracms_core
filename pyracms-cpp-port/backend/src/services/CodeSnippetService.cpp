@@ -35,15 +35,15 @@ void CodeSnippetService::listSnippets(
     // We build dynamic SQL based on filters
     // For simplicity we handle the common cases
     if (!language.empty()) {
-        sql += " AND s.language = $4";
-        countSql += " AND s.language = $4";
+        sql += " AND s.language = $2";
+        countSql += " AND s.language = $2";
     }
     if (authorId > 0) {
-        sql += " AND s.author_id = $5";
-        countSql += " AND s.author_id = $5";
+        sql += " AND s.author_id = $3";
+        countSql += " AND s.author_id = $3";
     }
 
-    sql += " ORDER BY s.created_at DESC LIMIT $2 OFFSET $3";
+    sql += " ORDER BY s.created_at DESC LIMIT " + std::to_string(limit) + " OFFSET " + std::to_string(offset);
 
     if (!language.empty() && authorId > 0) {
         db->execSqlAsync(
@@ -62,7 +62,7 @@ void CodeSnippetService::listSnippets(
                     [cb](const drogon::orm::DrogonDbException &) {
                         cb({}, 0);
                     },
-                    tenantId, limit, offset, language, authorId);
+                    tenantId, language, authorId);
             },
             [cb](const drogon::orm::DrogonDbException &) {
                 cb({}, 0);
@@ -85,7 +85,7 @@ void CodeSnippetService::listSnippets(
                     [cb](const drogon::orm::DrogonDbException &) {
                         cb({}, 0);
                     },
-                    tenantId, limit, offset, language);
+                    tenantId, language);
             },
             [cb](const drogon::orm::DrogonDbException &) {
                 cb({}, 0);
@@ -96,11 +96,11 @@ void CodeSnippetService::listSnippets(
         std::string sql2 =
             "SELECT s.*, u.username FROM code_snippets s "
             "LEFT JOIN users u ON u.id = s.author_id "
-            "WHERE s.tenant_id = $1 AND s.author_id = $4 "
-            "ORDER BY s.created_at DESC LIMIT $2 OFFSET $3";
+            "WHERE s.tenant_id = $1 AND s.author_id = $2 "
+            "ORDER BY s.created_at DESC LIMIT " + std::to_string(limit) + " OFFSET " + std::to_string(offset);
         std::string countSql2 =
             "SELECT COUNT(*) AS cnt FROM code_snippets s "
-            "WHERE s.tenant_id = $1 AND s.author_id = $4";
+            "WHERE s.tenant_id = $1 AND s.author_id = $2";
 
         db->execSqlAsync(
             countSql2,
@@ -118,7 +118,7 @@ void CodeSnippetService::listSnippets(
                     [cb](const drogon::orm::DrogonDbException &) {
                         cb({}, 0);
                     },
-                    tenantId, limit, offset, authorId);
+                    tenantId, authorId);
             },
             [cb](const drogon::orm::DrogonDbException &) {
                 cb({}, 0);
@@ -129,7 +129,7 @@ void CodeSnippetService::listSnippets(
             "SELECT s.*, u.username FROM code_snippets s "
             "LEFT JOIN users u ON u.id = s.author_id "
             "WHERE s.tenant_id = $1 "
-            "ORDER BY s.created_at DESC LIMIT $2 OFFSET $3";
+            "ORDER BY s.created_at DESC LIMIT " + std::to_string(limit) + " OFFSET " + std::to_string(offset);
         std::string simpleCountSql =
             "SELECT COUNT(*) AS cnt FROM code_snippets s WHERE s.tenant_id = $1";
 
@@ -149,7 +149,7 @@ void CodeSnippetService::listSnippets(
                     [cb](const drogon::orm::DrogonDbException &) {
                         cb({}, 0);
                     },
-                    tenantId, limit, offset);
+                    tenantId);
             },
             [cb](const drogon::orm::DrogonDbException &) {
                 cb({}, 0);

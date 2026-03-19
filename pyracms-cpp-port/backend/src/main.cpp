@@ -42,7 +42,7 @@ int main() {
         db_name ? db_name : "pyracms",          // databaseName
         db_user ? db_user : "pyracms",          // userName
         db_pass ? db_pass : "pyracms",          // password
-        1,                                      // connectionNum
+        4,                                      // connectionNum
         "",                                     // filename
         "default",                              // name
         false,                                  // isFast

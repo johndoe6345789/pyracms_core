@@ -37,7 +37,7 @@ void ArticleService::listArticles(const DbClientPtr &db, int tenantId,
                                    ArticleListCallback cb) {
     db->execSqlAsync(
         "SELECT * FROM articles WHERE tenant_id = $1 AND is_private = false "
-        "ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+        "ORDER BY created_at DESC LIMIT " + std::to_string(limit) + " OFFSET " + std::to_string(offset),
         [this, cb](const drogon::orm::Result &result) {
             std::vector<ArticleDto> articles;
             articles.reserve(result.size());
@@ -46,10 +46,11 @@ void ArticleService::listArticles(const DbClientPtr &db, int tenantId,
             }
             cb(articles);
         },
-        [cb](const drogon::orm::DrogonDbException &) {
+        [cb](const drogon::orm::DrogonDbException &e) {
+            LOG_ERROR << "listArticles error: " << e.base().what();
             cb({});
         },
-        tenantId, limit, offset);
+        tenantId);
 }
 
 void ArticleService::getArticle(const DbClientPtr &db, int tenantId,

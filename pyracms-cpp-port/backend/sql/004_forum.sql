@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS forums (
     name VARCHAR(128) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     category_id INTEGER REFERENCES forum_categories(id) ON DELETE CASCADE,
+    total_threads INTEGER NOT NULL DEFAULT 0,
+    total_posts INTEGER NOT NULL DEFAULT 0,
     UNIQUE (name, category_id)
 );
 
@@ -25,7 +27,9 @@ CREATE TABLE IF NOT EXISTS forum_threads (
     name VARCHAR(256) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     forum_id INTEGER REFERENCES forums(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     view_count INTEGER NOT NULL DEFAULT 0,
+    total_posts INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

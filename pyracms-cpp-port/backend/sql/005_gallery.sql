@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS gallery_albums (
     display_name VARCHAR(256) NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    private BOOLEAN NOT NULL DEFAULT FALSE,
-    protected BOOLEAN NOT NULL DEFAULT FALSE,
+    is_private BOOLEAN NOT NULL DEFAULT FALSE,
+    is_protected BOOLEAN NOT NULL DEFAULT FALSE,
     user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     default_picture_id INTEGER
 );
@@ -21,9 +21,10 @@ CREATE TABLE IF NOT EXISTS gallery_pictures (
     display_name VARCHAR(256) NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    private BOOLEAN NOT NULL DEFAULT FALSE,
+    is_private BOOLEAN NOT NULL DEFAULT FALSE,
     album_id INTEGER REFERENCES gallery_albums(id) ON DELETE CASCADE,
     file_id INTEGER REFERENCES files(id) ON DELETE SET NULL,
+    file_uuid VARCHAR(256),
     thread_id INTEGER NOT NULL DEFAULT -1,
     user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
 );

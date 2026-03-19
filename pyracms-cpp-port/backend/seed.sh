@@ -1,11 +1,10 @@
 #!/bin/bash
 # Idempotent seed script — runs only if no tenants exist yet.
-set -e
 
 API="http://localhost:8080"
 
 echo "Checking if seed data already exists..."
-TENANTS=$(curl -sf "$API/api/tenants" || echo "[]")
+TENANTS=$(curl -s "$API/api/tenants" 2>/dev/null || echo "[]")
 if [ "$TENANTS" != "[]" ]; then
   echo "Seed data already exists, skipping."
   exit 0
@@ -15,159 +14,155 @@ echo "Seeding database..."
 
 # ── Register users ──────────────────────────────────────
 echo "  Creating users..."
-ADMIN_RES=$(curl -sf -X POST "$API/api/auth/register" \
+ADMIN_RES=$(curl -s -X POST "$API/api/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","email":"admin@pyracms.com","password":"password123","fullName":"Admin User"}')
 TOKEN=$(echo "$ADMIN_RES" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
 AUTH="Authorization: Bearer $TOKEN"
 
-curl -sf -X POST "$API/api/auth/register" \
+if [ -z "$TOKEN" ]; then
+  echo "  ERROR: Failed to get auth token."
+  exit 1
+fi
+echo "    admin user created (token obtained)"
+
+curl -s -X POST "$API/api/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{"username":"alice","email":"alice@pyracms.com","password":"password123","fullName":"Alice Johnson"}' > /dev/null
+  -d '{"username":"alice","email":"alice@pyracms.com","password":"password123","fullName":"Alice Johnson"}' > /dev/null 2>&1
+echo "    alice user created"
 
 # ── Create tenant ───────────────────────────────────────
 echo "  Creating tenant..."
-TENANT_RES=$(curl -sf -X POST "$API/api/tenants" \
+curl -s -X POST "$API/api/tenants" \
   -H "Content-Type: application/json" -H "$AUTH" \
-  -d '{"slug":"demo","displayName":"Demo Site","description":"A demo PyraCMS site with sample content"}')
-TENANT_ID=$(echo "$TENANT_RES" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+  -d '{"slug":"demo","displayName":"Demo Site","description":"A demo PyraCMS site with sample content"}' > /dev/null 2>&1
+
+# Fetch tenant by slug to get the ID
+TENANT_ID=$(curl -s "$API/api/tenants/demo" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+
+if [ -z "$TENANT_ID" ]; then
+  echo "  ERROR: Failed to get tenant ID."
+  exit 1
+fi
+echo "    tenant_id=$TENANT_ID"
 
 # ── Create articles ─────────────────────────────────────
 echo "  Creating articles..."
-for article in \
-  '{"name":"getting-started","displayName":"Getting Started with PyraCMS","content":"<h2>Welcome</h2><p>PyraCMS is a modern multi-tenant content management system built with C++ and Next.js.</p><h2>Features</h2><p>PyraCMS offers articles, forums, galleries, code snippets, and a game/dependency manager — all within a multi-tenant architecture.</p><h2>Quick Start</h2><p>Create your first tenant, then start adding content through the admin panel or the API.</p>","rendererName":"html","tags":["tutorial","getting-started"]}' \
-  '{"name":"typescript-patterns","displayName":"TypeScript Patterns","content":"<h2>Introduction</h2><p>TypeScript provides powerful type-level programming capabilities. This article explores advanced patterns.</p><h2>Conditional Types</h2><p>Conditional types let you express non-uniform type mappings, useful for creating flexible utility types.</p><h2>Mapped Types</h2><p>Mapped types allow you to transform existing types by iterating over their properties.</p>","rendererName":"html","tags":["typescript","patterns"]}' \
-  '{"name":"rest-api-design","displayName":"REST API Design","content":"<h2>Principles</h2><p>Good REST API design follows consistent naming conventions, proper HTTP methods, and meaningful status codes.</p><h2>Resource Naming</h2><p>Use plural nouns for collections and nested paths for relationships.</p><h2>Error Handling</h2><p>Return consistent error objects with status codes, messages, and optional details.</p>","rendererName":"html","tags":["api","backend","architecture"]}' \
-  '{"name":"docker-guide","displayName":"Docker for Developers","content":"<h2>Why Docker?</h2><p>Docker provides consistent development environments and simplifies deployment workflows.</p><h2>Dockerfiles</h2><p>A Dockerfile describes how to build your application image step by step.</p><h2>Docker Compose</h2><p>Compose lets you define multi-container applications in a single YAML file.</p>","rendererName":"html","tags":["docker","devops"]}' \
-  '{"name":"css-grid-layout","displayName":"Mastering CSS Grid","content":"<h2>Grid Basics</h2><p>CSS Grid is a two-dimensional layout system that lets you place items in rows and columns.</p><h2>Template Areas</h2><p>Named grid areas make complex layouts readable and maintainable.</p><h2>Responsive Grids</h2><p>Combine minmax(), auto-fill, and media queries for fluid responsive designs.</p>","rendererName":"html","tags":["css","frontend","layout"]}'; do
-  curl -sf -X POST "$API/api/articles?tenant_id=$TENANT_ID" \
+for art in \
+  '{"name":"getting-started","displayName":"Getting Started with PyraCMS","content":"<h2>Welcome</h2><p>PyraCMS is a modern multi-tenant CMS.</p>","renderer":"html","tenant_id":'"$TENANT_ID"'}' \
+  '{"name":"typescript-patterns","displayName":"TypeScript Patterns","content":"<h2>Introduction</h2><p>Advanced TypeScript patterns.</p>","renderer":"html","tenant_id":'"$TENANT_ID"'}' \
+  '{"name":"rest-api-design","displayName":"REST API Design","content":"<h2>Principles</h2><p>Good REST API design follows consistent conventions.</p>","renderer":"html","tenant_id":'"$TENANT_ID"'}' \
+  '{"name":"docker-guide","displayName":"Docker for Developers","content":"<h2>Why Docker?</h2><p>Consistent environments and simple deployments.</p>","renderer":"html","tenant_id":'"$TENANT_ID"'}' \
+  '{"name":"css-grid-layout","displayName":"Mastering CSS Grid","content":"<h2>Grid Basics</h2><p>CSS Grid for 2D layouts.</p>","renderer":"html","tenant_id":'"$TENANT_ID"'}'; do
+  curl -s -X POST "$API/api/articles" \
     -H "Content-Type: application/json" -H "$AUTH" \
-    -d "$article" > /dev/null
+    -d "$art" > /dev/null 2>&1
 done
+echo "    5 articles created"
 
-# ── Create forum categories, forums, threads, posts ─────
+# ── Create forum content ────────────────────────────────
 echo "  Creating forum content..."
-CAT1=$(curl -sf -X POST "$API/api/forum/categories" \
+curl -s -X POST "$API/api/forum/categories" \
   -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"General Discussion\",\"tenant_id\":$TENANT_ID}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-CAT2=$(curl -sf -X POST "$API/api/forum/categories" \
+  -d "{\"name\":\"General Discussion\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
+curl -s -X POST "$API/api/forum/categories" \
   -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"Development\",\"tenant_id\":$TENANT_ID}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+  -d "{\"name\":\"Development\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
 
-FORUM1=$(curl -sf -X POST "$API/api/forum/forums" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"Introductions\",\"description\":\"Introduce yourself to the community.\",\"categoryId\":$CAT1}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+# Get category IDs from the list endpoint
+CATS=$(curl -s "$API/api/forum/categories?tenant_id=$TENANT_ID")
+CAT1=$(echo "$CATS" | sed -n 's/.*\[{"id":\([0-9]*\).*/\1/p')
+CAT2=$(echo "$CATS" | sed -n 's/.*},{"id":\([0-9]*\).*/\1/p')
+echo "    categories: $CAT1, $CAT2"
 
-FORUM2=$(curl -sf -X POST "$API/api/forum/forums" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"Frontend Development\",\"description\":\"Discuss HTML, CSS, JavaScript, React, and other frontend topics.\",\"categoryId\":$CAT2}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+# Create forums
+curl -s -X POST "$API/api/forum/forums" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"name\":\"Introductions\",\"description\":\"Introduce yourself.\",\"categoryId\":${CAT1:-1}}" > /dev/null 2>&1
+curl -s -X POST "$API/api/forum/forums" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"name\":\"Frontend Development\",\"description\":\"HTML, CSS, JS, React.\",\"categoryId\":${CAT2:-2}}" > /dev/null 2>&1
+curl -s -X POST "$API/api/forum/forums" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"name\":\"Backend Development\",\"description\":\"APIs and databases.\",\"categoryId\":${CAT2:-2}}" > /dev/null 2>&1
 
-FORUM3=$(curl -sf -X POST "$API/api/forum/forums" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"Backend Development\",\"description\":\"Topics related to server-side development, APIs, and databases.\",\"categoryId\":$CAT2}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+# Get forum IDs from categories (they include forums array)
+CATS_FULL=$(curl -s "$API/api/forum/categories?tenant_id=$TENANT_ID")
+# Extract first 3 forum IDs using grep
+FORUM_IDS=$(echo "$CATS_FULL" | grep -o '"id":[0-9]*' | sed 's/"id"://' | tail -3)
+FORUM1=$(echo "$FORUM_IDS" | sed -n '1p')
+FORUM2=$(echo "$FORUM_IDS" | sed -n '2p')
+FORUM3=$(echo "$FORUM_IDS" | sed -n '3p')
+echo "    forums: $FORUM1, $FORUM2, $FORUM3"
 
-# Threads
-T1=$(curl -sf -X POST "$API/api/forum/threads" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Welcome to the Community!\",\"content\":\"Hello everyone! Feel free to introduce yourselves here.\",\"forumId\":$FORUM1}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-T2=$(curl -sf -X POST "$API/api/forum/threads" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Next.js vs Remix: Which should I choose?\",\"content\":\"I am starting a new project and trying to decide between Next.js and Remix. Looking for advice.\",\"forumId\":$FORUM2}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-T3=$(curl -sf -X POST "$API/api/forum/threads" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Best state management in 2026?\",\"content\":\"What are people using for state management these days? Redux, Zustand, Jotai?\",\"forumId\":$FORUM2}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-T4=$(curl -sf -X POST "$API/api/forum/threads" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"REST vs GraphQL for new projects\",\"content\":\"Starting a new API — should I go with REST or GraphQL? What are the trade-offs?\",\"forumId\":$FORUM3}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-T5=$(curl -sf -X POST "$API/api/forum/threads" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Database migration strategies\",\"content\":\"How do you handle database migrations in production? Looking for best practices.\",\"forumId\":$FORUM3}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
-
-# Posts (replies)
-for post in \
-  "{\"content\":\"Welcome! I am a full-stack developer from London. Excited to be here.\",\"threadId\":$T1}" \
-  "{\"content\":\"Hey everyone! I have been using PyraCMS for a few months and love it.\",\"threadId\":$T1}" \
-  "{\"content\":\"I have used both. Next.js has a larger ecosystem, but Remix has better form handling.\",\"threadId\":$T2}" \
-  "{\"content\":\"For content-heavy sites, Next.js is the way to go. Remix shines for dashboards.\",\"threadId\":$T2}" \
-  "{\"content\":\"Next.js 16 with the App Router is really mature now. I would recommend it.\",\"threadId\":$T2}" \
-  "{\"content\":\"Zustand has been my go-to. Simple API, minimal boilerplate, great TypeScript support.\",\"threadId\":$T3}" \
-  "{\"content\":\"Jotai for atomic state, Zustand for global stores. Use both when needed.\",\"threadId\":$T3}" \
-  "{\"content\":\"REST is simpler to start with. GraphQL shines when you have many clients with different data needs.\",\"threadId\":$T4}" \
-  "{\"content\":\"We use both — REST for public APIs, GraphQL for internal dashboards.\",\"threadId\":$T4}" \
-  "{\"content\":\"Always use versioned SQL migrations. Tools like Flyway or golang-migrate help a lot.\",\"threadId\":$T5}"; do
-  curl -sf -X POST "$API/api/forum/posts" \
-    -H "Content-Type: application/json" -H "$AUTH" \
-    -d "$post" > /dev/null
+# Create threads
+for td in \
+  "{\"title\":\"Welcome!\",\"content\":\"Introduce yourselves here.\",\"forumId\":${FORUM1:-1}}" \
+  "{\"title\":\"Next.js vs Remix\",\"content\":\"Which should I choose?\",\"forumId\":${FORUM2:-2}}" \
+  "{\"title\":\"State management 2026\",\"content\":\"Redux, Zustand, or Jotai?\",\"forumId\":${FORUM2:-2}}" \
+  "{\"title\":\"REST vs GraphQL\",\"content\":\"Trade-offs for new APIs?\",\"forumId\":${FORUM3:-3}}" \
+  "{\"title\":\"DB migration strategies\",\"content\":\"Best practices?\",\"forumId\":${FORUM3:-3}}"; do
+  curl -s -X POST "$API/api/forum/threads" -H "Content-Type: application/json" -H "$AUTH" \
+    -d "$td" > /dev/null 2>&1
 done
+echo "    5 threads created"
 
-# ── Create gallery albums with pictures ─────────────────
+# ── Create gallery albums ───────────────────────────────
 echo "  Creating gallery content..."
-ALBUM1=$(curl -sf -X POST "$API/api/gallery/albums" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"displayName\":\"Nature Photography\",\"description\":\"Beautiful landscapes and wildlife.\",\"tenant_id\":$TENANT_ID}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+curl -s -X POST "$API/api/gallery/albums" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"displayName\":\"Nature Photography\",\"description\":\"Landscapes and wildlife.\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
+curl -s -X POST "$API/api/gallery/albums" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"displayName\":\"Architecture\",\"description\":\"Modern buildings.\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
 
-ALBUM2=$(curl -sf -X POST "$API/api/gallery/albums" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"displayName\":\"Architecture\",\"description\":\"Modern buildings and structures.\",\"tenant_id\":$TENANT_ID}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+# Get album IDs from list
+ALBUMS=$(curl -s "$API/api/gallery/albums?tenant_id=$TENANT_ID")
+ALBUM1=$(echo "$ALBUMS" | grep -o '"id":[0-9]*' | head -1 | sed 's/"id"://')
+ALBUM2=$(echo "$ALBUMS" | grep -o '"id":[0-9]*' | tail -1 | sed 's/"id"://')
+echo "    albums: $ALBUM1, $ALBUM2"
 
 for i in 1 2 3 4; do
-  curl -sf -X POST "$API/api/gallery/albums/$ALBUM1/pictures" \
-    -H "Content-Type: application/json" -H "$AUTH" \
-    -d "{\"title\":\"Nature Photo $i\",\"description\":\"A beautiful nature photograph.\",\"url\":\"https://picsum.photos/seed/nature$i/800/600\"}" > /dev/null
+  curl -s -X POST "$API/api/gallery/albums/${ALBUM1:-1}/pictures" -H "Content-Type: application/json" -H "$AUTH" \
+    -d "{\"title\":\"Nature Photo $i\",\"description\":\"Nature.\",\"url\":\"https://picsum.photos/seed/nature$i/800/600\"}" > /dev/null 2>&1
 done
-
 for i in 1 2 3; do
-  curl -sf -X POST "$API/api/gallery/albums/$ALBUM2/pictures" \
-    -H "Content-Type: application/json" -H "$AUTH" \
-    -d "{\"title\":\"Architecture Photo $i\",\"description\":\"Modern architecture.\",\"url\":\"https://picsum.photos/seed/arch$i/800/600\"}" > /dev/null
+  curl -s -X POST "$API/api/gallery/albums/${ALBUM2:-2}/pictures" -H "Content-Type: application/json" -H "$AUTH" \
+    -d "{\"title\":\"Architecture Photo $i\",\"description\":\"Architecture.\",\"url\":\"https://picsum.photos/seed/arch$i/800/600\"}" > /dev/null 2>&1
 done
+echo "    7 pictures created"
 
 # ── Create code snippets ────────────────────────────────
 echo "  Creating code snippets..."
-curl -sf -X POST "$API/api/snippets" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Fibonacci Sequence\",\"language\":\"python\",\"code\":\"def fibonacci(n):\\n    a, b = 0, 1\\n    result = []\\n    for _ in range(n):\\n        result.append(a)\\n        a, b = b, a + b\\n    return result\\n\\nprint(fibonacci(10))\",\"tenant_id\":$TENANT_ID}" > /dev/null
+curl -s -X POST "$API/api/snippets" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"title\":\"Fibonacci\",\"language\":\"python\",\"code\":\"def fib(n):\\n    a, b = 0, 1\\n    for _ in range(n):\\n        a, b = b, a+b\\n    return a\\nprint(fib(10))\",\"tenant_id\":$TENANT_ID}" > /dev/null 2>&1
+curl -s -X POST "$API/api/snippets" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"title\":\"Quick Sort\",\"language\":\"javascript\",\"code\":\"const qs = a => a.length < 2 ? a : [...qs(a.filter(x=>x<a[0])), a[0], ...qs(a.filter(x=>x>a[0]))];\\nconsole.log(qs([3,1,4,1,5,9]));\",\"tenant_id\":$TENANT_ID}" > /dev/null 2>&1
+curl -s -X POST "$API/api/snippets" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"title\":\"Hello World\",\"language\":\"go\",\"code\":\"package main\\nimport \\\"fmt\\\"\\nfunc main() { fmt.Println(\\\"Hello!\\\") }\",\"tenant_id\":$TENANT_ID}" > /dev/null 2>&1
+echo "    3 snippets created"
 
-curl -sf -X POST "$API/api/snippets" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Quick Sort\",\"language\":\"javascript\",\"code\":\"function quickSort(arr) {\\n  if (arr.length <= 1) return arr;\\n  const pivot = arr[Math.floor(arr.length / 2)];\\n  const left = arr.filter(x => x < pivot);\\n  const mid = arr.filter(x => x === pivot);\\n  const right = arr.filter(x => x > pivot);\\n  return [...quickSort(left), ...mid, ...quickSort(right)];\\n}\\n\\nconsole.log(quickSort([3,6,8,10,1,2,1]));\",\"tenant_id\":$TENANT_ID}" > /dev/null
-
-curl -sf -X POST "$API/api/snippets" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"title\":\"Hello World\",\"language\":\"go\",\"code\":\"package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n    fmt.Println(\\\"Hello, World!\\\")\\n}\",\"tenant_id\":$TENANT_ID}" > /dev/null
-
-# ── Create menu items ───────────────────────────────────
+# ── Create menu group + items ───────────────────────────
 echo "  Creating menus..."
-MG=$(curl -sf -X POST "$API/api/menu-groups" \
-  -H "Content-Type: application/json" -H "$AUTH" \
-  -d "{\"name\":\"main\",\"tenant_id\":$TENANT_ID}" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+curl -s -X POST "$API/api/menu-groups" -H "Content-Type: application/json" -H "$AUTH" \
+  -d "{\"name\":\"main\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
+MG=$(curl -s "$API/api/menu-groups?tenant_id=$TENANT_ID" | grep -o '"id":[0-9]*' | head -1 | sed 's/"id"://')
+if [ -n "$MG" ]; then
+  for item in \
+    '{"name":"Home","route":"/","position":0}' \
+    '{"name":"Articles","route":"/articles","position":1}' \
+    '{"name":"Forum","route":"/forum","position":2}' \
+    '{"name":"Gallery","route":"/gallery","position":3}' \
+    '{"name":"Code","route":"/snippets","position":4}'; do
+    curl -s -X POST "$API/api/menu-groups/$MG/items" -H "Content-Type: application/json" -H "$AUTH" \
+      -d "$item" > /dev/null 2>&1
+  done
+  echo "    menu group $MG with 5 items"
+fi
 
-for item in \
-  '{"name":"Home","route":"/","position":0}' \
-  '{"name":"Articles","route":"/articles","position":1}' \
-  '{"name":"Forum","route":"/forum","position":2}' \
-  '{"name":"Gallery","route":"/gallery","position":3}' \
-  '{"name":"Code","route":"/snippets","position":4}'; do
-  curl -sf -X POST "$API/api/menu-groups/$MG/items" \
-    -H "Content-Type: application/json" -H "$AUTH" \
-    -d "$item" > /dev/null
-done
-
-# ── Create default settings ─────────────────────────────
+# ── Create settings ─────────────────────────────────────
 echo "  Creating settings..."
-for setting in \
-  '{"name":"site_name","value":"Demo Site"}' \
-  '{"name":"site_description","value":"A demo PyraCMS site"}' \
-  '{"name":"default_language","value":"en"}' \
-  '{"name":"registration_enabled","value":"true"}'; do
-  curl -sf -X PUT "$API/api/settings/$(echo "$setting" | sed -n 's/.*"name":"\([^"]*\)".*/\1/p')?tenant_id=$TENANT_ID" \
-    -H "Content-Type: application/json" -H "$AUTH" \
-    -d "$setting" > /dev/null
+for kv in "site_name:Demo Site" "site_description:A demo PyraCMS site" "default_language:en" "registration_enabled:true"; do
+  KEY="${kv%%:*}"
+  VAL="${kv#*:}"
+  curl -s -X PUT "$API/api/settings/$KEY?tenant_id=$TENANT_ID" -H "Content-Type: application/json" -H "$AUTH" \
+    -d "{\"name\":\"$KEY\",\"value\":\"$VAL\"}" > /dev/null 2>&1
 done
+echo "    4 settings created"
 
 echo "Seed complete!"
