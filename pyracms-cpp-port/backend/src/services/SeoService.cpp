@@ -159,7 +159,7 @@ void SeoService::getArticleJsonLd(const DbClientPtr &db, int tenantId,
                 cb(Json::Value::null);
                 return;
             }
-            auto &row = result[0];
+            const auto row = result[0];
             Json::Value ld;
             ld["@context"] = "https://schema.org";
             ld["@type"] = "Article";
@@ -202,7 +202,7 @@ void SeoService::getOpenGraphData(const DbClientPtr &db, int tenantId,
                 cb(Json::Value::null);
                 return;
             }
-            auto &row = result[0];
+            const auto row = result[0];
             Json::Value og;
             og["og:type"] = "article";
             og["og:title"] = row["display_name"].as<std::string>();

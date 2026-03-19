@@ -191,7 +191,7 @@ void WebhookService::fireEvent(
                 auto webhook = rowToDto(row);
                 Json::Value payload;
                 payload["event"] = event;
-                payload["timestamp"] = drogon::utils::getFormattedDate();
+                payload["timestamp"] = trantor::Date::now().toFormattedString(false);
                 payload["data"] = data;
                 deliverWebhook(webhook, event, payload, db, 0);
             }
