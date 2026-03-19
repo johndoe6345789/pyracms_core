@@ -102,12 +102,10 @@ export default function NotificationBell() {
     } catch { /* ignore */ }
   }
 
-  if (!isAuthenticated) return null
-
   return (
     <>
       <IconButton onClick={handleOpen} sx={{ color: 'text.primary' }}>
-        <Badge badgeContent={unreadCount} color="error" max={99}>
+        <Badge badgeContent={isAuthenticated ? unreadCount : 0} color="error" max={99}>
           <NotificationsOutlined />
         </Badge>
       </IconButton>
@@ -128,7 +126,11 @@ export default function NotificationBell() {
           )}
         </Box>
         <Divider />
-        {loading ? (
+        {!isAuthenticated ? (
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography color="text.secondary">Sign in to see notifications</Typography>
+          </Box>
+        ) : loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
         ) : notifications.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
