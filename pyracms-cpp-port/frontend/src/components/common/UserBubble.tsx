@@ -25,13 +25,11 @@ export default function UserBubble() {
     (s: RootState) => s.auth)
   const [el, setEl] =
     useState<null | HTMLElement>(null)
-
   const doLogout = () => {
     localStorage.removeItem('token')
     dispatch(logout())
     setEl(null); router.push('/')
   }
-
   if (!isAuthenticated) return (
     <Chip icon={<PersonOutlined />}
       label="Guest" variant="outlined"
@@ -40,16 +38,13 @@ export default function UserBubble() {
       data-testid="guest-login-link"
       sx={{ borderColor: 'divider',
         color: 'text.secondary' }} />)
-
   const init =
     user?.username?.charAt(0).toUpperCase()
     || '?'
-
   return (<>
     <IconButton
       onClick={(e) => setEl(e.currentTarget)}
-      sx={{ p: 0.5 }}
-      aria-label="User menu"
+      sx={{ p: 0.5 }} aria-label="User menu"
       data-testid="user-bubble-btn">
       <Avatar sx={{ width: 32, height: 32,
         bgcolor: 'primary.main',

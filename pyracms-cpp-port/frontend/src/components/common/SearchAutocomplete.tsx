@@ -23,58 +23,47 @@ const ICONS: Record<string, React.ReactNode> = {
   gamedep: (
     <SportsEsportsOutlined fontSize="small" />),
 }
-
 interface Props {
   tenantId?: number
   onSelect?: (url: string) => void
   onSearch?: (query: string) => void
   placeholder?: string
 }
-
 export default function SearchAutocomplete({
   tenantId = 1, onSelect, onSearch,
   placeholder = 'Search...',
 }: Props) {
   const [q, setQ] = useState('')
-  const [results, setResults] =
-    useState<Result[]>([])
+  const [res, setRes] = useState<Result[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLInputElement>(null)
-  const timer = useRef<NodeJS.Timeout>(null)
-
-  const onChange = useCallback((v: string) => {
+  const tm = useRef<NodeJS.Timeout>(null)
+  const chg = useCallback((v: string) => {
     setQ(v)
-    if (timer.current) clearTimeout(timer.current)
+    if (tm.current) clearTimeout(tm.current)
     if (v.length < 2) {
-      setResults([]); setOpen(false); return
-    }
-    timer.current = setTimeout(async () => {
+      setRes([]); setOpen(false); return }
+    tm.current = setTimeout(async () => {
       try {
         const u = '/api/search/autocomplete?q='
           + encodeURIComponent(v)
           + `&tenant_id=${tenantId}&limit=8`
         const r = await api.get(u)
-        setResults(r.data || [])
+        setRes(r.data || [])
         setOpen((r.data || []).length > 0)
-      } catch {
-        setResults([]); setOpen(false)
-      }
+      } catch { setRes([]); setOpen(false) }
     }, 200)
   }, [tenantId])
-
   return (
     <div style={{ position: 'relative' }}>
       <TextField inputRef={ref} fullWidth
         size="small" placeholder={placeholder}
         value={q}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            setOpen(false); onSearch?.(q)
-          }
-        }}
+        onChange={(e) => chg(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter')
+          { setOpen(false); onSearch?.(q) } }}
         onFocus={() =>
-          results.length > 0 && setOpen(true)}
+          res.length > 0 && setOpen(true)}
         onBlur={() => setTimeout(
           () => setOpen(false), 200)}
         data-testid="search-autocomplete-input"
@@ -82,20 +71,19 @@ export default function SearchAutocomplete({
           <InputAdornment position="start">
             <SearchOutlined />
           </InputAdornment>) }} />
-      <Popper open={open} anchorEl={ref.current}
+      <Popper open={open}
+        anchorEl={ref.current}
         placement="bottom-start"
         sx={{ zIndex: 1300,
           width: ref.current?.offsetWidth }}>
-        <Paper elevation={8}
-          sx={{ maxHeight: 300,
-            overflow: 'auto' }}>
+        <Paper elevation={8} sx={{
+          maxHeight: 300, overflow: 'auto' }}>
           <List dense>
-            {results.map((r, i) => (
+            {res.map((r, i) => (
               <ListItem key={i}
-                onClick={() => {
-                  setQ(r.text); setOpen(false)
-                  onSelect?.(r.url)
-                }}
+                onClick={() => { setQ(r.text)
+                  setOpen(false)
+                  onSelect?.(r.url) }}
                 data-testid={
                   `autocomplete-item-${i}`}
                 sx={{ cursor: 'pointer',
@@ -110,13 +98,12 @@ export default function SearchAutocomplete({
                 <ListItemText
                   primary={r.text} />
                 <Chip label={r.type}
-                  size="small"
-                  sx={{ height: 20,
+                  size="small" sx={{
+                    height: 20,
                     fontSize: '0.6rem' }} />
               </ListItem>))}
           </List>
         </Paper>
       </Popper>
-    </div>
-  )
+    </div>)
 }

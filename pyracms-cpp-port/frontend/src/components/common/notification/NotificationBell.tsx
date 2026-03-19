@@ -28,13 +28,12 @@ export default function NotificationBell() {
     (s: RootState) => s.auth.isAuthenticated)
   const API = process.env.NEXT_PUBLIC_API_URL
     || 'http://localhost:8080'
-
   const onWs = useCallback(
     (data: unknown) => {
       const m = data as Record<string, unknown>
       if (m.type !== 'notification') return
       setUnread((c) => c + 1)
-      setItems((prev) => [{
+      setItems((p) => [{
         id: m.id as number,
         type: (m.notificationType as string)
           || 'system',
@@ -43,23 +42,19 @@ export default function NotificationBell() {
         link: m.link as string | null,
         is_read: false,
         created_at: new Date().toISOString(),
-      }, ...prev].slice(0, 20))
+      }, ...p].slice(0, 20))
     }, [])
-
   useWebSocket({
     url: isAuth
       ? `${API}/api/ws/notifications` : '',
     onMessage: onWs,
-    autoReconnect: isAuth,
-  })
-
+    autoReconnect: isAuth })
   useEffect(() => {
     if (!isAuth) return
     api.get('/api/notifications/unread-count')
       .then((r) => setUnread(r.data.count))
       .catch(() => {})
   }, [isAuth])
-
   const open = async (
     e: React.MouseEvent<HTMLElement>) => {
     setAnchor(e.currentTarget)
@@ -90,7 +85,6 @@ export default function NotificationBell() {
       setUnread((c) => Math.max(0, c - 1))
     } catch { /* ignore */ }
   }
-
   return (<>
     <IconButton onClick={open}
       sx={{ color: 'text.primary' }}
@@ -99,8 +93,7 @@ export default function NotificationBell() {
       <Badge color="error" max={99}
         badgeContent={isAuth ? unread : 0}>
         <NotificationsOutlined />
-      </Badge>
-    </IconButton>
+      </Badge></IconButton>
     <Popover anchorEl={anchor}
       open={Boolean(anchor)}
       onClose={() => setAnchor(null)}
@@ -122,12 +115,10 @@ export default function NotificationBell() {
               <MarkEmailReadOutlined />}
             onClick={markAll}
             data-testid="mark-all-read-btn">
-            Mark all read
-          </Button>)}
+            Mark all read</Button>)}
       </Box>
       <Divider />
-      <NotificationList
-        notifications={items}
+      <NotificationList notifications={items}
         loading={loading}
         isAuthenticated={isAuth}
         onMarkRead={markOne} />

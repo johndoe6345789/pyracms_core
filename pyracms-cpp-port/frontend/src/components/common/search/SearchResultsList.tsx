@@ -12,11 +12,8 @@ import {
 export interface SearchResult {
   id: string
   type: 'article' | 'post' | 'snippet' | 'user'
-  title: string
-  snippet: string
-  url: string
+  title: string; snippet: string; url: string
 }
-
 const ICONS: Record<string, React.ReactNode> = {
   article: <ArticleOutlined fontSize="small" />,
   post: <ForumOutlined fontSize="small" />,
@@ -29,11 +26,9 @@ const COLORS: Record<string, string> = {
 }
 
 interface Props {
-  results: SearchResult[]
-  query: string
+  results: SearchResult[]; query: string
   onSelect: (r: SearchResult) => void
 }
-
 export default function SearchResultsList({
   results, query, onSelect,
 }: Props) {
@@ -43,32 +38,26 @@ export default function SearchResultsList({
         borderTop: 1, borderColor: 'divider' }}>
         <Typography color="text.secondary">
           No results for &quot;{query}&quot;
-        </Typography>
-      </Box>
-    )
+        </Typography></Box>)
   if (results.length === 0) return null
-
-  const grouped = results.reduce<
+  const grp = results.reduce<
     Record<string, SearchResult[]>
   >((a, r) => {
-    ;(a[r.type] ??= []).push(r)
-    return a
+    ;(a[r.type] ??= []).push(r); return a
   }, {})
-
   return (
     <Box sx={{ borderTop: 1,
       borderColor: 'divider',
       maxHeight: 400, overflow: 'auto' }}>
-      {Object.entries(grouped).map(
-        ([type, items]) => (
-        <Box key={type}>
+      {Object.entries(grp).map(([t, items]) => (
+        <Box key={t}>
           <Typography variant="caption" sx={{
             px: 2, py: 0.5, display: 'block',
             color: 'text.secondary',
             textTransform: 'uppercase',
             fontWeight: 600,
-            bgcolor: 'background.default',
-          }}>{type}s</Typography>
+            bgcolor: 'background.default' }}>
+            {t}s</Typography>
           <List disablePadding>
             {items.map((r) => (
               <ListItem key={r.id}
@@ -77,12 +66,12 @@ export default function SearchResultsList({
                   `search-result-${r.id}`}
                 sx={{ cursor: 'pointer',
                   '&:hover': {
-                    bgcolor: 'action.hover',
-                  }, px: 2, py: 1 }}>
+                    bgcolor: 'action.hover' },
+                  px: 2, py: 1 }}>
                 <ListItemIcon sx={{
                   minWidth: 36,
-                  color: COLORS[r.type],
-                }}>{ICONS[r.type]}</ListItemIcon>
+                  color: COLORS[r.type] }}>
+                  {ICONS[r.type]}</ListItemIcon>
                 <ListItemText
                   primary={r.title}
                   secondary={
@@ -94,11 +83,8 @@ export default function SearchResultsList({
                     fontWeight: 600 }}
                   secondaryTypographyProps={{
                     variant: 'caption' }} />
-              </ListItem>
-            ))}
+              </ListItem>))}
           </List>
-        </Box>
-      ))}
-    </Box>
-  )
+        </Box>))}
+    </Box>)
 }

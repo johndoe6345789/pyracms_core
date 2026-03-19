@@ -1,8 +1,6 @@
 'use client'
 
-import {
-  useCallback, useEffect, useRef, useState,
-} from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Box } from '@mui/material'
 import DOMPurify from 'dompurify'
 import Editor, { type OnMount } from '@monaco-editor/react'
@@ -18,6 +16,7 @@ import {
   HtmlPreviewContent,
 } from './EditorPreviewPane'
 import { getToolbarActions } from './toolbarActions'
+import { useAutoSave } from './useAutoSave'
 
 interface MonacoEditorProps {
   value: string
@@ -26,60 +25,48 @@ interface MonacoEditorProps {
   autoSaveKey?: string
 }
 
-const LANG_MAP: Record<string, string> = {
+const LANG: Record<string, string> = {
   HTML: 'html', Markdown: 'markdown',
   BBCode: 'plaintext', RST: 'plaintext',
+}
+const OPTS = {
+  minimap: { enabled: false },
+  wordWrap: 'on' as const, fontSize: 14,
+  scrollBeyondLastLine: false,
+  automaticLayout: true,
 }
 
 export function MonacoEditorComponent({
   value, onChange, language, autoSaveKey,
 }: MonacoEditorProps) {
-  const editorRef = useRef<
+  const ref = useRef<
     MonacoEditor.IStandaloneCodeEditor | null
   >(null)
-  const [viewMode, setViewMode] =
+  const [vm, setVm] =
     useState<ViewMode>('edit')
-  const lang = LANG_MAP[language] ?? 'plaintext'
-
-  useEffect(() => {
-    if (!autoSaveKey) return
-    const t = setTimeout(() => {
-      localStorage.setItem(
-        `autosave-${autoSaveKey}`, value)
-    }, 1000)
-    return () => clearTimeout(t)
-  }, [value, autoSaveKey])
-
-  useEffect(() => {
-    if (!autoSaveKey) return
-    const s = localStorage.getItem(
-      `autosave-${autoSaveKey}`)
-    if (s && !value) onChange(s)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSaveKey])
+  useAutoSave(value, onChange, autoSaveKey)
 
   const onMount: OnMount = (ed) => {
-    editorRef.current = ed
+    ref.current = ed
   }
-
   const insert = useCallback(
     (pre: string, suf: string) => {
-      const ed = editorRef.current
+      const ed = ref.current
       if (!ed) return
       const sel = ed.getSelection()
       if (!sel) return
-      const txt = ed.getModel()
+      const t = ed.getModel()
         ?.getValueInRange(sel) ?? ''
       ed.executeEdits('toolbar', [
-        { range: sel, text: `${pre}${txt}${suf}` },
+        { range: sel, text: `${pre}${t}${suf}` },
       ])
       ed.focus()
     }, [])
 
   const showEd =
-    viewMode === 'edit' || viewMode === 'split'
+    vm === 'edit' || vm === 'split'
   const showPv =
-    viewMode === 'preview' || viewMode === 'split'
+    vm === 'preview' || vm === 'split'
 
   return (
     <section aria-label="Monaco code editor">
@@ -89,26 +76,25 @@ export function MonacoEditorComponent({
       }}>
         <EditorToolbar
           actions={getToolbarActions(language)}
-          onAction={insert}
-        >
+          onAction={insert}>
           <EditorViewToggle
-            viewMode={viewMode}
-            onViewModeChange={setViewMode} />
+            viewMode={vm}
+            onViewModeChange={setVm} />
         </EditorToolbar>
-        <Box sx={{ display: 'flex', minHeight: 400 }}>
+        <Box sx={{
+          display: 'flex', minHeight: 400,
+        }}>
           {showEd && (
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Editor
-                height="400px" language={lang}
+                height="400px"
+                language={LANG[language]
+                  ?? 'plaintext'}
                 value={value} theme="vs-dark"
-                onChange={(v) => onChange(v ?? '')}
+                onChange={(v) =>
+                  onChange(v ?? '')}
                 onMount={onMount}
-                options={{
-                  minimap: { enabled: false },
-                  wordWrap: 'on', fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  automaticLayout: true,
-                }} />
+                options={OPTS} />
             </Box>)}
           {showPv && (
             <Box sx={{
@@ -118,11 +104,12 @@ export function MonacoEditorComponent({
             }}>
               <EditorPreviewPane
                 label={`Preview (${language})`}>
-                {value ? (
-                  <HtmlPreviewContent
-                    sanitizedHtml={
-                      DOMPurify.sanitize(value)} />
-                ) : <EmptyPreview />}
+                {value
+                  ? <HtmlPreviewContent
+                      sanitizedHtml={
+                        DOMPurify.sanitize(value)
+                      } />
+                  : <EmptyPreview />}
               </EditorPreviewPane>
             </Box>)}
         </Box>
