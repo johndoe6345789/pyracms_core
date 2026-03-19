@@ -9,6 +9,8 @@ namespace pyracms {
 std::mutex WebSocketNotificationController::connectionsMutex_;
 std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
     WebSocketNotificationController::userConnections_;
+std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
+    WebSocketNotificationController::threadSubscriptions_;
 
 int WebSocketNotificationController::authenticateFromToken(const std::string &token) {
     try {
@@ -95,12 +97,28 @@ void WebSocketNotificationController::handleNewMessage(
         return;
     }
 
+    auto msgType = root.isMember("type") ? root["type"].asString() : "";
+
     // Handle ping/pong keepalive from client
-    if (root.isMember("type") && root["type"].asString() == "ping") {
+    if (msgType == "ping") {
         Json::Value pong;
         pong["type"] = "pong";
         Json::StreamWriterBuilder writer;
         wsConnPtr->send(Json::writeString(writer, pong));
+    }
+    // Thread subscription
+    else if (msgType == "thread_subscribe" && root.isMember("threadId")) {
+        handleThreadSubscribe(wsConnPtr, root["threadId"].asInt());
+    }
+    else if (msgType == "thread_unsubscribe" && root.isMember("threadId")) {
+        handleThreadUnsubscribe(wsConnPtr, root["threadId"].asInt());
+    }
+    // Typing indicators
+    else if (msgType == "typing_start" && root.isMember("threadId")) {
+        handleTypingIndicator(wsConnPtr, root["threadId"].asInt(), true);
+    }
+    else if (msgType == "typing_stop" && root.isMember("threadId")) {
+        handleTypingIndicator(wsConnPtr, root["threadId"].asInt(), false);
     }
 }
 
@@ -127,6 +145,16 @@ void WebSocketNotificationController::handleConnectionClosed(
             userConnections_.erase(it);
         }
     }
+
+    // Clean up thread subscriptions
+    for (auto &[threadId, subs] : threadSubscriptions_) {
+        subs.erase(
+            std::remove_if(subs.begin(), subs.end(),
+                [&wsConnPtr](const drogon::WebSocketConnectionPtr &conn) {
+                    return conn == wsConnPtr;
+                }),
+            subs.end());
+    }
 }
 
 void WebSocketNotificationController::pushNotification(
@@ -151,6 +179,76 @@ void WebSocketNotificationController::broadcastNotification(
         for (auto &conn : conns) {
             if (conn->connected()) {
                 conn->send(jsonPayload);
+            }
+        }
+    }
+}
+
+void WebSocketNotificationController::pushToThread(
+    int threadId, const std::string &jsonPayload) {
+
+    std::lock_guard<std::mutex> lock(connectionsMutex_);
+    auto it = threadSubscriptions_.find(threadId);
+    if (it != threadSubscriptions_.end()) {
+        for (auto &conn : it->second) {
+            if (conn->connected()) {
+                conn->send(jsonPayload);
+            }
+        }
+    }
+}
+
+void WebSocketNotificationController::handleThreadSubscribe(
+    const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId) {
+
+    std::lock_guard<std::mutex> lock(connectionsMutex_);
+    threadSubscriptions_[threadId].push_back(wsConnPtr);
+
+    Json::Value ack;
+    ack["type"] = "thread_subscribed";
+    ack["threadId"] = threadId;
+    Json::StreamWriterBuilder writer;
+    wsConnPtr->send(Json::writeString(writer, ack));
+}
+
+void WebSocketNotificationController::handleThreadUnsubscribe(
+    const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId) {
+
+    std::lock_guard<std::mutex> lock(connectionsMutex_);
+    auto it = threadSubscriptions_.find(threadId);
+    if (it != threadSubscriptions_.end()) {
+        auto &subs = it->second;
+        subs.erase(
+            std::remove_if(subs.begin(), subs.end(),
+                [&wsConnPtr](const drogon::WebSocketConnectionPtr &conn) {
+                    return conn == wsConnPtr;
+                }),
+            subs.end());
+    }
+}
+
+void WebSocketNotificationController::handleTypingIndicator(
+    const drogon::WebSocketConnectionPtr &wsConnPtr,
+    int threadId, bool isTyping) {
+
+    auto ctx = wsConnPtr->getContext<int>();
+    if (!ctx) return;
+    int userId = *ctx;
+
+    Json::Value msg;
+    msg["type"] = isTyping ? "typing_start" : "typing_stop";
+    msg["threadId"] = threadId;
+    msg["userId"] = userId;
+    Json::StreamWriterBuilder writer;
+    auto payload = Json::writeString(writer, msg);
+
+    // Relay to all thread subscribers except the sender
+    std::lock_guard<std::mutex> lock(connectionsMutex_);
+    auto it = threadSubscriptions_.find(threadId);
+    if (it != threadSubscriptions_.end()) {
+        for (auto &conn : it->second) {
+            if (conn != wsConnPtr && conn->connected()) {
+                conn->send(payload);
             }
         }
     }

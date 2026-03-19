@@ -1,35 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box, Paper, Typography, Chip, Button, FormControl, InputLabel, Select, MenuItem, Divider,
 } from '@mui/material'
 import {
   ArticleOutlined, ForumOutlined, CodeOutlined, ThumbUpOutlined, TimelineOutlined,
 } from '@mui/icons-material'
+import api from '@/lib/api'
 
 interface ActivityEvent {
   id: string
-  type: 'post' | 'article' | 'snippet' | 'vote'
+  type: 'post' | 'article' | 'snippet' | 'vote' | 'forum_post'
   title: string
   description: string
   date: string
   link?: string
 }
 
-const PLACEHOLDER_ACTIVITIES: ActivityEvent[] = [
-  { id: '1', type: 'post', title: 'Replied to "Next.js vs Remix"', description: 'Great points from everyone. I should also mention...', date: '2026-03-18 09:15' },
-  { id: '2', type: 'article', title: 'Published "Advanced TypeScript Patterns"', description: 'A deep dive into conditional types, mapped types, and template literals.', date: '2026-03-17 14:30' },
-  { id: '3', type: 'snippet', title: 'Created "Fibonacci Sequence"', description: 'Python implementation of fibonacci with generator pattern.', date: '2026-03-16 11:00' },
-  { id: '4', type: 'vote', title: 'Upvoted "Best practices for React"', description: '', date: '2026-03-16 09:45' },
-  { id: '5', type: 'post', title: 'Started thread "Help with Docker deployment"', description: 'Having issues with multi-stage builds...', date: '2026-03-15 16:20' },
-  { id: '6', type: 'article', title: 'Updated "Getting Started with Next.js"', description: 'Added section on App Router and Server Components.', date: '2026-03-14 10:00' },
-  { id: '7', type: 'snippet', title: 'Forked "Quick Sort" by Bob', description: 'Added randomized pivot selection for better average case.', date: '2026-03-13 15:30' },
-  { id: '8', type: 'vote', title: 'Upvoted 3 posts in "Tech Discussion"', description: '', date: '2026-03-12 12:00' },
-]
-
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   post: <ForumOutlined sx={{ fontSize: 18 }} />,
+  forum_post: <ForumOutlined sx={{ fontSize: 18 }} />,
   article: <ArticleOutlined sx={{ fontSize: 18 }} />,
   snippet: <CodeOutlined sx={{ fontSize: 18 }} />,
   vote: <ThumbUpOutlined sx={{ fontSize: 18 }} />,
@@ -37,19 +28,41 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 
 const TYPE_COLORS: Record<string, string> = {
   post: '#ed6c02',
+  forum_post: '#ed6c02',
   article: '#1976d2',
   snippet: '#2e7d32',
   vote: '#9c27b0',
 }
 
 interface ActivityTimelineProps {
+  userId?: number
   activities?: ActivityEvent[]
 }
 
-export function ActivityTimeline({ activities }: ActivityTimelineProps) {
-  const allActivities = activities ?? PLACEHOLDER_ACTIVITIES
+export function ActivityTimeline({ userId, activities: propActivities }: ActivityTimelineProps) {
+  const [apiActivities, setApiActivities] = useState<ActivityEvent[]>([])
   const [filter, setFilter] = useState<string>('all')
   const [visibleCount, setVisibleCount] = useState(5)
+
+  useEffect(() => {
+    if (propActivities || !userId) return
+    const fetchActivity = async () => {
+      try {
+        const res = await api.get(`/api/users/${userId}/activity?limit=50`)
+        const items = (res.data || []).map((item: Record<string, string | number>) => ({
+          id: String(item.id),
+          type: item.type as string,
+          title: item.title as string,
+          description: (item.summary as string) || '',
+          date: item.createdAt as string,
+        }))
+        setApiActivities(items)
+      } catch { /* ignore */ }
+    }
+    fetchActivity()
+  }, [userId, propActivities])
+
+  const allActivities = propActivities ?? apiActivities
 
   const filtered = filter === 'all' ? allActivities : allActivities.filter((a) => a.type === filter)
   const visible = filtered.slice(0, visibleCount)
@@ -66,10 +79,9 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
           <InputLabel>Filter</InputLabel>
           <Select value={filter} label="Filter" onChange={(e) => { setFilter(e.target.value); setVisibleCount(5) }}>
             <MenuItem value="all">All</MenuItem>
-            <MenuItem value="post">Posts</MenuItem>
+            <MenuItem value="forum_post">Posts</MenuItem>
             <MenuItem value="article">Articles</MenuItem>
             <MenuItem value="snippet">Snippets</MenuItem>
-            <MenuItem value="vote">Votes</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -81,13 +93,13 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {visible.map((activity, idx) => (
             <Box key={activity.id} sx={{ display: 'flex', gap: 2, px: 3, py: 2, borderBottom: idx < visible.length - 1 ? 1 : 0, borderColor: 'divider', '&:hover': { bgcolor: 'action.hover' } }}>
-              <Box sx={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: TYPE_COLORS[activity.type] + '14', color: TYPE_COLORS[activity.type], flexShrink: 0, mt: 0.5 }}>
-                {TYPE_ICONS[activity.type]}
+              <Box sx={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: (TYPE_COLORS[activity.type] || '#666') + '14', color: TYPE_COLORS[activity.type] || '#666', flexShrink: 0, mt: 0.5 }}>
+                {TYPE_ICONS[activity.type] || TYPE_ICONS.article}
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{activity.title}</Typography>
-                  <Chip label={activity.type} size="small" sx={{ height: 18, fontSize: '0.65rem', bgcolor: TYPE_COLORS[activity.type] + '20', color: TYPE_COLORS[activity.type] }} />
+                  <Chip label={activity.type} size="small" sx={{ height: 18, fontSize: '0.65rem', bgcolor: (TYPE_COLORS[activity.type] || '#666') + '20', color: TYPE_COLORS[activity.type] || '#666' }} />
                 </Box>
                 {activity.description && (
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }} noWrap>{activity.description}</Typography>

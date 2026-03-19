@@ -1,9 +1,17 @@
 #include "services/SearchService.h"
+#include "services/ElasticsearchService.h"
+#include "services/CacheService.h"
 
 #include <memory>
 #include <mutex>
 
 namespace pyracms {
+
+bool SearchService::useElasticsearch() {
+    const char *engine = std::getenv("SEARCH_ENGINE");
+    return engine && std::string(engine) == "elasticsearch" &&
+           ElasticsearchService::instance().isConfigured();
+}
 
 void SearchService::search(
     const DbClientPtr &db, int tenantId,
@@ -11,6 +19,78 @@ void SearchService::search(
     int limit, int offset,
     std::function<void(const SearchResults &)> cb) {
 
+    // Delegate to Elasticsearch if configured
+    if (useElasticsearch()) {
+        // Check Redis cache first
+        auto cacheKey = CacheService::searchKey(tenantId, query, type);
+        auto &cache = CacheService::instance();
+        if (cache.isConnected()) {
+            cache.get(cacheKey, [this, db, tenantId, query, type, limit, offset, cb, cacheKey](
+                const std::string &cached, bool found) {
+                if (found) {
+                    // Parse cached JSON
+                    Json::Value root;
+                    Json::CharReaderBuilder reader;
+                    std::istringstream stream(cached);
+                    std::string errors;
+                    if (Json::parseFromStream(reader, stream, &root, &errors)) {
+                        SearchResults results;
+                        results.query = root["query"].asString();
+                        results.totalCount = root["totalCount"].asInt();
+                        for (const auto &item : root["items"]) {
+                            SearchResultItem sri;
+                            sri.type = item["type"].asString();
+                            sri.id = item["id"].asInt();
+                            sri.title = item["title"].asString();
+                            sri.snippet = item["snippet"].asString();
+                            sri.url = item["url"].asString();
+                            sri.rank = item["rank"].asDouble();
+                            sri.createdAt = item["createdAt"].asString();
+                            results.items.push_back(sri);
+                        }
+                        for (const auto &key : root["facets"].getMemberNames()) {
+                            results.facets[key] = root["facets"][key].asInt();
+                        }
+                        cb(results);
+                        return;
+                    }
+                }
+                // Cache miss — search ES
+                ElasticsearchService::instance().search(tenantId, query, type, limit, offset,
+                    [cb, cacheKey](const SearchResults &results) {
+                        // Cache the result for 60 seconds
+                        Json::Value cacheVal;
+                        cacheVal["query"] = results.query;
+                        cacheVal["totalCount"] = results.totalCount;
+                        cacheVal["items"] = Json::Value(Json::arrayValue);
+                        for (const auto &item : results.items) {
+                            Json::Value ji;
+                            ji["type"] = item.type;
+                            ji["id"] = item.id;
+                            ji["title"] = item.title;
+                            ji["snippet"] = item.snippet;
+                            ji["url"] = item.url;
+                            ji["rank"] = item.rank;
+                            ji["createdAt"] = item.createdAt;
+                            cacheVal["items"].append(ji);
+                        }
+                        cacheVal["facets"] = Json::Value(Json::objectValue);
+                        for (const auto &[k, v] : results.facets) {
+                            cacheVal["facets"][k] = v;
+                        }
+                        Json::StreamWriterBuilder writer;
+                        CacheService::instance().set(cacheKey, Json::writeString(writer, cacheVal), 60, [](bool) {});
+                        cb(results);
+                    });
+            });
+            return;
+        }
+        // No Redis — search ES directly
+        ElasticsearchService::instance().search(tenantId, query, type, limit, offset, cb);
+        return;
+    }
+
+    // Fallback: PostgreSQL full-text search
     // Convert user query to tsquery format
     // Replace spaces with & for AND matching
     std::string tsQuery;
@@ -68,6 +148,10 @@ void SearchService::search(
             state->results.items.push_back(item);
         }
         state->results.totalCount += count;
+        // Build facet counts
+        if (!items.empty()) {
+            state->results.facets[items[0].type] += count;
+        }
         state->pendingQueries--;
         if (state->pendingQueries == 0) {
             // Sort by rank descending
@@ -234,6 +318,101 @@ void SearchService::searchGameDeps(
             cb({}, 0);
         },
         tenantId, tsQuery, limit, offset);
+}
+
+void SearchService::autocomplete(
+    const DbClientPtr &db, int tenantId,
+    const std::string &prefix, int limit,
+    std::function<void(const std::vector<AutocompleteItem> &)> cb) {
+
+    // Delegate to Elasticsearch if configured
+    if (useElasticsearch()) {
+        // Check Redis cache
+        auto cacheKey = CacheService::autocompleteKey(tenantId, prefix);
+        auto &cache = CacheService::instance();
+        if (cache.isConnected()) {
+            cache.get(cacheKey, [this, db, tenantId, prefix, limit, cb, cacheKey](
+                const std::string &cached, bool found) {
+                if (found) {
+                    Json::Value root;
+                    Json::CharReaderBuilder reader;
+                    std::istringstream stream(cached);
+                    std::string errors;
+                    if (Json::parseFromStream(reader, stream, &root, &errors)) {
+                        std::vector<AutocompleteItem> items;
+                        for (const auto &item : root) {
+                            AutocompleteItem ai;
+                            ai.text = item["text"].asString();
+                            ai.type = item["type"].asString();
+                            ai.url = item["url"].asString();
+                            items.push_back(ai);
+                        }
+                        cb(items);
+                        return;
+                    }
+                }
+                ElasticsearchService::instance().autocomplete(tenantId, prefix, limit,
+                    [cb, cacheKey](const std::vector<AutocompleteItem> &items) {
+                        // Cache for 30 seconds
+                        Json::Value cacheVal(Json::arrayValue);
+                        for (const auto &item : items) {
+                            Json::Value ji;
+                            ji["text"] = item.text;
+                            ji["type"] = item.type;
+                            ji["url"] = item.url;
+                            cacheVal.append(ji);
+                        }
+                        Json::StreamWriterBuilder writer;
+                        CacheService::instance().set(cacheKey, Json::writeString(writer, cacheVal), 30, [](bool) {});
+                        cb(items);
+                    });
+            });
+            return;
+        }
+        ElasticsearchService::instance().autocomplete(tenantId, prefix, limit, cb);
+        return;
+    }
+
+    // Fallback: PostgreSQL prefix search
+    auto likePattern = prefix + "%";
+
+    db->execSqlAsync(
+        "("
+        "  SELECT display_name AS text, 'article' AS type, "
+        "  '/articles/' || name AS url "
+        "  FROM articles WHERE tenant_id = $1 AND status = 'published' "
+        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3"
+        ") UNION ALL ("
+        "  SELECT title AS text, 'forum_post' AS type, "
+        "  '/forum/thread/' || thread_id::text AS url "
+        "  FROM forum_posts p "
+        "  JOIN forum_threads t ON t.id = p.thread_id "
+        "  JOIN forums f ON f.id = t.forum_id "
+        "  JOIN forum_categories c ON c.id = f.category_id "
+        "  WHERE c.tenant_id = $1 AND p.title IS NOT NULL "
+        "  AND LOWER(p.title) LIKE LOWER($2) LIMIT $3"
+        ") UNION ALL ("
+        "  SELECT display_name AS text, 'gamedep' AS type, "
+        "  '/gamedep/' || name AS url "
+        "  FROM gamedep_pages WHERE tenant_id = $1 "
+        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3"
+        ") LIMIT $3",
+        [cb](const drogon::orm::Result &result) {
+            std::vector<AutocompleteItem> items;
+            items.reserve(result.size());
+            for (const auto &row : result) {
+                AutocompleteItem item;
+                item.text = row["text"].as<std::string>();
+                item.type = row["type"].as<std::string>();
+                item.url = row["url"].as<std::string>();
+                items.push_back(item);
+            }
+            cb(items);
+        },
+        [cb](const drogon::orm::DrogonDbException &) {
+            cb({});
+        },
+        tenantId, likePattern, limit);
 }
 
 } // namespace pyracms

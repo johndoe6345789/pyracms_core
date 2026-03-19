@@ -7,7 +7,7 @@ import "../theme" as Theme
 Dialog {
     id: root
 
-    title: "Create Account"
+    title: qsTr("Create Account")
     modal: true
     width: 380
     height: 460
@@ -22,7 +22,7 @@ Dialog {
         spacing: Theme.Theme.spacingMedium
 
         Label {
-            text: "Hypernucleus"
+            text: qsTr("Hypernucleus")
             font.pixelSize: Theme.Theme.fontSizeHeader
             font.bold: true
             color: Theme.Theme.primary
@@ -30,7 +30,7 @@ Dialog {
         }
 
         Label {
-            text: "Create a new account"
+            text: qsTr("Create a new account")
             font.pixelSize: Theme.Theme.fontSizeSmall
             color: Theme.Theme.textSecondary
             Layout.alignment: Qt.AlignHCenter
@@ -42,7 +42,7 @@ Dialog {
         TextField {
             id: regUsernameField
             Layout.fillWidth: true
-            placeholderText: "Username"
+            placeholderText: qsTr("Username")
             font.pixelSize: Theme.Theme.fontSizeNormal
             inputMethodHints: Qt.ImhNoAutoUppercase
 
@@ -53,7 +53,7 @@ Dialog {
         TextField {
             id: regEmailField
             Layout.fillWidth: true
-            placeholderText: "Email"
+            placeholderText: qsTr("Email")
             font.pixelSize: Theme.Theme.fontSizeNormal
             inputMethodHints: Qt.ImhEmailCharactersOnly
 
@@ -64,7 +64,7 @@ Dialog {
         TextField {
             id: regPasswordField
             Layout.fillWidth: true
-            placeholderText: "Password"
+            placeholderText: qsTr("Password")
             font.pixelSize: Theme.Theme.fontSizeNormal
             echoMode: TextInput.Password
 
@@ -75,7 +75,7 @@ Dialog {
         TextField {
             id: regConfirmField
             Layout.fillWidth: true
-            placeholderText: "Confirm Password"
+            placeholderText: qsTr("Confirm Password")
             font.pixelSize: Theme.Theme.fontSizeNormal
             echoMode: TextInput.Password
 
@@ -84,7 +84,7 @@ Dialog {
 
         // Password mismatch warning
         Label {
-            text: "Passwords do not match"
+            text: qsTr("Passwords do not match")
             visible: regConfirmField.text.length > 0 &&
                      regPasswordField.text !== regConfirmField.text
             color: Theme.Theme.warning
@@ -116,7 +116,7 @@ Dialog {
         // Register button
         Button {
             id: registerButton
-            text: apiClient.loading ? "Creating account..." : "Register"
+            text: apiClient.loading ? qsTr("Creating account...") : qsTr("Register")
             Layout.fillWidth: true
             enabled: regUsernameField.text.length > 0 &&
                      regEmailField.text.length > 0 &&
@@ -144,13 +144,13 @@ Dialog {
             spacing: Theme.Theme.spacingSmall
 
             Label {
-                text: "Already have an account?"
+                text: qsTr("Already have an account?")
                 font.pixelSize: Theme.Theme.fontSizeSmall
                 color: Theme.Theme.textSecondary
             }
 
             Label {
-                text: "Sign In"
+                text: qsTr("Sign In")
                 font.pixelSize: Theme.Theme.fontSizeSmall
                 color: Theme.Theme.primary
                 font.underline: true
@@ -170,7 +170,7 @@ Dialog {
     Connections {
         target: authService
         function onRegisterSuccess() {
-            root.successMessage = "Account created! You can now sign in."
+            root.successMessage = qsTr("Account created! You can now sign in.")
             root.errorMessage = ""
             // Clear fields
             regUsernameField.text = ""

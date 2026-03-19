@@ -27,13 +27,20 @@ public:
     static void pushNotification(int userId, const std::string &jsonPayload);
     static void broadcastNotification(const std::string &jsonPayload);
     static std::unordered_set<int> getOnlineUsers();
+    static void pushToThread(int threadId, const std::string &jsonPayload);
 
 private:
     static std::mutex connectionsMutex_;
     // userId -> set of WebSocket connections (user may have multiple tabs)
     static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>> userConnections_;
+    // threadId -> set of WebSocket connections subscribed to that thread
+    static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>> threadSubscriptions_;
 
     int authenticateFromToken(const std::string &token);
+    void handleThreadSubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
+    void handleThreadUnsubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
+    void handleTypingIndicator(const drogon::WebSocketConnectionPtr &wsConnPtr,
+                                int threadId, bool isTyping);
 };
 
 } // namespace pyracms

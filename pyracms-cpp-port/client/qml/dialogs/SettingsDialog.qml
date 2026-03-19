@@ -7,10 +7,10 @@ import "../theme" as Theme
 Dialog {
     id: root
 
-    title: "Settings"
+    title: qsTr("Settings")
     modal: true
     width: 500
-    height: 420
+    height: 480
     standardButtons: Dialog.NoButton
 
     onOpened: {
@@ -26,11 +26,15 @@ Dialog {
             Layout.fillWidth: true
 
             TabButton {
-                text: "General"
+                text: qsTr("General")
                 font.pixelSize: Theme.Theme.fontSizeNormal
             }
             TabButton {
-                text: "Advanced"
+                text: qsTr("Appearance")
+                font.pixelSize: Theme.Theme.fontSizeNormal
+            }
+            TabButton {
+                text: qsTr("Advanced")
                 font.pixelSize: Theme.Theme.fontSizeNormal
             }
         }
@@ -46,7 +50,7 @@ Dialog {
 
                 // Repository URL
                 Label {
-                    text: "Repository URL"
+                    text: qsTr("Repository URL")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -74,7 +78,7 @@ Dialog {
 
                 // Operating System
                 Label {
-                    text: "Operating System"
+                    text: qsTr("Operating System")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -96,7 +100,7 @@ Dialog {
 
                 // Architecture
                 Label {
-                    text: "Architecture"
+                    text: qsTr("Architecture")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -119,12 +123,79 @@ Dialog {
                 Item { Layout.fillHeight: true }
             }
 
+            // Appearance tab
+            ColumnLayout {
+                spacing: Theme.Theme.spacingMedium
+
+                // Dark mode toggle
+                Label {
+                    text: qsTr("Theme")
+                    font.pixelSize: Theme.Theme.fontSizeNormal
+                    font.bold: true
+                    color: Theme.Theme.textPrimary
+                }
+
+                RowLayout {
+                    spacing: Theme.Theme.spacingNormal
+
+                    Switch {
+                        id: darkModeSwitch
+                        checked: settingsManager.darkMode
+                        onCheckedChanged: settingsManager.darkMode = checked
+                    }
+
+                    Label {
+                        text: darkModeSwitch.checked ? qsTr("Dark Mode") : qsTr("Light Mode")
+                        font.pixelSize: Theme.Theme.fontSizeNormal
+                        color: Theme.Theme.textPrimary
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+                    color: Theme.Theme.divider
+                    Layout.topMargin: Theme.Theme.spacingNormal
+                }
+
+                // Language selector
+                Label {
+                    text: qsTr("Language")
+                    font.pixelSize: Theme.Theme.fontSizeNormal
+                    font.bold: true
+                    color: Theme.Theme.textPrimary
+                    Layout.topMargin: Theme.Theme.spacingNormal
+                }
+
+                ComboBox {
+                    id: languageCombo
+                    Layout.fillWidth: true
+                    model: ["English", "Español", "Français"]
+                    property var langCodes: ["en", "es", "fr"]
+                    currentIndex: langCodes.indexOf(settingsManager.language)
+                    font.pixelSize: Theme.Theme.fontSizeNormal
+
+                    onCurrentIndexChanged: {
+                        if (currentIndex >= 0 && currentIndex < langCodes.length)
+                            settingsManager.language = langCodes[currentIndex]
+                    }
+                }
+
+                Label {
+                    text: qsTr("Language changes require restart.")
+                    font.pixelSize: Theme.Theme.fontSizeSmall
+                    color: Theme.Theme.textSecondary
+                }
+
+                Item { Layout.fillHeight: true }
+            }
+
             // Advanced tab
             ColumnLayout {
                 spacing: Theme.Theme.spacingMedium
 
                 Label {
-                    text: "Download Chunk Size (bytes)"
+                    text: qsTr("Download Chunk Size (bytes)")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -143,7 +214,7 @@ Dialog {
                 }
 
                 Label {
-                    text: "Recommended: 8192 bytes. Larger values may improve download speed on fast connections."
+                    text: qsTr("Recommended: 8192 bytes. Larger values may improve download speed on fast connections.")
                     font.pixelSize: Theme.Theme.fontSizeSmall
                     color: Theme.Theme.textSecondary
                     wrapMode: Text.WordWrap
@@ -158,7 +229,7 @@ Dialog {
                 }
 
                 Label {
-                    text: "Data Directory"
+                    text: qsTr("Data Directory")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -188,7 +259,7 @@ Dialog {
             spacing: Theme.Theme.spacingNormal
 
             Button {
-                text: "Reset Defaults"
+                text: qsTr("Reset Defaults")
                 flat: true
                 Material.foreground: Theme.Theme.warning
 
@@ -198,7 +269,7 @@ Dialog {
             Item { Layout.fillWidth: true }
 
             Button {
-                text: "Cancel"
+                text: qsTr("Cancel")
                 flat: true
 
                 onClicked: {
@@ -208,7 +279,7 @@ Dialog {
             }
 
             Button {
-                text: "Save"
+                text: qsTr("Save")
                 enabled: settingsViewModel.isDirty && settingsViewModel.urlError === ""
                 Material.background: Theme.Theme.primary
                 Material.foreground: Theme.Theme.textOnPrimary

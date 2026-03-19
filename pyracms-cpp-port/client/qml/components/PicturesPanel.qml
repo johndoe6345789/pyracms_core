@@ -20,7 +20,7 @@ Item {
 
             // Header
             Label {
-                text: "Screenshots"
+                text: qsTr("Screenshots")
                 font.pixelSize: Theme.Theme.fontSizeMedium
                 font.bold: true
                 color: Theme.Theme.textPrimary
@@ -77,7 +77,7 @@ Item {
 
                                 Label {
                                     anchors.centerIn: parent
-                                    text: "No Preview"
+                                    text: qsTr("No Preview")
                                     font.pixelSize: Theme.Theme.fontSizeSmall
                                     color: Theme.Theme.textDisabled
                                     visible: thumbnail.status === Image.Error ||
@@ -109,7 +109,7 @@ Item {
         height: Math.min(root.Window.window ? root.Window.window.height * 0.8 : 600, 600)
         anchors.centerIn: Overlay.overlay
         standardButtons: Dialog.Close
-        title: "Screenshot"
+        title: qsTr("Screenshot")
 
         Image {
             id: enlargedImage

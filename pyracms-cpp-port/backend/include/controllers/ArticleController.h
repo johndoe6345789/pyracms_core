@@ -20,6 +20,9 @@ public:
     ADD_METHOD_TO(ArticleController::togglePrivate, "/api/articles/{name}/private", drogon::Put, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(ArticleController::voteArticle, "/api/articles/{name}/vote", drogon::Post, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(ArticleController::setTags, "/api/articles/{name}/tags", drogon::Put, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::publishArticle, "/api/articles/{name}/publish", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::scheduleArticle, "/api/articles/{name}/schedule", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::unpublishArticle, "/api/articles/{name}/unpublish", drogon::Post, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 
     void listArticles(const drogon::HttpRequestPtr &req,
@@ -69,6 +72,18 @@ public:
     void setTags(const drogon::HttpRequestPtr &req,
                  std::function<void(const drogon::HttpResponsePtr &)> &&callback,
                  const std::string &name);
+
+    void publishArticle(const drogon::HttpRequestPtr &req,
+                        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+                        const std::string &name);
+
+    void scheduleArticle(const drogon::HttpRequestPtr &req,
+                         std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+                         const std::string &name);
+
+    void unpublishArticle(const drogon::HttpRequestPtr &req,
+                          std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+                          const std::string &name);
 
 private:
     ArticleService articleService_;

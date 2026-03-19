@@ -12,6 +12,8 @@ SettingsManager::SettingsManager(QObject* parent)
     , m_archName(detectArch())
     , m_chunkSize(DEFAULT_CHUNK_SIZE)
     , m_windowGeometry(100, 100, 1280, 800)
+    , m_darkMode(false)
+    , m_language("en")
 {
     load();
 }
@@ -63,6 +65,24 @@ void SettingsManager::setWindowGeometry(const QRect& geometry)
     emit windowGeometryChanged();
 }
 
+bool SettingsManager::darkMode() const { return m_darkMode; }
+
+void SettingsManager::setDarkMode(bool dark)
+{
+    if (m_darkMode == dark) return;
+    m_darkMode = dark;
+    emit darkModeChanged();
+}
+
+QString SettingsManager::language() const { return m_language; }
+
+void SettingsManager::setLanguage(const QString& lang)
+{
+    if (m_language == lang) return;
+    m_language = lang;
+    emit languageChanged();
+}
+
 void SettingsManager::save()
 {
     QSettings settings;
@@ -72,6 +92,8 @@ void SettingsManager::save()
     settings.setValue("archName", m_archName);
     settings.setValue("chunkSize", m_chunkSize);
     settings.setValue("windowGeometry", m_windowGeometry);
+    settings.setValue("darkMode", m_darkMode);
+    settings.setValue("language", m_language);
     settings.endGroup();
     settings.sync();
 }
@@ -91,6 +113,10 @@ void SettingsManager::load()
         setChunkSize(settings.value("chunkSize").toInt());
     if (settings.contains("windowGeometry"))
         setWindowGeometry(settings.value("windowGeometry").toRect());
+    if (settings.contains("darkMode"))
+        setDarkMode(settings.value("darkMode").toBool());
+    if (settings.contains("language"))
+        setLanguage(settings.value("language").toString());
 
     settings.endGroup();
 }
@@ -102,6 +128,8 @@ void SettingsManager::reset()
     setArchName(detectArch());
     setChunkSize(DEFAULT_CHUNK_SIZE);
     setWindowGeometry(QRect(100, 100, 1280, 800));
+    setDarkMode(false);
+    setLanguage("en");
     save();
 }
 

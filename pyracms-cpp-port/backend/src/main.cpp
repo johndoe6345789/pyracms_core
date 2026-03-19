@@ -1,5 +1,8 @@
 #include <drogon/drogon.h>
 #include <iostream>
+#include "services/ArticleService.h"
+#include "services/CacheService.h"
+#include "services/ElasticsearchService.h"
 
 int main() {
     // Load config from json file if it exists, otherwise use defaults
@@ -45,6 +48,34 @@ int main() {
         false,                                  // isFast
         "utf8"                                  // characterSet
     );
+
+    // Initialize Redis cache
+    pyracms::CacheService::instance().initialize();
+    if (pyracms::CacheService::instance().isConnected()) {
+        std::cout << "Redis cache connected" << std::endl;
+    } else {
+        std::cout << "Redis not available — running without cache" << std::endl;
+    }
+
+    // Initialize Elasticsearch
+    pyracms::ElasticsearchService::instance().initialize();
+    if (pyracms::ElasticsearchService::instance().isConfigured()) {
+        std::cout << "Elasticsearch connected — using ES for search" << std::endl;
+    } else {
+        std::cout << "Elasticsearch not configured — using PostgreSQL FTS" << std::endl;
+    }
+
+    // Scheduled publishing timer: check every 60 seconds
+    app.getLoop()->runEvery(60.0, []() {
+        auto db = drogon::app().getDbClient();
+        static pyracms::ArticleService articleService;
+        articleService.publishDueArticles(db,
+            [](bool success, const std::string &msg) {
+                if (success && msg != "0 articles published") {
+                    LOG_INFO << "Scheduled publishing: " << msg;
+                }
+            });
+    });
 
     std::cout << "PyraCMS Server starting on "
               << (host ? host : "0.0.0.0") << ":"

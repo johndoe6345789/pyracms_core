@@ -17,7 +17,7 @@ Item {
         // Empty state
         Label {
             visible: !item || Object.keys(item).length === 0
-            text: "Select an item from the list to view details"
+            text: qsTr("Select an item from the list to view details")
             font.pixelSize: Theme.Theme.fontSizeMedium
             color: Theme.Theme.textSecondary
             horizontalAlignment: Text.AlignHCenter
@@ -59,7 +59,7 @@ Item {
                     Label {
                         id: typeBadge
                         anchors.centerIn: parent
-                        text: item.type === "game" ? "Game" : "Dependency"
+                        text: item.type === "game" ? qsTr("Game") : qsTr("Dependency")
                         color: Theme.Theme.textOnPrimary
                         font.pixelSize: Theme.Theme.fontSizeSmall
                         font.bold: true
@@ -81,8 +81,8 @@ Item {
 
                     Label {
                         text: item.installed
-                            ? "Installed (v" + item.installedVersion + ")"
-                            : "Not installed"
+                            ? qsTr("Installed (v%1)").arg(item.installedVersion)
+                            : qsTr("Not installed")
                         font.pixelSize: Theme.Theme.fontSizeNormal
                         color: item.installed
                             ? Theme.Theme.success
@@ -92,7 +92,7 @@ Item {
 
                 // Description
                 Label {
-                    text: item.description || "No description available."
+                    text: item.description || qsTr("No description available.")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     color: Theme.Theme.textPrimary
                     Layout.fillWidth: true
@@ -110,7 +110,7 @@ Item {
 
                 // Dependencies section
                 Label {
-                    text: "Dependencies"
+                    text: qsTr("Dependencies")
                     font.pixelSize: Theme.Theme.fontSizeMedium
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -119,7 +119,7 @@ Item {
                 }
 
                 Label {
-                    text: "No dependencies"
+                    text: qsTr("No dependencies")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     color: Theme.Theme.textSecondary
                     visible: mainViewModel.dependencyModel.count === 0
@@ -165,7 +165,7 @@ Item {
                             }
 
                             Label {
-                                text: model.installed ? "Installed" : "Missing"
+                                text: model.installed ? qsTr("Installed") : qsTr("Missing")
                                 font.pixelSize: Theme.Theme.fontSizeSmall
                                 color: model.installed
                                     ? Theme.Theme.success
@@ -185,7 +185,7 @@ Item {
 
                 // Available versions
                 Label {
-                    text: "Available Versions"
+                    text: qsTr("Available Versions")
                     font.pixelSize: Theme.Theme.fontSizeMedium
                     font.bold: true
                     color: Theme.Theme.textPrimary
@@ -229,7 +229,7 @@ Item {
                     spacing: Theme.Theme.spacingNormal
 
                     Button {
-                        text: item.installed ? "Reinstall" : "Install"
+                        text: item.installed ? qsTr("Reinstall") : qsTr("Install")
                         Material.background: Theme.Theme.primary
                         Material.foreground: Theme.Theme.textOnPrimary
                         font.pixelSize: Theme.Theme.fontSizeNormal
@@ -237,7 +237,7 @@ Item {
                     }
 
                     Button {
-                        text: "Uninstall"
+                        text: qsTr("Uninstall")
                         visible: item.installed
                         Material.background: Theme.Theme.error
                         Material.foreground: Theme.Theme.textOnPrimary
@@ -246,7 +246,7 @@ Item {
                     }
 
                     Button {
-                        text: mainViewModel.gameRunning ? "Stop" : "Launch"
+                        text: mainViewModel.gameRunning ? qsTr("Stop") : qsTr("Launch")
                         visible: item.type === "game" && item.installed
                         Material.background: mainViewModel.gameRunning
                             ? Theme.Theme.warning

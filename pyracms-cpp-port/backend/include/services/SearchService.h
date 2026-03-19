@@ -2,6 +2,7 @@
 
 #include <drogon/drogon.h>
 #include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -21,6 +22,13 @@ struct SearchResults {
     std::vector<SearchResultItem> items;
     int totalCount;
     std::string query;
+    std::map<std::string, int> facets;  // type -> count
+};
+
+struct AutocompleteItem {
+    std::string text;
+    std::string type;
+    std::string url;
 };
 
 class SearchService {
@@ -31,6 +39,13 @@ public:
                 const std::string &query, const std::string &type,
                 int limit, int offset,
                 std::function<void(const SearchResults &)> cb);
+
+    void autocomplete(const DbClientPtr &db, int tenantId,
+                      const std::string &prefix, int limit,
+                      std::function<void(const std::vector<AutocompleteItem> &)> cb);
+
+    // Check if Elasticsearch is the active search engine
+    static bool useElasticsearch();
 
 private:
     void searchArticles(const DbClientPtr &db, int tenantId,

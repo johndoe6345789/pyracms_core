@@ -7,7 +7,7 @@ import "../theme" as Theme
 Dialog {
     id: root
 
-    title: "Login to Hypernucleus"
+    title: qsTr("Login to Hypernucleus")
     modal: true
     width: 380
     height: 340
@@ -22,7 +22,7 @@ Dialog {
 
         // Logo/header area
         Label {
-            text: "Hypernucleus"
+            text: qsTr("Hypernucleus")
             font.pixelSize: Theme.Theme.fontSizeHeader
             font.bold: true
             color: Theme.Theme.primary
@@ -30,7 +30,7 @@ Dialog {
         }
 
         Label {
-            text: "Sign in to manage your games and dependencies"
+            text: qsTr("Sign in to manage your games and dependencies")
             font.pixelSize: Theme.Theme.fontSizeSmall
             color: Theme.Theme.textSecondary
             Layout.alignment: Qt.AlignHCenter
@@ -45,7 +45,7 @@ Dialog {
         TextField {
             id: usernameField
             Layout.fillWidth: true
-            placeholderText: "Username"
+            placeholderText: qsTr("Username")
             font.pixelSize: Theme.Theme.fontSizeNormal
             inputMethodHints: Qt.ImhNoAutoUppercase
 
@@ -57,7 +57,7 @@ Dialog {
         TextField {
             id: passwordField
             Layout.fillWidth: true
-            placeholderText: "Password"
+            placeholderText: qsTr("Password")
             font.pixelSize: Theme.Theme.fontSizeNormal
             echoMode: TextInput.Password
 
@@ -80,7 +80,7 @@ Dialog {
         // Login button
         Button {
             id: loginButton
-            text: apiClient.loading ? "Signing in..." : "Sign In"
+            text: apiClient.loading ? qsTr("Signing in...") : qsTr("Sign In")
             Layout.fillWidth: true
             enabled: usernameField.text.length > 0 &&
                      passwordField.text.length > 0 &&
@@ -101,13 +101,13 @@ Dialog {
             spacing: Theme.Theme.spacingSmall
 
             Label {
-                text: "Don't have an account?"
+                text: qsTr("Don't have an account?")
                 font.pixelSize: Theme.Theme.fontSizeSmall
                 color: Theme.Theme.textSecondary
             }
 
             Label {
-                text: "Register"
+                text: qsTr("Register")
                 font.pixelSize: Theme.Theme.fontSizeSmall
                 color: Theme.Theme.primary
                 font.underline: true
@@ -125,7 +125,7 @@ Dialog {
 
         // Skip login (for browsing without auth)
         Button {
-            text: "Continue without login"
+            text: qsTr("Continue without login")
             Layout.alignment: Qt.AlignHCenter
             flat: true
             font.pixelSize: Theme.Theme.fontSizeSmall

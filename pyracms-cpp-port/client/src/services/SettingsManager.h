@@ -13,6 +13,8 @@ class SettingsManager : public QObject {
     Q_PROPERTY(QString archName READ archName WRITE setArchName NOTIFY archNameChanged)
     Q_PROPERTY(int chunkSize READ chunkSize WRITE setChunkSize NOTIFY chunkSizeChanged)
     Q_PROPERTY(QRect windowGeometry READ windowGeometry WRITE setWindowGeometry NOTIFY windowGeometryChanged)
+    Q_PROPERTY(bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)
+    Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
 
 public:
     explicit SettingsManager(QObject* parent = nullptr);
@@ -33,6 +35,12 @@ public:
     QRect windowGeometry() const;
     void setWindowGeometry(const QRect& geometry);
 
+    bool darkMode() const;
+    void setDarkMode(bool dark);
+
+    QString language() const;
+    void setLanguage(const QString& lang);
+
     // Persistence
     Q_INVOKABLE void save();
     Q_INVOKABLE void load();
@@ -48,6 +56,8 @@ signals:
     void archNameChanged();
     void chunkSizeChanged();
     void windowGeometryChanged();
+    void darkModeChanged();
+    void languageChanged();
 
 private:
     static constexpr const char* DEFAULT_REPO_URL = "http://localhost:8080";
@@ -58,6 +68,8 @@ private:
     QString m_archName;
     int m_chunkSize;
     QRect m_windowGeometry;
+    bool m_darkMode;
+    QString m_language;
 };
 
 } // namespace Hypernucleus

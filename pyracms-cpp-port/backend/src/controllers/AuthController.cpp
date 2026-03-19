@@ -365,4 +365,187 @@ void AuthController::verifyEmail(
         token);
 }
 
+void AuthController::oauthUrl(
+    const drogon::HttpRequestPtr &req,
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    const std::string &provider) {
+
+    auto state = req->getParameter("state");
+    if (state.empty()) state = "pyracms";
+
+    auto url = oauthService_.getAuthorizationUrl(provider, state);
+    if (url.empty()) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "Provider not configured: " + provider;
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+
+    Json::Value result;
+    result["url"] = url;
+    result["provider"] = provider;
+    callback(drogon::HttpResponse::newHttpJsonResponse(result));
+}
+
+void AuthController::oauthCallback(
+    const drogon::HttpRequestPtr &req,
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    const std::string &provider) {
+
+    auto json = req->getJsonObject();
+    if (!json || !(*json).isMember("code")) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "code is required";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+
+    auto code = (*json)["code"].asString();
+    auto db = drogon::app().getDbClient();
+
+    oauthService_.exchangeCode(provider, code,
+        [this, db, provider, callback](const std::string &accessToken, const std::string &error) {
+            if (!error.empty()) {
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                (*resp->jsonObject())["error"] = error;
+                resp->setStatusCode(drogon::k401Unauthorized);
+                callback(resp);
+                return;
+            }
+
+            oauthService_.getProviderProfile(provider, accessToken,
+                [this, db, provider, accessToken, callback](const std::optional<OAuthUserInfo> &info) {
+                    if (!info) {
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                        (*resp->jsonObject())["error"] = "Failed to get user profile";
+                        resp->setStatusCode(drogon::k500InternalServerError);
+                        callback(resp);
+                        return;
+                    }
+
+                    // Check if this OAuth account is already linked
+                    oauthService_.findByProvider(db, provider, info->providerId,
+                        [this, db, provider, accessToken, info, callback](std::optional<int> userId) {
+                            if (userId) {
+                                // Existing user — generate JWT
+                                userService_.findById(db, *userId,
+                                    [this, callback](const auto &user) {
+                                        if (!user) {
+                                            auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                                            (*resp->jsonObject())["error"] = "User not found";
+                                            resp->setStatusCode(drogon::k404NotFound);
+                                            callback(resp);
+                                            return;
+                                        }
+                                        auto token = authService_.generateToken(user->id, user->username);
+                                        Json::Value result;
+                                        result["token"] = token;
+                                        result["user"]["id"] = user->id;
+                                        result["user"]["username"] = user->username;
+                                        result["user"]["email"] = user->email;
+                                        callback(drogon::HttpResponse::newHttpJsonResponse(result));
+                                    });
+                            } else {
+                                // New user — create account from OAuth info, then link
+                                auto username = info->displayName;
+                                auto email = info->email;
+                                auto password = authService_.generateRandomToken();
+                                auto passwordHash = authService_.hashPassword(password);
+
+                                userService_.createUser(db, username, username, email, passwordHash,
+                                    [this, db, provider, accessToken, info, callback](bool success, const std::string &error) {
+                                        if (!success) {
+                                            auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                                            (*resp->jsonObject())["error"] = error;
+                                            resp->setStatusCode(drogon::k409Conflict);
+                                            callback(resp);
+                                            return;
+                                        }
+
+                                        userService_.findByUsername(db, info->displayName,
+                                            [this, db, provider, accessToken, info, callback](const auto &user) {
+                                                if (!user) {
+                                                    auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                                                    (*resp->jsonObject())["error"] = "Failed to find created user";
+                                                    resp->setStatusCode(drogon::k500InternalServerError);
+                                                    callback(resp);
+                                                    return;
+                                                }
+
+                                                oauthService_.linkAccount(db, user->id, provider, *info, accessToken,
+                                                    [this, user, callback](bool success, const std::string &error) {
+                                                        if (!success) {
+                                                            auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                                                            (*resp->jsonObject())["error"] = error;
+                                                            resp->setStatusCode(drogon::k500InternalServerError);
+                                                            callback(resp);
+                                                            return;
+                                                        }
+
+                                                        auto token = authService_.generateToken(user->id, user->username);
+                                                        Json::Value result;
+                                                        result["token"] = token;
+                                                        result["user"]["id"] = user->id;
+                                                        result["user"]["username"] = user->username;
+                                                        result["user"]["email"] = user->email;
+                                                        result["created"] = true;
+                                                        callback(drogon::HttpResponse::newHttpJsonResponse(result));
+                                                    });
+                                            });
+                                    });
+                            }
+                        });
+                });
+        });
+}
+
+void AuthController::oauthUnlink(
+    const drogon::HttpRequestPtr &req,
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    const std::string &provider) {
+
+    int userId = req->attributes()->get<int>("userId");
+    auto db = drogon::app().getDbClient();
+
+    oauthService_.unlinkProvider(db, userId, provider,
+        [callback](bool success, const std::string &error) {
+            if (!success) {
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                (*resp->jsonObject())["error"] = error;
+                resp->setStatusCode(drogon::k404NotFound);
+                callback(resp);
+                return;
+            }
+            Json::Value result;
+            result["message"] = "Provider unlinked";
+            callback(drogon::HttpResponse::newHttpJsonResponse(result));
+        });
+}
+
+void AuthController::oauthProviders(
+    const drogon::HttpRequestPtr &req,
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
+
+    int userId = req->attributes()->get<int>("userId");
+    auto db = drogon::app().getDbClient();
+
+    oauthService_.getLinkedProviders(db, userId,
+        [callback](const std::vector<OAuthLinkDto> &links) {
+            Json::Value result(Json::arrayValue);
+            for (const auto &link : links) {
+                Json::Value item;
+                item["id"] = link.id;
+                item["provider"] = link.provider;
+                item["providerUserId"] = link.providerUserId;
+                item["email"] = link.email;
+                item["displayName"] = link.displayName;
+                item["createdAt"] = link.createdAt;
+                result.append(item);
+            }
+            callback(drogon::HttpResponse::newHttpJsonResponse(result));
+        });
+}
+
 } // namespace pyracms

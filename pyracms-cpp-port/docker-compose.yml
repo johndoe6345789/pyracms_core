@@ -24,6 +24,37 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   backend:
     build:
       context: ./backend
@@ -39,8 +70,25 @@ services:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8080
       JWT_SECRET: change-me-in-production
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Elasticsearch
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      SEARCH_ENGINE: elasticsearch
+      # OAuth (uncomment and fill in for OAuth support)
+      # OAUTH_GITHUB_CLIENT_ID: ""
+      # OAUTH_GITHUB_CLIENT_SECRET: ""
+      # OAUTH_GOOGLE_CLIENT_ID: ""
+      # OAUTH_GOOGLE_CLIENT_SECRET: ""
+      # OAUTH_DISCORD_CLIENT_ID: ""
+      # OAUTH_DISCORD_CLIENT_SECRET: ""
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
 
   frontend:
@@ -67,3 +115,5 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
+  es_data:

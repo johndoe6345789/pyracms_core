@@ -30,7 +30,7 @@ Item {
                 TextField {
                     id: searchField
                     Layout.fillWidth: true
-                    placeholderText: "Search..."
+                    placeholderText: qsTr("Search...")
                     font.pixelSize: Theme.Theme.fontSizeNormal
                     leftPadding: 36
 
@@ -173,7 +173,7 @@ Item {
                                         Label {
                                             text: model.installed
                                                 ? "v" + model.installedVersion
-                                                : "Not installed"
+                                                : qsTr("Not installed")
                                             font.pixelSize: Theme.Theme.fontSizeSmall
                                             color: model.installed
                                                 ? Theme.Theme.success
@@ -215,7 +215,7 @@ Item {
 
             Label {
                 anchors.centerIn: parent
-                text: mainViewModel.gameDepModel.totalCount + " items"
+                text: mainViewModel.gameDepModel.totalCount + " " + qsTr("items")
                 font.pixelSize: Theme.Theme.fontSizeSmall
                 color: Theme.Theme.textSecondary
             }

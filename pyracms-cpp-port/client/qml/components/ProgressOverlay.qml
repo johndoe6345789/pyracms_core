@@ -42,7 +42,7 @@ Popup {
 
         // Title
         Label {
-            text: "Installing: " + root.moduleName
+            text: qsTr("Installing: %1").arg(root.moduleName)
             font.pixelSize: Theme.Theme.fontSizeMedium
             font.bold: true
             color: Theme.Theme.textPrimary
@@ -75,7 +75,7 @@ Popup {
         Label {
             text: root.progressValue >= 0
                 ? Math.round(root.progressValue * 100) + "%"
-                : "Please wait..."
+                : qsTr("Please wait...")
             font.pixelSize: Theme.Theme.fontSizeLarge
             font.bold: true
             color: Theme.Theme.primary
@@ -87,7 +87,7 @@ Popup {
 
         // Cancel button
         Button {
-            text: "Cancel"
+            text: qsTr("Cancel")
             Layout.alignment: Qt.AlignRight
             flat: true
             Material.foreground: Theme.Theme.error

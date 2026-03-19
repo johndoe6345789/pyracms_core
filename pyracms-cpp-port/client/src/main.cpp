@@ -4,6 +4,7 @@
 #include <QQuickStyle>
 #include <QIcon>
 #include <QSysInfo>
+#include <QTranslator>
 
 #include "viewmodels/MainViewModel.h"
 #include "viewmodels/SettingsViewModel.h"
@@ -27,6 +28,18 @@ int main(int argc, char* argv[])
 
     // Set Material Design style
     QQuickStyle::setStyle("Material");
+
+    // Load translation based on saved language setting
+    QTranslator translator;
+    {
+        Hypernucleus::SettingsManager tempSettings;
+        QString lang = tempSettings.language();
+        if (!lang.isEmpty() && lang != "en") {
+            if (translator.load("hypernucleus_" + lang, ":/translations")) {
+                app.installTranslator(&translator);
+            }
+        }
+    }
 
     // Register enums for QML access
     qmlRegisterUncreatableMetaObject(

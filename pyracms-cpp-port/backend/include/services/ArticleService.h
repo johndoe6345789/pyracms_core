@@ -18,6 +18,9 @@ struct ArticleDto {
     std::string rendererName;
     int viewCount;
     std::string createdAt;
+    std::string status;       // draft, scheduled, published, unpublished
+    std::string publishedAt;
+    std::string scheduledAt;
 };
 
 struct ArticleRevisionDto {
@@ -89,6 +92,24 @@ public:
     void setTags(const DbClientPtr &db, int articleId,
                  const std::vector<std::string> &tags,
                  BoolCallback cb);
+
+    void publishArticle(const DbClientPtr &db, int articleId,
+                        BoolCallback cb);
+
+    void scheduleArticle(const DbClientPtr &db, int articleId,
+                         const std::string &scheduledAt,
+                         BoolCallback cb);
+
+    void unpublishArticle(const DbClientPtr &db, int articleId,
+                          BoolCallback cb);
+
+    void publishDueArticles(const DbClientPtr &db,
+                            BoolCallback cb);
+
+    void listArticlesByStatus(const DbClientPtr &db, int tenantId,
+                              const std::string &status,
+                              int limit, int offset,
+                              ArticleListCallback cb);
 
 private:
     ArticleDto rowToArticleDto(const drogon::orm::Row &row);

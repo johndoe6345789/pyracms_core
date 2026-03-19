@@ -1,42 +1,26 @@
-'use client'
-
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import { lightTheme, darkTheme } from '@/lib/theme'
 import StoreProvider from '@/store/StoreProvider'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store/store'
-import { useMemo, useEffect, useState } from 'react'
-import type { ColorMode } from '@/store/slices/uiSlice'
+import ThemeWrapper from '@/components/common/ThemeWrapper'
+import type { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
-function ThemeWrapper({ children }: { children: React.ReactNode }) {
-  const colorMode = useSelector((state: RootState) => state.ui.colorMode)
-  const [systemDark, setSystemDark] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    setSystemDark(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setSystemDark(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  const theme = useMemo(() => {
-    if (colorMode === 'system') {
-      return systemDark ? darkTheme : lightTheme
-    }
-    return colorMode === 'dark' ? darkTheme : lightTheme
-  }, [colorMode, systemDark])
-
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
-  )
+export const metadata: Metadata = {
+  title: {
+    default: 'PyraCMS',
+    template: '%s | PyraCMS',
+  },
+  description: 'A multi-tenant content management system with articles, forums, galleries, and more.',
+  openGraph: {
+    type: 'website',
+    siteName: 'PyraCMS',
+    title: 'PyraCMS',
+    description: 'A multi-tenant content management system.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({

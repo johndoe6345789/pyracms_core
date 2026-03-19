@@ -2,35 +2,38 @@ pragma Singleton
 import QtQuick 2.15
 
 QtObject {
+    // Dark mode toggle — bound from SettingsManager
+    property bool isDark: false
+
     // Primary palette
-    readonly property color primary: "#1976D2"
-    readonly property color primaryDark: "#0D47A1"
-    readonly property color primaryLight: "#BBDEFB"
-    readonly property color secondary: "#FF6F00"
-    readonly property color secondaryLight: "#FFE082"
+    readonly property color primary: isDark ? "#90CAF9" : "#1976D2"
+    readonly property color primaryDark: isDark ? "#42A5F5" : "#0D47A1"
+    readonly property color primaryLight: isDark ? "#E3F2FD" : "#BBDEFB"
+    readonly property color secondary: isDark ? "#FFB74D" : "#FF6F00"
+    readonly property color secondaryLight: isDark ? "#FFE0B2" : "#FFE082"
 
     // Surface colors
-    readonly property color background: "#FAFAFA"
-    readonly property color surface: "#FFFFFF"
-    readonly property color surfaceVariant: "#F5F5F5"
-    readonly property color error: "#D32F2F"
-    readonly property color success: "#388E3C"
-    readonly property color warning: "#F57C00"
+    readonly property color background: isDark ? "#121212" : "#FAFAFA"
+    readonly property color surface: isDark ? "#1E1E1E" : "#FFFFFF"
+    readonly property color surfaceVariant: isDark ? "#2C2C2C" : "#F5F5F5"
+    readonly property color error: isDark ? "#EF5350" : "#D32F2F"
+    readonly property color success: isDark ? "#66BB6A" : "#388E3C"
+    readonly property color warning: isDark ? "#FFA726" : "#F57C00"
 
     // Text colors
-    readonly property color textPrimary: "#212121"
-    readonly property color textSecondary: "#757575"
+    readonly property color textPrimary: isDark ? "#E0E0E0" : "#212121"
+    readonly property color textSecondary: isDark ? "#9E9E9E" : "#757575"
     readonly property color textOnPrimary: "#FFFFFF"
     readonly property color textOnSecondary: "#FFFFFF"
-    readonly property color textDisabled: "#BDBDBD"
+    readonly property color textDisabled: isDark ? "#616161" : "#BDBDBD"
 
     // Borders and dividers
-    readonly property color divider: "#E0E0E0"
-    readonly property color border: "#BDBDBD"
+    readonly property color divider: isDark ? "#424242" : "#E0E0E0"
+    readonly property color border: isDark ? "#616161" : "#BDBDBD"
 
     // Category colors
     readonly property color installedColor: "#4CAF50"
-    readonly property color notInstalledColor: "#9E9E9E"
+    readonly property color notInstalledColor: isDark ? "#616161" : "#9E9E9E"
 
     // Font sizes
     readonly property int fontSizeSmall: 11

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   IconButton, Badge, Popover, List, ListItem, ListItemText, ListItemIcon,
   Typography, Box, Button, Divider, CircularProgress
@@ -12,6 +12,7 @@ import {
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
+import { useWebSocket } from '@/hooks/useWebSocket'
 
 interface Notification {
   id: number
@@ -39,6 +40,31 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false)
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+
+  const handleWsMessage = useCallback((data: unknown) => {
+    const msg = data as Record<string, unknown>
+    if (msg.type === 'notification') {
+      setUnreadCount(c => c + 1)
+      setNotifications(prev => [{
+        id: msg.id as number,
+        type: msg.notificationType as string || 'system',
+        title: msg.title as string || '',
+        message: msg.message as string || '',
+        link: msg.link as string | null,
+        is_read: false,
+        created_at: new Date().toISOString(),
+      }, ...prev].slice(0, 20))
+    }
+  }, [])
+
+  useWebSocket({
+    url: isAuthenticated ? `${API_URL}/api/ws/notifications` : '',
+    onMessage: handleWsMessage,
+    autoReconnect: isAuthenticated,
+  })
+
+  // Initial count fetch on mount
   useEffect(() => {
     if (!isAuthenticated) return
     const fetchCount = async () => {
@@ -48,8 +74,6 @@ export default function NotificationBell() {
       } catch { /* ignore */ }
     }
     fetchCount()
-    const interval = setInterval(fetchCount, 30000)
-    return () => clearInterval(interval)
   }, [isAuthenticated])
 
   const handleOpen = async (e: React.MouseEvent<HTMLElement>) => {

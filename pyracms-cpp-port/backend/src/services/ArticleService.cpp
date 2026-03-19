@@ -1,4 +1,6 @@
 #include "services/ArticleService.h"
+#include "services/CacheService.h"
+#include "services/ElasticsearchService.h"
 
 namespace pyracms {
 
@@ -13,6 +15,9 @@ ArticleDto ArticleService::rowToArticleDto(const drogon::orm::Row &row) {
     dto.rendererName = row["renderer_name"].isNull() ? "markdown" : row["renderer_name"].as<std::string>();
     dto.viewCount = row["view_count"].as<int>();
     dto.createdAt = row["created_at"].as<std::string>();
+    dto.status = row["status"].isNull() ? "published" : row["status"].as<std::string>();
+    dto.publishedAt = row["published_at"].isNull() ? "" : row["published_at"].as<std::string>();
+    dto.scheduledAt = row["scheduled_at"].isNull() ? "" : row["scheduled_at"].as<std::string>();
     return dto;
 }
 
@@ -80,14 +85,21 @@ void ArticleService::createArticle(const DbClientPtr &db, int tenantId,
         "hide_display_name, user_id, renderer_name, view_count, created_at) "
         "VALUES ($1, $2, $3, false, false, $4, $5, 0, NOW()) "
         "RETURNING id",
-        [this, db, content, userId, cb](const drogon::orm::Result &result) {
+        [this, db, tenantId, name, displayName, content, userId, cb](const drogon::orm::Result &result) {
             int articleId = result[0]["id"].as<int>();
             // Create the initial revision
             db->execSqlAsync(
                 "INSERT INTO article_revisions (article_id, content, summary, "
                 "user_id, created_at) "
                 "VALUES ($1, $2, 'Initial revision', $3, NOW())",
-                [cb](const drogon::orm::Result &) {
+                [tenantId, name, displayName, content, articleId, cb](const drogon::orm::Result &) {
+                    // Invalidate cache
+                    CacheService::instance().invalidateArticle(tenantId, name);
+                    // Index in Elasticsearch
+                    if (ElasticsearchService::instance().isConfigured()) {
+                        ElasticsearchService::instance().indexArticle(
+                            tenantId, articleId, name, displayName, content, "");
+                    }
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
@@ -138,11 +150,16 @@ void ArticleService::deleteArticle(const DbClientPtr &db, int tenantId,
                                     const std::string &name,
                                     BoolCallback cb) {
     db->execSqlAsync(
-        "DELETE FROM articles WHERE tenant_id = $1 AND name = $2",
-        [cb](const drogon::orm::Result &result) {
+        "DELETE FROM articles WHERE tenant_id = $1 AND name = $2 RETURNING id",
+        [tenantId, name, cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Article not found");
             } else {
+                CacheService::instance().invalidateArticle(tenantId, name);
+                if (ElasticsearchService::instance().isConfigured()) {
+                    ElasticsearchService::instance().deleteDocument(
+                        "pyracms_articles", result[0]["id"].as<int>());
+                }
                 cb(true, "");
             }
         },
@@ -329,6 +346,94 @@ void ArticleService::setTags(const DbClientPtr &db, int articleId,
             cb(false, e.base().what());
         },
         articleId);
+}
+
+void ArticleService::publishArticle(const DbClientPtr &db, int articleId,
+                                     BoolCallback cb) {
+    db->execSqlAsync(
+        "UPDATE articles SET status = 'published', published_at = NOW(), "
+        "scheduled_at = NULL WHERE id = $1",
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Article not found");
+            } else {
+                cb(true, "");
+            }
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        },
+        articleId);
+}
+
+void ArticleService::scheduleArticle(const DbClientPtr &db, int articleId,
+                                      const std::string &scheduledAt,
+                                      BoolCallback cb) {
+    db->execSqlAsync(
+        "UPDATE articles SET status = 'scheduled', scheduled_at = $2 "
+        "WHERE id = $1",
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Article not found");
+            } else {
+                cb(true, "");
+            }
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        },
+        articleId, scheduledAt);
+}
+
+void ArticleService::unpublishArticle(const DbClientPtr &db, int articleId,
+                                       BoolCallback cb) {
+    db->execSqlAsync(
+        "UPDATE articles SET status = 'unpublished' WHERE id = $1",
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Article not found");
+            } else {
+                cb(true, "");
+            }
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        },
+        articleId);
+}
+
+void ArticleService::publishDueArticles(const DbClientPtr &db,
+                                         BoolCallback cb) {
+    db->execSqlAsync(
+        "UPDATE articles SET status = 'published', published_at = NOW() "
+        "WHERE status = 'scheduled' AND scheduled_at <= NOW()",
+        [cb](const drogon::orm::Result &result) {
+            cb(true, std::to_string(result.affectedRows()) + " articles published");
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        });
+}
+
+void ArticleService::listArticlesByStatus(const DbClientPtr &db, int tenantId,
+                                           const std::string &status,
+                                           int limit, int offset,
+                                           ArticleListCallback cb) {
+    db->execSqlAsync(
+        "SELECT * FROM articles WHERE tenant_id = $1 AND status = $2 "
+        "ORDER BY created_at DESC LIMIT $3 OFFSET $4",
+        [this, cb](const drogon::orm::Result &result) {
+            std::vector<ArticleDto> articles;
+            articles.reserve(result.size());
+            for (const auto &row : result) {
+                articles.push_back(rowToArticleDto(row));
+            }
+            cb(articles);
+        },
+        [cb](const drogon::orm::DrogonDbException &) {
+            cb({});
+        },
+        tenantId, status, limit, offset);
 }
 
 } // namespace pyracms

@@ -13,11 +13,18 @@ ApplicationWindow {
     minimumWidth: 800
     minimumHeight: 600
     visible: true
-    title: "Hypernucleus - Game & Dependency Manager"
+    title: qsTr("Hypernucleus - Game & Dependency Manager")
 
-    Material.theme: Material.Light
+    Material.theme: settingsManager.darkMode ? Material.Dark : Material.Light
     Material.primary: Theme.Theme.primary
     Material.accent: Theme.Theme.secondary
+
+    // Bind Theme singleton dark mode
+    Binding {
+        target: Theme.Theme
+        property: "isDark"
+        value: settingsManager.darkMode
+    }
 
     // Save/restore window geometry
     Component.onCompleted: {
@@ -59,11 +66,11 @@ ApplicationWindow {
             Material.background: Theme.Theme.surface
 
             TabButton {
-                text: "Games"
+                text: qsTr("Games")
                 font.pixelSize: Theme.Theme.fontSizeNormal
             }
             TabButton {
-                text: "Dependencies"
+                text: qsTr("Dependencies")
                 font.pixelSize: Theme.Theme.fontSizeNormal
             }
         }
@@ -168,7 +175,7 @@ ApplicationWindow {
     // Error dialog
     Dialog {
         id: errorDialog
-        title: "Error"
+        title: qsTr("Error")
         modal: true
         anchors.centerIn: parent
         width: 400

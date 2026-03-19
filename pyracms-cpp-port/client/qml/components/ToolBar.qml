@@ -16,7 +16,7 @@ ToolBar {
 
         // App title
         Label {
-            text: "Hypernucleus"
+            text: qsTr("Hypernucleus")
             font.pixelSize: Theme.Theme.fontSizeLarge
             font.bold: true
             color: Theme.Theme.textOnPrimary
@@ -35,7 +35,7 @@ ToolBar {
                      mainViewModel.selectedItem.installed &&
                      !mainViewModel.gameRunning
             ToolTip.visible: hovered
-            ToolTip.text: "Launch Game (Ctrl+Enter)"
+            ToolTip.text: qsTr("Launch Game (Ctrl+Enter)")
 
             onClicked: mainViewModel.launchSelected()
 
@@ -55,7 +55,7 @@ ToolBar {
             font.pixelSize: 16
             enabled: mainViewModel.gameRunning
             ToolTip.visible: hovered
-            ToolTip.text: "Stop Game"
+            ToolTip.text: qsTr("Stop Game")
 
             onClicked: mainViewModel.stopGame()
 
@@ -84,7 +84,7 @@ ToolBar {
             font.pixelSize: 16
             enabled: mainViewModel.selectedItem.installed === true
             ToolTip.visible: hovered
-            ToolTip.text: "Uninstall Selected"
+            ToolTip.text: qsTr("Uninstall Selected")
 
             onClicked: mainViewModel.uninstallSelected()
 
@@ -104,7 +104,7 @@ ToolBar {
             font.pixelSize: 18
             enabled: !mainViewModel.isLoading
             ToolTip.visible: hovered
-            ToolTip.text: "Refresh Catalog (Ctrl+R)"
+            ToolTip.text: qsTr("Refresh Catalog (Ctrl+R)")
 
             onClicked: mainViewModel.refreshCatalog()
 
@@ -140,7 +140,7 @@ ToolBar {
         Label {
             text: authService.authenticated
                 ? authService.username
-                : "Not logged in"
+                : qsTr("Not logged in")
             font.pixelSize: Theme.Theme.fontSizeSmall
             color: Qt.rgba(1, 1, 1, 0.8)
         }
@@ -151,7 +151,7 @@ ToolBar {
             text: "\u2699"
             font.pixelSize: 18
             ToolTip.visible: hovered
-            ToolTip.text: "Settings (Ctrl+,)"
+            ToolTip.text: qsTr("Settings (Ctrl+,)")
 
             onClicked: settingsDialog.open()
 
@@ -170,7 +170,7 @@ ToolBar {
             text: "\u2715"
             font.pixelSize: 16
             ToolTip.visible: hovered
-            ToolTip.text: "Exit (Ctrl+Q)"
+            ToolTip.text: qsTr("Exit (Ctrl+Q)")
             Layout.rightMargin: Theme.Theme.spacingNormal
 
             onClicked: Qt.quit()
