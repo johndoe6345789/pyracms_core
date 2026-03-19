@@ -7,8 +7,10 @@ import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import { useMemo, useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { useAuthHydration } from '@/hooks/useAuthHydration'
 
 export default function ThemeWrapper({ children }: { children: React.ReactNode }) {
+  useAuthHydration()
   const colorMode = useSelector((state: RootState) => state.ui.colorMode)
   const [systemDark, setSystemDark] = useState(false)
 

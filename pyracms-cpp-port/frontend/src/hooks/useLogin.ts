@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux'
+import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
-import type { LoginRequest, AuthResponse } from '@/types'
+import type { LoginRequest } from '@/types'
 
 export function useLogin() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [formData, setFormData] = useState<LoginRequest>({
     username: '',
     password: '',
@@ -24,16 +27,19 @@ export function useLogin() {
     setLoading(true)
 
     try {
-      const response = await api.post<AuthResponse>('/api/auth/login', formData)
+      const response = await api.post('/api/auth/login', formData)
+      const { token, user } = response.data
 
-      if (response.data.success && response.data.token) {
-        localStorage.setItem('token', response.data.token)
+      if (token) {
+        localStorage.setItem('token', token)
+        dispatch(setCredentials({ user, token }))
         router.push('/dashboard')
       } else {
         setError(response.data.error || 'Login failed')
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'An error occurred during login')
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: string } } }
+      setError(axiosErr.response?.data?.error || 'An error occurred during login')
     } finally {
       setLoading(false)
     }

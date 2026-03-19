@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux'
+import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
-import type { RegisterRequest, AuthResponse } from '@/types'
+import type { RegisterRequest } from '@/types'
 
 export function useRegister() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [formData, setFormData] = useState<RegisterRequest>({
     username: '',
     email: '',
@@ -27,16 +30,19 @@ export function useRegister() {
     setLoading(true)
 
     try {
-      const response = await api.post<AuthResponse>('/api/auth/register', formData)
+      const response = await api.post('/api/auth/register', formData)
+      const { token, user } = response.data
 
-      if (response.data.success && response.data.token) {
-        localStorage.setItem('token', response.data.token)
+      if (token) {
+        localStorage.setItem('token', token)
+        dispatch(setCredentials({ user, token }))
         router.push('/dashboard')
       } else {
         setError(response.data.error || 'Registration failed')
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'An error occurred during registration')
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: string } } }
+      setError(axiosErr.response?.data?.error || 'An error occurred during registration')
     } finally {
       setLoading(false)
     }

@@ -7,6 +7,7 @@ import {
 import { ArrowBackOutlined, SearchOutlined, AdminPanelSettingsOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
+import UserBubble from '@/components/common/UserBubble'
 
 interface TenantDrawerProps {
   slug: string
@@ -19,8 +20,9 @@ export default function TenantDrawer({ slug, siteName, open, onClose }: TenantDr
   return (
     <Drawer anchor="left" open={open} onClose={onClose}>
       <Box sx={{ width: 260, pt: 2 }}>
-        <Box sx={{ px: 2, pb: 2 }}>
+        <Box sx={{ px: 2, pb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>{siteName}</Typography>
+          <UserBubble />
         </Box>
         <Divider />
         <List>
@@ -36,7 +38,7 @@ export default function TenantDrawer({ slug, siteName, open, onClose }: TenantDr
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component={Link} href={`/search`} onClick={onClose}>
+            <ListItemButton component={Link} href="/search" onClick={onClose}>
               <ListItemIcon sx={{ minWidth: 40 }}><SearchOutlined /></ListItemIcon>
               <ListItemText primary="Search" />
             </ListItemButton>

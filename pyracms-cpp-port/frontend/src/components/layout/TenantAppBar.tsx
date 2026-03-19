@@ -1,10 +1,14 @@
 'use client'
 
-import { AppBar, Toolbar, Typography, Box, Button, IconButton } from '@mui/material'
-import { MenuOutlined, ArrowBackOutlined, LanguageOutlined, SearchOutlined, AdminPanelSettingsOutlined } from '@mui/icons-material'
+import { AppBar, Toolbar, Typography, Box, Button, IconButton, Divider } from '@mui/material'
+import { MenuOutlined, ArrowBackOutlined, LanguageOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
 import { GlobalSearch } from '@/components/common/GlobalSearch'
+import UserBubble from '@/components/common/UserBubble'
+import NotificationBell from '@/components/common/NotificationBell'
+import ThemeToggle from '@/components/common/ThemeToggle'
+import LanguageSelect from '@/components/common/LanguageSelect'
 
 interface TenantAppBarProps {
   slug: string
@@ -44,14 +48,14 @@ export default function TenantAppBar({ slug, siteName, isMobile, onMenuClick }: 
             ))}
           </Box>
         )}
-        {!isMobile && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GlobalSearch />
-            <IconButton component={Link} href="/dashboard" sx={{ color: 'text.secondary' }}>
-              <AdminPanelSettingsOutlined />
-            </IconButton>
-          </Box>
-        )}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}>
+          {!isMobile && <GlobalSearch />}
+          <LanguageSelect />
+          <ThemeToggle />
+          <NotificationBell />
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5, display: { xs: 'none', md: 'block' } }} />
+          <UserBubble />
+        </Box>
       </Toolbar>
     </AppBar>
   )
