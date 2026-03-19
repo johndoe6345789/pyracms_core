@@ -37,6 +37,20 @@ export function getUserRole(user: User | null): UserRole {
   return user.isAdmin ? UserRole.SiteAdmin : UserRole.User
 }
 
+/**
+ * Returns true when the user's effective role is greater than or
+ * equal to `minRole`.  Passing `null` is treated as Guest (0).
+ *
+ * @example
+ * hasMinRole(user, UserRole.Moderator) // true if Moderator, SiteAdmin, or SuperAdmin
+ */
+export function hasMinRole(
+  user: User | null,
+  minRole: UserRole,
+): boolean {
+  return getUserRole(user) >= minRole
+}
+
 export interface LoginRequest {
   username: string
   password: string
@@ -46,6 +60,8 @@ export interface RegisterRequest {
   username: string
   email: string
   password: string
+  /** Must match password; validated client-side before submission. */
+  confirmPassword?: string
   firstName?: string
   lastName?: string
 }

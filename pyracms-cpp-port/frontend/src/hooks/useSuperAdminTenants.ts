@@ -12,6 +12,12 @@ export interface TenantRow {
   createdAt: string
 }
 
+export interface CreateTenantPayload {
+  slug: string
+  displayName?: string
+  ownerUsername?: string
+}
+
 export function useSuperAdminTenants() {
   const [tenants, setTenants] = useState<TenantRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,6 +63,27 @@ export function useSuperAdminTenants() {
 
   const cancelDelete = () => setConfirmDeleteId(null)
 
+  const createTenant = (
+    payload: CreateTenantPayload,
+  ): Promise<void> => {
+    return api.post('/api/tenants', payload)
+      .then((res) => {
+        const t = res.data as Record<string, unknown>
+        const row: TenantRow = {
+          id: Number(t.id),
+          slug: String(t.slug || ''),
+          name: String(t.displayName || t.slug || ''),
+          owner: String(t.ownerUsername || ''),
+          isActive: Boolean(t.isActive ?? true),
+          createdAt: typeof t.createdAt === 'string'
+            ? t.createdAt.split('T')[0]
+            : '',
+        }
+        setTenants((prev) => [...prev, row])
+      })
+      .catch(() => {})
+  }
+
   return {
     tenants,
     loading,
@@ -64,5 +91,6 @@ export function useSuperAdminTenants() {
     handleDelete,
     confirmDelete,
     cancelDelete,
+    createTenant,
   }
 }
