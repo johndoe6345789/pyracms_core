@@ -11,7 +11,7 @@ export default function ViewThreadPage() {
   const params = useParams()
   const slug = params.slug as string
   const threadId = params.threadId as string
-  const { thread, posts, replyContent, setReplyContent } = useThread(threadId)
+  const { thread, posts, replyContent, setReplyContent, handleSubmitReply, handleVotePost, handleEditPost, handleDeletePost } = useThread(threadId)
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -25,10 +25,16 @@ export default function ViewThreadPage() {
       <Divider sx={{ mb: 4 }} />
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={post}
+            onVote={handleVotePost}
+            onEdit={handleEditPost}
+            onDelete={handleDeletePost}
+          />
         ))}
       </Box>
-      <QuickReplyForm value={replyContent} onChange={setReplyContent} />
+      <QuickReplyForm value={replyContent} onChange={setReplyContent} onSubmit={handleSubmitReply} />
     </Container>
   )
 }

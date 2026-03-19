@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
 
 export interface Post {
   id: string
@@ -17,24 +18,77 @@ export interface ThreadInfo {
   description: string
 }
 
-const PLACEHOLDER_THREAD: ThreadInfo = {
-  title: 'Next.js vs Remix: Which should I choose?',
-  description:
-    'I am starting a new project and trying to decide between Next.js and Remix. Looking for advice from people who have used both.',
-}
-
-const PLACEHOLDER_POSTS: Post[] = [
-  { id: '1', author: 'Alice Johnson', date: '2026-03-15 14:30', content: 'I have been using Next.js for about two years now, and I recently tried Remix for a side project. Both are great frameworks, but they have different philosophies. Next.js leans heavily into React Server Components and has excellent static generation support. Remix focuses more on web standards and progressive enhancement. For most projects, I would recommend Next.js because of its larger ecosystem and community.', likes: 12, dislikes: 1, isOwner: false },
-  { id: '2', author: 'Bob Williams', date: '2026-03-15 15:45', content: 'I would actually argue in favor of Remix for form-heavy applications. Its approach to mutations and error handling using web standards is really elegant. That said, if you need SSG or ISR, Next.js is the way to go.', likes: 8, dislikes: 0, isOwner: false },
-  { id: '3', author: 'Jane Smith', date: '2026-03-16 09:00', content: 'It depends on your use case. I have used both in production:\n\n- Next.js: Better for content-heavy sites, blogs, e-commerce\n- Remix: Better for complex forms, dashboards, internal tools\n\nBoth have excellent TypeScript support and great developer experience.', likes: 15, dislikes: 2, isOwner: true },
-  { id: '4', author: 'Charlie Brown', date: '2026-03-16 11:30', content: 'One thing to consider is deployment. Next.js has Vercel which makes deployment trivial. Remix can be deployed anywhere but you need to set up your own server adapter. For a team that values simplicity in deployment, Next.js + Vercel is hard to beat.', likes: 6, dislikes: 0, isOwner: false },
-  { id: '5', author: 'Alice Johnson', date: '2026-03-18 09:15', content: 'Great points from everyone. I should also mention that Next.js 15 has some really impressive improvements to the App Router. The caching story is much simpler now. I would say go with Next.js unless you have a specific reason to choose Remix.', likes: 4, dislikes: 0, isOwner: false },
-]
-
-export function useThread(_threadId: string) {
-  const thread = PLACEHOLDER_THREAD
-  const posts = PLACEHOLDER_POSTS
+export function useThread(threadId: string) {
+  const [thread, setThread] = useState<ThreadInfo>({ title: '', description: '' })
+  const [posts, setPosts] = useState<Post[]>([])
   const [replyContent, setReplyContent] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  return { thread, posts, replyContent, setReplyContent }
+  const fetchThread = () => {
+    if (!threadId) return
+    api.get(`/api/forum/threads/${threadId}`)
+      .then(res => {
+        const data = res.data
+        setThread({ title: data.title || '', description: data.content || '' })
+        const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null
+        const mapped: Post[] = (data.posts || []).map((p: Record<string, unknown>) => ({
+          id: String(p.id),
+          author: p.authorUsername || 'Unknown',
+          date: typeof p.createdAt === 'string' ? (p.createdAt as string).replace('T', ' ').substring(0, 16) : '',
+          content: p.content || '',
+          likes: p.likes || 0,
+          dislikes: p.dislikes || 0,
+          isOwner: currentUserId ? String(p.authorId) === currentUserId : false,
+        }))
+        setPosts(mapped)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    fetchThread()
+  }, [threadId])
+
+  const handleSubmitReply = () => {
+    if (!replyContent.trim() || !threadId) return Promise.reject()
+    return api.post('/api/forum/posts', { threadId: Number(threadId), content: replyContent })
+      .then(() => {
+        setReplyContent('')
+        fetchThread()
+      })
+  }
+
+  const handleVotePost = (postId: string, isLike: boolean) => {
+    return api.post(`/api/forum/posts/${postId}/vote`, { like: isLike })
+      .then(() => {
+        setPosts(prev => prev.map(p =>
+          p.id === postId ? {
+            ...p,
+            likes: p.likes + (isLike ? 1 : 0),
+            dislikes: p.dislikes + (isLike ? 0 : 1),
+          } : p
+        ))
+      })
+      .catch(() => {})
+  }
+
+  const handleEditPost = (postId: string, content: string) => {
+    return api.put(`/api/forum/posts/${postId}`, { content })
+      .then(() => {
+        setPosts(prev => prev.map(p =>
+          p.id === postId ? { ...p, content } : p
+        ))
+      })
+  }
+
+  const handleDeletePost = (postId: string) => {
+    return api.delete(`/api/forum/posts/${postId}`)
+      .then(() => {
+        setPosts(prev => prev.filter(p => p.id !== postId))
+      })
+  }
+
+  return { thread, posts, replyContent, setReplyContent, loading, handleSubmitReply, handleVotePost, handleEditPost, handleDeletePost }
 }

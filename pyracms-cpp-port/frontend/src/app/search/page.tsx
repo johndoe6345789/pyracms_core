@@ -126,7 +126,7 @@ export default function SearchPage() {
         </Box>
 
         <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid item xs={12} md={3}>
             <FacetSidebar
               facets={facets}
               activeType={activeType}
@@ -135,7 +135,7 @@ export default function SearchPage() {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 9 }}>
+          <Grid item xs={12} md={9}>
             {loading ? (
               <Typography color="text.secondary">Searching...</Typography>
             ) : results.length === 0 ? (

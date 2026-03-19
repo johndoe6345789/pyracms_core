@@ -63,7 +63,8 @@ RUN ldconfig
 
 # Init script to run migrations then start server
 COPY docker-entrypoint.sh /app/
-RUN chmod +x /app/docker-entrypoint.sh
+COPY seed.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh /app/seed.sh
 
 EXPOSE 8080
 

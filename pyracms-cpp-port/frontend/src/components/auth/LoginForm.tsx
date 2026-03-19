@@ -23,6 +23,10 @@ export default function LoginForm() {
 
       {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
 
+      <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+        Test credentials: <strong>admin</strong> / <strong>password123</strong>
+      </Alert>
+
       <form onSubmit={handleSubmit}>
         <TextField
           fullWidth label="Username" margin="normal" required

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import api from '@/lib/api'
 
 export interface FileItem {
   id: number
@@ -9,18 +10,8 @@ export interface FileItem {
   type: string
   downloads: number
   uploadedAt: string
+  uuid: string
 }
-
-const PLACEHOLDER_FILES: FileItem[] = [
-  { id: 1, name: 'hero-banner.jpg', size: 245760, type: 'image/jpeg', downloads: 34, uploadedAt: '2025-05-01' },
-  { id: 2, name: 'logo.png', size: 18432, type: 'image/png', downloads: 128, uploadedAt: '2025-04-15' },
-  { id: 3, name: 'annual-report.pdf', size: 3145728, type: 'application/pdf', downloads: 56, uploadedAt: '2025-04-20' },
-  { id: 4, name: 'styles-backup.css', size: 8192, type: 'text/css', downloads: 5, uploadedAt: '2025-05-10' },
-  { id: 5, name: 'product-photo.jpg', size: 512000, type: 'image/jpeg', downloads: 22, uploadedAt: '2025-05-12' },
-  { id: 6, name: 'readme.txt', size: 2048, type: 'text/plain', downloads: 12, uploadedAt: '2025-05-15' },
-  { id: 7, name: 'avatar-default.png', size: 4096, type: 'image/png', downloads: 200, uploadedAt: '2025-03-01' },
-  { id: 8, name: 'terms-of-service.pdf', size: 1048576, type: 'application/pdf', downloads: 88, uploadedAt: '2025-02-20' },
-]
 
 export function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -28,11 +19,32 @@ export function formatFileSize(bytes: number): string {
   return `${(bytes / 1048576).toFixed(1)} MB`
 }
 
-export function useFileManager() {
-  const [files, setFiles] = useState<FileItem[]>(PLACEHOLDER_FILES)
+export function useFileManager(tenantId: number | null) {
+  const [files, setFiles] = useState<FileItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
   const [dragOver, setDragOver] = useState(false)
+
+  useEffect(() => {
+    if (!tenantId) return
+    setLoading(true)
+    api.get(`/api/files?tenant_id=${tenantId}`)
+      .then(res => {
+        const mapped: FileItem[] = (res.data || []).map((f: Record<string, unknown>) => ({
+          id: f.id,
+          name: f.filename || '',
+          size: f.size || 0,
+          type: f.mimetype || '',
+          downloads: f.downloadCount || 0,
+          uploadedAt: typeof f.createdAt === 'string' ? (f.createdAt as string).split('T')[0] : '',
+          uuid: f.uuid || '',
+        }))
+        setFiles(mapped)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [tenantId])
 
   const handleDeleteClick = (file: FileItem) => {
     setSelectedFile(file)
@@ -41,7 +53,11 @@ export function useFileManager() {
 
   const handleDeleteConfirm = () => {
     if (selectedFile) {
-      setFiles((prev) => prev.filter((f) => f.id !== selectedFile.id))
+      api.delete(`/api/files/${selectedFile.uuid}`)
+        .then(() => {
+          setFiles(prev => prev.filter(f => f.id !== selectedFile.id))
+        })
+        .catch(() => {})
     }
     setDeleteDialogOpen(false)
     setSelectedFile(null)
@@ -51,6 +67,29 @@ export function useFileManager() {
     setDeleteDialogOpen(false)
     setSelectedFile(null)
   }
+
+  const uploadFiles = useCallback((fileList: FileList) => {
+    if (!tenantId) return
+    Array.from(fileList).forEach(file => {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('tenant_id', String(tenantId))
+      api.post('/api/files', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }).then(res => {
+        const f = res.data
+        setFiles(prev => [...prev, {
+          id: f.id,
+          name: f.filename || file.name,
+          size: f.size || file.size,
+          type: f.mimetype || file.type,
+          downloads: 0,
+          uploadedAt: new Date().toISOString().split('T')[0],
+          uuid: f.uuid || '',
+        }])
+      }).catch(() => {})
+    })
+  }, [tenantId])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -64,11 +103,14 @@ export function useFileManager() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setDragOver(false)
-    // TODO: Wire up actual file upload via RTK Query
-  }, [])
+    if (e.dataTransfer.files.length > 0) {
+      uploadFiles(e.dataTransfer.files)
+    }
+  }, [uploadFiles])
 
   return {
     files,
+    loading,
     deleteDialogOpen,
     selectedFile,
     dragOver,
@@ -78,5 +120,6 @@ export function useFileManager() {
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    uploadFiles,
   }
 }

@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  Box, TextField, InputAdornment, Paper, Typography, List, ListItem, ListItemIcon, ListItemText,
+  Box, TextField, InputAdornment, Typography, List, ListItem, ListItemIcon, ListItemText,
   Chip, Dialog, DialogContent, Fade,
 } from '@mui/material'
 import {
-  SearchOutlined, ArticleOutlined, ForumOutlined, CodeOutlined, PersonOutlined, CloseOutlined,
+  SearchOutlined, ArticleOutlined, ForumOutlined, CodeOutlined, PersonOutlined,
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
+import api from '@/lib/api'
 
 interface SearchResult {
   id: string
@@ -17,16 +18,6 @@ interface SearchResult {
   snippet: string
   url: string
 }
-
-const PLACEHOLDER_RESULTS: SearchResult[] = [
-  { id: '1', type: 'article', title: 'Getting Started with Next.js', snippet: 'A comprehensive guide to building applications with Next.js...', url: '/site/demo/articles/getting-started' },
-  { id: '2', type: 'article', title: 'Advanced TypeScript Patterns', snippet: 'Deep dive into conditional types, mapped types...', url: '/site/demo/articles/typescript-patterns' },
-  { id: '3', type: 'post', title: 'Next.js vs Remix discussion', snippet: 'I have been using Next.js for about two years...', url: '/site/demo/forum/thread/1' },
-  { id: '4', type: 'snippet', title: 'Fibonacci Sequence', snippet: 'def fibonacci(n): a, b = 0, 1...', url: '/site/demo/snippets/snippet-1' },
-  { id: '5', type: 'user', title: 'Alice Johnson', snippet: 'Full-stack developer, Next.js enthusiast', url: '/users/alice' },
-  { id: '6', type: 'post', title: 'Best practices for React', snippet: 'When building React components, always consider...', url: '/site/demo/forum/thread/2' },
-  { id: '7', type: 'snippet', title: 'Quick Sort', snippet: 'def quicksort(arr): if len(arr) <= 1...', url: '/site/demo/snippets/snippet-2' },
-]
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   article: <ArticleOutlined fontSize="small" />,
@@ -45,8 +36,10 @@ const TYPE_COLORS: Record<string, string> = {
 export function GlobalSearch() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -68,15 +61,34 @@ export function GlobalSearch() {
       setTimeout(() => inputRef.current?.focus(), 100)
     } else {
       setQuery('')
+      setResults([])
     }
   }, [open])
 
-  const results = query.length >= 2
-    ? PLACEHOLDER_RESULTS.filter((r) =>
-        r.title.toLowerCase().includes(query.toLowerCase()) ||
-        r.snippet.toLowerCase().includes(query.toLowerCase())
-      )
-    : []
+  useEffect(() => {
+    if (query.length < 2) {
+      setResults([])
+      return
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      // Try to detect tenant_id from current URL
+      const slugMatch = window.location.pathname.match(/\/site\/([^/]+)/)
+      const tenantParam = slugMatch ? `&tenant_id=1` : ''
+      api.get(`/api/search/autocomplete?q=${encodeURIComponent(query)}${tenantParam}`)
+        .then(res => {
+          const items = res.data.items || res.data || []
+          setResults(items.map((item: Record<string, unknown>) => ({
+            id: String(item.id),
+            type: item.type || 'article',
+            title: item.title || '',
+            snippet: item.snippet || '',
+            url: item.url || '#',
+          })))
+        })
+        .catch(() => setResults([]))
+    }, 300)
+  }, [query])
 
   const grouped = results.reduce<Record<string, SearchResult[]>>((acc, r) => {
     if (!acc[r.type]) acc[r.type] = []
@@ -155,7 +167,7 @@ export function GlobalSearch() {
                         </ListItemIcon>
                         <ListItemText
                           primary={result.title}
-                          secondary={result.snippet.substring(0, 80) + '...'}
+                          secondary={result.snippet.substring(0, 80) + (result.snippet.length > 80 ? '...' : '')}
                           primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
                           secondaryTypographyProps={{ variant: 'caption' }}
                         />

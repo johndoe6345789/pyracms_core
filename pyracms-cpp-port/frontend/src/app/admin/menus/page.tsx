@@ -7,11 +7,13 @@ import {
 } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
+import { useAdminTenantId } from '@/hooks/useAdminTenantId'
 import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
 import MenuItemTable from '@/components/admin/MenuItemTable'
 
 export default function AdminMenusPage() {
-  const editor = useMenuEditor()
+  const { tenantId } = useAdminTenantId()
+  const editor = useMenuEditor(tenantId)
 
   return (
     <Box>

@@ -20,7 +20,7 @@ export function useWebSocket({
   reconnectInterval = 3000,
 }: UseWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>()
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout>(null)
   const [connected, setConnected] = useState(false)
 
   const connect = useCallback(() => {

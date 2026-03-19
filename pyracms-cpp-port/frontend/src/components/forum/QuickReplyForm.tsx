@@ -6,9 +6,10 @@ import { SendOutlined } from '@mui/icons-material'
 interface QuickReplyFormProps {
   value: string
   onChange: (value: string) => void
+  onSubmit?: () => void
 }
 
-export function QuickReplyForm({ value, onChange }: QuickReplyFormProps) {
+export function QuickReplyForm({ value, onChange, onSubmit }: QuickReplyFormProps) {
   return (
     <Paper variant="outlined" sx={{ p: 3, mt: 4, borderColor: 'divider' }}>
       <Typography variant="h6" gutterBottom>Reply</Typography>
@@ -22,7 +23,7 @@ export function QuickReplyForm({ value, onChange }: QuickReplyFormProps) {
         onChange={(e) => onChange(e.target.value)}
         sx={{ mb: 2 }}
       />
-      <Button variant="contained" endIcon={<SendOutlined />}>Submit Reply</Button>
+      <Button variant="contained" endIcon={<SendOutlined />} onClick={onSubmit} disabled={!value.trim()}>Submit Reply</Button>
     </Paper>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SelectChangeEvent } from '@mui/material'
+import api from '@/lib/api'
 
 export interface MenuItemRow {
   id: number
@@ -12,41 +13,15 @@ export interface MenuItemRow {
 }
 
 export interface MenuGroup {
+  id: number
   name: string
   items: MenuItemRow[]
 }
 
-const PLACEHOLDER_MENU_GROUPS: MenuGroup[] = [
-  {
-    name: 'main',
-    items: [
-      { id: 1, name: 'Home', route: '/', position: 0, permissions: 'public' },
-      { id: 2, name: 'Articles', route: '/articles', position: 1, permissions: 'public' },
-      { id: 3, name: 'Forum', route: '/forum', position: 2, permissions: 'authenticated' },
-      { id: 4, name: 'Gallery', route: '/gallery', position: 3, permissions: 'public' },
-    ],
-  },
-  {
-    name: 'footer',
-    items: [
-      { id: 5, name: 'About', route: '/about', position: 0, permissions: 'public' },
-      { id: 6, name: 'Contact', route: '/contact', position: 1, permissions: 'public' },
-      { id: 7, name: 'Privacy Policy', route: '/privacy', position: 2, permissions: 'public' },
-    ],
-  },
-  {
-    name: 'user',
-    items: [
-      { id: 8, name: 'Profile', route: '/profile', position: 0, permissions: 'authenticated' },
-      { id: 9, name: 'Settings', route: '/settings', position: 1, permissions: 'authenticated' },
-      { id: 10, name: 'Logout', route: '/auth/logout', position: 2, permissions: 'authenticated' },
-    ],
-  },
-]
-
-export function useMenuEditor() {
-  const [menuGroups, setMenuGroups] = useState<MenuGroup[]>(PLACEHOLDER_MENU_GROUPS)
-  const [selectedGroup, setSelectedGroup] = useState('main')
+export function useMenuEditor(tenantId: number | null) {
+  const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedGroup, setSelectedGroup] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editRow, setEditRow] = useState<MenuItemRow | null>(null)
   const [newName, setNewName] = useState('')
@@ -56,7 +31,37 @@ export function useMenuEditor() {
   const [groupDialogOpen, setGroupDialogOpen] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
 
-  const currentGroup = menuGroups.find((g) => g.name === selectedGroup)
+  useEffect(() => {
+    if (!tenantId) return
+    setLoading(true)
+    api.get(`/api/menu-groups?tenant_id=${tenantId}`)
+      .then(async res => {
+        const groups = res.data || []
+        const loaded: MenuGroup[] = []
+        for (const g of groups) {
+          const itemsRes = await api.get(`/api/menu-groups/${g.id}/items`).catch(() => ({ data: [] }))
+          loaded.push({
+            id: g.id,
+            name: g.name || '',
+            items: (itemsRes.data || []).map((i: Record<string, unknown>) => ({
+              id: i.id,
+              name: i.name || '',
+              route: i.route || '',
+              position: i.position || 0,
+              permissions: i.permissions || 'public',
+            })),
+          })
+        }
+        setMenuGroups(loaded)
+        if (loaded.length > 0 && !selectedGroup) {
+          setSelectedGroup(loaded[0].name)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [tenantId])
+
+  const currentGroup = menuGroups.find(g => g.name === selectedGroup)
   const currentItems = currentGroup?.items ?? []
 
   const handleGroupChange = (e: SelectChangeEvent) => {
@@ -71,15 +76,22 @@ export function useMenuEditor() {
 
   const handleSaveEdit = () => {
     if (!editRow) return
-    setMenuGroups((prev) =>
-      prev.map((g) =>
-        g.name === selectedGroup
-          ? { ...g, items: g.items.map((i) => (i.id === editRow.id ? editRow : i)) }
-          : g
+    api.put(`/api/menus/${editRow.id}`, {
+      name: editRow.name,
+      route: editRow.route,
+      position: editRow.position,
+      permissions: editRow.permissions,
+    }).then(() => {
+      setMenuGroups(prev =>
+        prev.map(g =>
+          g.name === selectedGroup
+            ? { ...g, items: g.items.map(i => i.id === editRow.id ? editRow : i) }
+            : g
+        )
       )
-    )
-    setEditingId(null)
-    setEditRow(null)
+      setEditingId(null)
+      setEditRow(null)
+    }).catch(() => {})
   }
 
   const handleCancelEdit = () => {
@@ -88,45 +100,58 @@ export function useMenuEditor() {
   }
 
   const handleDelete = (id: number) => {
-    setMenuGroups((prev) =>
-      prev.map((g) =>
-        g.name === selectedGroup
-          ? { ...g, items: g.items.filter((i) => i.id !== id) }
-          : g
-      )
-    )
+    api.delete(`/api/menus/${id}`)
+      .then(() => {
+        setMenuGroups(prev =>
+          prev.map(g =>
+            g.name === selectedGroup
+              ? { ...g, items: g.items.filter(i => i.id !== id) }
+              : g
+          )
+        )
+      })
+      .catch(() => {})
   }
 
   const handleAddItem = () => {
-    if (!newName.trim() || !newRoute.trim()) return
-    const allIds = menuGroups.flatMap((g) => g.items.map((i) => i.id))
-    const nextId = Math.max(...allIds, 0) + 1
-    const newItem: MenuItemRow = {
-      id: nextId,
+    if (!newName.trim() || !newRoute.trim() || !currentGroup) return
+    api.post(`/api/menu-groups/${currentGroup.id}/items`, {
       name: newName.trim(),
       route: newRoute.trim(),
       position: parseInt(newPosition, 10) || 0,
       permissions: newPermissions,
-    }
-    setMenuGroups((prev) =>
-      prev.map((g) =>
-        g.name === selectedGroup ? { ...g, items: [...g.items, newItem] } : g
+    }).then(res => {
+      const newItem: MenuItemRow = {
+        id: res.data.id,
+        name: newName.trim(),
+        route: newRoute.trim(),
+        position: parseInt(newPosition, 10) || 0,
+        permissions: newPermissions,
+      }
+      setMenuGroups(prev =>
+        prev.map(g =>
+          g.name === selectedGroup ? { ...g, items: [...g.items, newItem] } : g
+        )
       )
-    )
-    setNewName('')
-    setNewRoute('')
-    setNewPosition('')
-    setNewPermissions('public')
+      setNewName('')
+      setNewRoute('')
+      setNewPosition('')
+      setNewPermissions('public')
+    }).catch(() => {})
   }
 
   const handleCreateGroup = () => {
-    if (!newGroupName.trim()) return
+    if (!newGroupName.trim() || !tenantId) return
     const groupName = newGroupName.trim().toLowerCase().replace(/\s+/g, '_')
-    if (menuGroups.some((g) => g.name === groupName)) return
-    setMenuGroups((prev) => [...prev, { name: groupName, items: [] }])
-    setSelectedGroup(groupName)
-    setGroupDialogOpen(false)
-    setNewGroupName('')
+    if (menuGroups.some(g => g.name === groupName)) return
+    api.post('/api/menu-groups', { name: groupName, tenant_id: tenantId })
+      .then(res => {
+        setMenuGroups(prev => [...prev, { id: res.data.id, name: groupName, items: [] }])
+        setSelectedGroup(groupName)
+        setGroupDialogOpen(false)
+        setNewGroupName('')
+      })
+      .catch(() => {})
   }
 
   const handleOpenGroupDialog = () => setGroupDialogOpen(true)
@@ -134,6 +159,7 @@ export function useMenuEditor() {
 
   return {
     menuGroups,
+    loading,
     selectedGroup,
     editingId,
     editRow,

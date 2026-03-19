@@ -1,9 +1,10 @@
 'use client'
 
 import { AppBar, Toolbar, Typography, Box, Button, IconButton } from '@mui/material'
-import { MenuOutlined, ArrowBackOutlined, LanguageOutlined } from '@mui/icons-material'
+import { MenuOutlined, ArrowBackOutlined, LanguageOutlined, SearchOutlined, AdminPanelSettingsOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
+import { GlobalSearch } from '@/components/common/GlobalSearch'
 
 interface TenantAppBarProps {
   slug: string
@@ -34,13 +35,21 @@ export default function TenantAppBar({ slug, siteName, isMobile, onMenuClick }: 
           {siteName}
         </Typography>
         {!isMobile && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexGrow: 1 }}>
             {NAV_ITEMS.map((item) => (
               <Button key={item.path} component={Link} href={`/site/${slug}/${item.path}`}
                 startIcon={item.icon} sx={{ color: 'text.secondary' }}>
                 {item.label}
               </Button>
             ))}
+          </Box>
+        )}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GlobalSearch />
+            <IconButton component={Link} href="/dashboard" sx={{ color: 'text.secondary' }}>
+              <AdminPanelSettingsOutlined />
+            </IconButton>
           </Box>
         )}
       </Toolbar>

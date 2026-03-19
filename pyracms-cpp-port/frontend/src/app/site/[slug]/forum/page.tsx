@@ -3,12 +3,14 @@
 import { useParams } from 'next/navigation'
 import { Container, Typography, Box } from '@mui/material'
 import { useForumCategories } from '@/hooks/useForumCategories'
+import { useTenantId } from '@/hooks/useTenantId'
 import { CategoryAccordion } from '@/components/forum/CategoryAccordion'
 
 export default function ForumPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { categories } = useForumCategories()
+  const { tenantId } = useTenantId(slug)
+  const { categories } = useForumCategories(tenantId)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>

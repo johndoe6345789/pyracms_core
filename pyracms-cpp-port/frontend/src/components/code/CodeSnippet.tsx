@@ -1,13 +1,28 @@
-import { Box, Typography, Button, Paper, Divider } from '@mui/material'
+import { useState } from 'react'
+import { Box, Typography, Button, Paper, Divider, CircularProgress } from '@mui/material'
 import { PlayArrowOutlined, EditOutlined } from '@mui/icons-material'
 import CodeResult from './CodeResult'
 import type { CodeSnippetData } from '@/hooks/useCodeAlbum'
 
 interface CodeSnippetProps {
   snippet: CodeSnippetData
+  onRun?: (snippetId: string) => Promise<string>
+  onEdit?: (snippetId: string) => void
 }
 
-export default function CodeSnippet({ snippet }: CodeSnippetProps) {
+export default function CodeSnippet({ snippet, onRun, onEdit }: CodeSnippetProps) {
+  const [running, setRunning] = useState(false)
+  const [result, setResult] = useState(snippet.result)
+
+  const handleRun = () => {
+    if (!onRun) return
+    setRunning(true)
+    onRun(snippet.id)
+      .then(output => setResult(output))
+      .catch(() => setResult('Error running snippet'))
+      .finally(() => setRunning(false))
+  }
+
   return (
     <Paper variant="outlined" sx={{ borderColor: 'divider', overflow: 'hidden' }}>
       <Box
@@ -24,10 +39,13 @@ export default function CodeSnippet({ snippet }: CodeSnippetProps) {
           {snippet.title}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="contained" size="small" startIcon={<PlayArrowOutlined />} color="success">
-            Run
+          <Button
+            variant="contained" size="small" startIcon={running ? <CircularProgress size={16} /> : <PlayArrowOutlined />}
+            color="success" onClick={handleRun} disabled={running}
+          >
+            {running ? 'Running...' : 'Run'}
           </Button>
-          <Button variant="outlined" size="small" startIcon={<EditOutlined />}>
+          <Button variant="outlined" size="small" startIcon={<EditOutlined />} onClick={() => onEdit?.(snippet.id)}>
             Edit
           </Button>
         </Box>
@@ -49,7 +67,7 @@ export default function CodeSnippet({ snippet }: CodeSnippetProps) {
       >
         <code>{snippet.code}</code>
       </Box>
-      {snippet.result && <CodeResult result={snippet.result} />}
+      {result && <CodeResult result={result} />}
     </Paper>
   )
 }

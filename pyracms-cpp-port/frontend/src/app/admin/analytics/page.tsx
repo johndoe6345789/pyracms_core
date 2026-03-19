@@ -7,6 +7,7 @@ import {
 import { PageViewChart } from '@/components/admin/charts/PageViewChart'
 import { TopContentChart } from '@/components/admin/charts/TopContentChart'
 import { TrafficPieChart } from '@/components/admin/charts/TrafficPieChart'
+import { useAdminTenantId } from '@/hooks/useAdminTenantId'
 
 const TOP_REFERRERS = [
   { source: 'Google Search', visits: 3420, percentage: 35.2 },
@@ -31,6 +32,7 @@ const POPULAR_SEARCHES = [
 ]
 
 export default function AnalyticsPage() {
+  const { tenantId } = useAdminTenantId()
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
       <Typography variant="h3" component="h1" gutterBottom>Analytics Dashboard</Typography>
@@ -44,10 +46,10 @@ export default function AnalyticsPage() {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TopContentChart />
+          <TopContentChart tenantId={tenantId} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TrafficPieChart />
+          <TrafficPieChart tenantId={tenantId} />
         </Grid>
 
         <Grid item xs={12} md={6}>

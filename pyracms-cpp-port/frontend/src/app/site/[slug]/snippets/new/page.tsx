@@ -1,17 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Container, Typography, Box, TextField, Button, Divider } from '@mui/material'
 import { SaveOutlined, PlayArrowOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { CodeEditor } from '@/components/code/CodeEditor'
 import { CodeOutput } from '@/components/code/CodeOutput'
 import { BackButton } from '@/components/common/BackButton'
+import { useTenantId } from '@/hooks/useTenantId'
+import api from '@/lib/api'
 
 export default function NewSnippetPage() {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
   const [title, setTitle] = useState('')
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState('python')
@@ -20,20 +24,34 @@ export default function NewSnippetPage() {
 
   const handleRun = () => {
     setIsRunning(true)
-    // Placeholder: simulate execution
-    setTimeout(() => {
-      setOutput({
-        stdout: '# Output would appear here after execution\n# This is a placeholder for the actual code runner',
-        exitCode: 0,
-        executionTime: 142,
+    setOutput(null)
+    // Save first if not saved, then run
+    api.post('/api/snippets', { title: title || 'Untitled', code, language, tenant_id: tenantId })
+      .then(res => {
+        const id = res.data.id
+        return api.post(`/api/snippets/${id}/run`)
       })
-      setIsRunning(false)
-    }, 1500)
+      .then(res => {
+        setOutput({
+          stdout: res.data.output || res.data.stdout || '',
+          stderr: res.data.stderr || '',
+          exitCode: res.data.exitCode ?? 0,
+          executionTime: res.data.executionTime,
+        })
+      })
+      .catch(() => {
+        setOutput({ stderr: 'Failed to run snippet', exitCode: 1 })
+      })
+      .finally(() => setIsRunning(false))
   }
 
   const handleSave = () => {
-    // TODO: Wire up API call
-    console.log('Saving snippet:', { title, code, language })
+    if (!tenantId) return
+    api.post('/api/snippets', { title, code, language, tenant_id: tenantId })
+      .then(res => {
+        router.push(`/site/${slug}/snippets/${res.data.id}`)
+      })
+      .catch(() => {})
   }
 
   return (

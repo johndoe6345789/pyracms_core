@@ -5,13 +5,15 @@ import { Container, Typography, Box, Button } from '@mui/material'
 import { AddOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { useArticles } from '@/hooks/useArticles'
+import { useTenantId } from '@/hooks/useTenantId'
 import { ArticleSearchBar } from '@/components/articles/ArticleSearchBar'
 import { ArticleList } from '@/components/articles/ArticleList'
 
 export default function ArticleListPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { articles, searchQuery, setSearchQuery } = useArticles()
+  const { tenantId } = useTenantId(slug)
+  const { articles, searchQuery, setSearchQuery } = useArticles(tenantId)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>

@@ -1,10 +1,12 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material'
 import {
   PeopleOutlined, ArticleOutlined, DashboardOutlined, SettingsOutlined,
 } from '@mui/icons-material'
 import type { SvgIconComponent } from '@mui/icons-material'
+import api from '@/lib/api'
 
 interface Stat {
   title: string
@@ -13,17 +15,42 @@ interface Stat {
   color: string
 }
 
-const STATS: Stat[] = [
-  { title: 'Total Users', value: '1,234', icon: PeopleOutlined, color: '#667eea' },
-  { title: 'Content Items', value: '567', icon: ArticleOutlined, color: '#f093fb' },
-  { title: 'Active Plugins', value: '8', icon: DashboardOutlined, color: '#4facfe' },
-  { title: 'Settings', value: '12', icon: SettingsOutlined, color: '#43e97b' },
-]
-
 export default function DashboardStats() {
+  const [stats, setStats] = useState<Stat[]>([
+    { title: 'Total Users', value: '...', icon: PeopleOutlined, color: '#667eea' },
+    { title: 'Content Items', value: '...', icon: ArticleOutlined, color: '#f093fb' },
+    { title: 'Tenants', value: '...', icon: DashboardOutlined, color: '#4facfe' },
+    { title: 'Settings', value: '...', icon: SettingsOutlined, color: '#43e97b' },
+  ])
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/api/users').then(r => (r.data || []).length).catch(() => 0),
+      api.get('/api/tenants').then(r => {
+        const tenants = r.data || []
+        const tenantCount = tenants.length
+        const tenantId = tenants[0]?.id
+        return { tenantCount, tenantId }
+      }).catch(() => ({ tenantCount: 0, tenantId: null })),
+    ]).then(async ([userCount, { tenantCount, tenantId }]) => {
+      let articleCount = 0
+      let settingCount = 0
+      if (tenantId) {
+        articleCount = await api.get(`/api/articles?tenant_id=${tenantId}`).then(r => (r.data || []).length).catch(() => 0)
+        settingCount = await api.get(`/api/settings?tenant_id=${tenantId}`).then(r => (r.data || []).length).catch(() => 0)
+      }
+      setStats([
+        { title: 'Total Users', value: String(userCount), icon: PeopleOutlined, color: '#667eea' },
+        { title: 'Content Items', value: String(articleCount), icon: ArticleOutlined, color: '#f093fb' },
+        { title: 'Tenants', value: String(tenantCount), icon: DashboardOutlined, color: '#4facfe' },
+        { title: 'Settings', value: String(settingCount), icon: SettingsOutlined, color: '#43e97b' },
+      ])
+    })
+  }, [])
+
   return (
     <Grid container spacing={3} sx={{ mb: 4 }}>
-      {STATS.map((stat, index) => (
+      {stats.map((stat, index) => (
         <Grid item xs={12} sm={6} md={3} key={index}>
           <Card sx={{
             height: '100%',

@@ -1,5 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
+
 export interface Article {
   title: string
   content: string
@@ -13,31 +16,45 @@ export interface Article {
   revisionNumber: number
 }
 
-const PLACEHOLDER_ARTICLE: Article = {
-  title: 'Getting Started with Next.js',
-  content: `
-    <h2>Introduction</h2>
-    <p>Next.js is a powerful React framework that enables server-side rendering, static site generation, and more. In this article, we will explore the fundamentals of building modern web applications with Next.js.</p>
-    <h2>Setting Up Your Project</h2>
-    <p>To get started, you can create a new Next.js project using the create-next-app CLI tool. This sets up everything you need, including TypeScript support, ESLint configuration, and a development server.</p>
-    <h2>App Router</h2>
-    <p>Next.js 14 introduced the App Router, a new paradigm for building applications using React Server Components. The App Router uses a file-system based routing approach where folders define routes.</p>
-    <h2>Data Fetching</h2>
-    <p>With the App Router, you can fetch data directly in your components using async/await. Server Components make it easy to fetch data on the server without additional client-side libraries.</p>
-    <h2>Conclusion</h2>
-    <p>Next.js provides a robust foundation for building modern web applications. Whether you are building a simple blog or a complex enterprise application, Next.js has the tools and patterns to support your needs.</p>
-  `,
-  author: 'Jane Smith',
-  createdDate: '2026-03-10',
-  renderer: 'HTML',
-  views: 1243,
-  likes: 42,
-  dislikes: 3,
-  tags: ['nextjs', 'react', 'tutorial', 'webdev'],
-  revisionNumber: 5,
-}
+export function useArticle(name: string, tenantId: number | null) {
+  const [article, setArticle] = useState<Article | null>(null)
+  const [loading, setLoading] = useState(true)
 
-export function useArticle(_name: string) {
-  const article = PLACEHOLDER_ARTICLE
-  return { article }
+  useEffect(() => {
+    if (!name || !tenantId) return
+    setLoading(true)
+    api.get(`/api/articles/${name}?tenant_id=${tenantId}`)
+      .then(res => {
+        const a = res.data
+        setArticle({
+          title: a.displayName || a.name,
+          content: a.content || '',
+          author: a.authorUsername || 'Unknown',
+          createdDate: a.createdAt?.split('T')[0] || '',
+          renderer: a.rendererName || 'html',
+          views: a.viewCount || 0,
+          likes: a.likes || 0,
+          dislikes: a.dislikes || 0,
+          tags: a.tags || [],
+          revisionNumber: a.revisionNumber || 1,
+        })
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [name, tenantId])
+
+  const handleVote = (isLike: boolean) => {
+    if (!tenantId) return
+    api.post(`/api/articles/${name}/vote`, { like: isLike })
+      .then(() => {
+        setArticle(prev => prev ? {
+          ...prev,
+          likes: prev.likes + (isLike ? 1 : 0),
+          dislikes: prev.dislikes + (isLike ? 0 : 1),
+        } : prev)
+      })
+      .catch(() => {})
+  }
+
+  return { article, loading, handleVote }
 }

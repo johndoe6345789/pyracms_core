@@ -2,23 +2,12 @@
 
 import { useState } from 'react'
 import {
-  Box,
-  TextField,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-  Paper,
-  Typography,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
+  Box, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem,
+  Button, Paper, Typography, Chip, List, ListItem, ListItemText,
 } from '@mui/material'
 import { SearchOutlined, FilterListOutlined } from '@mui/icons-material'
 import DOMPurify from 'dompurify'
+import api from '@/lib/api'
 
 interface ForumSearchResult {
   id: string
@@ -29,18 +18,13 @@ interface ForumSearchResult {
   forumName: string
 }
 
-const PLACEHOLDER_RESULTS: ForumSearchResult[] = [
-  { id: '1', threadTitle: 'Next.js vs Remix', postContent: 'I have been using Next.js for about two years now...', author: 'Alice', date: '2026-03-15', forumName: 'Technology' },
-  { id: '2', threadTitle: 'Best practices for React', postContent: 'When building React components, always consider...', author: 'Bob', date: '2026-03-14', forumName: 'Technology' },
-  { id: '3', threadTitle: 'Help with deployment', postContent: 'I am trying to deploy my Next.js app to a VPS...', author: 'Charlie', date: '2026-03-13', forumName: 'Help & Support' },
-]
-
 interface ForumSearchBarProps {
   forums?: string[]
+  tenantId?: number | null
   onResultClick?: (result: ForumSearchResult) => void
 }
 
-export function ForumSearchBar({ forums, onResultClick }: ForumSearchBarProps) {
+export function ForumSearchBar({ forums, tenantId, onResultClick }: ForumSearchBarProps) {
   const [query, setQuery] = useState('')
   const [author, setAuthor] = useState('')
   const [forum, setForum] = useState('')
@@ -53,17 +37,35 @@ export function ForumSearchBar({ forums, onResultClick }: ForumSearchBarProps) {
   const availableForums = forums ?? ['General Discussion', 'Technology', 'Help & Support', 'Off Topic']
 
   const handleSearch = () => {
-    const filtered = PLACEHOLDER_RESULTS.filter((r) => {
-      const matchesQuery = !query || r.postContent.toLowerCase().includes(query.toLowerCase()) || r.threadTitle.toLowerCase().includes(query.toLowerCase())
-      const matchesAuthor = !author || r.author.toLowerCase().includes(author.toLowerCase())
-      const matchesForum = !forum || r.forumName === forum
-      return matchesQuery && matchesAuthor && matchesForum
-    })
-    setResults(filtered)
-    setHasSearched(true)
+    const params = new URLSearchParams()
+    if (query) params.set('q', query)
+    if (tenantId) params.set('tenant_id', String(tenantId))
+    params.set('type', 'forum_post')
+
+    api.get(`/api/search?${params.toString()}`)
+      .then(res => {
+        const items = res.data.items || res.data || []
+        let mapped: ForumSearchResult[] = items.map((item: Record<string, unknown>) => ({
+          id: String(item.id),
+          threadTitle: item.title || '',
+          postContent: item.snippet || item.content || '',
+          author: item.author || '',
+          date: typeof item.createdAt === 'string' ? (item.createdAt as string).split('T')[0] : '',
+          forumName: item.forumName || '',
+        }))
+        if (author) mapped = mapped.filter(r => r.author.toLowerCase().includes(author.toLowerCase()))
+        if (forum) mapped = mapped.filter(r => r.forumName === forum)
+        setResults(mapped)
+        setHasSearched(true)
+      })
+      .catch(() => {
+        setResults([])
+        setHasSearched(true)
+      })
   }
 
   const highlightMatch = (text: string, highlight: string): string => {
+    // All output is sanitized through DOMPurify before rendering
     if (!highlight) return DOMPurify.sanitize(text)
     const escaped = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const regex = new RegExp(`(${escaped})`, 'gi')
@@ -159,11 +161,11 @@ export function ForumSearchBar({ forums, onResultClick }: ForumSearchBarProps) {
                         <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                           {result.threadTitle}
                         </Typography>
-                        <Chip label={result.forumName} size="small" variant="outlined" />
+                        {result.forumName && <Chip label={result.forumName} size="small" variant="outlined" />}
                       </Box>
                     }
                     secondary={
-                      <Box>
+                      <Box component="span">
                         <Typography
                           variant="body2"
                           component="span"

@@ -4,11 +4,13 @@ import { useParams } from 'next/navigation'
 import { Container, Typography, Box, Grid } from '@mui/material'
 import CodeAlbumCard from '@/components/code/CodeAlbumCard'
 import { useCodeAlbums } from '@/hooks/useCodeAlbums'
+import { useTenantId } from '@/hooks/useTenantId'
 
 export default function CodeAlbumListPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { albums } = useCodeAlbums()
+  const { tenantId } = useTenantId(slug)
+  const { albums } = useCodeAlbums(tenantId)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>

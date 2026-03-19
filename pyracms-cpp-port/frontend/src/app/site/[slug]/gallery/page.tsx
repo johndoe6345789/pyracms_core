@@ -5,11 +5,13 @@ import { Container, Typography, Box, Button } from '@mui/material'
 import { AddPhotoAlternateOutlined } from '@mui/icons-material'
 import AlbumGrid from '@/components/gallery/AlbumGrid'
 import { useGalleryAlbums } from '@/hooks/useGalleryAlbums'
+import { useTenantId } from '@/hooks/useTenantId'
 
 export default function GalleryPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { albums } = useGalleryAlbums()
+  const { tenantId } = useTenantId(slug)
+  const { albums } = useGalleryAlbums(tenantId)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>

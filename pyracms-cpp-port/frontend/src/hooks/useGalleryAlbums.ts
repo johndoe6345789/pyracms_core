@@ -1,41 +1,7 @@
-const PLACEHOLDER_ALBUMS = [
-  {
-    id: 'vacation-2024',
-    name: 'Vacation 2024',
-    coverImage: 'https://picsum.photos/seed/album1/400/300',
-    pictureCount: 24,
-  },
-  {
-    id: 'nature',
-    name: 'Nature Photography',
-    coverImage: 'https://picsum.photos/seed/album2/400/300',
-    pictureCount: 48,
-  },
-  {
-    id: 'portraits',
-    name: 'Portraits',
-    coverImage: 'https://picsum.photos/seed/album3/400/300',
-    pictureCount: 12,
-  },
-  {
-    id: 'architecture',
-    name: 'Architecture',
-    coverImage: 'https://picsum.photos/seed/album4/400/300',
-    pictureCount: 36,
-  },
-  {
-    id: 'street',
-    name: 'Street Photography',
-    coverImage: 'https://picsum.photos/seed/album5/400/300',
-    pictureCount: 19,
-  },
-  {
-    id: 'abstract',
-    name: 'Abstract Art',
-    coverImage: 'https://picsum.photos/seed/album6/400/300',
-    pictureCount: 8,
-  },
-]
+'use client'
+
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
 
 export interface GalleryAlbum {
   id: string
@@ -44,7 +10,26 @@ export interface GalleryAlbum {
   pictureCount: number
 }
 
-export function useGalleryAlbums() {
-  const albums: GalleryAlbum[] = PLACEHOLDER_ALBUMS
-  return { albums }
+export function useGalleryAlbums(tenantId: number | null) {
+  const [albums, setAlbums] = useState<GalleryAlbum[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!tenantId) return
+    setLoading(true)
+    api.get(`/api/gallery/albums?tenant_id=${tenantId}`)
+      .then(res => {
+        const mapped: GalleryAlbum[] = (res.data || []).map((a: Record<string, unknown>) => ({
+          id: String(a.id),
+          name: a.displayName || a.name || '',
+          coverImage: a.defaultPictureUrl || `https://picsum.photos/seed/album${a.id}/400/300`,
+          pictureCount: a.pictureCount || 0,
+        }))
+        setAlbums(mapped)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [tenantId])
+
+  return { albums, loading }
 }

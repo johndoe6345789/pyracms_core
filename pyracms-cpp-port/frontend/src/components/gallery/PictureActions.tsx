@@ -5,16 +5,22 @@ import {
   DeleteOutlined,
 } from '@mui/icons-material'
 
-export default function PictureActions() {
+interface PictureActionsProps {
+  onSetCover?: () => void
+  onEdit?: () => void
+  onDelete?: () => void
+}
+
+export default function PictureActions({ onSetCover, onEdit, onDelete }: PictureActionsProps) {
   return (
     <Box sx={{ display: 'flex', gap: 1 }}>
-      <Button variant="outlined" startIcon={<WallpaperOutlined />} size="small">
+      <Button variant="outlined" startIcon={<WallpaperOutlined />} size="small" onClick={onSetCover}>
         Set as Cover
       </Button>
-      <Button variant="outlined" startIcon={<EditOutlined />} size="small">
+      <Button variant="outlined" startIcon={<EditOutlined />} size="small" onClick={onEdit}>
         Edit
       </Button>
-      <Button variant="outlined" color="error" startIcon={<DeleteOutlined />} size="small">
+      <Button variant="outlined" color="error" startIcon={<DeleteOutlined />} size="small" onClick={onDelete}>
         Delete
       </Button>
     </Box>

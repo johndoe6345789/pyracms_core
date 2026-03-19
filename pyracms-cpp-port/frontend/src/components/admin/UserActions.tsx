@@ -11,13 +11,14 @@ interface UserActionsProps {
   user: UserRow
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
+  onEdit?: (user: UserRow) => void
 }
 
-export default function UserActions({ user, onToggleBan, onDelete }: UserActionsProps) {
+export default function UserActions({ user, onToggleBan, onDelete, onEdit }: UserActionsProps) {
   return (
     <>
       <Tooltip title="Edit">
-        <IconButton size="small" color="primary">
+        <IconButton size="small" color="primary" onClick={() => onEdit?.(user)}>
           <EditOutlined fontSize="small" />
         </IconButton>
       </Tooltip>

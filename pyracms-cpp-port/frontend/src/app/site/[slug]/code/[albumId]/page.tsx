@@ -6,12 +6,14 @@ import Link from 'next/link'
 import { NavigateNextOutlined } from '@mui/icons-material'
 import CodeSnippet from '@/components/code/CodeSnippet'
 import { useCodeAlbum } from '@/hooks/useCodeAlbum'
+import { useTenantId } from '@/hooks/useTenantId'
 
 export default function CodeAlbumViewPage() {
   const params = useParams()
   const slug = params.slug as string
   const albumId = params.albumId as string
-  const { albumName, snippets } = useCodeAlbum(albumId)
+  const { tenantId } = useTenantId(slug)
+  const { albumName, snippets, handleRun } = useCodeAlbum(albumId, tenantId)
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -34,7 +36,7 @@ export default function CodeAlbumViewPage() {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {snippets.map((snippet) => (
-          <CodeSnippet key={snippet.id} snippet={snippet} />
+          <CodeSnippet key={snippet.id} snippet={snippet} onRun={handleRun} />
         ))}
       </Box>
     </Container>

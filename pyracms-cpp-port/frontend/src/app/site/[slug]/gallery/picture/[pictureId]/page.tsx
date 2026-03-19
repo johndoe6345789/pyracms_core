@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Container, Typography, Box, Button, Breadcrumbs, Divider } from '@mui/material'
 import Link from 'next/link'
 import { ArrowBackOutlined, NavigateNextOutlined } from '@mui/icons-material'
@@ -12,9 +12,12 @@ import { useGalleryPicture } from '@/hooks/useGalleryPicture'
 
 export default function PictureViewPage() {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
   const pictureId = params.pictureId as string
-  const { picture, handleLike, handleDislike } = useGalleryPicture(pictureId)
+  const { picture, handleLike, handleDislike, handleSetCover, handleDelete } = useGalleryPicture(pictureId)
+
+  if (!picture) return null
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -36,7 +39,10 @@ export default function PictureViewPage() {
       <Divider sx={{ mb: 3 }} />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <VoteButtons likes={picture.likes} dislikes={picture.dislikes} onLike={handleLike} onDislike={handleDislike} />
-        <PictureActions />
+        <PictureActions
+          onSetCover={() => handleSetCover?.().catch(() => {})}
+          onDelete={() => handleDelete?.().then(() => router.push(`/site/${slug}/gallery/${picture.albumId}`)).catch(() => {})}
+        />
       </Box>
     </Container>
   )

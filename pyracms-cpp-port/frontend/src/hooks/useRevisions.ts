@@ -1,5 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
+
 export interface Revision {
   number: number
   author: string
@@ -7,16 +10,46 @@ export interface Revision {
   summary: string
 }
 
-const PLACEHOLDER_REVISIONS: Revision[] = [
-  { number: 5, author: 'Jane Smith', date: '2026-03-10 14:30', summary: 'Added conclusion section' },
-  { number: 4, author: 'Jane Smith', date: '2026-03-09 10:15', summary: 'Updated data fetching section with new examples' },
-  { number: 3, author: 'John Doe', date: '2026-03-07 16:45', summary: 'Fixed typos in App Router section' },
-  { number: 2, author: 'Jane Smith', date: '2026-03-05 09:00', summary: 'Added App Router and Data Fetching sections' },
-  { number: 1, author: 'Jane Smith', date: '2026-03-03 11:20', summary: 'Initial draft' },
-]
+export function useRevisions(name: string, tenantId: number | null) {
+  const [revisions, setRevisions] = useState<Revision[]>([])
+  const [loading, setLoading] = useState(true)
 
-export function useRevisions(_name: string) {
-  const revisions = PLACEHOLDER_REVISIONS
+  useEffect(() => {
+    if (!name || !tenantId) return
+    setLoading(true)
+    api.get(`/api/articles/${name}/revisions?tenant_id=${tenantId}`)
+      .then(res => {
+        const mapped: Revision[] = (res.data || []).map((r: Record<string, unknown>) => ({
+          number: r.revisionNumber || r.id,
+          author: r.authorUsername || 'Unknown',
+          date: typeof r.createdAt === 'string' ? (r.createdAt as string).replace('T', ' ').substring(0, 16) : '',
+          summary: r.summary || '',
+        }))
+        setRevisions(mapped)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [name, tenantId])
+
   const latestRevision = revisions[0]?.number ?? 0
-  return { revisions, latestRevision }
+
+  const handleRevert = (revNumber: number) => {
+    if (!name) return Promise.reject()
+    return api.post(`/api/articles/${name}/revert/${revNumber}`)
+      .then(() => {
+        // Refresh revisions
+        api.get(`/api/articles/${name}/revisions?tenant_id=${tenantId}`)
+          .then(res => {
+            const mapped: Revision[] = (res.data || []).map((r: Record<string, unknown>) => ({
+              number: r.revisionNumber || r.id,
+              author: r.authorUsername || 'Unknown',
+              date: typeof r.createdAt === 'string' ? (r.createdAt as string).replace('T', ' ').substring(0, 16) : '',
+              summary: r.summary || '',
+            }))
+            setRevisions(mapped)
+          })
+      })
+  }
+
+  return { revisions, latestRevision, loading, handleRevert }
 }

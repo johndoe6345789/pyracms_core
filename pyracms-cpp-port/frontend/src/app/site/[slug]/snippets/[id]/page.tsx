@@ -1,45 +1,75 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { Container, Typography, Box, Button, Chip, Divider, Paper, TextField, Avatar } from '@mui/material'
 import { PlayArrowOutlined, ForkRightOutlined, ShareOutlined, SendOutlined } from '@mui/icons-material'
 import { BackButton } from '@/components/common/BackButton'
 import { CodeOutput } from '@/components/code/CodeOutput'
+import { useTenantId } from '@/hooks/useTenantId'
+import api from '@/lib/api'
 
-const PLACEHOLDER_SNIPPET = {
-  id: 'snippet-1',
-  title: 'Fibonacci Sequence',
-  language: 'python',
-  code: 'def fibonacci(n):\n    """Generate Fibonacci sequence up to n terms."""\n    a, b = 0, 1\n    result = []\n    for _ in range(n):\n        result.append(a)\n        a, b = b, a + b\n    return result\n\nprint(fibonacci(10))',
-  author: 'Alice',
-  date: '2026-03-15',
-  runCount: 42,
+interface SnippetDetail {
+  id: string
+  title: string
+  language: string
+  code: string
+  author: string
+  date: string
+  runCount: number
 }
-
-const PLACEHOLDER_COMMENTS = [
-  { id: '1', author: 'Bob', date: '2026-03-16', content: 'Nice implementation! You could also use a generator for memory efficiency.' },
-  { id: '2', author: 'Charlie', date: '2026-03-17', content: 'Great example. I adapted this for my project.' },
-]
 
 export default function ViewSnippetPage() {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
-  const snippet = PLACEHOLDER_SNIPPET
+  const snippetId = params.id as string
+  const { tenantId } = useTenantId(slug)
+  const [snippet, setSnippet] = useState<SnippetDetail | null>(null)
   const [isRunning, setIsRunning] = useState(false)
   const [output, setOutput] = useState<{ stdout?: string; exitCode?: number; executionTime?: number } | null>(null)
   const [commentText, setCommentText] = useState('')
 
+  useEffect(() => {
+    api.get(`/api/snippets/${snippetId}`)
+      .then(res => {
+        const s = res.data
+        setSnippet({
+          id: String(s.id),
+          title: s.title || '',
+          language: s.language || '',
+          code: s.code || '',
+          author: s.authorUsername || 'Unknown',
+          date: s.createdAt?.split('T')[0] || '',
+          runCount: s.runCount || 0,
+        })
+      })
+      .catch(() => {})
+  }, [snippetId])
+
   const handleRun = () => {
     setIsRunning(true)
-    setTimeout(() => {
-      setOutput({ stdout: '[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]', exitCode: 0, executionTime: 45 })
-      setIsRunning(false)
-    }, 1000)
+    api.post(`/api/snippets/${snippetId}/run`)
+      .then(res => {
+        setOutput({ stdout: res.data.output || res.data.stdout || '', exitCode: res.data.exitCode ?? 0, executionTime: res.data.executionTime })
+      })
+      .catch(() => {
+        setOutput({ stdout: 'Error running snippet', exitCode: 1 })
+      })
+      .finally(() => setIsRunning(false))
   }
 
-  const handleFork = () => { console.log('Fork snippet') }
+  const handleFork = () => {
+    api.post(`/api/snippets/${snippetId}/fork`)
+      .then(res => {
+        router.push(`/site/${slug}/snippets/${res.data.id}`)
+      })
+      .catch(() => {})
+  }
+
   const handleShare = () => { navigator.clipboard.writeText(window.location.href) }
+
+  if (!snippet) return null
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -79,18 +109,6 @@ export default function ViewSnippetPage() {
       <Divider sx={{ my: 4 }} />
 
       <Typography variant="h5" gutterBottom>Comments</Typography>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-        {PLACEHOLDER_COMMENTS.map((comment) => (
-          <Paper key={comment.id} variant="outlined" sx={{ p: 2, borderColor: 'divider' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.main', fontSize: '0.8rem' }}>{comment.author.charAt(0)}</Avatar>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{comment.author}</Typography>
-              <Typography variant="caption" color="text.secondary">{comment.date}</Typography>
-            </Box>
-            <Typography variant="body2">{comment.content}</Typography>
-          </Paper>
-        ))}
-      </Box>
 
       <Paper variant="outlined" sx={{ p: 2, borderColor: 'divider' }}>
         <TextField fullWidth multiline minRows={2} maxRows={6} placeholder="Write a comment..." value={commentText} onChange={(e) => setCommentText(e.target.value)} sx={{ mb: 1 }} />

@@ -22,4 +22,20 @@ done
 echo "Migrations complete."
 
 echo "Starting PyraCMS server..."
-exec /app/pyracms_server
+/app/pyracms_server &
+SERVER_PID=$!
+
+# Wait for the server to be ready, then run seed data
+echo "Waiting for server to be ready..."
+for i in $(seq 1 30); do
+    if curl -sf http://localhost:8080/api/tenants > /dev/null 2>&1; then
+        echo "Server is ready."
+        if [ -f /app/seed.sh ]; then
+            bash /app/seed.sh
+        fi
+        break
+    fi
+    sleep 1
+done
+
+wait $SERVER_PID

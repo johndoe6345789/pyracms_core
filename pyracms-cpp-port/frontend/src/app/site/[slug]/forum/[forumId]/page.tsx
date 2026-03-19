@@ -24,7 +24,7 @@ export default function ThreadListPage() {
           <Typography variant="h3" component="h1" gutterBottom>{forum.name}</Typography>
           <Typography variant="body1" color="text.secondary">{forum.description}</Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddOutlined />} component={Link} href={`/site/${slug}/forum/thread/create`}>
+        <Button variant="contained" startIcon={<AddOutlined />} component={Link} href={`/site/${slug}/forum/thread/create?forumId=${forumId}`}>
           New Thread
         </Button>
       </Box>

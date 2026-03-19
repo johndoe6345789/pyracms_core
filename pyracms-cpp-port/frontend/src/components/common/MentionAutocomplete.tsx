@@ -18,7 +18,7 @@ export function MentionAutocomplete({ inputRef, onSelect }: MentionAutocompleteP
   const [suggestions, setSuggestions] = useState<UserSuggestion[]>([])
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [mentionQuery, setMentionQuery] = useState('')
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout>(null)
 
   const handleInput = useCallback(() => {
     const el = inputRef.current

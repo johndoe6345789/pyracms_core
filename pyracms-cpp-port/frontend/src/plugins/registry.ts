@@ -49,7 +49,7 @@ export interface PluginDataModel {
       default?: any
       relation?: {
         model: string
-        type: 'one-to-one' | 'one-to-many' | 'many-to-many'
+        type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'
       }
     }
   }

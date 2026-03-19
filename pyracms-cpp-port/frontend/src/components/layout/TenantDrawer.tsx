@@ -4,7 +4,7 @@ import {
   Drawer, Box, Typography, Divider, List, ListItem, ListItemButton,
   ListItemIcon, ListItemText,
 } from '@mui/material'
-import { ArrowBackOutlined } from '@mui/icons-material'
+import { ArrowBackOutlined, SearchOutlined, AdminPanelSettingsOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
 
@@ -35,6 +35,18 @@ export default function TenantDrawer({ slug, siteName, open, onClose }: TenantDr
         </List>
         <Divider />
         <List>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} href={`/search`} onClick={onClose}>
+              <ListItemIcon sx={{ minWidth: 40 }}><SearchOutlined /></ListItemIcon>
+              <ListItemText primary="Search" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} href="/dashboard" onClick={onClose}>
+              <ListItemIcon sx={{ minWidth: 40 }}><AdminPanelSettingsOutlined /></ListItemIcon>
+              <ListItemText primary="Admin" />
+            </ListItemButton>
+          </ListItem>
           <ListItem disablePadding>
             <ListItemButton component={Link} href="/" onClick={onClose}>
               <ListItemIcon sx={{ minWidth: 40 }}><ArrowBackOutlined /></ListItemIcon>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { Container, Typography, Box } from '@mui/material'
 import { useCreateThread } from '@/hooks/useCreateThread'
 import { BackButton } from '@/components/common/BackButton'
@@ -8,8 +8,10 @@ import { CreateThreadForm } from '@/components/forum/CreateThreadForm'
 
 export default function CreateThreadPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const slug = params.slug as string
-  const { title, setTitle, description, setDescription, content, setContent } = useCreateThread()
+  const forumId = searchParams.get('forumId') || '1'
+  const { title, setTitle, description, setDescription, content, setContent, loading, error, handleSubmit } = useCreateThread(forumId)
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -27,6 +29,7 @@ export default function CreateThreadPage() {
         title={title} setTitle={setTitle}
         description={description} setDescription={setDescription}
         content={content} setContent={setContent}
+        loading={loading} error={error} onSubmit={handleSubmit}
       />
     </Container>
   )

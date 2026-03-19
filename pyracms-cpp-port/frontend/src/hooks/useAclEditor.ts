@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
 
 export interface AclRule {
   id: number
@@ -9,46 +10,60 @@ export interface AclRule {
   permission: string
 }
 
-const PLACEHOLDER_RULES: AclRule[] = [
-  { id: 1, action: 'Allow', principal: 'admin', permission: 'manage_users' },
-  { id: 2, action: 'Allow', principal: 'admin', permission: 'manage_settings' },
-  { id: 3, action: 'Allow', principal: 'editor', permission: 'edit_articles' },
-  { id: 4, action: 'Allow', principal: 'editor', permission: 'publish_articles' },
-  { id: 5, action: 'Allow', principal: 'authenticated', permission: 'create_comments' },
-  { id: 6, action: 'Deny', principal: 'banned', permission: 'create_comments' },
-  { id: 7, action: 'Deny', principal: 'banned', permission: 'create_posts' },
-  { id: 8, action: 'Allow', principal: 'moderator', permission: 'delete_comments' },
-]
-
-export function useAclEditor() {
-  const [rules, setRules] = useState<AclRule[]>(PLACEHOLDER_RULES)
+export function useAclEditor(tenantId: number | null) {
+  const [rules, setRules] = useState<AclRule[]>([])
+  const [loading, setLoading] = useState(true)
   const [newAction, setNewAction] = useState<'Allow' | 'Deny'>('Allow')
   const [newPrincipal, setNewPrincipal] = useState('')
   const [newPermission, setNewPermission] = useState('')
 
+  useEffect(() => {
+    if (!tenantId) return
+    setLoading(true)
+    api.get(`/api/settings/acl_rules?tenant_id=${tenantId}`)
+      .then(res => {
+        try {
+          const parsed = JSON.parse(res.data.value || '[]')
+          setRules(parsed)
+        } catch {
+          setRules([])
+        }
+      })
+      .catch(() => setRules([]))
+      .finally(() => setLoading(false))
+  }, [tenantId])
+
+  const saveRules = (updated: AclRule[]) => {
+    if (!tenantId) return
+    api.put(`/api/settings/acl_rules?tenant_id=${tenantId}`, {
+      name: 'acl_rules',
+      value: JSON.stringify(updated),
+    }).catch(() => {})
+  }
+
   const handleAdd = () => {
     if (!newPrincipal.trim() || !newPermission.trim()) return
-    const nextId = Math.max(...rules.map((r) => r.id), 0) + 1
-    setRules((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        action: newAction,
-        principal: newPrincipal.trim(),
-        permission: newPermission.trim(),
-      },
-    ])
+    const nextId = Math.max(...rules.map(r => r.id), 0) + 1
+    const updated = [
+      ...rules,
+      { id: nextId, action: newAction, principal: newPrincipal.trim(), permission: newPermission.trim() },
+    ]
+    setRules(updated)
+    saveRules(updated)
     setNewPrincipal('')
     setNewPermission('')
     setNewAction('Allow')
   }
 
   const handleDelete = (id: number) => {
-    setRules((prev) => prev.filter((r) => r.id !== id))
+    const updated = rules.filter(r => r.id !== id)
+    setRules(updated)
+    saveRules(updated)
   }
 
   return {
     rules,
+    loading,
     newAction,
     setNewAction,
     newPrincipal,

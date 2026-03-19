@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@/lib/api'
 
 export interface Setting {
   id: number
@@ -8,22 +9,29 @@ export interface Setting {
   value: string
 }
 
-const PLACEHOLDER_SETTINGS: Setting[] = [
-  { id: 1, key: 'site_name', value: 'PyraCMS' },
-  { id: 2, key: 'site_description', value: 'A modern multi-tenant CMS' },
-  { id: 3, key: 'max_upload_size', value: '10485760' },
-  { id: 4, key: 'default_language', value: 'en' },
-  { id: 5, key: 'smtp_host', value: 'smtp.example.com' },
-  { id: 6, key: 'smtp_port', value: '587' },
-  { id: 7, key: 'registration_enabled', value: 'true' },
-]
-
-export function useAdminSettings() {
-  const [settings, setSettings] = useState<Setting[]>(PLACEHOLDER_SETTINGS)
+export function useAdminSettings(tenantId: number | null) {
+  const [settings, setSettings] = useState<Setting[]>([])
+  const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editValue, setEditValue] = useState('')
   const [newKey, setNewKey] = useState('')
   const [newValue, setNewValue] = useState('')
+
+  useEffect(() => {
+    if (!tenantId) return
+    setLoading(true)
+    api.get(`/api/settings?tenant_id=${tenantId}`)
+      .then(res => {
+        const mapped: Setting[] = (res.data || []).map((s: Record<string, unknown>) => ({
+          id: s.id,
+          key: s.name || '',
+          value: s.value || '',
+        }))
+        setSettings(mapped)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [tenantId])
 
   const handleStartEdit = (setting: Setting) => {
     setEditingId(setting.id)
@@ -31,11 +39,15 @@ export function useAdminSettings() {
   }
 
   const handleSaveEdit = (id: number) => {
-    setSettings((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, value: editValue } : s))
-    )
-    setEditingId(null)
-    setEditValue('')
+    const setting = settings.find(s => s.id === id)
+    if (!setting) return
+    api.put(`/api/settings/${setting.key}?tenant_id=${tenantId}`, { name: setting.key, value: editValue })
+      .then(() => {
+        setSettings(prev => prev.map(s => s.id === id ? { ...s, value: editValue } : s))
+        setEditingId(null)
+        setEditValue('')
+      })
+      .catch(() => {})
   }
 
   const handleCancelEdit = () => {
@@ -44,22 +56,34 @@ export function useAdminSettings() {
   }
 
   const handleDelete = (id: number) => {
-    setSettings((prev) => prev.filter((s) => s.id !== id))
+    const setting = settings.find(s => s.id === id)
+    if (!setting) return
+    api.delete(`/api/settings/${setting.key}?tenant_id=${tenantId}`)
+      .then(() => {
+        setSettings(prev => prev.filter(s => s.id !== id))
+      })
+      .catch(() => {})
   }
 
   const handleAdd = () => {
-    if (!newKey.trim() || !newValue.trim()) return
-    const nextId = Math.max(...settings.map((s) => s.id), 0) + 1
-    setSettings((prev) => [
-      ...prev,
-      { id: nextId, key: newKey.trim(), value: newValue.trim() },
-    ])
-    setNewKey('')
-    setNewValue('')
+    if (!newKey.trim() || !newValue.trim() || !tenantId) return
+    api.put(`/api/settings/${newKey.trim()}?tenant_id=${tenantId}`, { name: newKey.trim(), value: newValue.trim() })
+      .then(res => {
+        const newSetting: Setting = {
+          id: res.data?.id || Math.max(...settings.map(s => s.id), 0) + 1,
+          key: newKey.trim(),
+          value: newValue.trim(),
+        }
+        setSettings(prev => [...prev, newSetting])
+        setNewKey('')
+        setNewValue('')
+      })
+      .catch(() => {})
   }
 
   return {
     settings,
+    loading,
     editingId,
     editValue,
     setEditValue,

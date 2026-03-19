@@ -83,7 +83,7 @@ function DraggableMenuItem({ item, index, parentId, depth, onEdit, onDelete, onM
           bgcolor: isOver ? 'primary.main' + '08' : 'background.paper',
         }}
       >
-        <Box ref={drag} sx={{ cursor: 'grab', display: 'flex' }}>
+        <Box ref={(node: HTMLElement | null) => { drag(node) }} sx={{ cursor: 'grab', display: 'flex' }}>
           <DragIndicatorOutlined sx={{ color: 'text.secondary' }} />
         </Box>
         {depth > 0 && <SubdirectoryArrowRightOutlined sx={{ fontSize: 16, color: 'text.secondary' }} />}

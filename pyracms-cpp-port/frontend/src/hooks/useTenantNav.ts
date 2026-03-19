@@ -7,6 +7,7 @@ import {
   ForumOutlined,
   PhotoLibraryOutlined,
   SportsEsportsOutlined,
+  CodeOutlined,
 } from '@mui/icons-material'
 import React from 'react'
 
@@ -15,6 +16,7 @@ export const NAV_ITEMS = [
   { label: 'Forum', icon: React.createElement(ForumOutlined), path: 'forum' },
   { label: 'Gallery', icon: React.createElement(PhotoLibraryOutlined), path: 'gallery' },
   { label: 'Games', icon: React.createElement(SportsEsportsOutlined), path: 'games' },
+  { label: 'Code', icon: React.createElement(CodeOutlined), path: 'snippets' },
 ]
 
 export function useTenantNav() {

@@ -41,7 +41,7 @@ export default function SearchAutocomplete({
   const [results, setResults] = useState<AutocompleteResult[]>([])
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout>(null)
 
   const handleChange = useCallback((value: string) => {
     setQuery(value)
