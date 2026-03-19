@@ -117,7 +117,7 @@ set(LIB_SOURCES
 
 )
 
-add_library(pyracms_lib OBJECT ${LIB_SOURCES})
+add_library(pyracms_lib STATIC ${LIB_SOURCES})
 target_link_libraries(pyracms_lib
     PUBLIC
     Drogon::Drogon

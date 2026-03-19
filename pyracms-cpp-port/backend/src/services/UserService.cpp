@@ -13,7 +13,12 @@ UserDto UserService::rowToDto(const drogon::orm::Row &row) {
     dto.timezone = row["timezone"].as<std::string>();
     dto.banned = row["banned"].as<bool>();
     dto.createdAt = row["created_at"].as<std::string>();
-    dto.apiUuid = row["api_uuid"].isNull() ? "" : row["api_uuid"].as<std::string>();
+    dto.apiUuid =
+        row["api_uuid"].isNull() ? "" : row["api_uuid"].as<std::string>();
+    // role column defaults to 1 (User) if absent or NULL
+    dto.role = row["role"].isNull()
+                   ? UserRole::User
+                   : static_cast<UserRole>(row["role"].as<int>());
     return dto;
 }
 
@@ -223,6 +228,41 @@ void UserService::countUsers(const DbClientPtr &db,
         [cb](const drogon::orm::DrogonDbException &) {
             cb(0);
         });
+}
+
+void UserService::setUserRole(const DbClientPtr &db,
+                               int userId,
+                               UserRole role,
+                               BoolCallback cb) {
+    int roleInt = static_cast<int>(role);
+    db->execSqlAsync(
+        "UPDATE users SET role = $1 WHERE id = $2",
+        [cb](const drogon::orm::Result &) {
+            cb(true, "");
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        },
+        roleInt, userId);
+}
+
+void UserService::getUserRole(const DbClientPtr &db,
+                               int userId,
+                               RoleCallback cb) {
+    db->execSqlAsync(
+        "SELECT role FROM users WHERE id = $1",
+        [cb](const drogon::orm::Result &result) {
+            if (result.empty()) {
+                cb(std::nullopt);
+            } else {
+                int raw = result[0]["role"].as<int>();
+                cb(static_cast<UserRole>(raw));
+            }
+        },
+        [cb](const drogon::orm::DrogonDbException &) {
+            cb(std::nullopt);
+        },
+        userId);
 }
 
 } // namespace pyracms

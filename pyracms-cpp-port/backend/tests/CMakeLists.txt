@@ -19,7 +19,11 @@ set(TEST_SOURCES
 
     test_auth_service.cpp
 
+    test_tenant_service.cpp
+
     test_user_service.cpp
+
+    test_user_service_roles.cpp
 
 )
 
