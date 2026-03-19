@@ -18,6 +18,23 @@ int main() {
     app.setThreadNum(std::thread::hardware_concurrency());
 
     // Enable CORS for frontend
+    // Use sync advice (fires before routing) to handle OPTIONS preflight
+    app.registerSyncAdvice(
+        [](const drogon::HttpRequestPtr &req) -> drogon::HttpResponsePtr {
+            if (req->method() == drogon::Options) {
+                auto resp = drogon::HttpResponse::newHttpResponse();
+                resp->setStatusCode(drogon::k204NoContent);
+                resp->addHeader("Access-Control-Allow-Origin", "*");
+                resp->addHeader("Access-Control-Allow-Methods",
+                                "GET, POST, PUT, DELETE, OPTIONS");
+                resp->addHeader("Access-Control-Allow-Headers",
+                                "Content-Type, Authorization");
+                resp->addHeader("Access-Control-Max-Age", "86400");
+                return resp;
+            }
+            return {};
+        });
+    // Add CORS headers to all responses
     app.registerPostHandlingAdvice(
         [](const drogon::HttpRequestPtr &req,
            const drogon::HttpResponsePtr &resp) {
