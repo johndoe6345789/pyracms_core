@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: pyracms
       POSTGRES_DB: pyracms
     ports:
-      - "5433:5432"
+      - "5499:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/sql:/docker-entrypoint-initdb.d:ro
@@ -25,7 +25,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6380:6379"
+      - "6399:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -45,7 +45,7 @@ services:
       - network.host=0.0.0.0
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
-      - "9201:9200"
+      - "9299:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
     healthcheck:
@@ -60,7 +60,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8085:8080"
+      - "8099:8080"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -96,9 +96,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3016:3000"
+      - "3099:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8085
+      NEXT_PUBLIC_API_URL: http://localhost:8099
       API_URL: http://backend:8080
     depends_on:
       - backend
