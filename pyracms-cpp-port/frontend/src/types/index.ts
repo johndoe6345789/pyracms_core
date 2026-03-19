@@ -1,3 +1,19 @@
+export enum UserRole {
+  Guest = 0,
+  User = 1,
+  Moderator = 2,
+  SiteAdmin = 3,
+  SuperAdmin = 4,
+}
+
+export const USER_ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.Guest]: 'Guest',
+  [UserRole.User]: 'User',
+  [UserRole.Moderator]: 'Moderator',
+  [UserRole.SiteAdmin]: 'Site Admin',
+  [UserRole.SuperAdmin]: 'Super Admin',
+}
+
 export interface User {
   id: number
   username: string
@@ -8,8 +24,17 @@ export interface User {
   avatar?: string
   isActive: boolean
   isAdmin: boolean
+  /** Numeric role level (0-4). Falls back to isAdmin if absent. */
+  role?: UserRole
   createdAt: string
   updatedAt: string
+}
+
+/** Returns effective role, bridging legacy isAdmin boolean. */
+export function getUserRole(user: User | null): UserRole {
+  if (!user) return UserRole.Guest
+  if (user.role !== undefined) return user.role
+  return user.isAdmin ? UserRole.SiteAdmin : UserRole.User
 }
 
 export interface LoginRequest {

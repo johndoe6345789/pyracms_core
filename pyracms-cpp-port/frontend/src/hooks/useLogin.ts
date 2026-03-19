@@ -7,7 +7,7 @@ import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
 import type { LoginRequest } from '@/types'
 
-export function useLogin() {
+export function useLogin(redirectTo = '/') {
   const router = useRouter()
   const dispatch = useDispatch()
   const [formData, setFormData] = useState<LoginRequest>({
@@ -33,7 +33,7 @@ export function useLogin() {
       if (token) {
         localStorage.setItem('token', token)
         dispatch(setCredentials({ user, token }))
-        router.push('/admin')
+        router.push(redirectTo)
       } else {
         setError(response.data.error || 'Login failed')
       }

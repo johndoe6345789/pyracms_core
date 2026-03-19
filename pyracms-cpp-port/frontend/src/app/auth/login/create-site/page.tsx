@@ -4,10 +4,11 @@ import AuthPageShell
   from '@/components/auth/AuthPageShell'
 import LoginForm from '@/components/auth/LoginForm'
 
-export default function LoginPage() {
+/** Login page that redirects to /create-site on success. */
+export default function LoginCreateSitePage() {
   return (
     <AuthPageShell>
-      <LoginForm />
+      <LoginForm redirectTo="/create-site" />
     </AuthPageShell>
   )
 }
