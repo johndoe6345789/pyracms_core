@@ -10,15 +10,13 @@ import {
 } from './EditorPreviewPane'
 
 interface BBCodeEditorProps {
-  value: string
-  onChange: (value: string) => void
+  value: string; onChange: (v: string) => void
 }
 
 export function BBCodeEditor({
   value, onChange,
 }: BBCodeEditorProps) {
   const ref = useRef<HTMLTextAreaElement>(null)
-
   const insertTag = useCallback((
     tag: string, hasAttr?: boolean,
     attrPrompt?: string,

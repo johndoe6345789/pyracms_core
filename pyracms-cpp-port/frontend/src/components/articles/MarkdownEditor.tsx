@@ -11,10 +11,8 @@ import { MarkdownPreview } from './MarkdownPreview'
 import { getMarkdownActions } from './toolbarActions'
 
 interface MarkdownEditorProps {
-  value: string
-  onChange: (value: string) => void
+  value: string; onChange: (v: string) => void
 }
-
 const MONO_FONT = '"Fira Code",'
   + '"JetBrains Mono", monospace'
 
@@ -45,10 +43,8 @@ export function MarkdownEditor({
     }, 0)
   }, [value, onChange])
 
-  const showEd =
-    viewMode === 'edit' || viewMode === 'split'
-  const showPv =
-    viewMode === 'preview' || viewMode === 'split'
+  const showEd = viewMode !== 'preview'
+  const showPv = viewMode !== 'edit'
 
   return (
     <section aria-label="Markdown editor">

@@ -1,73 +1,37 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Box, Typography, Avatar,
-  Button, Collapse,
-} from '@mui/material'
-import {
-  ExpandMoreOutlined, ExpandLessOutlined,
-} from '@mui/icons-material'
+import { Box, Typography, Avatar } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
-import api from '@/lib/api'
 import type { Comment } from './types'
 import CommentForm from './CommentForm'
 import CommentHeader from './CommentHeader'
 import EditForm from './EditForm'
 import CommentActions from './CommentActions'
+import CommentChildren from './CommentChildren'
 import DeleteCommentDialog
   from './DeleteCommentDialog'
+import { useCommentActions }
+  from './useCommentActions'
 
 interface Props {
   comment: Comment; contentType: string
   contentId: number; depth: number
   onRefresh: () => void
 }
-
 export default function CommentItem({
   comment: c, contentType, contentId,
   depth, onRefresh,
 }: Props) {
   const [replying, setReplying] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [editTxt, setEditTxt] = useState(c.content)
-  const [delOpen, setDelOpen] = useState(false)
   const [exp, setExp] = useState(true)
-  const [saving, setSaving] = useState(false)
   const isAuth = useSelector(
     (s: RootState) => s.auth.isAuthenticated)
   const usr = useSelector(
     (s: RootState) => s.auth.user)
-
-  const vote = async (v: number) => {
-    if (!isAuth) return
-    try {
-      const nv = c.user_vote === v ? 0 : v
-      await api.post(
-        `/api/comments/${c.id}/vote`,
-        { value: nv })
-      onRefresh()
-    } catch { /* ignore */ }
-  }
-  const saveEdit = async () => {
-    if (!editTxt.trim()) return
-    setSaving(true)
-    try {
-      await api.put(`/api/comments/${c.id}`,
-        { content: editTxt })
-      setEditing(false); onRefresh()
-    } catch { /* ignore */ }
-    setSaving(false)
-  }
-  const del = async () => {
-    try {
-      await api.delete(`/api/comments/${c.id}`)
-      setDelOpen(false); onRefresh()
-    } catch { /* ignore */ }
-  }
-  const ct = c.children.length
-  const w = ct === 1 ? 'reply' : 'replies'
+  const a = useCommentActions(
+    c.id, c.content, onRefresh)
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
@@ -77,12 +41,12 @@ export default function CommentItem({
           {c.username[0]?.toUpperCase()}</Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentHeader comment={c} />
-          {editing
-            ? <EditForm editText={editTxt}
-                setEditText={setEditTxt}
-                onSave={saveEdit} submitting={saving}
-                onCancel={() => { setEditing(false)
-                  setEditTxt(c.content) }} />
+          {a.editing
+            ? <EditForm editText={a.editTxt}
+                setEditText={a.setEditTxt}
+                onSave={a.saveEdit}
+                submitting={a.saving}
+                onCancel={a.cancelEdit} />
             : <Typography variant="body2"
                 sx={{ mb: 0.5,
                   whiteSpace: 'pre-wrap' }}>
@@ -90,10 +54,14 @@ export default function CommentItem({
           <CommentActions comment={c}
             isAuthenticated={isAuth}
             isOwner={usr?.id === c.user_id}
-            depth={depth} onVote={vote}
-            onReply={() => setReplying(!replying)}
-            onEdit={() => setEditing(true)}
-            onDelete={() => setDelOpen(true)} />
+            depth={depth}
+            onVote={(v) =>
+              a.vote(v, c.user_vote, isAuth)}
+            onReply={() =>
+              setReplying(!replying)}
+            onEdit={() => a.setEditing(true)}
+            onDelete={() =>
+              a.setDelOpen(true)} />
           {replying && <CommentForm
             contentType={contentType}
             contentId={contentId}
@@ -101,34 +69,21 @@ export default function CommentItem({
             placeholder="Write a reply..."
             submitLabel="Reply"
             onSubmitted={() => {
-              setReplying(false); onRefresh() }}
-            onCancel={() => setReplying(false)}
-          />}
-          {ct > 0 && <>
-            <Button size="small"
-              onClick={() => setExp(!exp)}
-              startIcon={exp
-                ? <ExpandLessOutlined />
-                : <ExpandMoreOutlined />}
-              sx={{ textTransform: 'none',
-                mt: 0.5 }}
-              data-testid="toggle-replies-btn">
-              {exp ? 'Hide' : 'Show'}
-              {' '}{ct} {w}</Button>
-            <Collapse in={exp}>
-              {c.children.map((ch) =>
-                <CommentItem key={ch.id}
-                  comment={ch}
-                  contentType={contentType}
-                  contentId={contentId}
-                  depth={depth + 1}
-                  onRefresh={onRefresh} />)}
-            </Collapse>
-          </>}
+              setReplying(false)
+              onRefresh() }}
+            onCancel={() =>
+              setReplying(false)} />}
+          <CommentChildren items={c.children}
+            expanded={exp}
+            onToggle={() => setExp(!exp)}
+            contentType={contentType}
+            contentId={contentId}
+            depth={depth}
+            onRefresh={onRefresh} />
         </Box>
       </Box>
-      <DeleteCommentDialog open={delOpen}
-        onClose={() => setDelOpen(false)}
-        onConfirm={del} />
+      <DeleteCommentDialog open={a.delOpen}
+        onClose={() => a.setDelOpen(false)}
+        onConfirm={a.del} />
     </Box>)
 }

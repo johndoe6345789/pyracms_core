@@ -4,11 +4,8 @@ import { useState } from 'react'
 import {
   Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
-  Paper, Box, Button,
+  Paper,
 } from '@mui/material'
-import {
-  VisibilityOutlined, RestoreOutlined,
-} from '@mui/icons-material'
 import DOMPurify from 'dompurify'
 import type { Revision } from '@/hooks/useRevisions'
 import api from '@/lib/api'
@@ -18,6 +15,7 @@ import {
 import {
   RevertConfirmDialog,
 } from './RevertConfirmDialog'
+import { RevisionRow } from './RevisionRow'
 
 interface RevisionTableProps {
   revisions: Revision[]
@@ -40,15 +38,15 @@ export function RevisionTable({
 
   const handleView = (rev: Revision) => {
     if (!articleName || !tenantId) return
-    api.get(`/api/articles/${articleName}`
+    const url = `/api/articles/${articleName}`
       + `/revisions/${rev.number}`
-      + `?tenant_id=${tenantId}`)
-      .then((res) => {
-        setContent(DOMPurify.sanitize(
-          res.data.content || ''))
-        setViewRev(rev)
-        setDlgOpen(true)
-      }).catch(() => {})
+      + `?tenant_id=${tenantId}`
+    api.get(url).then((res) => {
+      setContent(DOMPurify.sanitize(
+        res.data.content || ''))
+      setViewRev(rev)
+      setDlgOpen(true)
+    }).catch(() => {})
   }
 
   const handleRevert = () => {
@@ -58,6 +56,7 @@ export function RevisionTable({
       .catch(() => {})
   }
 
+  const hdr = { fontWeight: 600 }
   return (
     <>
       <TableContainer
@@ -65,56 +64,23 @@ export function RevisionTable({
         <Table data-testid="revision-table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>
-                Rev #</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                Author</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                Date</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                Summary</TableCell>
-              <TableCell
-                sx={{ fontWeight: 600 }}
-                align="right">
+              <TableCell sx={hdr}>Rev #</TableCell>
+              <TableCell sx={hdr}>Author</TableCell>
+              <TableCell sx={hdr}>Date</TableCell>
+              <TableCell sx={hdr}>Summary</TableCell>
+              <TableCell sx={hdr} align="right">
                 Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {revisions.map((rev) => (
-              <TableRow key={rev.number} hover>
-                <TableCell>{rev.number}</TableCell>
-                <TableCell>{rev.author}</TableCell>
-                <TableCell>{rev.date}</TableCell>
-                <TableCell>{rev.summary}</TableCell>
-                <TableCell align="right">
-                  <Box sx={{
-                    display: 'flex', gap: 1,
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button size="small"
-                      variant="outlined"
-                      startIcon={
-                        <VisibilityOutlined />}
-                      onClick={() =>
-                        handleView(rev)}
-                      data-testid={
-                        `view-rev-${rev.number}`}>
-                      View</Button>
-                    {rev.number
-                      !== latestRevision && (
-                      <Button size="small"
-                        variant="outlined"
-                        color="warning"
-                        startIcon={
-                          <RestoreOutlined />}
-                        onClick={() =>
-                          setRevertNum(rev.number)}
-                        data-testid={
-                          `revert-${rev.number}`}>
-                        Revert</Button>)}
-                  </Box>
-                </TableCell>
-              </TableRow>))}
+              <RevisionRow key={rev.number}
+                rev={rev}
+                isLatest={
+                  rev.number === latestRevision}
+                onView={handleView}
+                onRevert={setRevertNum} />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

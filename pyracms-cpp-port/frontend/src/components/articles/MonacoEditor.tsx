@@ -2,8 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { Box } from '@mui/material'
-import DOMPurify from 'dompurify'
-import Editor, { type OnMount } from '@monaco-editor/react'
+import type { OnMount } from '@monaco-editor/react'
 import type {
   editor as MonacoEditor,
 } from 'monaco-editor'
@@ -11,29 +10,15 @@ import { EditorToolbar } from './EditorToolbar'
 import {
   EditorViewToggle, type ViewMode,
 } from './EditorViewToggle'
-import {
-  EditorPreviewPane, EmptyPreview,
-  HtmlPreviewContent,
-} from './EditorPreviewPane'
 import { getToolbarActions } from './toolbarActions'
 import { useAutoSave } from './useAutoSave'
+import { MonacoEditorPane } from './MonacoEditorPane'
 
 interface MonacoEditorProps {
   value: string
   onChange: (value: string) => void
   language: string
   autoSaveKey?: string
-}
-
-const LANG: Record<string, string> = {
-  HTML: 'html', Markdown: 'markdown',
-  BBCode: 'plaintext', RST: 'plaintext',
-}
-const OPTS = {
-  minimap: { enabled: false },
-  wordWrap: 'on' as const, fontSize: 14,
-  scrollBeyondLastLine: false,
-  automaticLayout: true,
 }
 
 export function MonacoEditorComponent({
@@ -81,38 +66,13 @@ export function MonacoEditorComponent({
             viewMode={vm}
             onViewModeChange={setVm} />
         </EditorToolbar>
-        <Box sx={{
-          display: 'flex', minHeight: 400,
-        }}>
-          {showEd && (
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Editor
-                height="400px"
-                language={LANG[language]
-                  ?? 'plaintext'}
-                value={value} theme="vs-dark"
-                onChange={(v) =>
-                  onChange(v ?? '')}
-                onMount={onMount}
-                options={OPTS} />
-            </Box>)}
-          {showPv && (
-            <Box sx={{
-              flex: 1, minWidth: 0,
-              borderLeft: showEd ? 1 : 0,
-              borderColor: 'divider',
-            }}>
-              <EditorPreviewPane
-                label={`Preview (${language})`}>
-                {value
-                  ? <HtmlPreviewContent
-                      sanitizedHtml={
-                        DOMPurify.sanitize(value)
-                      } />
-                  : <EmptyPreview />}
-              </EditorPreviewPane>
-            </Box>)}
-        </Box>
+        <MonacoEditorPane
+          value={value}
+          language={language}
+          showEditor={showEd}
+          showPreview={showPv}
+          onChange={onChange}
+          onMount={onMount} />
       </Box>
     </section>
   )

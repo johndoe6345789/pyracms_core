@@ -2,26 +2,15 @@
 
 import { useState, useRef, useCallback } from 'react'
 import {
-  TextField, Paper, List, ListItem,
-  ListItemIcon, ListItemText,
-  Popper, InputAdornment, Chip,
+  TextField, InputAdornment,
 } from '@mui/material'
-import {
-  SearchOutlined, ArticleOutlined,
-  ForumOutlined, CodeOutlined,
-  SportsEsportsOutlined,
-} from '@mui/icons-material'
+import { SearchOutlined } from '@mui/icons-material'
 import api from '@/lib/api'
+import AutocompleteDropdown
+  from './search/AutocompleteDropdown'
 
 interface Result {
   text: string; type: string; url: string
-}
-const ICONS: Record<string, React.ReactNode> = {
-  article: <ArticleOutlined fontSize="small" />,
-  forum_post: <ForumOutlined fontSize="small" />,
-  snippet: <CodeOutlined fontSize="small" />,
-  gamedep: (
-    <SportsEsportsOutlined fontSize="small" />),
 }
 interface Props {
   tenantId?: number
@@ -60,8 +49,9 @@ export default function SearchAutocomplete({
         size="small" placeholder={placeholder}
         value={q}
         onChange={(e) => chg(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter')
-          { setOpen(false); onSearch?.(q) } }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            setOpen(false); onSearch?.(q) } }}
         onFocus={() =>
           res.length > 0 && setOpen(true)}
         onBlur={() => setTimeout(
@@ -71,39 +61,11 @@ export default function SearchAutocomplete({
           <InputAdornment position="start">
             <SearchOutlined />
           </InputAdornment>) }} />
-      <Popper open={open}
-        anchorEl={ref.current}
-        placement="bottom-start"
-        sx={{ zIndex: 1300,
-          width: ref.current?.offsetWidth }}>
-        <Paper elevation={8} sx={{
-          maxHeight: 300, overflow: 'auto' }}>
-          <List dense>
-            {res.map((r, i) => (
-              <ListItem key={i}
-                onClick={() => { setQ(r.text)
-                  setOpen(false)
-                  onSelect?.(r.url) }}
-                data-testid={
-                  `autocomplete-item-${i}`}
-                sx={{ cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: 'action.hover' } }}>
-                <ListItemIcon
-                  sx={{ minWidth: 32 }}>
-                  {ICONS[r.type] || (
-                    <SearchOutlined
-                      fontSize="small" />)}
-                </ListItemIcon>
-                <ListItemText
-                  primary={r.text} />
-                <Chip label={r.type}
-                  size="small" sx={{
-                    height: 20,
-                    fontSize: '0.6rem' }} />
-              </ListItem>))}
-          </List>
-        </Paper>
-      </Popper>
+      <AutocompleteDropdown open={open}
+        anchorEl={ref.current} results={res}
+        width={ref.current?.offsetWidth}
+        onSelect={(r) => { setQ(r.text)
+          setOpen(false)
+          onSelect?.(r.url) }} />
     </div>)
 }

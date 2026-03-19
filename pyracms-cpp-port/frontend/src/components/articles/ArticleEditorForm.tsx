@@ -10,13 +10,8 @@ import {
   EditorModeSelector, type EditorMode,
 } from './EditorModeSelector'
 import {
-  MonacoEditorComponent,
-} from './MonacoEditor'
-import { RichTextEditor } from './RichTextEditor'
-import { BBCodeEditor } from './BBCodeEditor'
-import { MarkdownEditor } from './MarkdownEditor'
-import { ViewModeToggle } from './ViewModeToggle'
-import { ContentPreview } from './ContentPreview'
+  ArticleEditorContent,
+} from './ArticleEditorContent'
 
 interface ArticleEditorFormProps {
   editor: ArticleEditorState
@@ -26,7 +21,7 @@ interface ArticleEditorFormProps {
 export function ArticleEditorForm({
   editor,
 }: ArticleEditorFormProps) {
-  const [editorMode, setEditorMode] =
+  const [mode, setMode] =
     useState<EditorMode>('monaco')
 
   return (
@@ -54,41 +49,14 @@ export function ArticleEditorForm({
           {RENDERERS.map((r) => (
             <MenuItem key={r} value={r}>
               {r}
-            </MenuItem>
-          ))}
+            </MenuItem>))}
         </TextField>
         <EditorModeSelector
-          mode={editorMode}
-          onModeChange={setEditorMode} />
+          mode={mode}
+          onModeChange={setMode} />
       </Box>
-      {editorMode === 'monaco' && (<>
-        <ViewModeToggle
-          viewMode={editor.viewMode}
-          setViewMode={editor.setViewMode} />
-        {editor.viewMode === 'edit' ? (
-          <MonacoEditorComponent
-            value={editor.content}
-            onChange={editor.setContent}
-            language={editor.renderer}
-            autoSaveKey="article-editor" />
-        ) : (
-          <ContentPreview
-            content={editor.content}
-            renderer={editor.renderer} />
-        )}
-      </>)}
-      {editorMode === 'wysiwyg' && (
-        <RichTextEditor
-          value={editor.content}
-          onChange={editor.setContent} />)}
-      {editorMode === 'bbcode' && (
-        <BBCodeEditor
-          value={editor.content}
-          onChange={editor.setContent} />)}
-      {editorMode === 'markdown' && (
-        <MarkdownEditor
-          value={editor.content}
-          onChange={editor.setContent} />)}
+      <ArticleEditorContent
+        mode={mode} editor={editor} />
       <TextField
         label="Tags (comma-separated)"
         value={editor.tagsInput}
