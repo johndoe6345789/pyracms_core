@@ -2,12 +2,15 @@
 
 import { Typography, Box } from '@mui/material'
 import { useAdminSettings } from '@/hooks/useAdminSettings'
-import { useAdminTenantId } from '@/hooks/useAdminTenantId'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useParams } from 'next/navigation'
 import AddSettingForm from '@/components/admin/AddSettingForm'
 import SettingsTable from '@/components/admin/SettingsTable'
 
 export default function AdminSettingsPage() {
-  const { tenantId } = useAdminTenantId()
+  const params = useParams()
+  const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
   const {
     settings, editingId, editValue, setEditValue,
     newKey, setNewKey, newValue, setNewValue,

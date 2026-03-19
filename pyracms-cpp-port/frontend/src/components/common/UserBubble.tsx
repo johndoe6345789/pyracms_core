@@ -9,13 +9,15 @@ import {
   PersonOutlined, LoginOutlined, LogoutOutlined, DashboardOutlined, SettingsOutlined,
 } from '@mui/icons-material'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { logout } from '@/store/slices/authSlice'
 import type { RootState } from '@/store/store'
 
 export default function UserBubble() {
   const dispatch = useDispatch()
   const router = useRouter()
+  const params = useParams()
+  const slug = (params.slug as string) || 'demo'
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -63,11 +65,11 @@ export default function UserBubble() {
           <Typography variant="caption" color="text.secondary">{user?.email}</Typography>
         </Box>
         <Divider />
-        <MenuItem component={Link} href="/dashboard" onClick={() => setAnchorEl(null)}>
+        <MenuItem component={Link} href={`/site/${slug}/admin`} onClick={() => setAnchorEl(null)}>
           <ListItemIcon><DashboardOutlined fontSize="small" /></ListItemIcon>
-          <ListItemText>Dashboard</ListItemText>
+          <ListItemText>Admin</ListItemText>
         </MenuItem>
-        <MenuItem component={Link} href="/auth/login" onClick={() => setAnchorEl(null)}>
+        <MenuItem component={Link} href={`/site/${slug}/admin/settings`} onClick={() => setAnchorEl(null)}>
           <ListItemIcon><SettingsOutlined fontSize="small" /></ListItemIcon>
           <ListItemText>Settings</ListItemText>
         </MenuItem>

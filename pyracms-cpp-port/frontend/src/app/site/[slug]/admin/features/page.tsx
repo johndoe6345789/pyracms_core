@@ -3,11 +3,14 @@
 import { Typography, Box, Button, Snackbar, Alert } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
-import { useAdminTenantId } from '@/hooks/useAdminTenantId'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useParams } from 'next/navigation'
 import FeatureToggleCard from '@/components/admin/FeatureToggleCard'
 
 export default function AdminFeaturesPage() {
-  const { tenantId } = useAdminTenantId()
+  const params = useParams()
+  const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
   const { features, snackbarOpen, handleToggle, handleSave, handleCloseSnackbar } =
     useFeatureToggles(tenantId)
 

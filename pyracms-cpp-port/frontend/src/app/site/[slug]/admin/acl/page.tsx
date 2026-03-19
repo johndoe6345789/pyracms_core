@@ -2,12 +2,15 @@
 
 import { Typography, Box } from '@mui/material'
 import { useAclEditor } from '@/hooks/useAclEditor'
-import { useAdminTenantId } from '@/hooks/useAdminTenantId'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useParams } from 'next/navigation'
 import AddAclRuleForm from '@/components/admin/AddAclRuleForm'
 import AclRuleTable from '@/components/admin/AclRuleTable'
 
 export default function AdminAclPage() {
-  const { tenantId } = useAdminTenantId()
+  const params = useParams()
+  const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
   const {
     rules, newAction, setNewAction,
     newPrincipal, setNewPrincipal,

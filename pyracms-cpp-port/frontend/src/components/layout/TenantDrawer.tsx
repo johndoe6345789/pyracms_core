@@ -44,7 +44,7 @@ export default function TenantDrawer({ slug, siteName, open, onClose }: TenantDr
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component={Link} href="/dashboard" onClick={onClose}>
+            <ListItemButton component={Link} href={`/site/${slug}/admin`} onClick={onClose}>
               <ListItemIcon sx={{ minWidth: 40 }}><AdminPanelSettingsOutlined /></ListItemIcon>
               <ListItemText primary="Admin" />
             </ListItemButton>

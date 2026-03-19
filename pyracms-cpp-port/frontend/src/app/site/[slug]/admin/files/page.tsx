@@ -2,13 +2,16 @@
 
 import { Typography, Box } from '@mui/material'
 import { useFileManager } from '@/hooks/useFileManager'
-import { useAdminTenantId } from '@/hooks/useAdminTenantId'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useParams } from 'next/navigation'
 import UploadDropzone from '@/components/admin/UploadDropzone'
 import FileGrid from '@/components/admin/FileGrid'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 export default function AdminFilesPage() {
-  const { tenantId } = useAdminTenantId()
+  const params = useParams()
+  const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
   const {
     files, deleteDialogOpen, selectedFile, dragOver,
     handleDeleteClick, handleDeleteConfirm, handleDeleteCancel,
