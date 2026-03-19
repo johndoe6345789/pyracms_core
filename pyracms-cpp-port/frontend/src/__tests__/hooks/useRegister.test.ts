@@ -57,7 +57,7 @@ function makeWrapper() {
     children,
   }: {
     children: React.ReactNode
-  }) => React.createElement(Provider, { store }, children)
+  }) => React.createElement(Provider, { store, children })
   return { store, Wrapper }
 }
 
