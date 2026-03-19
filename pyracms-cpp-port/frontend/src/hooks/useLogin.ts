@@ -38,8 +38,12 @@ export function useLogin() {
         setError(response.data.error || 'Login failed')
       }
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } } }
-      setError(axiosErr.response?.data?.error || 'An error occurred during login')
+      if (err && typeof err === 'object' && 'response' in err) {
+        const resp = (err as { response: { data?: { error?: string } } }).response
+        setError(resp?.data?.error || 'Login failed')
+      } else {
+        setError('Unable to connect to server')
+      }
     } finally {
       setLoading(false)
     }
