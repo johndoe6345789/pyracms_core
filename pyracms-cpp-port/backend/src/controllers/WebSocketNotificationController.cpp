@@ -2,7 +2,7 @@
 
 #include <drogon/drogon.h>
 #include <json/json.h>
-#include <jwt-cpp/jwt.h>
+#include <jwt-cpp/traits/boost-json/defaults.h>
 
 namespace pyracms {
 
