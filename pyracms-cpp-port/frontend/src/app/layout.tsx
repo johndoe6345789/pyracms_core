@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     title: 'PyraCMS',
     description: 'A multi-tenant content management system.',
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192.png',
+  },
   robots: {
     index: true,
     follow: true,
@@ -32,6 +36,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="theme-color" content="#6366f1" />
       </head>
       <body className={inter.className}>
