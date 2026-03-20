@@ -89,7 +89,12 @@ export function useRegister(redirectTo = '/') {
 
     // Strip confirmPassword — the API does not expect it.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword: _cp, ...payload } = formData
+    const { confirmPassword: _cp, ...rest } = formData
+    const payload = {
+      ...rest,
+      username: rest.username.trim(),
+      email: rest.email.trim(),
+    }
 
     try {
       const response = await api.post(

@@ -23,6 +23,7 @@ export function useSuperAdminTenants() {
   const [loading, setLoading] = useState(true)
   const [confirmDeleteId, setConfirmDeleteId] =
     useState<number | null>(null)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   useEffect(() => {
     api.get('/api/tenants')
@@ -63,25 +64,29 @@ export function useSuperAdminTenants() {
 
   const cancelDelete = () => setConfirmDeleteId(null)
 
-  const createTenant = (
+  const createTenant = async (
     payload: CreateTenantPayload,
-  ): Promise<void> => {
-    return api.post('/api/tenants', payload)
-      .then((res) => {
-        const t = res.data as Record<string, unknown>
-        const row: TenantRow = {
-          id: Number(t.id),
-          slug: String(t.slug || ''),
-          name: String(t.displayName || t.slug || ''),
-          owner: String(t.ownerUsername || ''),
-          isActive: Boolean(t.isActive ?? true),
-          createdAt: typeof t.createdAt === 'string'
-            ? t.createdAt.split('T')[0]
-            : '',
-        }
-        setTenants((prev) => [...prev, row])
-      })
-      .catch(() => {})
+  ): Promise<boolean> => {
+    setCreateError(null)
+    try {
+      const res = await api.post('/api/tenants', payload)
+      const t = res.data as Record<string, unknown>
+      const row: TenantRow = {
+        id: Number(t.id),
+        slug: String(t.slug || ''),
+        name: String(t.displayName || t.slug || ''),
+        owner: String(t.ownerUsername || ''),
+        isActive: Boolean(t.isActive ?? true),
+        createdAt: typeof t.createdAt === 'string'
+          ? t.createdAt.split('T')[0]
+          : '',
+      }
+      setTenants((prev) => [...prev, row])
+      return true
+    } catch (e: any) {
+      setCreateError(e.response?.data?.error ?? 'Failed to create site')
+      return false
+    }
   }
 
   return {
@@ -92,5 +97,6 @@ export function useSuperAdminTenants() {
     confirmDelete,
     cancelDelete,
     createTenant,
+    createError,
   }
 }

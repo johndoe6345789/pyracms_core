@@ -61,7 +61,11 @@ export function useLogin(redirectTo = '/') {
     setLoading(true)
 
     try {
-      const response = await api.post('/api/auth/login', formData)
+      const payload = {
+        username: formData.username.trim(),
+        password: formData.password,
+      }
+      const response = await api.post('/api/auth/login', payload)
       const { token, user } = response.data
 
       if (token) {

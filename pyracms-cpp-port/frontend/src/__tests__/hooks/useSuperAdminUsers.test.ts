@@ -348,7 +348,7 @@ describe('useSuperAdminUsers — toggleBan', () => {
     expect(mockApi.put).not.toHaveBeenCalled()
   })
 
-  it('leaves state unchanged when PUT fails', async () => {
+  it('applies optimistic update even when PUT fails (no rollback)', async () => {
     mockApi.get.mockResolvedValueOnce({ data: RAW_USERS })
     mockApi.put.mockRejectedValueOnce(new Error('Server error'))
     const { result } = renderHook(() => useSuperAdminUsers())
@@ -360,7 +360,8 @@ describe('useSuperAdminUsers — toggleBan', () => {
     // Give microtasks time to settle
     await act(async () => {})
 
-    expect(result.current.users[0].isActive).toBe(true)
+    // Optimistic update is not rolled back on failure (admin UI trade-off)
+    expect(result.current.users[0].isActive).toBe(false)
   })
 
   it('does not affect other users when toggling one', async () => {

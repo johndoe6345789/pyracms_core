@@ -237,8 +237,12 @@ void UserService::setUserRole(const DbClientPtr &db,
     int roleInt = static_cast<int>(role);
     db->execSqlAsync(
         "UPDATE users SET role = $1 WHERE id = $2",
-        [cb](const drogon::orm::Result &) {
-            cb(true, "");
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "User not found");
+            } else {
+                cb(true, "");
+            }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, e.base().what());
@@ -255,7 +259,9 @@ void UserService::getUserRole(const DbClientPtr &db,
             if (result.empty()) {
                 cb(std::nullopt);
             } else {
-                int raw = result[0]["role"].as<int>();
+                const auto &roleField = result[0]["role"];
+                int raw = roleField.isNull() ? 1 : roleField.as<int>();
+                if (raw < 0 || raw > 4) raw = 1; // clamp to UserRole::User
                 cb(static_cast<UserRole>(raw));
             }
         },

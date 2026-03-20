@@ -65,8 +65,8 @@ export function useCreateSite() {
     if (field === 'slug') {
       if (value !== '' && !SLUG_PATTERN.test(value)) {
         setError(
-          'Slug may only contain lowercase letters, numbers, ' +
-          'and hyphens, and must not start or end with a hyphen.',
+          'Slug must be lowercase letters/numbers separated by ' +
+          'single hyphens, no leading/trailing hyphens',
         )
         return
       }
