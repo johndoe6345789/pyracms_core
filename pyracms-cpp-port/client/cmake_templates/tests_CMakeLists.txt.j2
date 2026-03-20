@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.16)
+
+# Find Google Test
+find_package(GTest)
+
+if(NOT GTest_FOUND)
+    message(STATUS "Google Test not found, downloading from GitHub...")
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.14.0
+    )
+    FetchContent_MakeAvailable(googletest)
+endif()
+
+# Find Qt6 Test module
+find_package(Qt6 REQUIRED COMPONENTS Test)
+
+# Auto-generated test sources — run `python generate_cmake.py` to update
+set(TEST_SOURCES
+{% for src in test_sources %}
+    {{ src }}
+{% endfor %}
+)
+
+add_executable(hypernucleus_tests ${TEST_SOURCES})
+
+target_link_libraries(hypernucleus_tests
+    PRIVATE
+    hypernucleus_lib
+    Qt6::Test
+    GTest::gtest_main
+    GTest::gmock
+)
+
+include(GoogleTest)
+gtest_discover_tests(hypernucleus_tests)

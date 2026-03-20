@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.15)
+project({{ project_name }} VERSION {{ version }} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD {{ cxx_standard }})
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Conan-generated toolchain
+if(EXISTS "${CMAKE_BINARY_DIR}/conan_toolchain.cmake")
+    include("${CMAKE_BINARY_DIR}/conan_toolchain.cmake")
+endif()
+
+# Options
+option(BUILD_TESTS "Build tests" ON)
+
+# Find dependencies
+find_package(Drogon REQUIRED)
+find_package(jwt-cpp REQUIRED)
+find_package(CURL REQUIRED)
+
+# Include directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Backend library (shared between server and tests)
+# Auto-generated from source files — run `python generate_cmake.py` to update
+set(LIB_SOURCES
+{% for src in lib_sources %}
+    {{ src }}
+{% endfor %}
+)
+
+add_library(pyracms_lib STATIC ${LIB_SOURCES})
+target_link_libraries(pyracms_lib
+    PUBLIC
+    Drogon::Drogon
+    jwt-cpp::jwt-cpp
+    CURL::libcurl
+)
+target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Main executable
+add_executable({{ project_name }} {{ main_source }})
+target_link_libraries({{ project_name }} PRIVATE pyracms_lib)
+
+# Testing
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
+# Installation
+install(TARGETS {{ project_name }} RUNTIME DESTINATION bin)

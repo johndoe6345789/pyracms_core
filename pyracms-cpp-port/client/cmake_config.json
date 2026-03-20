@@ -1,0 +1,48 @@
+{
+  "project_name": "hypernucleus",
+  "version": "0.1.0",
+  "cxx_standard": 17,
+  "lib_sources": [
+    "src/models/DependencyModel.cpp",
+    "src/models/GameDepModel.cpp",
+    "src/services/ApiClient.cpp",
+    "src/services/AuthService.cpp",
+    "src/services/GameManager.cpp",
+    "src/services/ModuleInstaller.cpp",
+    "src/services/PathManager.cpp",
+    "src/services/SettingsManager.cpp",
+    "src/viewmodels/MainViewModel.cpp",
+    "src/viewmodels/SettingsViewModel.cpp"
+  ],
+  "lib_headers": [
+    "src/models/Constants.h",
+    "src/models/DependencyModel.h",
+    "src/models/GameDepModel.h",
+    "src/services/ApiClient.h",
+    "src/services/AuthService.h",
+    "src/services/GameManager.h",
+    "src/services/ModuleInstaller.h",
+    "src/services/PathManager.h",
+    "src/services/SettingsManager.h",
+    "src/viewmodels/MainViewModel.h",
+    "src/viewmodels/SettingsViewModel.h"
+  ],
+  "main_source": "src/main.cpp",
+  "qml_sources": [
+    "qml/Main.qml",
+    "qml/components/GameDepTab.qml",
+    "qml/components/InfoPanel.qml",
+    "qml/components/PicturesPanel.qml",
+    "qml/components/ProgressOverlay.qml",
+    "qml/components/ToolBar.qml",
+    "qml/dialogs/LoginDialog.qml",
+    "qml/dialogs/RegisterDialog.qml",
+    "qml/dialogs/SettingsDialog.qml",
+    "qml/theme/Theme.qml"
+  ],
+  "test_sources": [
+    "tst_ApiClient.cpp",
+    "tst_ModuleInstaller.cpp",
+    "tst_SettingsManager.cpp"
+  ]
+}

@@ -1,0 +1,12 @@
+[requires]
+qt/6.7.3
+quazip/1.4
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+qt/*:shared=True
+qt/*:qtdeclarative=True
+qt/*:qtquickcontrols2=True

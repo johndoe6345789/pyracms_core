@@ -1,60 +1,71 @@
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 
-# Install build dependencies including Ninja and Conan
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     ninja-build \
     git \
     libssl-dev \
-    curl \
+    libpq-dev \
+    libjsoncpp-dev \
     python3 \
     python3-pip \
+    curl \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Conan package manager
-RUN pip3 install conan && conan --version
-
-# Install Bun for Prisma and TypeScript tooling
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
+# Install Conan 2
+RUN pip3 install --break-system-packages conan && conan profile detect
 
 WORKDIR /app
+
+# Copy conan files first for dependency caching
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build --build=missing \
+    -s compiler.cppstd=17 -s build_type=Release
 
 # Copy source files
 COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
-# Copy package.json and optionally bun.lockb if it exists
-COPY package.json bun.lockb* ./
-COPY prisma/ ./prisma/
+COPY sql/ ./sql/
 
-# Install Prisma using bunx
-RUN bun install --frozen-lockfile
-RUN bunx prisma generate
-
-# Build the application with Ninja
-RUN mkdir build && cd build \
-    && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF .. \
+# Build with CMake + Ninja
+RUN cd build && cmake .. \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+    -DBUILD_TESTS=OFF \
     && ninja
 
 # Production stage
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
-# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
-    libssl3 \
+    libssl3t64 \
+    libpq5 \
+    postgresql-client \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy binary from builder
+# Copy binary, migrations, and openapi spec
 COPY --from=builder /app/build/pyracms_server /app/
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/prisma /app/prisma
+COPY --from=builder /app/sql/ /app/sql/
+COPY openapi.yaml /app/
+
+# Copy Conan shared libraries needed at runtime
+COPY --from=builder /root/.conan2/p/*/p/lib/*.so* /usr/local/lib/
+RUN ldconfig
+
+# Init script to run migrations then start server
+COPY docker-entrypoint.sh /app/
+COPY seed.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh /app/seed.sh
 
 EXPOSE 8080
 
-CMD ["/app/pyracms_server", "--host", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

@@ -12,7 +12,6 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    // Check if we're on the client side
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token')
       if (token) {
@@ -27,15 +26,17 @@ api.interceptors.request.use(
 )
 
 // Response interceptor to handle errors
+// Only redirect to login for 401s on non-auth endpoints.
+// Auth endpoints (login, register, me) handle their own errors.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - only on client side
-      if (typeof window !== 'undefined') {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const url = error.config?.url || ''
+      // Don't redirect for auth-related calls — let them fail gracefully
+      const isAuthCall = url.includes('/api/auth/')
+      if (!isAuthCall) {
         localStorage.removeItem('token')
-        // Use window.location as a fallback since we can't use Next.js router in interceptors
-        // Components should handle 401 errors and use Next.js router for navigation
         window.location.href = '/auth/login'
       }
     }

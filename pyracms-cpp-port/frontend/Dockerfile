@@ -1,35 +1,36 @@
-FROM oven/bun:1-alpine AS frontend-builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
-# Pattern bun.lockb* copies the lockfile if it exists, or skips if not present
-COPY package.json bun.lockb* ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies using bunx
-RUN bun install --frozen-lockfile
+# Install dependencies
+RUN npm ci || npm install
 
-# Copy source files
+# Copy source
 COPY . .
 
-# Build the application using bunx
-RUN bunx next build
+# Build — NEXT_PUBLIC_ vars must be set at build time
+ARG NEXT_PUBLIC_API_URL=http://localhost:8099
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+RUN npm run build
 
 # Production stage
-FROM oven/bun:1-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
-# Copy necessary files from builder
-COPY --from=frontend-builder /app/public ./public
-COPY --from=frontend-builder /app/.next/standalone ./
-COPY --from=frontend-builder /app/.next/static ./.next/static
+# Copy built output (standalone mode)
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: PyraCMS API
+  description: Multi-tenant CMS with articles, forums, galleries, code snippets, and social features.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    Article:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        displayName: { type: string }
+        isPrivate: { type: boolean }
+        userId: { type: integer }
+        rendererName: { type: string }
+        viewCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        status: { type: string, enum: [draft, scheduled, published, unpublished] }
+        publishedAt: { type: string, format: date-time, nullable: true }
+        scheduledAt: { type: string, format: date-time, nullable: true }
+        content: { type: string }
+
+    SearchResult:
+      type: object
+      properties:
+        query: { type: string }
+        totalCount: { type: integer }
+        facets:
+          type: object
+          additionalProperties: { type: integer }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string }
+              id: { type: integer }
+              title: { type: string }
+              snippet: { type: string }
+              url: { type: string }
+              rank: { type: number }
+
+    AutocompleteItem:
+      type: object
+      properties:
+        text: { type: string }
+        type: { type: string }
+        url: { type: string }
+
+    UserFollow:
+      type: object
+      properties:
+        userId: { type: integer }
+        username: { type: string }
+        avatarUrl: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Achievement:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        displayName: { type: string }
+        description: { type: string }
+        icon: { type: string }
+        earned: { type: boolean }
+        earnedAt: { type: string, format: date-time, nullable: true }
+
+    Reputation:
+      type: object
+      properties:
+        total: { type: integer }
+        postCount: { type: integer }
+        upvoteCount: { type: integer }
+        achievementCount: { type: integer }
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: JWT token
+        '401':
+          description: Invalid credentials
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      security: [{ bearerAuth: [] }]
+      summary: Get current user info
+
+  /api/auth/oauth/{provider}/url:
+    get:
+      tags: [Auth, OAuth]
+      summary: Get OAuth authorization URL
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: { type: string, enum: [github, google, discord] }
+
+  /api/auth/oauth/{provider}/callback:
+    post:
+      tags: [Auth, OAuth]
+      summary: Exchange OAuth code for JWT
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+
+  /api/articles:
+    get:
+      tags: [Articles]
+      summary: List articles
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: Array of articles
+    post:
+      tags: [Articles]
+      security: [{ bearerAuth: [] }]
+      summary: Create an article
+
+  /api/articles/{name}:
+    get:
+      tags: [Articles]
+      summary: Get article by name
+    put:
+      tags: [Articles]
+      security: [{ bearerAuth: [] }]
+      summary: Update article content
+    delete:
+      tags: [Articles]
+      security: [{ bearerAuth: [] }]
+      summary: Delete article
+
+  /api/articles/{name}/publish:
+    post:
+      tags: [Articles, Publishing]
+      security: [{ bearerAuth: [] }]
+      summary: Publish an article
+
+  /api/articles/{name}/schedule:
+    post:
+      tags: [Articles, Publishing]
+      security: [{ bearerAuth: [] }]
+      summary: Schedule article for future publishing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenant_id, scheduled_at]
+              properties:
+                tenant_id: { type: integer }
+                scheduled_at: { type: string, format: date-time }
+
+  /api/articles/{name}/unpublish:
+    post:
+      tags: [Articles, Publishing]
+      security: [{ bearerAuth: [] }]
+      summary: Unpublish an article
+
+  /api/search:
+    get:
+      tags: [Search]
+      summary: Full-text search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+        - name: tenant_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: type
+          in: query
+          schema: { type: string, enum: [all, article, forum_post, snippet, gamedep] }
+      responses:
+        '200':
+          description: Search results with facets
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SearchResult' }
+
+  /api/search/autocomplete:
+    get:
+      tags: [Search]
+      summary: Prefix-based autocomplete
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+        - name: tenant_id
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Autocomplete suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AutocompleteItem' }
+
+  /api/sitemap.xml:
+    get:
+      tags: [SEO]
+      summary: XML sitemap
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: XML sitemap
+          content:
+            text/xml: {}
+
+  /api/rss.xml:
+    get:
+      tags: [SEO]
+      summary: RSS 2.0 feed
+
+  /api/atom.xml:
+    get:
+      tags: [SEO]
+      summary: Atom feed
+
+  /api/articles/{name}/jsonld:
+    get:
+      tags: [SEO]
+      summary: Schema.org JSON-LD for article
+
+  /api/articles/{name}/opengraph:
+    get:
+      tags: [SEO]
+      summary: Open Graph metadata for article
+
+  /api/users/{id}/follow:
+    post:
+      tags: [Social]
+      security: [{ bearerAuth: [] }]
+      summary: Follow a user
+    delete:
+      tags: [Social]
+      security: [{ bearerAuth: [] }]
+      summary: Unfollow a user
+
+  /api/users/{id}/followers:
+    get:
+      tags: [Social]
+      summary: Get user's followers
+
+  /api/users/{id}/following:
+    get:
+      tags: [Social]
+      summary: Get users being followed
+
+  /api/users/{id}/activity:
+    get:
+      tags: [Social]
+      summary: User activity feed
+
+  /api/users/{id}/achievements:
+    get:
+      tags: [Social]
+      summary: User achievements
+
+  /api/users/{id}/reputation:
+    get:
+      tags: [Social]
+      summary: Calculate user reputation
+
+  /api/docs:
+    get:
+      tags: [Documentation]
+      summary: Swagger UI

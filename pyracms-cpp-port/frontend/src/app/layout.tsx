@@ -1,15 +1,30 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import theme from '@/lib/theme'
+import StoreProvider from '@/store/StoreProvider'
+import ThemeWrapper from '@/components/common/ThemeWrapper'
+import type { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PyraCMS',
-  description: 'Modern CMS with C++ backend and React frontend',
+  title: {
+    default: 'PyraCMS',
+    template: '%s | PyraCMS',
+  },
+  description: 'A multi-tenant content management system with articles, forums, galleries, and more.',
+  openGraph: {
+    type: 'website',
+    siteName: 'PyraCMS',
+    title: 'PyraCMS',
+    description: 'A multi-tenant content management system.',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192.png',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({
@@ -18,14 +33,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="theme-color" content="#6366f1" />
+      </head>
       <body className={inter.className}>
-        <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
+        <StoreProvider>
+          <ThemeWrapper>
             {children}
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+          </ThemeWrapper>
+        </StoreProvider>
       </body>
     </html>
   )

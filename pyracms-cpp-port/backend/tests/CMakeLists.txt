@@ -9,33 +9,32 @@ if(NOT GTest_FOUND)
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.12.1
+        GIT_TAG v1.14.0
     )
     FetchContent_MakeAvailable(googletest)
 endif()
 
-# Test files
+# Auto-generated test sources — run `python generate_cmake.py` to update
 set(TEST_SOURCES
-    test_auth.cpp
-    test_database.cpp
-    test_user_handler.cpp
+
+    test_auth_service.cpp
+
+    test_tenant_service.cpp
+
+    test_user_service.cpp
+
+    test_user_service_roles.cpp
+
 )
 
-# Create test executable
 add_executable(pyracms_tests ${TEST_SOURCES})
 
-# Include directories
-target_include_directories(pyracms_tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include
-)
-
-# Link test executable
 target_link_libraries(pyracms_tests
     PRIVATE
+    pyracms_lib
     GTest::gtest_main
     GTest::gmock
 )
 
-# Add tests
 include(GoogleTest)
 gtest_discover_tests(pyracms_tests)
