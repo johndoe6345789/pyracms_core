@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect } from 'react'
 import {
-  Box, Container, Paper, Typography,
+  Box, Button, Container, Paper, Typography,
 } from '@mui/material'
-import { WebOutlined } from '@mui/icons-material'
+import { ArrowBack, WebOutlined } from '@mui/icons-material'
+import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import AuthPromptCard
@@ -15,6 +17,10 @@ export default function CreateSitePage() {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   )
+
+  useEffect(() => {
+    document.title = 'Create New Site – PyraCMS'
+  }, [])
 
   return (
     <Box
@@ -39,6 +45,20 @@ export default function CreateSitePage() {
             color: 'white',
           }}
         >
+          <Button
+            component={Link}
+            href="/portal"
+            startIcon={<ArrowBack />}
+            data-testid="back-to-portal-link"
+            aria-label="Back to Portal"
+            sx={{
+              color: 'white',
+              mb: 2,
+              textTransform: 'none',
+            }}
+          >
+            Back to Portal
+          </Button>
           <WebOutlined
             sx={{ fontSize: 48, mb: 1 }}
             aria-hidden="true"

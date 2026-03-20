@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.15)
+project(pyracms_unit_tests CXX)
+set(CMAKE_CXX_STANDARD 17)
+
+find_package(GTest REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
+# Only UserRole tests — no Drogon dependency
+add_executable(test_user_role test_user_role_standalone.cpp)
+target_link_libraries(test_user_role GTest::GTest GTest::Main)
+
+include(GoogleTest)
+gtest_discover_tests(test_user_role)

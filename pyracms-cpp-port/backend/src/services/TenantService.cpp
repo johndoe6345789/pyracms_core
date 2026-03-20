@@ -1,6 +1,55 @@
 #include "services/TenantService.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace pyracms {
+
+// ── Static helpers ──────────────────────────────────────────────────────────
+
+bool TenantService::isValidSlug(const std::string &slug) {
+    if (slug.empty()) return false;
+    if (slug.front() == '-' || slug.back() == '-') return false;
+    for (char c : slug) {
+        bool ok = (c >= 'a' && c <= 'z') ||
+                  (c >= '0' && c <= '9') ||
+                  c == '-';
+        if (!ok) return false;
+    }
+    return true;
+}
+
+std::string TenantService::normalizeSlug(const std::string &name) {
+    std::string result;
+    result.reserve(name.size());
+
+    for (unsigned char c : name) {
+        if (std::isalnum(c)) {
+            result += static_cast<char>(std::tolower(c));
+        } else {
+            // Replace any non-alphanumeric char with a hyphen separator
+            if (!result.empty() && result.back() != '-') {
+                result += '-';
+            }
+        }
+    }
+
+    // Strip trailing hyphen
+    while (!result.empty() && result.back() == '-') {
+        result.pop_back();
+    }
+
+    return result;
+}
+
+bool TenantService::isValidDisplayName(const std::string &displayName) {
+    // Must contain at least one non-whitespace character
+    return std::any_of(
+        displayName.begin(), displayName.end(),
+        [](unsigned char c) { return !std::isspace(c); });
+}
+
+// ── DB-backed methods ────────────────────────────────────────────────────────
 
 TenantDto TenantService::rowToDto(const drogon::orm::Row &row) {
     TenantDto dto;

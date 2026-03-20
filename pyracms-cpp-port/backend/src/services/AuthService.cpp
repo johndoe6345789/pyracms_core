@@ -1,5 +1,5 @@
 #include "services/AuthService.h"
-#include <jwt-cpp/traits/boost-json/defaults.h>
+#include <jwt-cpp/traits/nlohmann-json/defaults.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <random>

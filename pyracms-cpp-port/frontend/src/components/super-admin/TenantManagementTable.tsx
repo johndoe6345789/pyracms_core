@@ -1,10 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import {
   Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
   Paper, Typography, Box, CircularProgress,
+  TextField, InputAdornment,
 } from '@mui/material'
+import { SearchOutlined } from '@mui/icons-material'
 import {
   useSuperAdminTenants,
 } from '@/hooks/useSuperAdminTenants'
@@ -17,6 +20,8 @@ export default function TenantManagementTable() {
     handleDelete, confirmDelete, cancelDelete,
   } = useSuperAdminTenants()
 
+  const [filter, setFilter] = useState('')
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', pt: 4 }}>
@@ -27,8 +32,33 @@ export default function TenantManagementTable() {
     )
   }
 
+  const lc = filter.toLowerCase()
+  const visible = filter
+    ? tenants.filter((t) =>
+        t.name.toLowerCase().includes(lc),
+      )
+    : tenants
+
   return (
     <>
+      <TextField
+        size="small"
+        placeholder="Filter by name…"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        inputProps={{ 'aria-label': 'Filter tenants' }}
+        data-testid="tenant-filter-input"
+        sx={{ mb: 1, width: 320 }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined fontSize="small" />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
       <TableContainer
         component={Paper}
         variant="outlined"
@@ -48,7 +78,7 @@ export default function TenantManagementTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tenants.length === 0 && (
+            {visible.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6}>
                   <Typography color="text.secondary">
@@ -57,7 +87,7 @@ export default function TenantManagementTable() {
                 </TableCell>
               </TableRow>
             )}
-            {tenants.map((t) => (
+            {visible.map((t) => (
               <TenantTableRow
                 key={t.id}
                 tenant={t}

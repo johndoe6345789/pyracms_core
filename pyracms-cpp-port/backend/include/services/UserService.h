@@ -1,5 +1,7 @@
 #pragma once
 
+#include "services/UserRole.h"
+
 #include <drogon/drogon.h>
 #include <functional>
 #include <optional>
@@ -18,6 +20,8 @@ struct UserDto {
     bool banned;
     std::string createdAt;
     std::string apiUuid;
+    // Role stored as the integer value of UserRole; defaults to User (1)
+    UserRole role{UserRole::User};
 };
 
 class UserService {
@@ -63,6 +67,20 @@ public:
 
     void countUsers(const DbClientPtr &db,
                     std::function<void(int)> cb);
+
+    // Role management — persists role as integer in the `role` column.
+    // The role column stores the int cast of UserRole (0–4).
+    using RoleCallback =
+        std::function<void(const std::optional<UserRole> &)>;
+
+    void setUserRole(const DbClientPtr &db,
+                     int userId,
+                     UserRole role,
+                     BoolCallback cb);
+
+    void getUserRole(const DbClientPtr &db,
+                     int userId,
+                     RoleCallback cb);
 
 private:
     UserDto rowToDto(const drogon::orm::Row &row);

@@ -65,5 +65,17 @@ export function useSuperAdminUsers() {
       .catch(() => {})
   }
 
-  return { users, loading, updateRole }
+  const toggleBan = (id: number) => {
+    setUsers((prev) => {
+      const target = prev.find((u) => u.id === id)
+      if (!target) return prev
+      const nextActive = !target.isActive
+      api.put(`/api/users/${id}`, { isActive: nextActive }).catch(() => {})
+      return prev.map((u) =>
+        u.id === id ? { ...u, isActive: nextActive } : u,
+      )
+    })
+  }
+
+  return { users, loading, updateRole, toggleBan }
 }

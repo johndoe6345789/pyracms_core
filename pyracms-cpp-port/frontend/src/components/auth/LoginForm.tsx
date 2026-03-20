@@ -52,6 +52,26 @@ export default function LoginForm({ redirectTo }: Props) {
           data-testid="password-input"
           sx={{ mb: 3 }}
         />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            mb: 1,
+          }}
+        >
+          <Link
+            href="/auth/forgot-password"
+            data-testid="forgot-password-link"
+            aria-label="Forgot your password?"
+            style={{
+              color: '#667eea',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+            }}
+          >
+            Forgot password?
+          </Link>
+        </Box>
         <Button
           fullWidth
           variant="contained"
