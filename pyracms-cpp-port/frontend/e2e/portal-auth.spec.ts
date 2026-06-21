@@ -1294,7 +1294,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1337,7 +1337,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1375,7 +1375,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1430,7 +1430,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1464,7 +1464,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1518,7 +1518,7 @@ test.describe('Search — /search', () => {
           rank: 1.0,
           createdAt: '2024-01-01T00:00:00Z',
         }))
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1554,7 +1554,7 @@ test.describe('Search — /search', () => {
           rank: 1.0,
           createdAt: '2024-01-01T00:00:00Z',
         }))
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1599,7 +1599,7 @@ test.describe('Search — /search', () => {
           rank: 1.0,
           createdAt: '2024-01-01T00:00:00Z',
         }))
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1638,7 +1638,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1678,7 +1678,7 @@ test.describe('Search — /search', () => {
         if (route.request().url().includes('autocomplete')) {
           return route.continue()
         }
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1719,7 +1719,7 @@ test.describe('Search — /search', () => {
           return route.continue()
         }
         await new Promise((r) => setTimeout(r, 1_500))
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1945,7 +1945,7 @@ test.describe('Admin redirect — /admin', () => {
       // Slow API to ensure the spinner is visible briefly
       await page.route('**/api/tenants**', async (route) => {
         await new Promise((r) => setTimeout(r, 1_000))
-        route.fulfill({
+        return route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify([]),

@@ -12,13 +12,14 @@ import { ProfileStats } from './ProfileStats'
 import { ProfileActions } from './ProfileActions'
 
 interface UserProfileCardProps {
-  username: string; avatarUrl?: string
-  bio: string; location?: string
-  website?: string; githubUrl?: string
-  twitterUrl?: string; joinDate: string
+  username: string; avatarUrl?: string | undefined
+  bio: string; location?: string | undefined
+  website?: string | undefined; githubUrl?: string | undefined
+  twitterUrl?: string | undefined; joinDate: string
   postCount: number; reputation: number
   badges: { label: string; color: string }[]
-  isFollowing?: boolean; onFollow?: () => void
+  isFollowing?: boolean | undefined
+  onFollow?: (() => void) | undefined
 }
 
 export function UserProfileCard({
@@ -44,7 +45,9 @@ export function UserProfileCard({
           justifyContent: 'space-between',
           alignItems: 'flex-end',
         }}>
-          <Avatar src={avatarUrl} sx={{
+          <Avatar
+            {...(avatarUrl ? { src: avatarUrl } : {})}
+            sx={{
             width: 96, height: 96, border: 4,
             borderColor: 'background.paper',
             bgcolor: 'primary.dark',
@@ -71,12 +74,15 @@ export function UserProfileCard({
           sx={{ mt: 0.5, mb: 2, lineHeight: 1.6 }}>
           {bio}
         </Typography>
-        <ProfileInfo location={location}
-          website={website} joinDate={joinDate} />
+        <ProfileInfo
+          {...(location ? { location } : {})}
+          {...(website ? { website } : {})}
+          joinDate={joinDate} />
         <ProfileStats postCount={postCount}
           reputation={reputation} />
-        <ProfileActions githubUrl={githubUrl}
-          twitterUrl={twitterUrl} />
+        <ProfileActions
+          {...(githubUrl ? { githubUrl } : {})}
+          {...(twitterUrl ? { twitterUrl } : {})} />
         {badges.length > 0 && (<>
           <Divider sx={{ mb: 2 }} />
           <Typography variant="subtitle2"

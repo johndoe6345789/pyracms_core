@@ -12,8 +12,8 @@ interface PasswordFieldProps {
   value: string
   onChange: (value: string) => void
   label?: string
-  sx?: object
-  'data-testid'?: string
+  sx?: object | undefined
+  'data-testid'?: string | undefined
 }
 
 export default function PasswordField({
@@ -61,7 +61,7 @@ export default function PasswordField({
           </InputAdornment>
         ),
       }}
-      sx={sx}
+      {...(sx ? { sx } : {})}
     />
   )
 }

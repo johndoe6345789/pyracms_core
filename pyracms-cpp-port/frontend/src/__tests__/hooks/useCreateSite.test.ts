@@ -16,6 +16,7 @@
 
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { makeMockFormEvent } from '../helpers/mockFormEvent'
 
 // ─── mocks ──────────────────────────────────────────────────────────────────
 
@@ -36,12 +37,7 @@ import { useCreateSite } from '@/hooks/useCreateSite'
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Builds a minimal synthetic FormEvent whose preventDefault is a jest spy.
- */
-function fakeSubmitEvent(): React.FormEvent {
-  return { preventDefault: jest.fn() } as unknown as React.FormEvent
-}
+const fakeSubmitEvent = () => makeMockFormEvent().event
 
 // ─── tests ───────────────────────────────────────────────────────────────────
 
@@ -73,7 +69,7 @@ describe('initial state', () => {
   })
 })
 
-// ── 2. Auto-slug from name ────────────────────────────────────────────────────
+// ── 2. Auto-slug from name ───────────────────────────────────────────────────
 
 describe('updateField(name) – auto-slug generation', () => {
   it('sets name and generates a slug from a simple name', () => {
@@ -283,7 +279,7 @@ describe('updateField(description)', () => {
   })
 })
 
-// ── 5. Successful submit ──────────────────────────────────────────────────────
+// ── 5. Successful submit ─────────────────────────────────────────────────────
 
 describe('handleSubmit – success', () => {
   it('calls POST /api/tenants with correct payload', async () => {
@@ -326,14 +322,13 @@ describe('handleSubmit – success', () => {
   it('calls preventDefault on the submit event', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
     const { result } = renderHook(() => useCreateSite())
-    const event = fakeSubmitEvent()
-    const preventDefaultSpy = event.preventDefault as jest.Mock
+    const { event, preventDefault } = makeMockFormEvent()
 
     await act(async () => {
       await result.current.handleSubmit(event)
     })
 
-    expect(preventDefaultSpy).toHaveBeenCalledTimes(1)
+    expect(preventDefault).toHaveBeenCalledTimes(1)
   })
 
   it('leaves error as empty string after success', async () => {
@@ -352,7 +347,7 @@ describe('handleSubmit – success', () => {
   })
 })
 
-// ── 6. API error response ─────────────────────────────────────────────────────
+// ── 6. API error response ────────────────────────────────────────────────────
 
 describe('handleSubmit – API error response', () => {
   it('sets the error from response.data.error', async () => {
@@ -404,10 +399,10 @@ describe('handleSubmit – API error response', () => {
   })
 })
 
-// ── 7. Network error ──────────────────────────────────────────────────────────
+// ── 7. Network error ─────────────────────────────────────────────────────────
 
 describe('handleSubmit – network error', () => {
-  it('sets "Unable to connect to server" for errors with no response', async () => {
+  it('sets connection error for errors with no response', async () => {
     mockPost.mockRejectedValueOnce(new Error('Network Error'))
     const { result } = renderHook(() => useCreateSite())
 
@@ -418,7 +413,7 @@ describe('handleSubmit – network error', () => {
     expect(result.current.error).toBe('Unable to connect to server')
   })
 
-  it('sets the same message when the rejection value is a plain string', async () => {
+  it('handles a plain string rejection value', async () => {
     mockPost.mockRejectedValueOnce('timeout')
     const { result } = renderHook(() => useCreateSite())
 
@@ -430,7 +425,7 @@ describe('handleSubmit – network error', () => {
   })
 })
 
-// ── 8. loading flag ───────────────────────────────────────────────────────────
+// ── 8. loading flag ──────────────────────────────────────────────────────────
 
 describe('loading flag', () => {
   it('is true while the request is in-flight', async () => {

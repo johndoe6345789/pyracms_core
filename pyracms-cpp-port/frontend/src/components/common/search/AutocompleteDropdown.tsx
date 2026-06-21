@@ -24,7 +24,7 @@ interface Props {
   open: boolean
   anchorEl: HTMLElement | null
   results: Result[]
-  width?: number
+  width?: number | undefined
   onSelect: (r: Result) => void
 }
 export default function AutocompleteDropdown({

@@ -6,11 +6,11 @@ export interface TrafficEntry {
   color: string
 }
 
-const C: Record<string, string> = {
+const C = {
   Articles: '#1976d2', Forum: '#2e7d32',
   'Code Snippets': '#ed6c02',
   Gallery: '#9c27b0', Other: '#757575',
-}
+} as const
 
 export const DEFAULT_DATA: TrafficEntry[] = [
   { name: 'Articles', value: 0, color: C.Articles },
@@ -27,7 +27,7 @@ export function mapTraffic(
   return traffic.map((t) => ({
     name: t.name as string,
     value: (t.value || t.count) as number,
-    color: C[t.name as string] || '#757575',
+    color: C[t.name as keyof typeof C] ?? C.Other,
   }))
 }
 
@@ -70,7 +70,7 @@ export function fetchFallback(
     api.get(`/api/gallery/albums${q}`)
       .then((r) => countPics(r.data || []))
       .catch(() => 0),
-  ]).then(([a, p, s, g]) => [
+  ]).then(([a = 0, p = 0, s = 0, g = 0]) => [
     { name: 'Articles', value: a, color: C.Articles },
     { name: 'Forum', value: p, color: C.Forum },
     { name: 'Code Snippets', value: s, color: C['Code Snippets'] },

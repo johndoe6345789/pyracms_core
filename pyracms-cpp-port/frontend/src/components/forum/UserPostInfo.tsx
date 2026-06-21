@@ -7,7 +7,7 @@ import { UserStats } from './UserStats'
 
 interface UserPostInfoProps {
   username: string
-  avatarUrl?: string
+  avatarUrl?: string | undefined
   joinDate: string
   postCount: number
   reputation: number
@@ -39,7 +39,9 @@ export function UserPostInfo({
       minWidth: { md: 160 },
     }} data-testid={
       `user-post-info-${username}`}>
-      <Avatar src={avatarUrl} sx={{
+      <Avatar
+        {...(avatarUrl ? { src: avatarUrl } : {})}
+        sx={{
         width: { xs: 40, md: 64 },
         height: { xs: 40, md: 64 },
         bgcolor: 'primary.main',

@@ -15,6 +15,7 @@ struct ArticleDto {
     bool isPrivate;
     bool hideDisplayName;
     int userId;
+    std::string authorUsername;
     std::string rendererName;
     int viewCount;
     std::string createdAt;
@@ -29,6 +30,7 @@ struct ArticleRevisionDto {
     std::string content;
     std::string summary;
     int userId;
+    std::string authorUsername;
     std::string createdAt;
 };
 
@@ -92,6 +94,9 @@ public:
     void setTags(const DbClientPtr &db, int articleId,
                  const std::vector<std::string> &tags,
                  BoolCallback cb);
+
+    using TagListCallback = std::function<void(const std::vector<std::string> &)>;
+    void listTags(const DbClientPtr &db, int articleId, TagListCallback cb);
 
     void publishArticle(const DbClientPtr &db, int articleId,
                         BoolCallback cb);

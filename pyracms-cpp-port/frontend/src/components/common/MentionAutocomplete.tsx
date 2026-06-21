@@ -31,7 +31,8 @@ export function MentionAutocomplete({
     const pos = el.selectionStart || 0
     const before = val.substring(0, pos)
     const m = before.match(/@(\w*)$/)
-    if (m && m[1].length >= 1) {
+    const mention = m?.[1]
+    if (mention && mention.length >= 1) {
       setAnchor(el as HTMLElement)
       if (timer.current)
         clearTimeout(timer.current)
@@ -39,7 +40,7 @@ export function MentionAutocomplete({
         try {
           const r = await api.get(
             '/api/users?search='
-            + m[1] + '&limit=5')
+            + mention + '&limit=5')
           setList(Array.isArray(r.data)
             ? r.data : [])
         } catch { setList([]) }

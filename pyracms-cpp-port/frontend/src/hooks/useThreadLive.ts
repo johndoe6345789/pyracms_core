@@ -23,10 +23,17 @@ export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
     if (msg.type === 'typing_start') {
       setTypingUsers(prev => {
         const filtered = prev.filter(u => u.userId !== (msg.userId as number))
-        return [...filtered, { userId: msg.userId as number, timestamp: Date.now() }]
+        return [
+          ...filtered,
+          {
+            userId: msg.userId as number,
+            timestamp: Date.now(),
+          },
+        ]
       })
     } else if (msg.type === 'typing_stop') {
-      setTypingUsers(prev => prev.filter(u => u.userId !== (msg.userId as number)))
+      setTypingUsers(prev =>
+        prev.filter(u => u.userId !== (msg.userId as number)))
     } else if (msg.type === 'new_post') {
       onNewPost?.(msg)
     }
@@ -39,11 +46,12 @@ export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
 
   // Subscribe to thread when connected
   useEffect(() => {
-    if (connected && threadId > 0) {
-      send({ type: 'thread_subscribe', threadId })
-      return () => {
-        send({ type: 'thread_unsubscribe', threadId })
-      }
+    if (!connected || threadId <= 0) {
+      return undefined
+    }
+    send({ type: 'thread_subscribe', threadId })
+    return () => {
+      send({ type: 'thread_unsubscribe', threadId })
     }
   }, [connected, threadId, send])
 

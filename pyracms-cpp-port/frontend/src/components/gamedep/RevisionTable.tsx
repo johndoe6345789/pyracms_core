@@ -43,7 +43,9 @@ export default function RevisionTable({ revisions }: RevisionTableProps) {
                   label={rev.published ? 'Published' : 'Draft'}
                   color={rev.published ? 'success' : 'default'}
                   size="small"
-                  icon={rev.published ? <CheckCircleOutlined /> : undefined}
+                  {...(rev.published
+                    ? { icon: <CheckCircleOutlined /> }
+                    : {})}
                 />
               </TableCell>
             </TableRow>

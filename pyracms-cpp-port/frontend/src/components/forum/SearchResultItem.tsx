@@ -12,7 +12,7 @@ interface SearchResultItemProps {
   result: ForumSearchResult
   query: string
   showDivider: boolean
-  onClick?: (r: ForumSearchResult) => void
+  onClick?: ((r: ForumSearchResult) => void) | undefined
 }
 
 /**

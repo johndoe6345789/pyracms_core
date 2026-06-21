@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 import {
   TextField, InputAdornment, Chip,
-  Dialog, DialogContent, Fade,
+  Dialog, DialogContent,
 } from '@mui/material'
 import { SearchOutlined } from '@mui/icons-material'
 import type { SearchResult }
@@ -34,7 +34,6 @@ export default function SearchDialog({
   return (
     <Dialog open={open} onClose={onClose}
       maxWidth="sm" fullWidth
-      TransitionComponent={Fade}
       sx={{ '& .MuiDialog-paper': {
         mt: '10vh', borderRadius: 2 } }}>
       <DialogContent sx={{ p: 0 }}>
@@ -53,14 +52,18 @@ export default function SearchDialog({
               <InputAdornment position="start">
                 <SearchOutlined />
               </InputAdornment>),
-            endAdornment: query ? (
-              <InputAdornment position="end">
-                <Chip
-                  label="Enter to search all"
-                  size="small" variant="outlined"
-                  sx={{ height: 22,
-                    fontSize: '0.7rem' }} />
-              </InputAdornment>) : undefined,
+            ...(query
+              ? {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Chip
+                        label="Enter to search all"
+                        size="small" variant="outlined"
+                        sx={{ height: 22,
+                          fontSize: '0.7rem' }} />
+                    </InputAdornment>),
+                }
+              : {}),
           }}
           sx={{
             '& .MuiOutlinedInput-notchedOutline':

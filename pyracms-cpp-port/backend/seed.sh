@@ -18,6 +18,14 @@ ADMIN_RES=$(curl -s -X POST "$API/api/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","email":"admin@pyracms.com","password":"password123","fullName":"Admin User"}')
 TOKEN=$(echo "$ADMIN_RES" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+
+# Fall back to login if register failed (user already exists)
+if [ -z "$TOKEN" ]; then
+  LOGIN_RES=$(curl -s -X POST "$API/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"username":"admin","password":"password123"}')
+  TOKEN=$(echo "$LOGIN_RES" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+fi
 AUTH="Authorization: Bearer $TOKEN"
 
 if [ -z "$TOKEN" ]; then

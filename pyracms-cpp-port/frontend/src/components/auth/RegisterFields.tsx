@@ -9,7 +9,7 @@ interface Props {
     field: keyof RegisterRequest,
     value: string,
   ) => void
-  errorId?: string
+  errorId?: string | undefined
 }
 
 /** Password strength score: 0 (empty) … 4 (very strong). */

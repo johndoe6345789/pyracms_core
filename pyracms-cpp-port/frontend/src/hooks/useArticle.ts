@@ -13,7 +13,7 @@ export interface Article {
   likes: number
   dislikes: number
   tags: string[]
-  revisionNumber: number
+  revisionCount: number
 }
 
 export function useArticle(name: string, tenantId: number | null) {
@@ -26,17 +26,22 @@ export function useArticle(name: string, tenantId: number | null) {
     api.get(`/api/articles/${name}?tenant_id=${tenantId}`)
       .then(res => {
         const a = res.data
+        const rawDate = a.createdAt || ''
+        const parsedDate = rawDate
+          ? new Date(rawDate.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00'))
+              .toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+          : ''
         setArticle({
           title: a.displayName || a.name,
           content: a.content || '',
           author: a.authorUsername || 'Unknown',
-          createdDate: a.createdAt?.split('T')[0] || '',
-          renderer: a.rendererName || 'html',
+          createdDate: parsedDate,
+          renderer: (a.rendererName || 'html').toLowerCase(),
           views: a.viewCount || 0,
           likes: a.likes || 0,
           dislikes: a.dislikes || 0,
           tags: a.tags || [],
-          revisionNumber: a.revisionNumber || 1,
+          revisionCount: a.revisionCount || 0,
         })
       })
       .catch(() => {})

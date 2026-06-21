@@ -35,7 +35,8 @@ export default function CommentItem({
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
-        <Avatar src={c.avatar || undefined}
+        <Avatar
+          {...(c.avatar ? { src: c.avatar } : {})}
           sx={{ width: 32, height: 32,
             fontSize: 14 }}>
           {c.username[0]?.toUpperCase()}</Avatar>

@@ -19,7 +19,10 @@ const NAV_ITEMS = [
   { label: 'Settings', icon: <TuneOutlined />, path: '/super-admin/settings' },
 ]
 
-interface Props { width: number; onNavClick?: () => void }
+interface Props {
+  width: number
+  onNavClick?: (() => void) | undefined
+}
 
 export default function SuperAdminNav({
   width, onNavClick,
@@ -45,7 +48,7 @@ export default function SuperAdminNav({
               <ListItemButton
                 component={Link}
                 href={item.path}
-                onClick={onNavClick}
+                {...(onNavClick ? { onClick: onNavClick } : {})}
                 data-testid={
                   `super-admin-nav-${item.label.toLowerCase()}`
                 }

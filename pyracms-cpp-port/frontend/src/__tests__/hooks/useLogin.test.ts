@@ -22,6 +22,8 @@ import {
   validateLoginForm,
 } from '@/hooks/useLogin'
 import type { LoginRequest } from '@/types'
+import { asMockApi } from '../helpers/mockApi'
+import { makeMockFormEvent } from '../helpers/mockFormEvent'
 
 // ---------------------------------------------------------------------------
 // Module-level mocks (hoisted by Jest before any imports are evaluated)
@@ -42,7 +44,7 @@ jest.mock('@/lib/api', () => ({
 
 // Typed reference to the mocked axios instance
 import api from '@/lib/api'
-const mockPost = api.post as jest.MockedFunction<typeof api.post>
+const mockApi = asMockApi<'post'>(api)
 
 // ---------------------------------------------------------------------------
 // Helper: wrap renderHook with a fresh Redux Provider each time
@@ -85,7 +87,7 @@ const VALID_FORM: LoginRequest = {
 
 /** Fake `e.preventDefault` event object. */
 const fakeEvent = () =>
-  ({ preventDefault: jest.fn() } as unknown as React.FormEvent)
+  makeMockFormEvent().event
 
 // ---------------------------------------------------------------------------
 // validateLoginForm — pure function, no React needed
@@ -199,7 +201,7 @@ describe('useLogin', () => {
       await result.current.handleSubmit(fakeEvent())
     })
     expect(result.current.error).toBe('Username is required')
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('sets error and does not call API when password is empty', async () => {
@@ -214,7 +216,7 @@ describe('useLogin', () => {
       await result.current.handleSubmit(fakeEvent())
     })
     expect(result.current.error).toBe('Password is required')
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('loading stays false after a validation failure', async () => {
@@ -233,7 +235,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('successful login stores token in localStorage', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok123', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -251,7 +253,7 @@ describe('useLogin', () => {
   })
 
   it('successful login dispatches setCredentials to the store', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok123', user: MOCK_USER },
     })
     const { store, Wrapper } = makeWrapper()
@@ -271,7 +273,7 @@ describe('useLogin', () => {
   })
 
   it('successful login navigates to default "/" path', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok123', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -289,7 +291,7 @@ describe('useLogin', () => {
   })
 
   it('successful login navigates to a custom redirectTo path', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok456', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -319,7 +321,7 @@ describe('useLogin', () => {
     expect(result.current.error).toBeTruthy()
 
     // …then supply valid data and a successful response
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok789', user: MOCK_USER },
     })
     act(() => {
@@ -337,7 +339,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('sets error from response.data.error when token is absent', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { error: 'Invalid credentials' },
     })
     const { Wrapper } = makeWrapper()
@@ -354,8 +356,8 @@ describe('useLogin', () => {
     expect(result.current.error).toBe('Invalid credentials')
   })
 
-  it('falls back to "Login failed" when token absent and no error msg', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
+  it('falls back when token is absent and no error msg exists', async () => {
+    mockApi.post.mockResolvedValueOnce({ data: {} })
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -371,7 +373,7 @@ describe('useLogin', () => {
   })
 
   it('does not navigate when token is absent', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
+    mockApi.post.mockResolvedValueOnce({ data: {} })
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -391,7 +393,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('sets server error message from caught axios error', async () => {
-    mockPost.mockRejectedValueOnce({
+    mockApi.post.mockRejectedValueOnce({
       response: { data: { error: 'Account locked' } },
     })
     const { Wrapper } = makeWrapper()
@@ -408,8 +410,8 @@ describe('useLogin', () => {
     expect(result.current.error).toBe('Account locked')
   })
 
-  it('falls back to "Login failed" on axios error with no message', async () => {
-    mockPost.mockRejectedValueOnce({ response: { data: {} } })
+  it('falls back on axios error with no message', async () => {
+    mockApi.post.mockRejectedValueOnce({ response: { data: {} } })
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -429,7 +431,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('sets "Unable to connect to server" on a network error', async () => {
-    mockPost.mockRejectedValueOnce(new Error('Network Error'))
+    mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -447,7 +449,7 @@ describe('useLogin', () => {
   })
 
   it('sets "Unable to connect to server" when error is a string', async () => {
-    mockPost.mockRejectedValueOnce('timeout')
+    mockApi.post.mockRejectedValueOnce('timeout')
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -469,7 +471,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('loading is false after a successful request completes', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok123', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -487,7 +489,7 @@ describe('useLogin', () => {
   })
 
   it('loading is false after a failed request completes', async () => {
-    mockPost.mockRejectedValueOnce(new Error('Network Error'))
+    mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useLogin(), {
       wrapper: Wrapper,
@@ -503,7 +505,7 @@ describe('useLogin', () => {
   })
 
   it('loading is false after a server-side error (no token)', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { error: 'Bad creds' },
     })
     const { Wrapper } = makeWrapper()
@@ -525,7 +527,7 @@ describe('useLogin', () => {
   // -------------------------------------------------------------------------
 
   it('calls POST /api/auth/login with the form data', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -539,7 +541,7 @@ describe('useLogin', () => {
     await act(async () => {
       await result.current.handleSubmit(fakeEvent())
     })
-    expect(mockPost).toHaveBeenCalledWith(
+    expect(mockApi.post).toHaveBeenCalledWith(
       '/api/auth/login',
       { username: 'alice', password: 'pass123' },
     )

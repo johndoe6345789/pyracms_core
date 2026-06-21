@@ -28,6 +28,7 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import RegisterForm from '@/components/auth/RegisterForm'
 import type { RegisterRequest } from '@/types'
+import { asMockedFunction } from '../../helpers/mockFunction'
 
 // ---------------------------------------------------------------------------
 // Mock useRegister
@@ -69,9 +70,7 @@ jest.mock('@/hooks/useRegister', () => ({
 
 // Import after mock so we can control the return value.
 import { useRegister } from '@/hooks/useRegister'
-const mockUseRegister = useRegister as jest.MockedFunction<
-  typeof useRegister
->
+const mockUseRegister = asMockedFunction(useRegister)
 
 // ---------------------------------------------------------------------------
 // Redux store stub (RegisterForm only reads from the store via useDispatch;

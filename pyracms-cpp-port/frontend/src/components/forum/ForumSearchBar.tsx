@@ -17,9 +17,9 @@ import {
 interface ForumSearchBarProps {
   forums?: string[]
   tenantId?: number | null
-  onResultClick?: (
+  onResultClick?: ((
     result: ForumSearchResult
-  ) => void
+  ) => void) | undefined
 }
 
 export type { ForumSearchResult }

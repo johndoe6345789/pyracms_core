@@ -76,7 +76,7 @@ export function HtmlPreviewContent({
       dangerouslySetInnerHTML={{
         __html: sanitizedHtml,
       }}
-      sx={sx}
+      {...(sx ? { sx } : {})}
     />
   )
 }

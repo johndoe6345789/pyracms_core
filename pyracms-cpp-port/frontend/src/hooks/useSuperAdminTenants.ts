@@ -37,7 +37,7 @@ export function useSuperAdminTenants() {
           owner: String(t.ownerUsername || ''),
           isActive: Boolean(t.isActive ?? true),
           createdAt: typeof t.createdAt === 'string'
-            ? t.createdAt.split('T')[0]
+            ? t.createdAt.split('T')[0] ?? ''
             : '',
         }))
         setTenants(mapped)
@@ -78,7 +78,7 @@ export function useSuperAdminTenants() {
         owner: String(t.ownerUsername || ''),
         isActive: Boolean(t.isActive ?? true),
         createdAt: typeof t.createdAt === 'string'
-          ? t.createdAt.split('T')[0]
+          ? t.createdAt.split('T')[0] ?? ''
           : '',
       }
       setTenants((prev) => [...prev, row])

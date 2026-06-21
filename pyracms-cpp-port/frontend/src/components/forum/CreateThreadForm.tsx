@@ -17,9 +17,9 @@ interface CreateThreadFormProps {
   setDescription: (v: string) => void
   content: string
   setContent: (v: string) => void
-  loading?: boolean
-  error?: string
-  onSubmit?: () => void
+  loading?: boolean | undefined
+  error?: string | undefined
+  onSubmit?: (() => void) | undefined
 }
 
 export function CreateThreadForm({
@@ -106,8 +106,8 @@ export function CreateThreadForm({
           variant="contained"
           endIcon={<SendOutlined />}
           size="large"
-          onClick={onSubmit}
-          disabled={loading}
+          {...(onSubmit ? { onClick: onSubmit } : {})}
+          {...(loading === undefined ? {} : { disabled: loading })}
           aria-label="Create thread"
           data-testid={
             'create-thread-submit'

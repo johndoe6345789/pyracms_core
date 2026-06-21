@@ -5,6 +5,7 @@ import {
   TenantRow,
 } from '@/hooks/useSuperAdminTenants'
 import api from '@/lib/api'
+import { asMockApi } from '../helpers/mockApi'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -15,11 +16,7 @@ jest.mock('@/lib/api', () => ({
   },
 }))
 
-const mockApi = api as {
-  get: jest.MockedFunction<typeof api.get>
-  delete: jest.MockedFunction<typeof api.delete>
-  post: jest.MockedFunction<typeof api.post>
-}
+const mockApi = asMockApi<'get' | 'delete' | 'post'>(api)
 
 const RAW_TENANTS = [
   {
@@ -83,7 +80,7 @@ describe('useSuperAdminTenants — initial loading', () => {
 // 2. Maps API response correctly
 // ---------------------------------------------------------------------------
 describe('useSuperAdminTenants — mapping', () => {
-  it('maps all fields: id, slug, name, owner, isActive, createdAt', async () => {
+  it('maps all tenant row fields', async () => {
     mockApi.get.mockResolvedValueOnce({ data: RAW_TENANTS })
     const { result } = renderHook(() => useSuperAdminTenants())
 
@@ -101,7 +98,7 @@ describe('useSuperAdminTenants — mapping', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.tenants[0].name).toBe('delta')
+    expect(result.current.tenants[0]!.name).toBe('delta')
   })
 
   it('defaults isActive to true when field is missing', async () => {
@@ -111,7 +108,7 @@ describe('useSuperAdminTenants — mapping', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.tenants[0].isActive).toBe(true)
+    expect(result.current.tenants[0]!.isActive).toBe(true)
   })
 
   it('sets createdAt to empty string when field is absent', async () => {
@@ -121,7 +118,7 @@ describe('useSuperAdminTenants — mapping', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.tenants[0].createdAt).toBe('')
+    expect(result.current.tenants[0]!.createdAt).toBe('')
   })
 
   it('truncates ISO timestamp to date portion', async () => {
@@ -135,7 +132,7 @@ describe('useSuperAdminTenants — mapping', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.tenants[0].createdAt).toBe('2025-06-01')
+    expect(result.current.tenants[0]!.createdAt).toBe('2025-06-01')
   })
 })
 
@@ -195,7 +192,7 @@ describe('useSuperAdminTenants — confirmDelete (success)', () => {
 
     expect(mockApi.delete).toHaveBeenCalledWith('/api/tenants/1')
     expect(result.current.tenants).toHaveLength(1)
-    expect(result.current.tenants[0].id).toBe(2)
+    expect(result.current.tenants[0]!.id).toBe(2)
   })
 })
 
@@ -251,7 +248,7 @@ describe('useSuperAdminTenants — null/missing fields', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    const t = result.current.tenants[0]
+    const t = result.current.tenants[0]!
     expect(t.id).toBe(0)
     expect(t.slug).toBe('')
     expect(t.name).toBe('')
@@ -312,7 +309,7 @@ describe('useSuperAdminTenants — createTenant', () => {
       { slug: 'new-co', displayName: 'New Co', ownerUsername: 'carol' },
     )
     expect(result.current.tenants).toHaveLength(3)
-    const added = result.current.tenants[2]
+    const added = result.current.tenants[2]!
     expect(added.id).toBe(99)
     expect(added.slug).toBe('new-co')
     expect(added.name).toBe('New Co')

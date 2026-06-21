@@ -39,7 +39,7 @@ function mapFileRecord(
 ): FileItem {
   const createdAt =
     typeof f.createdAt === 'string'
-      ? (f.createdAt as string).split('T')[0]
+      ? (f.createdAt as string).split('T')[0] ?? ''
       : ''
   return {
     id: f.id as number,
@@ -151,7 +151,7 @@ export function useFileManager(
             const f = res.data
             const today = new Date()
               .toISOString()
-              .split('T')[0]
+              .split('T')[0] ?? ''
             setFiles((prev) => [
               ...prev,
               {

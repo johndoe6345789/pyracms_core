@@ -14,9 +14,9 @@ import type { ForumSearchResult } from
 interface SearchResultsProps {
   results: ForumSearchResult[]
   query: string
-  onResultClick?: (
+  onResultClick?: ((
     result: ForumSearchResult
-  ) => void
+  ) => void) | undefined
 }
 
 export function SearchResults({
@@ -41,11 +41,13 @@ export function SearchResults({
         {results.map((result, idx) => (
           <SearchResultItem
             key={result.id}
-            result={result}
-            query={query}
-            showDivider={
+          result={result}
+          query={query}
+          showDivider={
               idx < results.length - 1}
-            onClick={onResultClick} />
+            {...(onResultClick
+              ? { onClick: onResultClick }
+              : {})} />
         ))}
       </List>
     </Paper>

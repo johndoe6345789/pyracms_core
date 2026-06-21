@@ -100,13 +100,13 @@ export default function SuperAdminBreadcrumbs() {
             {crumb.label}
           </MuiLink>
         ))}
-        {crumbs.length > 0 && (
+        {crumbs.length > 0 && crumbs[crumbs.length - 1] && (
           <Typography
             color="text.primary"
             aria-current="page"
             data-testid="breadcrumb-current"
           >
-            {crumbs[crumbs.length - 1].label}
+            {crumbs[crumbs.length - 1]?.label}
           </Typography>
         )}
       </Breadcrumbs>

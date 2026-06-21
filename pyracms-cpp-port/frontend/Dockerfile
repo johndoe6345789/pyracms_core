@@ -12,7 +12,7 @@ RUN npm ci || npm install
 COPY . .
 
 # Build — NEXT_PUBLIC_ vars must be set at build time
-ARG NEXT_PUBLIC_API_URL=http://localhost:8099
+ARG NEXT_PUBLIC_API_URL=
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 

@@ -17,7 +17,7 @@ import type { GameDepItem } from '@/hooks/useGameDepList'
 interface GameDepCardProps {
   item: GameDepItem
   href: string
-  hoverColor?: string
+  hoverColor?: string | undefined
 }
 
 export default function GameDepCard({
@@ -50,12 +50,24 @@ export default function GameDepCard({
           <Box sx={{ mb: 2 }}>
             <TagChips tags={item.tags} />
           </Box>
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}
-          >
-            <StatIcon icon={<ThumbUpOutlined fontSize="small" />} value={item.likes} />
-            <StatIcon icon={<ThumbDownOutlined fontSize="small" />} value={item.dislikes} />
-            <StatIcon icon={<VisibilityOutlined fontSize="small" />} value={item.views} />
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            color: 'text.secondary',
+          }}>
+            <StatIcon
+              icon={<ThumbUpOutlined fontSize="small" />}
+              value={item.likes}
+            />
+            <StatIcon
+              icon={<ThumbDownOutlined fontSize="small" />}
+              value={item.dislikes}
+            />
+            <StatIcon
+              icon={<VisibilityOutlined fontSize="small" />}
+              value={item.views}
+            />
           </Box>
         </CardContent>
       </CardActionArea>

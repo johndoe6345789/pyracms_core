@@ -117,8 +117,9 @@ export function useMenuEditor(
     fetchMenuGroups(tenantId)
       .then((loaded) => {
         setMenuGroups(loaded)
-        if (loaded.length > 0 && !selectedGroup) {
-          setSelectedGroup(loaded[0].name)
+        const firstGroup = loaded[0]
+        if (firstGroup && !selectedGroup) {
+          setSelectedGroup(firstGroup.name)
         }
       })
       .catch(() => {})

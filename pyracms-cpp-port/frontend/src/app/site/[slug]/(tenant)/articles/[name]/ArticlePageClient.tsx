@@ -68,12 +68,13 @@ export default function ArticlePageClient() {
             <ArticleTagChips
               tags={article.tags}
               color="primary"
+              searchSlug={slug}
             />
             <ArticleActions
               slug={slug}
               name={name}
-              revisionNumber={
-                article.revisionNumber
+              revisionCount={
+                article.revisionCount
               }
             />
           </section>
@@ -82,7 +83,8 @@ export default function ArticlePageClient() {
             aria-label="Article body"
           >
             <ArticleContent
-              html={article.content}
+              content={article.content}
+              renderer={article.renderer}
             />
           </section>
           <Divider sx={{ mb: 3 }} />

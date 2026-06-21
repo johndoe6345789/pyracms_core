@@ -10,14 +10,14 @@ import Link from 'next/link'
 interface ArticleActionsProps {
   slug: string
   name: string
-  revisionNumber: number
+  revisionCount: number
 }
 
 export function ArticleActions(
   {
     slug,
     name,
-    revisionNumber,
+    revisionCount,
   }: ArticleActionsProps
 ) {
   return (
@@ -58,10 +58,10 @@ export function ArticleActions(
         data-testid="revisions-btn"
         aria-label={
           `View revisions ` +
-          `(${revisionNumber})`
+          `(${revisionCount})`
         }
       >
-        Revisions ({revisionNumber})
+        Revisions ({revisionCount})
       </Button>
     </Box>
   )

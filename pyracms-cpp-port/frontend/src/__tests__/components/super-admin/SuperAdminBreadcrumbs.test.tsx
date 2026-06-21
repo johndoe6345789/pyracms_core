@@ -25,6 +25,7 @@
 
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { asMockedFunction } from '../../helpers/mockFunction'
 import SuperAdminBreadcrumbs
   from '@/components/super-admin/SuperAdminBreadcrumbs'
 
@@ -41,7 +42,7 @@ jest.mock('next/navigation', () => ({
 // Import the mock *after* jest.mock so we get the spy reference.
 import { usePathname } from 'next/navigation'
 
-const mockUsePathname = usePathname as jest.Mock
+const mockUsePathname = asMockedFunction(usePathname)
 
 // ---------------------------------------------------------------------------
 // Helpers

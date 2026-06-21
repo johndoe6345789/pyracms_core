@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Box, TextField, MenuItem } from '@mui/material'
-import { ArticleTagChips } from './ArticleTagChips'
 import {
   RENDERERS, type ArticleEditorState,
 } from '@/hooks/useArticleEditor'
@@ -12,14 +11,16 @@ import {
 import {
   ArticleEditorContent,
 } from './ArticleEditorContent'
+import { ArticleTagEditor } from './ArticleTagEditor'
 
 interface ArticleEditorFormProps {
   editor: ArticleEditorState
   contentPlaceholder?: string
+  onSummaryChange?: (value: string) => void
 }
 
 export function ArticleEditorForm({
-  editor,
+  editor, onSummaryChange,
 }: ArticleEditorFormProps) {
   const [mode, setMode] =
     useState<EditorMode>('monaco')
@@ -57,23 +58,17 @@ export function ArticleEditorForm({
       </Box>
       <ArticleEditorContent
         mode={mode} editor={editor} />
-      <TextField
-        label="Tags (comma-separated)"
-        value={editor.tagsInput}
-        onChange={(e) =>
-          editor.setTagsInput(e.target.value)}
-        fullWidth
-        helperText="Separate tags with commas"
-        data-testid="tags-input" />
-      {editor.parsedTags.length > 0 && (
-        <ArticleTagChips
-          tags={editor.parsedTags}
-          color="primary" />)}
+      <ArticleTagEditor
+        tagsInput={editor.tagsInput}
+        setTagsInput={editor.setTagsInput}
+        tags={editor.parsedTags} />
       <TextField
         label="Revision Summary"
         value={editor.summary}
-        onChange={(e) =>
-          editor.setSummary(e.target.value)}
+        onChange={(e) => {
+          editor.setSummary(e.target.value)
+          onSummaryChange?.(e.target.value)
+        }}
         fullWidth
         placeholder="Describe your changes..."
         data-testid="summary-input" />

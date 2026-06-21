@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRegister } from '@/hooks/useRegister'
 import RegisterFields from './RegisterFields'
 
-interface Props { redirectTo?: string }
+interface Props { redirectTo?: string | undefined }
 
 /** Registration form. Pass redirectTo to override post-register destination. */
 export default function RegisterForm({ redirectTo }: Props) {

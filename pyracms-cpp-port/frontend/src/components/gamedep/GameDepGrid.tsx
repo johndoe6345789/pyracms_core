@@ -5,7 +5,7 @@ import type { GameDepItem } from '@/hooks/useGameDepList'
 interface GameDepGridProps {
   items: GameDepItem[]
   hrefPrefix: string
-  hoverColor?: string
+  hoverColor?: string | undefined
 }
 
 export default function GameDepGrid({
@@ -20,7 +20,7 @@ export default function GameDepGrid({
           <GameDepCard
             item={item}
             href={`${hrefPrefix}/${item.name}`}
-            hoverColor={hoverColor}
+            {...(hoverColor ? { hoverColor } : {})}
           />
         </Grid>
       ))}

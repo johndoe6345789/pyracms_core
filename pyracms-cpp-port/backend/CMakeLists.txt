@@ -36,6 +36,38 @@ set(LIB_SOURCES
 
     src/controllers/ArticleController.cpp
 
+    src/controllers/article/ArticleControllerCreateArticle.cpp
+
+    src/controllers/article/ArticleControllerDeleteArticle.cpp
+
+    src/controllers/article/ArticleControllerGetArticle.cpp
+
+    src/controllers/article/ArticleControllerGetRevision.cpp
+
+    src/controllers/article/ArticleControllerListArticles.cpp
+
+    src/controllers/article/ArticleControllerListRevisions.cpp
+
+    src/controllers/article/ArticleControllerPublishArticle.cpp
+
+    src/controllers/article/ArticleControllerRevertToRevision.cpp
+
+    src/controllers/article/ArticleControllerScheduleArticle.cpp
+
+    src/controllers/article/ArticleControllerSetTags.cpp
+
+    src/controllers/article/ArticleControllerSwitchRenderer.cpp
+
+    src/controllers/article/ArticleControllerTogglePrivate.cpp
+
+    src/controllers/article/ArticleControllerUnpublishArticle.cpp
+
+    src/controllers/article/ArticleControllerUpdateArticle.cpp
+
+    src/controllers/article/ArticleControllerVoteArticle.cpp
+
+    src/controllers/ArticleTagController.cpp
+
     src/controllers/AuthController.cpp
 
     src/controllers/CodeSnippetController.cpp
@@ -79,6 +111,48 @@ set(LIB_SOURCES
     src/services/AnalyticsService.cpp
 
     src/services/ArticleService.cpp
+
+    src/services/article/ArticleServiceCreateArticle.cpp
+
+    src/services/article/ArticleServiceDeleteArticle.cpp
+
+    src/services/article/ArticleServiceGetArticle.cpp
+
+    src/services/article/ArticleServiceGetRevision.cpp
+
+    src/services/article/ArticleServiceListArticles.cpp
+
+    src/services/article/ArticleServiceListArticlesByStatus.cpp
+
+    src/services/article/ArticleServiceListRevisions.cpp
+
+    src/services/article/ArticleServiceListTags.cpp
+
+    src/services/article/ArticleServicePublishArticle.cpp
+
+    src/services/article/ArticleServicePublishDueArticles.cpp
+
+    src/services/article/ArticleServiceRevertToRevision.cpp
+
+    src/services/article/ArticleServiceRowToArticleDto.cpp
+
+    src/services/article/ArticleServiceRowToRevisionDto.cpp
+
+    src/services/article/ArticleServiceScheduleArticle.cpp
+
+    src/services/article/ArticleServiceSetTags.cpp
+
+    src/services/article/ArticleServiceSwitchRenderer.cpp
+
+    src/services/article/ArticleServiceTogglePrivate.cpp
+
+    src/services/article/ArticleServiceUnpublishArticle.cpp
+
+    src/services/article/ArticleServiceUpdateArticle.cpp
+
+    src/services/article/ArticleServiceVoteArticle.cpp
+
+    src/services/ArticleTagService.cpp
 
     src/services/AuthService.cpp
 
@@ -135,8 +209,14 @@ target_link_libraries(pyracms_lib
 target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Main executable
+# --whole-archive is required so Drogon controller static initializers
+# (which register routes) are not stripped from the static lib by the linker.
 add_executable(pyracms_server src/main.cpp)
-target_link_libraries(pyracms_server PRIVATE pyracms_lib)
+target_link_libraries(pyracms_server PRIVATE
+    "-Wl,--whole-archive"
+    pyracms_lib
+    "-Wl,--no-whole-archive"
+)
 
 # Testing
 if(BUILD_TESTS)

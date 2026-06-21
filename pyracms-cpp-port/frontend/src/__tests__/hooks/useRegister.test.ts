@@ -22,6 +22,8 @@ import {
   validateRegisterForm,
 } from '@/hooks/useRegister'
 import type { RegisterRequest } from '@/types'
+import { asMockApi } from '../helpers/mockApi'
+import { makeMockFormEvent } from '../helpers/mockFormEvent'
 
 // ---------------------------------------------------------------------------
 // Module-level mocks
@@ -41,7 +43,7 @@ jest.mock('@/lib/api', () => ({
 }))
 
 import api from '@/lib/api'
-const mockPost = api.post as jest.MockedFunction<typeof api.post>
+const mockApi = asMockApi<'post'>(api)
 
 // ---------------------------------------------------------------------------
 // Helper: fresh Redux Provider per test
@@ -111,7 +113,7 @@ function fillValidForm(
 
 /** Fake e.preventDefault event object. */
 const fakeEvent = () =>
-  ({ preventDefault: jest.fn() } as unknown as React.FormEvent)
+  makeMockFormEvent().event
 
 // ---------------------------------------------------------------------------
 // validateRegisterForm — pure function, no React needed
@@ -355,7 +357,7 @@ describe('useRegister', () => {
       await result.current.handleSubmit(fakeEvent())
     })
     expect(result.current.error).toBe('Username is required')
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('sets error and skips API when email is invalid', async () => {
@@ -370,7 +372,7 @@ describe('useRegister', () => {
       await result.current.handleSubmit(fakeEvent())
     })
     expect(result.current.error).toBe('Invalid email address')
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('sets error and skips API when password is too short', async () => {
@@ -390,7 +392,7 @@ describe('useRegister', () => {
     expect(result.current.error).toBe(
       'Password must be at least 8 characters',
     )
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('sets error when confirmPassword does not match', async () => {
@@ -407,7 +409,7 @@ describe('useRegister', () => {
     expect(result.current.error).toBe(
       'Passwords do not match',
     )
-    expect(mockPost).not.toHaveBeenCalled()
+    expect(mockApi.post).not.toHaveBeenCalled()
   })
 
   it('loading stays false after a validation failure', async () => {
@@ -426,7 +428,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('successful registration stores token in localStorage', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'regTok1', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -441,7 +443,7 @@ describe('useRegister', () => {
   })
 
   it('successful registration dispatches setCredentials', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'regTok1', user: MOCK_USER },
     })
     const { store, Wrapper } = makeWrapper()
@@ -459,7 +461,7 @@ describe('useRegister', () => {
   })
 
   it('navigates to default "/" path on success', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'regTok2', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -474,7 +476,7 @@ describe('useRegister', () => {
   })
 
   it('navigates to a custom redirectTo on success', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'regTok3', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -501,7 +503,7 @@ describe('useRegister', () => {
     expect(result.current.error).toBeTruthy()
 
     // Now fill the form correctly and succeed
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok', user: MOCK_USER },
     })
     act(() => { fillValidForm(result) })
@@ -516,7 +518,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('sets error from response.data.error when token absent', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { error: 'Username already taken' },
     })
     const { Wrapper } = makeWrapper()
@@ -533,7 +535,7 @@ describe('useRegister', () => {
   })
 
   it('falls back to "Registration failed" when no error msg', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
+    mockApi.post.mockResolvedValueOnce({ data: {} })
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useRegister(), {
       wrapper: Wrapper,
@@ -546,7 +548,7 @@ describe('useRegister', () => {
   })
 
   it('does not navigate when token is absent', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
+    mockApi.post.mockResolvedValueOnce({ data: {} })
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useRegister(), {
       wrapper: Wrapper,
@@ -563,7 +565,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('sets server error message from caught axios error', async () => {
-    mockPost.mockRejectedValueOnce({
+    mockApi.post.mockRejectedValueOnce({
       response: {
         data: { error: 'Email already registered' },
       },
@@ -582,7 +584,7 @@ describe('useRegister', () => {
   })
 
   it('falls back to "Registration failed" on axios err', async () => {
-    mockPost.mockRejectedValueOnce({
+    mockApi.post.mockRejectedValueOnce({
       response: { data: {} },
     })
     const { Wrapper } = makeWrapper()
@@ -601,7 +603,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('sets "Unable to connect to server" on network error', async () => {
-    mockPost.mockRejectedValueOnce(new Error('Network Error'))
+    mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useRegister(), {
       wrapper: Wrapper,
@@ -616,7 +618,7 @@ describe('useRegister', () => {
   })
 
   it('sets "Unable to connect to server" when err is string', async () => {
-    mockPost.mockRejectedValueOnce('timeout')
+    mockApi.post.mockRejectedValueOnce('timeout')
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useRegister(), {
       wrapper: Wrapper,
@@ -635,7 +637,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('loading is false after successful request completes', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -650,7 +652,7 @@ describe('useRegister', () => {
   })
 
   it('loading is false after failed request completes', async () => {
-    mockPost.mockRejectedValueOnce(new Error('Network Error'))
+    mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
     const { Wrapper } = makeWrapper()
     const { result } = renderHook(() => useRegister(), {
       wrapper: Wrapper,
@@ -663,7 +665,7 @@ describe('useRegister', () => {
   })
 
   it('loading is false after server-side error (no token)', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { error: 'Taken' },
     })
     const { Wrapper } = makeWrapper()
@@ -682,7 +684,7 @@ describe('useRegister', () => {
   // -----------------------------------------------------------------------
 
   it('calls POST /api/auth/register without confirmPassword', async () => {
-    mockPost.mockResolvedValueOnce({
+    mockApi.post.mockResolvedValueOnce({
       data: { token: 'tok', user: MOCK_USER },
     })
     const { Wrapper } = makeWrapper()
@@ -706,7 +708,7 @@ describe('useRegister', () => {
     await act(async () => {
       await result.current.handleSubmit(fakeEvent())
     })
-    expect(mockPost).toHaveBeenCalledWith(
+    expect(mockApi.post).toHaveBeenCalledWith(
       '/api/auth/register',
       {
         username: 'carol',
@@ -716,7 +718,7 @@ describe('useRegister', () => {
         lastName: 'Jones',
       },
     )
-    const payload = mockPost.mock.calls[0][1] as Record<
+    const payload = mockApi.post.mock.calls[0]![1] as Record<
       string,
       unknown
     >

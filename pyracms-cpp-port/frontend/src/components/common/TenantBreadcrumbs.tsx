@@ -52,6 +52,7 @@ export default function TenantBreadcrumbs() {
       label: humanize(s), href: cur })
   }
   const last = crumbs[crumbs.length - 1]
+  if (!last) return null
 
   return (
     <Breadcrumbs

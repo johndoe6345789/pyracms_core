@@ -14,7 +14,7 @@ export default function TagChips({ tags, onDelete }: TagChipsProps) {
           label={tag}
           variant="outlined"
           size="small"
-          onDelete={onDelete ? () => onDelete(tag) : undefined}
+          {...(onDelete ? { onDelete: () => onDelete(tag) } : {})}
         />
       ))}
     </Box>

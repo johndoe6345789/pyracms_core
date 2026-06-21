@@ -6,6 +6,7 @@ import {
 } from '@/hooks/useSuperAdminUsers'
 import { UserRole } from '@/types'
 import api from '@/lib/api'
+import { asMockApi } from '../helpers/mockApi'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -15,10 +16,7 @@ jest.mock('@/lib/api', () => ({
   },
 }))
 
-const mockApi = api as {
-  get: jest.MockedFunction<typeof api.get>
-  put: jest.MockedFunction<typeof api.put>
-}
+const mockApi = asMockApi<'get' | 'put'>(api)
 
 const RAW_USERS = [
   {
@@ -106,8 +104,8 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].role).toBe(UserRole.Guest)
-    expect(result.current.users[0].roleLabel).toBe('Guest')
+    expect(result.current.users[0]!.role).toBe(UserRole.Guest)
+    expect(result.current.users[0]!.roleLabel).toBe('Guest')
   })
 
   it('maps role=2 to Moderator', async () => {
@@ -123,8 +121,8 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].role).toBe(UserRole.Moderator)
-    expect(result.current.users[0].roleLabel).toBe('Moderator')
+    expect(result.current.users[0]!.role).toBe(UserRole.Moderator)
+    expect(result.current.users[0]!.roleLabel).toBe('Moderator')
   })
 
   it('maps role=4 to SuperAdmin', async () => {
@@ -140,8 +138,8 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].role).toBe(UserRole.SuperAdmin)
-    expect(result.current.users[0].roleLabel).toBe('Super Admin')
+    expect(result.current.users[0]!.role).toBe(UserRole.SuperAdmin)
+    expect(result.current.users[0]!.roleLabel).toBe('Super Admin')
   })
 })
 
@@ -162,8 +160,8 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].role).toBe(UserRole.SiteAdmin)
-    expect(result.current.users[0].roleLabel).toBe('Site Admin')
+    expect(result.current.users[0]!.role).toBe(UserRole.SiteAdmin)
+    expect(result.current.users[0]!.roleLabel).toBe('Site Admin')
   })
 
   it('maps isAdmin=false to User when role is undefined', async () => {
@@ -179,8 +177,8 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].role).toBe(UserRole.User)
-    expect(result.current.users[0].roleLabel).toBe('User')
+    expect(result.current.users[0]!.role).toBe(UserRole.User)
+    expect(result.current.users[0]!.roleLabel).toBe('User')
   })
 
   it('defaults createdAt to empty string when absent', async () => {
@@ -190,7 +188,7 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].createdAt).toBe('')
+    expect(result.current.users[0]!.createdAt).toBe('')
   })
 
   it('truncates ISO timestamp to date portion', async () => {
@@ -206,7 +204,7 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.users[0].createdAt).toBe('2025-07-04')
+    expect(result.current.users[0]!.createdAt).toBe('2025-07-04')
   })
 })
 
@@ -226,14 +224,14 @@ describe('useSuperAdminUsers — updateRole (success)', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.users[0].role).toBe(UserRole.SuperAdmin)
+      expect(result.current.users[0]!.role).toBe(UserRole.SuperAdmin)
     })
 
     expect(mockApi.put).toHaveBeenCalledWith(
       '/api/users/1',
       { role: UserRole.SuperAdmin },
     )
-    expect(result.current.users[0].roleLabel).toBe('Super Admin')
+    expect(result.current.users[0]!.roleLabel).toBe('Super Admin')
   })
 
   it('does not mutate other users when updating one', async () => {
@@ -248,10 +246,10 @@ describe('useSuperAdminUsers — updateRole (success)', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.users[0].role).toBe(UserRole.SuperAdmin)
+      expect(result.current.users[0]!.role).toBe(UserRole.SuperAdmin)
     })
 
-    expect(result.current.users[1].role).toBe(UserRole.User)
+    expect(result.current.users[1]!.role).toBe(UserRole.User)
   })
 })
 
@@ -273,8 +271,8 @@ describe('useSuperAdminUsers — updateRole (error)', () => {
     // Give any pending microtasks time to settle
     await act(async () => {})
 
-    expect(result.current.users[0].role).toBe(UserRole.SiteAdmin)
-    expect(result.current.users[0].roleLabel).toBe('Site Admin')
+    expect(result.current.users[0]!.role).toBe(UserRole.SiteAdmin)
+    expect(result.current.users[0]!.roleLabel).toBe('Site Admin')
   })
 })
 
@@ -302,12 +300,12 @@ describe('useSuperAdminUsers — toggleBan', () => {
     const { result } = renderHook(() => useSuperAdminUsers())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
-    expect(result.current.users[0].isActive).toBe(true)
+    expect(result.current.users[0]!.isActive).toBe(true)
 
     await act(async () => { result.current.toggleBan(1) })
 
     await waitFor(() => {
-      expect(result.current.users[0].isActive).toBe(false)
+      expect(result.current.users[0]!.isActive).toBe(false)
     })
 
     expect(mockApi.put).toHaveBeenCalledWith(
@@ -323,12 +321,12 @@ describe('useSuperAdminUsers — toggleBan', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     // user id=2 starts with isActive=false
-    expect(result.current.users[1].isActive).toBe(false)
+    expect(result.current.users[1]!.isActive).toBe(false)
 
     await act(async () => { result.current.toggleBan(2) })
 
     await waitFor(() => {
-      expect(result.current.users[1].isActive).toBe(true)
+      expect(result.current.users[1]!.isActive).toBe(true)
     })
 
     expect(mockApi.put).toHaveBeenCalledWith(
@@ -348,7 +346,7 @@ describe('useSuperAdminUsers — toggleBan', () => {
     expect(mockApi.put).not.toHaveBeenCalled()
   })
 
-  it('applies optimistic update even when PUT fails (no rollback)', async () => {
+  it('keeps optimistic update when PUT fails', async () => {
     mockApi.get.mockResolvedValueOnce({ data: RAW_USERS })
     mockApi.put.mockRejectedValueOnce(new Error('Server error'))
     const { result } = renderHook(() => useSuperAdminUsers())
@@ -361,7 +359,7 @@ describe('useSuperAdminUsers — toggleBan', () => {
     await act(async () => {})
 
     // Optimistic update is not rolled back on failure (admin UI trade-off)
-    expect(result.current.users[0].isActive).toBe(false)
+    expect(result.current.users[0]!.isActive).toBe(false)
   })
 
   it('does not affect other users when toggling one', async () => {
@@ -374,10 +372,10 @@ describe('useSuperAdminUsers — toggleBan', () => {
     await act(async () => { result.current.toggleBan(1) })
 
     await waitFor(() => {
-      expect(result.current.users[0].isActive).toBe(false)
+      expect(result.current.users[0]!.isActive).toBe(false)
     })
 
     // bob's isActive must not have changed
-    expect(result.current.users[1].isActive).toBe(false)
+    expect(result.current.users[1]!.isActive).toBe(false)
   })
 })

@@ -13,11 +13,11 @@ import {
 } from '@mui/icons-material'
 
 interface CodeOutputProps {
-  stdout?: string
-  stderr?: string
-  exitCode?: number | null
-  executionTime?: number | null
-  isLoading?: boolean
+  stdout?: string | undefined
+  stderr?: string | undefined
+  exitCode?: number | null | undefined
+  executionTime?: number | null | undefined
+  isLoading?: boolean | undefined
 }
 
 export function CodeOutput({

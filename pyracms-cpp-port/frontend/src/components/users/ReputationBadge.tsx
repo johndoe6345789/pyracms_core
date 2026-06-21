@@ -26,9 +26,10 @@ const LEVELS: Level[] = [
 
 function getLevel(points: number): Level {
   for (let i = LEVELS.length - 1; i >= 0; i--) {
-    if (points >= LEVELS[i].min) return LEVELS[i]
+    const level = LEVELS[i]
+    if (level && points >= level.min) return level
   }
-  return LEVELS[0]
+  return LEVELS[0]!
 }
 
 function getProgress(points: number): number {
@@ -40,7 +41,9 @@ function getProgress(points: number): number {
 
 function getNextLevel(points: number): Level | null {
   const currentIdx = LEVELS.findIndex((l) => l.min <= points && points < l.max)
-  if (currentIdx < LEVELS.length - 1) return LEVELS[currentIdx + 1]
+  if (currentIdx < LEVELS.length - 1) {
+    return LEVELS[currentIdx + 1] ?? null
+  }
   return null
 }
 
@@ -50,24 +53,53 @@ export function ReputationBadge({ points }: ReputationBadgeProps) {
   const nextLevel = getNextLevel(points)
 
   const tooltipContent = nextLevel
-    ? `${level.name} - ${points.toLocaleString()} points\n${nextLevel.min - points} points until ${nextLevel.name}`
+    ? `${level.name} - ${points.toLocaleString()} points\n`
+      + `${nextLevel.min - points} points until ${nextLevel.name}`
     : `${level.name} - ${points.toLocaleString()} points (Max level!)`
 
   return (
     <Tooltip title={tooltipContent} arrow>
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.5, borderRadius: 2, bgcolor: level.color + '14', cursor: 'default' }}>
+      <Box sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 1,
+        px: 1.5,
+        py: 0.5,
+        borderRadius: 2,
+        bgcolor: level.color + '14',
+        cursor: 'default',
+      }}>
         <StarOutlined sx={{ fontSize: 18, color: level.color }} />
         <Box>
-          <Typography variant="caption" sx={{ fontWeight: 700, color: level.color, display: 'block', lineHeight: 1.2 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              color: level.color,
+              display: 'block',
+              lineHeight: 1.2,
+            }}
+          >
             {level.name}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <LinearProgress
               variant="determinate"
               value={progress}
-              sx={{ width: 60, height: 4, borderRadius: 2, bgcolor: level.color + '30', '& .MuiLinearProgress-bar': { bgcolor: level.color } }}
+              sx={{
+                width: 60,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: level.color + '30',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: level.color,
+                },
+              }}
             />
-            <Typography variant="caption" sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '0.6rem', color: 'text.secondary' }}
+            >
               {points.toLocaleString()}
             </Typography>
           </Box>
