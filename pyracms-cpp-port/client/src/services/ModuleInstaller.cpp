@@ -1,54 +1,66 @@
 #include "services/ModuleInstaller.h"
 #include "services/ApiClient.h"
+#include "services/ArchiveExtractor.h"
+#include "services/DownloadManager.h"
 #include "services/PathManager.h"
 
 #include <QDir>
 #include <QFile>
-#include <QSettings>
-#include <QTemporaryFile>
-
-// QuaZip headers
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
+#include <QFileInfo>
+#include <QRegularExpression>
+#include <QUrl>
+#include <functional>
 
 namespace Hypernucleus {
+
+namespace {
+
+QString safeFileName(const QString& s)
+{
+    static const QRegularExpression bad("[^A-Za-z0-9._-]");
+    QString out = s;
+    out.replace(bad, "_");
+    return out;
+}
+
+} // namespace
 
 ModuleInstaller::ModuleInstaller(ApiClient* apiClient, PathManager* pathManager,
                                  QObject* parent)
     : QObject(parent)
     , m_apiClient(apiClient)
     , m_pathManager(pathManager)
+    , m_downloads(new DownloadManager(apiClient, this))
+    , m_store(pathManager->stateFile())
 {
-    loadInstalledState();
+    m_store.load();
+    // First run after upgrading from the original Hypernucleus client.
+    if (m_store.count() == 0
+        && m_store.importLegacyIni(m_pathManager->legacyIniFile(),
+                                   m_pathManager->gamesDir(),
+                                   m_pathManager->depsDir()) > 0) {
+        m_store.save();
+    }
+    connectDownloads();
+}
 
-    // Handle file downloads completing
-    connect(m_apiClient, &ApiClient::fileFetched,
-            this, [this](const QString& uuid, const QByteArray& data) {
-        // Find the pending install matching this UUID
-        for (int i = 0; i < m_pendingInstalls.size(); ++i) {
-            const auto& pending = m_pendingInstalls[i];
-            QJsonObject info = pending.second;
-            if (info.value("uuid").toString() == uuid) {
-                QString name = pending.first;
-                QString version = info.value("version").toString();
-                QString type = info.value("type").toString();
-                m_pendingInstalls.removeAt(i);
-                performExtraction(name, version, type, data);
-                return;
-            }
-        }
+void ModuleInstaller::connectDownloads()
+{
+    connect(m_downloads, &DownloadManager::progress, this,
+            [this](const QString& id, qint64 r, qint64 t) {
+        emit downloadProgress(id, r, t);
     });
-
-    connect(m_apiClient, &ApiClient::downloadProgress,
-            this, [this](const QString& uuid, qint64 received, qint64 total) {
-        // Map UUID back to name for the signal
-        for (const auto& pending : m_pendingInstalls) {
-            QJsonObject info = pending.second;
-            if (info.value("uuid").toString() == uuid) {
-                emit downloadProgress(pending.first, received, total);
-                return;
-            }
-        }
+    connect(m_downloads, &DownloadManager::verifying, this,
+            [this](const QString& id) { emit verifyStarted(id); });
+    connect(m_downloads, &DownloadManager::finished, this,
+            [this](const QString&, const QString& path) { performInstall(path); });
+    connect(m_downloads, &DownloadManager::failed, this,
+            [this](const QString& id, const QString& err) { fail(id, err); });
+    connect(m_downloads, &DownloadManager::cancelled, this,
+            [this](const QString& id) {
+        m_hasJob = false;
+        setBusy(false);
+        emit installCancelled(id);
     });
 }
 
@@ -57,75 +69,196 @@ bool ModuleInstaller::isBusy() const
     return m_busy;
 }
 
-void ModuleInstaller::install(const QString& name, const QString& version,
-                               const QJsonObject& revisionData,
-                               const QString& type)
+QString ModuleInstaller::targetDirFor(const QString& name, const QString& type) const
 {
-    if (m_installed.contains(name) && m_installed[name] == version) {
+    return type == "game" ? m_pathManager->gameDir(name)
+                          : m_pathManager->depDir(name);
+}
+
+void ModuleInstaller::install(const QString& name, const QString& version,
+                              const QJsonObject& revisionData,
+                              const QString& type)
+{
+    if (m_busy) {
+        emit installFailed(name, "Another installation is in progress");
+        return;
+    }
+    const InstallRecord existing = m_store.get(name);
+    if (existing.isValid() && existing.version == version
+        && QDir(existing.path).exists()) {
         emit installComplete(name, version);
         return;
     }
 
     setBusy(true);
-
-    // Get the file UUID for this revision
-    QString fileUuid = revisionData.value("file_uuid").toString();
-    if (fileUuid.isEmpty()) {
-        emit installFailed(name, "No file UUID in revision data");
-        setBusy(false);
+    const DownloadTarget target = DownloadTarget::fromJson(revisionData);
+    if (!target.ok) {
+        fail(name, "No file UUID in revision data");
         return;
     }
 
-    // Queue the install
-    QJsonObject info;
-    info["version"] = version;
-    info["type"] = type;
-    info["uuid"] = fileUuid;
-    info["revisionData"] = revisionData;
-    m_pendingInstalls.append({name, info});
+    m_job = Job{name, version, type, target,
+                m_pathManager->archivePath(
+                    safeFileName(type + "-" + name + "-" + version) + ".zip")};
+    m_hasJob = true;
+    emit installStarted(name);
 
-    // Start download
-    m_apiClient->fetchFile(fileUuid);
+    DownloadManager::Request req;
+    req.id = name;
+    req.url = target.url.isEmpty()
+        ? m_apiClient->resolveUrl(QStringLiteral("/api/files/")
+                                + QString::fromLatin1(QUrl::toPercentEncoding(target.fileRef)))
+        : m_apiClient->resolveUrl(target.url);
+    req.destPath = m_job.archivePath;
+    req.expectedSize = target.size;
+    req.expectedSha256 = target.sha256;
+    m_downloads->start(req);
+}
+
+void ModuleInstaller::cancel()
+{
+    if (m_hasJob)
+        m_downloads->cancel(m_job.name);
+}
+
+void ModuleInstaller::fail(const QString& name, const QString& error)
+{
+    m_hasJob = false;
+    setBusy(false);
+    emit installFailed(name, error);
+}
+
+void ModuleInstaller::performInstall(const QString& archivePath)
+{
+    if (!m_hasJob)
+        return;
+    const Job job = m_job;
+    emit extractionStarted(job.name);
+
+    const QString targetDir = targetDirFor(job.name, job.type);
+    const QString staging = targetDir + ".partial";
+    ExtractResult result;
+
+    if (ArchiveExtractor::looksLikeZip(archivePath)) {
+        result = ArchiveExtractor::extractZip(archivePath, staging);
+        if (result.ok)
+            result = ArchiveExtractor::installLayout(staging, targetDir, job.name);
+    } else {
+        // A single file (native binary or one-file python module).
+        QDir(staging).removeRecursively();
+        QDir().mkpath(staging);
+        QString fileName = QFileInfo(job.target.executable).fileName();
+        if (fileName.isEmpty())
+            fileName = QFileInfo(QUrl(job.target.url).path()).fileName();
+        if (fileName.isEmpty())
+            fileName = job.name;
+        const QString dest = staging + "/" + fileName;
+        if (QFile::copy(archivePath, dest)) {
+            QFile::setPermissions(dest, QFile::permissions(dest) | QFile::ExeOwner
+                                        | QFile::ExeGroup | QFile::ExeOther);
+            result = ArchiveExtractor::installLayout(staging, targetDir, job.name);
+        } else {
+            result.error = "Could not copy downloaded file";
+        }
+    }
+    if (!result.ok) {
+        QDir(staging).removeRecursively();
+        fail(job.name, result.error);
+        return;
+    }
+
+    InstallRecord rec;
+    rec.name = job.name;
+    rec.version = job.version;
+    rec.type = job.type;
+    rec.path = targetDir;
+    rec.moduleType = job.target.moduleType;
+    rec.kind = job.target.nativeBuild ? "native" : "python";
+    rec.executable = job.target.executable;
+    rec.sizeBytes = result.bytes;
+    m_store.set(rec);
+    saveState();
+
+    QFile::remove(archivePath);   // the module is extracted, save disk space
+    m_hasJob = false;
+    setBusy(false);
+    emit installComplete(job.name, job.version);
+    emit installStateChanged();
 }
 
 void ModuleInstaller::uninstall(const QString& name, const QString& version,
-                                 const QString& type)
+                                const QString& type)
 {
-    if (!m_installed.contains(name)) {
+    if (!m_store.contains(name)) {
         emit uninstallFailed(name, "Module is not installed");
         return;
     }
+    const InstallRecord rec = m_store.get(name);
+    QString dir = rec.path.isEmpty() ? targetDirFor(name, type.isEmpty() ? rec.type : type)
+                                     : rec.path;
+    Q_UNUSED(version)
 
-    QString targetDir;
-    if (type == "game") {
-        targetDir = m_pathManager->gameDir(name, version);
-    } else {
-        targetDir = m_pathManager->depDir(name, version);
-    }
-
-    if (!removeDirectory(targetDir)) {
+    if (!removeDirectory(dir)) {
         emit uninstallFailed(name, "Failed to remove installation directory");
         return;
     }
+    if (rec.type == "game")
+        removeDirectory(m_pathManager->pipTargetDir(name));
 
-    m_installed.remove(name);
-    saveInstalledState();
+    m_store.remove(name);
+    saveState();
     emit uninstallComplete(name);
+    emit installStateChanged();
 }
 
 bool ModuleInstaller::isInstalled(const QString& name) const
 {
-    return m_installed.contains(name);
+    return m_store.contains(name);
 }
 
 QString ModuleInstaller::installedVersion(const QString& name) const
 {
-    return m_installed.value(name);
+    return m_store.version(name);
 }
 
 QMap<QString, QString> ModuleInstaller::installedVersions() const
 {
-    return m_installed;
+    return m_store.versions();
+}
+
+InstallRecord ModuleInstaller::record(const QString& name) const
+{
+    return m_store.get(name);
+}
+
+QMap<QString, InstallRecord> ModuleInstaller::installedRecords() const
+{
+    QMap<QString, InstallRecord> out;
+    for (const QString& n : m_store.names())
+        out.insert(n, m_store.get(n));
+    return out;
+}
+
+QString ModuleInstaller::installPath(const QString& name) const
+{
+    return m_store.get(name).path;
+}
+
+void ModuleInstaller::annotate(const QString& name, const QStringList& deps,
+                               const QStringList& pipSpecs)
+{
+    if (!m_store.contains(name))
+        return;
+    InstallRecord rec = m_store.get(name);
+    rec.deps = deps;
+    rec.pipSpecs = pipSpecs;
+    m_store.set(rec);
+    saveState();
+}
+
+void ModuleInstaller::saveState()
+{
+    m_store.save();
 }
 
 QList<QPair<QString, QString>> ModuleInstaller::resolveDependencies(
@@ -145,19 +278,16 @@ QList<QPair<QString, QString>> ModuleInstaller::resolveDependencies(
             visited.insert(depName);
 
             // Skip already installed deps with correct version
-            if (m_installed.contains(depName) && m_installed[depName] == depVersion)
+            if (m_store.version(depName) == depVersion && !depVersion.isEmpty())
                 continue;
 
-            // Recursively resolve this dep's own dependencies
             QJsonObject depsSection = catalog.value("dependencies").toObject();
             if (depsSection.contains(depName)) {
                 QJsonObject depCatalogEntry = depsSection[depName].toObject();
                 QJsonArray subDeps = depCatalogEntry.value("dependencies").toArray();
-                if (!subDeps.isEmpty()) {
+                if (!subDeps.isEmpty())
                     resolve(subDeps);
-                }
             }
-
             result.append({depName, depVersion});
         }
     };
@@ -172,134 +302,6 @@ void ModuleInstaller::setBusy(bool busy)
         return;
     m_busy = busy;
     emit busyChanged();
-}
-
-void ModuleInstaller::performExtraction(const QString& name, const QString& version,
-                                         const QString& type, const QByteArray& archiveData)
-{
-    emit extractionStarted(name);
-
-    // Determine target directory
-    QString targetDir;
-    if (type == "game") {
-        targetDir = m_pathManager->gameDir(name, version);
-    } else {
-        targetDir = m_pathManager->depDir(name, version);
-    }
-
-    QDir dir;
-    if (!dir.mkpath(targetDir)) {
-        emit installFailed(name, "Failed to create installation directory: " + targetDir);
-        setBusy(false);
-        return;
-    }
-
-    // Write archive to temporary file for QuaZip
-    QTemporaryFile tempFile;
-    tempFile.setAutoRemove(true);
-    if (!tempFile.open()) {
-        emit installFailed(name, "Failed to create temporary file");
-        setBusy(false);
-        return;
-    }
-    tempFile.write(archiveData);
-    tempFile.flush();
-
-    // Extract using QuaZip
-    QuaZip zip(tempFile.fileName());
-    if (!zip.open(QuaZip::mdUnzip)) {
-        emit installFailed(name, "Failed to open archive: " + zip.getZipError());
-        setBusy(false);
-        return;
-    }
-
-    QuaZipFile zipFile(&zip);
-    for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
-        QString entryName = zip.getCurrentFileName();
-        QString outputPath = targetDir + "/" + entryName;
-
-        if (entryName.endsWith('/')) {
-            // Directory entry
-            dir.mkpath(outputPath);
-            continue;
-        }
-
-        // Ensure parent directory exists
-        QFileInfo fi(outputPath);
-        dir.mkpath(fi.absolutePath());
-
-        if (!zipFile.open(QIODevice::ReadOnly)) {
-            zip.close();
-            emit installFailed(name, "Failed to read archive entry: " + entryName);
-            setBusy(false);
-            return;
-        }
-
-        QFile outFile(outputPath);
-        if (!outFile.open(QIODevice::WriteOnly)) {
-            zipFile.close();
-            zip.close();
-            emit installFailed(name, "Failed to write file: " + outputPath);
-            setBusy(false);
-            return;
-        }
-
-        // Stream extraction in chunks
-        constexpr qint64 CHUNK_SIZE = 65536;
-        while (!zipFile.atEnd()) {
-            QByteArray chunk = zipFile.read(CHUNK_SIZE);
-            outFile.write(chunk);
-        }
-
-        outFile.close();
-        zipFile.close();
-
-        // Preserve executable permissions on Unix
-#ifndef Q_OS_WIN
-        QuaZipFileInfo64 fileInfo;
-        if (zip.getCurrentFileInfo(&fileInfo)) {
-            quint32 externalAttr = fileInfo.externalAttr;
-            // Unix permissions are in the high 16 bits
-            quint32 unixPerms = (externalAttr >> 16) & 0xFFFF;
-            if (unixPerms & 0111) {
-                // Has execute bit set
-                outFile.setPermissions(outFile.permissions() | QFile::ExeOwner
-                                       | QFile::ExeGroup | QFile::ExeOther);
-            }
-        }
-#endif
-    }
-
-    zip.close();
-
-    // Record as installed
-    m_installed[name] = version;
-    saveInstalledState();
-
-    setBusy(false);
-    emit installComplete(name, version);
-}
-
-void ModuleInstaller::saveInstalledState()
-{
-    QSettings settings;
-    settings.beginGroup("installed_modules");
-    settings.remove(""); // Clear the group
-    for (auto it = m_installed.cbegin(); it != m_installed.cend(); ++it) {
-        settings.setValue(it.key(), it.value());
-    }
-    settings.endGroup();
-    settings.sync();
-}
-
-void ModuleInstaller::loadInstalledState()
-{
-    QSettings settings;
-    settings.beginGroup("installed_modules");
-    for (const QString& key : settings.childKeys()) {
-        m_installed[key] = settings.value(key).toString();
-    }
-    settings.endGroup();
 }
 
 bool ModuleInstaller::removeDirectory(const QString& path)

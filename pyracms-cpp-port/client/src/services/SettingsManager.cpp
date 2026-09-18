@@ -12,7 +12,7 @@ SettingsManager::SettingsManager(QObject* parent)
     , m_archName(detectArch())
     , m_chunkSize(DEFAULT_CHUNK_SIZE)
     , m_windowGeometry(100, 100, 1280, 800)
-    , m_darkMode(false)
+    , m_darkMode(true)
     , m_language("en")
 {
     load();
@@ -74,6 +74,45 @@ void SettingsManager::setDarkMode(bool dark)
     emit darkModeChanged();
 }
 
+QString SettingsManager::tenantSlug() const { return m_tenantSlug; }
+
+void SettingsManager::setTenantSlug(const QString& slug)
+{
+    const QString s = slug.trimmed();
+    if (m_tenantSlug == s) return;
+    m_tenantSlug = s;
+    emit tenantSlugChanged();
+}
+
+QString SettingsManager::installDir() const { return m_installDir; }
+
+void SettingsManager::setInstallDir(const QString& dir)
+{
+    const QString d = dir.trimmed();
+    if (m_installDir == d) return;
+    m_installDir = d;
+    emit installDirChanged();
+}
+
+QString SettingsManager::pythonPath() const { return m_pythonPath; }
+
+void SettingsManager::setPythonPath(const QString& path)
+{
+    const QString p = path.trimmed();
+    if (m_pythonPath == p) return;
+    m_pythonPath = p;
+    emit pythonPathChanged();
+}
+
+bool SettingsManager::preferPip() const { return m_preferPip; }
+
+void SettingsManager::setPreferPip(bool on)
+{
+    if (m_preferPip == on) return;
+    m_preferPip = on;
+    emit preferPipChanged();
+}
+
 QString SettingsManager::language() const { return m_language; }
 
 void SettingsManager::setLanguage(const QString& lang)
@@ -94,6 +133,10 @@ void SettingsManager::save()
     settings.setValue("windowGeometry", m_windowGeometry);
     settings.setValue("darkMode", m_darkMode);
     settings.setValue("language", m_language);
+    settings.setValue("tenantSlug", m_tenantSlug);
+    settings.setValue("installDir", m_installDir);
+    settings.setValue("pythonPath", m_pythonPath);
+    settings.setValue("preferPip", m_preferPip);
     settings.endGroup();
     settings.sync();
 }
@@ -117,6 +160,14 @@ void SettingsManager::load()
         setDarkMode(settings.value("darkMode").toBool());
     if (settings.contains("language"))
         setLanguage(settings.value("language").toString());
+    if (settings.contains("tenantSlug"))
+        setTenantSlug(settings.value("tenantSlug").toString());
+    if (settings.contains("installDir"))
+        setInstallDir(settings.value("installDir").toString());
+    if (settings.contains("pythonPath"))
+        setPythonPath(settings.value("pythonPath").toString());
+    if (settings.contains("preferPip"))
+        setPreferPip(settings.value("preferPip").toBool());
 
     settings.endGroup();
 }
@@ -128,8 +179,12 @@ void SettingsManager::reset()
     setArchName(detectArch());
     setChunkSize(DEFAULT_CHUNK_SIZE);
     setWindowGeometry(QRect(100, 100, 1280, 800));
-    setDarkMode(false);
+    setDarkMode(true);
     setLanguage("en");
+    setTenantSlug(QString());
+    setInstallDir(QString());
+    setPythonPath(QString());
+    setPreferPip(true);
     save();
 }
 

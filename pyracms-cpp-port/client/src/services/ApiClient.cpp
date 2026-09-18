@@ -1,6 +1,7 @@
 #include "services/ApiClient.h"
 
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QNetworkRequest>
 #include <QUrlQuery>
 
@@ -24,6 +25,66 @@ void ApiClient::setBaseUrl(const QString& url)
         return;
     m_baseUrl = url;
     emit baseUrlChanged();
+}
+
+QString ApiClient::tenant() const
+{
+    return m_tenant;
+}
+
+void ApiClient::setTenant(const QString& slug)
+{
+    const QString trimmed = slug.trimmed();
+    if (m_tenant == trimmed)
+        return;
+    m_tenant = trimmed;
+    emit tenantChanged();
+}
+
+QUrl ApiClient::resolveUrl(const QString& pathOrUrl) const
+{
+    if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://"))
+        return QUrl(pathOrUrl);
+    QString base = m_baseUrl;
+    while (base.endsWith('/'))
+        base.chop(1);
+    return QUrl(base + (pathOrUrl.startsWith('/') ? "" : "/") + pathOrUrl);
+}
+
+QNetworkRequest ApiClient::authorizedRequest(const QUrl& url) const
+{
+    QNetworkRequest request(url);
+    request.setRawHeader("Accept", "application/json, */*");
+    if (!m_token.isEmpty())
+        request.setRawHeader("Authorization", ("Bearer " + m_token).toUtf8());
+    if (!m_tenant.isEmpty())
+        request.setRawHeader("X-Tenant", m_tenant.toUtf8());
+    return request;
+}
+
+void ApiClient::getJson(const QString& path, JsonHandler handler)
+{
+    auto* reply = m_nam->get(createRequest(path));
+    connect(reply, &QNetworkReply::finished, this,
+            [reply, handler = std::move(handler)]() {
+        reply->deleteLater();
+        const int status = reply->attribute(
+            QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        const QByteArray body = reply->readAll();
+        const QJsonDocument doc = QJsonDocument::fromJson(body);
+        if (reply->error() != QNetworkReply::NoError) {
+            QString msg = doc.object().value("error").toString();
+            if (msg.isEmpty())
+                msg = reply->errorString();
+            handler(false, doc, status, msg);
+            return;
+        }
+        if (doc.isNull()) {
+            handler(false, doc, status, QStringLiteral("Invalid JSON response"));
+            return;
+        }
+        handler(true, doc, status, QString());
+    });
 }
 
 bool ApiClient::isLoading() const
@@ -53,13 +114,15 @@ bool ApiClient::hasToken() const
 
 QNetworkRequest ApiClient::createRequest(const QString& path) const
 {
-    QUrl url(m_baseUrl + path);
-    QNetworkRequest request(url);
+    QNetworkRequest request(resolveUrl(path));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
 
     if (!m_token.isEmpty()) {
         request.setRawHeader("Authorization", ("Bearer " + m_token).toUtf8());
+    }
+    if (!m_tenant.isEmpty()) {
+        request.setRawHeader("X-Tenant", m_tenant.toUtf8());
     }
 
     return request;
@@ -93,7 +156,7 @@ void ApiClient::fetchCatalog()
     setLoading(true);
     setError(QString());
 
-    auto* reply = m_nam->get(createRequest("/api/catalog"));
+    auto* reply = m_nam->get(createRequest("/api/outputs/json"));
     m_activeRequests++;
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
@@ -169,12 +232,20 @@ void ApiClient::fetchThumbnail(const QString& uuid)
 
 void ApiClient::login(const QString& username, const QString& password)
 {
+    loginWithTenant(username, password, m_tenant);
+}
+
+void ApiClient::loginWithTenant(const QString& username, const QString& password,
+                                const QString& tenant)
+{
     setLoading(true);
     setError(QString());
+    setTenant(tenant);
 
     QJsonObject body;
     body["username"] = username;
     body["password"] = password;
+    body["tenant"] = m_tenant;
 
     auto* reply = m_nam->post(createRequest("/api/auth/login"),
                                QJsonDocument(body).toJson());
@@ -191,8 +262,12 @@ void ApiClient::login(const QString& username, const QString& password)
         if (reply->error() != QNetworkReply::NoError) {
             int statusCode = reply->attribute(
                 QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            const QString serverMsg = QJsonDocument::fromJson(reply->readAll())
+                .object().value("error").toString();
             if (statusCode == 401) {
-                emit loginResponse(false, "Invalid username or password");
+                emit loginResponse(false, "Invalid username, password or site");
+            } else if (!serverMsg.isEmpty()) {
+                emit loginResponse(false, serverMsg);
             } else {
                 emit loginResponse(false, reply->errorString());
             }
@@ -222,6 +297,8 @@ void ApiClient::registerUser(const QString& username, const QString& email,
     body["username"] = username;
     body["email"] = email;
     body["password"] = password;
+    if (!m_tenant.isEmpty())
+        body["tenant"] = m_tenant;
 
     auto* reply = m_nam->post(createRequest("/api/auth/register"),
                                QJsonDocument(body).toJson());

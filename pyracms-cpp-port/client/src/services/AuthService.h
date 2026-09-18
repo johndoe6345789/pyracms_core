@@ -22,7 +22,9 @@ public:
     QString username() const;
     QString token() const;
 
-    Q_INVOKABLE void login(const QString& username, const QString& password);
+    // Accounts are per tenant: the slug travels in the login body as "tenant".
+    Q_INVOKABLE void login(const QString& username, const QString& password,
+                           const QString& tenant);
     Q_INVOKABLE void registerUser(const QString& username, const QString& email,
                                    const QString& password);
     Q_INVOKABLE void logout();

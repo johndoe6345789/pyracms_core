@@ -15,6 +15,10 @@ class SettingsManager : public QObject {
     Q_PROPERTY(QRect windowGeometry READ windowGeometry WRITE setWindowGeometry NOTIFY windowGeometryChanged)
     Q_PROPERTY(bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
+    Q_PROPERTY(QString tenantSlug READ tenantSlug WRITE setTenantSlug NOTIFY tenantSlugChanged)
+    Q_PROPERTY(QString installDir READ installDir WRITE setInstallDir NOTIFY installDirChanged)
+    Q_PROPERTY(QString pythonPath READ pythonPath WRITE setPythonPath NOTIFY pythonPathChanged)
+    Q_PROPERTY(bool preferPip READ preferPip WRITE setPreferPip NOTIFY preferPipChanged)
 
 public:
     explicit SettingsManager(QObject* parent = nullptr);
@@ -41,6 +45,22 @@ public:
     QString language() const;
     void setLanguage(const QString& lang);
 
+    // Tenant / site slug sent with login and as X-Tenant header
+    QString tenantSlug() const;
+    void setTenantSlug(const QString& slug);
+
+    // Folder for games/dependencies/logs; empty = platform default
+    QString installDir() const;
+    void setInstallDir(const QString& dir);
+
+    // Python interpreter for python games and pip; empty = auto-detect
+    QString pythonPath() const;
+    void setPythonPath(const QString& path);
+
+    // Look dependencies up on pip before the PyraCMS dependency API
+    bool preferPip() const;
+    void setPreferPip(bool on);
+
     // Persistence
     Q_INVOKABLE void save();
     Q_INVOKABLE void load();
@@ -58,6 +78,10 @@ signals:
     void windowGeometryChanged();
     void darkModeChanged();
     void languageChanged();
+    void tenantSlugChanged();
+    void installDirChanged();
+    void pythonPathChanged();
+    void preferPipChanged();
 
 private:
     static constexpr const char* DEFAULT_REPO_URL = "http://localhost:8080";
@@ -70,6 +94,10 @@ private:
     QRect m_windowGeometry;
     bool m_darkMode;
     QString m_language;
+    QString m_tenantSlug;
+    QString m_installDir;
+    QString m_pythonPath;
+    bool m_preferPip = true;
 };
 
 } // namespace Hypernucleus

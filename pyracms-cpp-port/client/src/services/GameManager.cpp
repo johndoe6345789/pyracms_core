@@ -1,90 +1,133 @@
 #include "services/GameManager.h"
-#include "services/PathManager.h"
 #include "services/ModuleInstaller.h"
+#include "services/PathManager.h"
+#include "services/PythonLocator.h"
+#include "services/SettingsManager.h"
+#include "domain/LaunchResolver.h"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
 #include <QProcessEnvironment>
 
 namespace Hypernucleus {
 
+namespace {
+constexpr int kMaxLogChars = 64 * 1024;
+constexpr qint64 kEarlyExitMs = 10000;   // non-zero exit before this = launch failed
+}
+
 GameManager::GameManager(PathManager* pathManager, ModuleInstaller* installer,
                          QObject* parent)
     : QObject(parent)
     , m_pathManager(pathManager)
     , m_installer(installer)
+    , m_os(SettingsManager::detectOs())
 {
 }
 
 GameManager::~GameManager()
 {
     if (m_process && m_process->state() != QProcess::NotRunning) {
+        m_process->disconnect(this);
         m_process->kill();
         m_process->waitForFinished(3000);
     }
 }
 
-bool GameManager::isRunning() const
+bool GameManager::isRunning() const { return m_running; }
+QString GameManager::currentGame() const { return m_currentGame; }
+
+QString GameManager::logFilePath(const QString& gameName) const
 {
-    return m_running;
+    return m_pathManager->logsDir() + "/" + gameName + ".log";
 }
 
-QString GameManager::currentGame() const
+void GameManager::append(const QString& text)
 {
-    return m_currentGame;
+    if (text.isEmpty())
+        return;
+    m_log = (m_log + text).right(kMaxLogChars);
+    if (m_logFile.isOpen()) {
+        m_logFile.write(text.toUtf8());
+        m_logFile.flush();
+    }
+    emit gameOutput(text);
+    emit logChanged();
 }
 
-void GameManager::launchGame(const QString& name, const QString& version,
-                              const QJsonObject& revisionData)
+void GameManager::launchGame(const QString& name)
 {
     if (m_running) {
         emit gameError(name, "Another game is already running: " + m_currentGame);
         return;
     }
-
-    QString gameDir = m_pathManager->gameDir(name, version);
-    QDir dir(gameDir);
-    if (!dir.exists()) {
-        emit gameError(name, "Game directory does not exist. Install the game first.");
+    const InstallRecord rec = m_installer->record(name);
+    if (!rec.isValid() || !QDir(rec.path).exists()) {
+        emit gameError(name, "The game is not installed. Install it first.");
         return;
     }
 
-    // Determine launch mode from revision data
-    QString moduleType = revisionData.value("module_type").toString("folder");
-    QJsonArray dependencies = revisionData.value("dependencies").toArray();
+    QString program;
+    QStringList args;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
-    // Clean up previous process
+    if (rec.kind == "native") {
+        program = LaunchResolver::findNativeExecutable(rec.path, name, rec.executable, m_os);
+        if (program.isEmpty()) {
+            emit gameError(name, rec.executable.isEmpty()
+                ? QStringLiteral("No executable for %1 found in the game folder").arg(m_os)
+                : QStringLiteral("Executable '%1' not found in the game folder").arg(rec.executable));
+            return;
+        }
+    } else {
+        const PythonInfo py = PythonLocator::find(m_pythonPath, m_pathManager->dataDir());
+        if (!py.found()) {
+            emit gameError(name, "Python was not found. Install Python 3 or set its "
+                                 "location in Settings.");
+            return;
+        }
+        program = py.exe;
+        args = py.prefix;
+        args << "-u" << "-c" << LaunchResolver::pythonBootstrapScript() << name << rec.path;
+
+        QStringList entries = LaunchResolver::pythonPathEntries(
+            rec, m_installer->installedRecords(), m_pathManager->pipTargetDir(name));
+        const QString existing = env.value("PYTHONPATH");
+        if (!existing.isEmpty())
+            entries << existing;
+        env.insert("PYTHONPATH", entries.join(QDir::listSeparator()));
+        env.insert("PYTHONUNBUFFERED", "1");
+    }
+
     if (m_process) {
         m_process->deleteLater();
         m_process = nullptr;
     }
-
-    m_process = new QProcess(this);
-    m_process->setWorkingDirectory(gameDir);
-
-    // Merge environment
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-
-    // Build PYTHONPATH from dependencies
-    QStringList pythonPaths;
-    buildPythonPath(dependencies, pythonPaths);
-    if (!pythonPaths.isEmpty()) {
-        QString existingPythonPath = env.value("PYTHONPATH");
-        QString separator =
-#ifdef Q_OS_WIN
-            ";";
-#else
-            ":";
-#endif
-        if (!existingPythonPath.isEmpty()) {
-            pythonPaths.append(existingPythonPath);
-        }
-        env.insert("PYTHONPATH", pythonPaths.join(separator));
+    m_log.clear();
+    emit logChanged();
+    m_logFile.close();
+    m_logFile.setFileName(logFilePath(name));
+    QDir().mkpath(QFileInfo(m_logFile.fileName()).absolutePath());
+    if (m_logFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        m_logFile.write(QStringLiteral("\n--- launch %1 (%2) ---\n")
+                            .arg(QDateTime::currentDateTime().toString(Qt::ISODate), rec.version)
+                            .toUtf8());
     }
 
+    m_errorReported = false;
+    m_stopRequested = false;
+    m_process = new QProcess(this);
     m_process->setProcessEnvironment(env);
+    m_process->setWorkingDirectory(rec.path);
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
+    connectProcess(name);
+    m_runTime.start();
+    m_process->start(program, args);
+}
 
-    // Connect process signals
+void GameManager::connectProcess(const QString& name)
+{
     connect(m_process, &QProcess::started, this, [this, name]() {
         m_running = true;
         m_currentGame = name;
@@ -93,72 +136,50 @@ void GameManager::launchGame(const QString& name, const QString& version,
         emit gameStarted(name);
     });
 
-    connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, [this, name](int exitCode, QProcess::ExitStatus exitStatus) {
-        m_running = false;
-        QString stoppedGame = m_currentGame;
-        m_currentGame.clear();
-        emit runningChanged();
-        emit currentGameChanged();
-
-        if (exitStatus == QProcess::CrashExit) {
-            emit gameError(stoppedGame, "Game crashed with exit code: "
-                           + QString::number(exitCode));
-        } else {
-            emit gameStopped(stoppedGame);
-        }
-    });
-
-    connect(m_process, &QProcess::errorOccurred,
-            this, [this, name](QProcess::ProcessError error) {
-        Q_UNUSED(error)
-        m_running = false;
-        m_currentGame.clear();
-        emit runningChanged();
-        emit currentGameChanged();
-        emit gameError(name, m_process->errorString());
-    });
-
     connect(m_process, &QProcess::readyReadStandardOutput, this, [this]() {
-        QString output = QString::fromUtf8(m_process->readAllStandardOutput());
-        emit gameOutput(output);
+        append(QString::fromUtf8(m_process->readAllStandardOutput()));
     });
 
-    connect(m_process, &QProcess::readyReadStandardError, this, [this]() {
-        QString output = QString::fromUtf8(m_process->readAllStandardError());
-        emit gameOutput(output);
+    connect(m_process, &QProcess::errorOccurred, this,
+            [this, name](QProcess::ProcessError error) {
+        if (error != QProcess::FailedToStart)
+            return;   // Crashed is reported by finished()
+        m_errorReported = true;
+        const QString msg = "Could not start the game: " + m_process->errorString();
+        append(msg + "\n");
+        finishRun();
+        emit gameError(name, msg);
     });
 
-    // Determine if this is a Python game or native executable
-    // Check for common Python entry points
-    bool isPython = false;
-    QStringList pythonEntries = {"__main__.py", "main.py", name + ".py"};
-    for (const QString& entry : pythonEntries) {
-        if (QFileInfo::exists(gameDir + "/" + entry)) {
-            isPython = true;
-
-            // Launch with python -r (run as module) or python <script>
-            QString pythonBin = "python3";
-#ifdef Q_OS_WIN
-            pythonBin = "python";
-#endif
-            if (entry == "__main__.py") {
-                m_process->start(pythonBin, {"-m", name});
-            } else {
-                m_process->start(pythonBin, {entry});
-            }
+    connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, [this, name](int exitCode, QProcess::ExitStatus status) {
+        if (m_errorReported)
             return;
+        const qint64 ranMs = m_runTime.elapsed();
+        append(QString::fromUtf8(m_process->readAllStandardOutput()));
+        finishRun();
+        if (m_stopRequested) {
+            emit gameStopped(name);
+        } else if (status == QProcess::CrashExit) {
+            emit gameError(name, "The game crashed (see the log for details)");
+        } else if (exitCode != 0 && ranMs < kEarlyExitMs) {
+            emit gameError(name, QStringLiteral("The game exited immediately with code %1 "
+                                                "(see the log for details)").arg(exitCode));
+        } else {
+            emit gameStopped(name);
         }
-    }
+    });
+}
 
-    // Native executable
-    if (!isPython) {
-        QString executable = findExecutable(gameDir, name);
-        if (executable.isEmpty()) {
-            emit gameError(name, "No executable found in game directory");
-            return;
-        }
-        m_process->start(executable, {});
+void GameManager::finishRun()
+{
+    const bool wasRunning = m_running;
+    m_running = false;
+    m_currentGame.clear();
+    m_logFile.close();
+    if (wasRunning) {
+        emit runningChanged();
+        emit currentGameChanged();
     }
 }
 
@@ -166,59 +187,12 @@ void GameManager::stopGame()
 {
     if (!m_process || !m_running)
         return;
-
+    m_stopRequested = true;
     m_process->terminate();
     if (!m_process->waitForFinished(5000)) {
         m_process->kill();
         m_process->waitForFinished(3000);
     }
-}
-
-void GameManager::buildPythonPath(const QJsonArray& dependencies,
-                                   QStringList& paths)
-{
-    for (const auto& depVal : dependencies) {
-        QJsonObject depObj = depVal.toObject();
-        QString depName = depObj.value("name").toString();
-        QString depVersion = m_installer->installedVersion(depName);
-        if (!depVersion.isEmpty()) {
-            QString depPath = m_pathManager->depDir(depName, depVersion);
-            if (QDir(depPath).exists()) {
-                paths.append(depPath);
-            }
-        }
-    }
-}
-
-QString GameManager::findExecutable(const QString& gameDir, const QString& name)
-{
-    QDir dir(gameDir);
-
-    // Platform-specific executable names
-    QStringList candidates;
-#ifdef Q_OS_WIN
-    candidates << name + ".exe" << name + ".bat" << name + ".cmd";
-#elif defined(Q_OS_MACOS)
-    candidates << name << name + ".app/Contents/MacOS/" + name;
-#else
-    candidates << name;
-#endif
-
-    for (const QString& candidate : candidates) {
-        QString path = dir.filePath(candidate);
-        QFileInfo fi(path);
-        if (fi.exists() && fi.isExecutable()) {
-            return path;
-        }
-    }
-
-    // Fallback: look for any executable file in the directory
-    QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::Executable);
-    if (!entries.isEmpty()) {
-        return entries.first().absoluteFilePath();
-    }
-
-    return {};
 }
 
 } // namespace Hypernucleus

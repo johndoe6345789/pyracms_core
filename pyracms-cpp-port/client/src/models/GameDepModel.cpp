@@ -1,291 +1,244 @@
 #include "models/GameDepModel.h"
 #include "models/Constants.h"
+#include "services/ApiClient.h"
+#include "services/EntryRepository.h"
+#include "services/ModuleInstaller.h"
+#include "domain/MediaRef.h"
+#include "domain/VersionCompare.h"
 
-#include <QJsonDocument>
+#include <QSettings>
+#include <algorithm>
 
 namespace Hypernucleus {
 
+namespace {
+
+QColor accentFor(const QString& name)
+{
+    uint h = 0;
+    for (const QChar c : name)
+        h = (h * 31 + c.unicode()) % 360;
+    return QColor::fromHsl(static_cast<int>(h), 110, 70);
+}
+
+} // namespace
+
 GameDepModel::GameDepModel(QObject* parent)
-    : QAbstractItemModel(parent)
-    , m_rootItem(new GameDepItem)
+    : QAbstractListModel(parent)
 {
-    m_rootItem->name = "Root";
+    QSettings s;
+    m_favourites = s.value("library/favourites").toStringList();
 }
 
-GameDepModel::~GameDepModel()
+void GameDepModel::attach(EntryRepository* repo, ModuleInstaller* installer, ApiClient* api)
 {
-    delete m_rootItem;
-}
-
-QModelIndex GameDepModel::index(int row, int column, const QModelIndex& parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return {};
-
-    GameDepItem* parentItem = parent.isValid()
-        ? static_cast<GameDepItem*>(parent.internalPointer())
-        : m_rootItem;
-
-    if (row >= 0 && row < parentItem->children.size()) {
-        return createIndex(row, column, parentItem->children.at(row));
-    }
-    return {};
-}
-
-QModelIndex GameDepModel::parent(const QModelIndex& child) const
-{
-    if (!child.isValid())
-        return {};
-
-    auto* childItem = static_cast<GameDepItem*>(child.internalPointer());
-    GameDepItem* parentItem = childItem->parent;
-
-    if (!parentItem || parentItem == m_rootItem)
-        return {};
-
-    return createIndex(parentItem->row, 0, parentItem);
+    m_repo = repo;
+    m_installer = installer;
+    m_api = api;
+    connect(m_repo, &EntryRepository::refreshed, this, &GameDepModel::rebuild);
+    connect(m_repo, &EntryRepository::entryChanged, this,
+            [this](const QString& type, const QString& name) {
+        if (type == "game")
+            refreshRow(name);
+    });
+    connect(m_installer, &ModuleInstaller::installStateChanged, this,
+            &GameDepModel::refreshAll);
+    rebuild();
 }
 
 int GameDepModel::rowCount(const QModelIndex& parent) const
 {
-    if (parent.column() > 0)
-        return 0;
-
-    GameDepItem* parentItem = parent.isValid()
-        ? static_cast<GameDepItem*>(parent.internalPointer())
-        : m_rootItem;
-
-    return parentItem->children.size();
-}
-
-int GameDepModel::columnCount(const QModelIndex& /*parent*/) const
-{
-    return 1;
-}
-
-QVariant GameDepModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid())
-        return {};
-
-    auto* item = static_cast<GameDepItem*>(index.internalPointer());
-
-    switch (role) {
-    case Qt::DisplayRole:
-    case DisplayNameRole:
-        return item->displayName.isEmpty() ? item->name : item->displayName;
-    case NameRole:
-        return item->name;
-    case DescriptionRole:
-        return item->description;
-    case TypeRole:
-        return item->type;
-    case InstalledRole:
-        return item->installed;
-    case VersionRole:
-        return item->installedVersion;
-    case CategoryRole:
-        return (item->parent == m_rootItem);
-    case UuidRole:
-        return item->uuid;
-    case PicturesRole:
-        return QVariant::fromValue(item->pictures);
-    case DependenciesRole:
-        return QVariant::fromValue(item->dependencies);
-    case RevisionsRole:
-        return QVariant::fromValue(item->revisions);
-    case ItemTypeRole:
-        return item->type == "game" ? static_cast<int>(ItemType::Game)
-                                    : static_cast<int>(ItemType::Dep);
-    case InstalledVersionRole:
-        return item->installedVersion;
-    default:
-        return {};
-    }
+    return parent.isValid() ? 0 : m_rows.size();
 }
 
 QHash<int, QByteArray> GameDepModel::roleNames() const
 {
     return {
-        { Qt::DisplayRole, "display" },
-        { NameRole, "name" },
-        { DisplayNameRole, "displayName" },
-        { DescriptionRole, "description" },
-        { TypeRole, "type" },
-        { InstalledRole, "installed" },
-        { VersionRole, "version" },
-        { CategoryRole, "isCategory" },
-        { UuidRole, "uuid" },
-        { PicturesRole, "pictures" },
-        { DependenciesRole, "dependencies" },
-        { RevisionsRole, "revisions" },
-        { ItemTypeRole, "itemType" },
-        { InstalledVersionRole, "installedVersion" },
+        {NameRole, "name"},
+        {TitleRole, "title"},
+        {DescriptionRole, "description"},
+        {TagsRole, "tags"},
+        {InstalledRole, "installed"},
+        {InstalledVersionRole, "installedVersion"},
+        {LatestVersionRole, "latestVersion"},
+        {UpdateAvailableRole, "updateAvailable"},
+        {StateRole, "state"},
+        {ProgressRole, "progress"},
+        {StatusTextRole, "statusText"},
+        {FavouriteRole, "favourite"},
+        {AccentRole, "accent"},
+        {CoverRole, "cover"},
+        {GroupRole, "group"},
     };
 }
 
-void GameDepModel::populate(const QJsonObject& catalog)
+QVariant GameDepModel::data(const QModelIndex& index, int role) const
 {
-    m_fullCatalog = catalog;
-    rebuildFiltered();
-}
-
-void GameDepModel::markInstalled(const QString& name, const QString& version)
-{
-    m_installedMap[name] = true;
-    m_installedVersions[name] = version;
-    rebuildFiltered();
-}
-
-void GameDepModel::markUninstalled(const QString& name)
-{
-    m_installedMap.remove(name);
-    m_installedVersions.remove(name);
-    rebuildFiltered();
-}
-
-QJsonObject GameDepModel::itemData(const QModelIndex& index) const
-{
-    if (!index.isValid())
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_rows.size())
         return {};
-
-    auto* item = static_cast<GameDepItem*>(index.internalPointer());
-    QJsonObject obj;
-    obj["name"] = item->name;
-    obj["displayName"] = item->displayName;
-    obj["description"] = item->description;
-    obj["type"] = item->type;
-    obj["installed"] = item->installed;
-    obj["installedVersion"] = item->installedVersion;
-    obj["uuid"] = item->uuid;
-    obj["pictures"] = item->pictures;
-    obj["dependencies"] = item->dependencies;
-    obj["revisions"] = item->revisions;
-    return obj;
+    const Row& row = m_rows.at(index.row());
+    switch (role) {
+    case Qt::DisplayRole:
+    case TitleRole: return row.title;
+    case NameRole: return row.name;
+    case DescriptionRole: return row.description;
+    case TagsRole: return row.tags;
+    case InstalledRole: return m_installer && m_installer->isInstalled(row.name);
+    case InstalledVersionRole: return m_installer ? m_installer->installedVersion(row.name) : QString();
+    case LatestVersionRole: return row.latest;
+    case UpdateAvailableRole: return updateAvailable(row);
+    case StateRole: return computeState(row);
+    case ProgressRole: return progressOf(row.name);
+    case StatusTextRole: return statusTextOf(row.name);
+    case FavouriteRole: return m_favourites.contains(row.name);
+    case AccentRole: return row.accent;
+    case CoverRole:
+        return row.coverRef.isEmpty() || !m_api
+            ? QString()
+            : m_api->resolveUrl(MediaRef::toPath(row.coverRef)).toString();
+    case GroupRole:
+        return m_installer && m_installer->isInstalled(row.name) ? tr("Installed")
+                                                                  : tr("Not installed");
+    default: return {};
+    }
 }
 
-QString GameDepModel::searchText() const
+QStringList GameDepModel::categories() const
 {
-    return m_searchText;
+    return m_repo ? m_repo->allTags("game") : QStringList();
 }
 
-void GameDepModel::setSearchText(const QString& text)
+void GameDepModel::fillRow(Row& row) const
 {
-    if (m_searchText == text)
+    const GameEntry* e = m_repo->find(row.name, "game");
+    if (!e)
         return;
-    m_searchText = text;
-    emit searchTextChanged();
-    rebuildFiltered();
+    row.title = e->title();
+    row.description = e->description;
+    row.tags = e->tags;
+    row.latest = e->latestVersion();
+    row.coverRef = !e->hero.isEmpty() ? e->hero
+                 : (!e->screenshots.isEmpty() ? e->screenshots.first() : QString());
+    row.accent = accentFor(e->name);
 }
 
-int GameDepModel::totalCount() const
+void GameDepModel::rebuild()
 {
-    int count = 0;
-    for (auto* cat : m_rootItem->children) {
-        count += cat->children.size();
-    }
-    return count;
-}
-
-void GameDepModel::clear()
-{
+    if (!m_repo)
+        return;
     beginResetModel();
-    qDeleteAll(m_rootItem->children);
-    m_rootItem->children.clear();
+    m_rows.clear();
+    const QList<GameEntry> games = m_repo->entries("game");
+    for (const GameEntry& g : games) {
+        Row r;
+        r.name = g.name;
+        fillRow(r);
+        m_rows.append(r);
+    }
+    std::sort(m_rows.begin(), m_rows.end(), [](const Row& a, const Row& b) {
+        return a.title.compare(b.title, Qt::CaseInsensitive) < 0;
+    });
     endResetModel();
+    emit countChanged();
+    emit categoriesChanged();
 }
 
-void GameDepModel::rebuildFiltered()
+int GameDepModel::rowOf(const QString& name) const
 {
-    beginResetModel();
-    qDeleteAll(m_rootItem->children);
-    m_rootItem->children.clear();
-
-    auto* catInstalledGames = createCategoryItem(CAT_INSTALLED_GAMES);
-    auto* catNotInstalledGames = createCategoryItem(CAT_NOT_INSTALLED_GAMES);
-    auto* catInstalledDeps = createCategoryItem(CAT_INSTALLED_DEPS);
-    auto* catNotInstalledDeps = createCategoryItem(CAT_NOT_INSTALLED_DEPS);
-
-    auto processItems = [&](const QJsonObject& items, const QString& type) {
-        for (auto it = items.begin(); it != items.end(); ++it) {
-            const QString& name = it.key();
-            const QJsonObject& itemObj = it.value().toObject();
-
-            // Apply search filter
-            if (!m_searchText.isEmpty()) {
-                QString displayName = itemObj.value("display_name").toString(name);
-                if (!name.contains(m_searchText, Qt::CaseInsensitive) &&
-                    !displayName.contains(m_searchText, Qt::CaseInsensitive)) {
-                    continue;
-                }
-            }
-
-            auto* item = new GameDepItem;
-            item->name = name;
-            item->displayName = itemObj.value("display_name").toString(name);
-            item->description = itemObj.value("description").toString();
-            item->type = type;
-            item->uuid = itemObj.value("uuid").toString();
-            item->pictures = itemObj.value("pictures").toArray();
-            item->dependencies = itemObj.value("dependencies").toArray();
-            item->revisions = itemObj.value("revisions").toObject();
-            item->installed = m_installedMap.value(name, false);
-            item->installedVersion = m_installedVersions.value(name);
-
-            GameDepItem* targetCategory = nullptr;
-            if (type == "game") {
-                targetCategory = item->installed ? catInstalledGames : catNotInstalledGames;
-            } else {
-                targetCategory = item->installed ? catInstalledDeps : catNotInstalledDeps;
-            }
-
-            item->parent = targetCategory;
-            item->row = targetCategory->children.size();
-            targetCategory->children.append(item);
-        }
-    };
-
-    // Process games
-    if (m_fullCatalog.contains("games")) {
-        processItems(m_fullCatalog["games"].toObject(), "game");
-    }
-
-    // Process dependencies
-    if (m_fullCatalog.contains("dependencies")) {
-        processItems(m_fullCatalog["dependencies"].toObject(), "dep");
-    }
-
-    // Add categories to root (even if empty, for consistent UI)
-    QList<GameDepItem*> categories = {
-        catInstalledGames, catNotInstalledGames,
-        catInstalledDeps, catNotInstalledDeps
-    };
-
-    int row = 0;
-    for (auto* cat : categories) {
-        cat->parent = m_rootItem;
-        cat->row = row++;
-        m_rootItem->children.append(cat);
-    }
-
-    endResetModel();
-    emit totalCountChanged();
+    for (int i = 0; i < m_rows.size(); ++i)
+        if (m_rows.at(i).name == name)
+            return i;
+    return -1;
 }
 
-GameDepItem* GameDepModel::createCategoryItem(const QString& name)
+void GameDepModel::emitRow(int row, const QList<int>& roles)
 {
-    auto* item = new GameDepItem;
-    item->name = name;
-    item->displayName = name;
-    item->type = "category";
-    return item;
+    if (row < 0 || row >= m_rows.size())
+        return;
+    emit dataChanged(index(row), index(row), roles);
 }
 
-GameDepItem* GameDepModel::itemFromIndex(const QModelIndex& index) const
+void GameDepModel::refreshAll()
 {
-    if (!index.isValid())
-        return m_rootItem;
-    return static_cast<GameDepItem*>(index.internalPointer());
+    if (m_rows.isEmpty())
+        return;
+    emit dataChanged(index(0), index(m_rows.size() - 1));
+}
+
+void GameDepModel::refreshRow(const QString& name)
+{
+    const int i = rowOf(name);
+    if (i < 0)
+        return;
+    fillRow(m_rows[i]);
+    emitRow(i);
+    emit categoriesChanged();
+}
+
+bool GameDepModel::updateAvailable(const Row& row) const
+{
+    if (!m_installer || row.latest.isEmpty())
+        return false;
+    const QString have = m_installer->installedVersion(row.name);
+    return !have.isEmpty() && VersionCompare::compare(have, row.latest) < 0;
+}
+
+int GameDepModel::computeState(const Row& row) const
+{
+    const auto t = m_transient.constFind(row.name);
+    if (t != m_transient.constEnd())
+        return t->state;
+    if (!m_installer || !m_installer->isInstalled(row.name))
+        return GameStates::NotInstalled;
+    return updateAvailable(row) ? GameStates::UpdateAvailable : GameStates::Installed;
+}
+
+int GameDepModel::stateOf(const QString& name) const
+{
+    const int i = rowOf(name);
+    return i < 0 ? static_cast<int>(GameStates::NotInstalled) : computeState(m_rows.at(i));
+}
+
+double GameDepModel::progressOf(const QString& name) const
+{
+    return m_transient.value(name).progress;
+}
+
+QColor GameDepModel::accentOf(const QString& name) const
+{
+    return accentFor(name);
+}
+
+QString GameDepModel::statusTextOf(const QString& name) const
+{
+    return m_transient.value(name).text;
+}
+
+void GameDepModel::setTransient(const QString& name, int state, double progress,
+                                const QString& text)
+{
+    m_transient.insert(name, Transient{state, progress, text});
+    emitRow(rowOf(name), {StateRole, ProgressRole, StatusTextRole});
+}
+
+void GameDepModel::clearTransient(const QString& name)
+{
+    if (m_transient.remove(name) > 0)
+        emitRow(rowOf(name), {StateRole, ProgressRole, StatusTextRole});
+}
+
+bool GameDepModel::isFavourite(const QString& name) const
+{
+    return m_favourites.contains(name);
+}
+
+void GameDepModel::toggleFavourite(const QString& name)
+{
+    if (!m_favourites.removeOne(name))
+        m_favourites.append(name);
+    QSettings s;
+    s.setValue("library/favourites", m_favourites);
+    emitRow(rowOf(name));   // all roles: the category filter depends on it
 }
 
 } // namespace Hypernucleus

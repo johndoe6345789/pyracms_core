@@ -8,45 +8,97 @@ namespace Hypernucleus {
 PathManager::PathManager(QObject* parent)
     : QObject(parent)
 {
-    m_dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                + "/Hypernucleus";
-    m_gamesDir = m_dataDir + "/games";
-    m_depsDir = m_dataDir + "/deps";
-    m_picturesDir = m_dataDir + "/pictures";
-    m_archivesDir = m_dataDir + "/archives";
+    m_configDir = defaultDataDir();
+    apply(m_configDir);
+}
 
-    ensureDirectories();
+PathManager::PathManager(const QString& overrideDir, QObject* parent)
+    : QObject(parent)
+{
+    const QString dir = overrideDir.isEmpty() ? defaultDataDir() : overrideDir;
+    m_configDir = QDir::cleanPath(dir);
+    apply(dir);
+}
+
+PathManager::PathManager(const QString& installRoot, const QString& configDir,
+                         QObject* parent)
+    : QObject(parent)
+{
+    m_configDir = QDir::cleanPath(configDir.isEmpty() ? defaultDataDir() : configDir);
+    apply(installRoot.trimmed().isEmpty() ? m_configDir : installRoot);
+}
+
+QString PathManager::defaultDataDir()
+{
+#if defined(Q_OS_WIN)
+    QString roaming = qEnvironmentVariable("APPDATA");
+    if (roaming.isEmpty())
+        roaming = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    return QDir::cleanPath(roaming + "/hypernucleus/hypernucleus");
+#elif defined(Q_OS_MACOS)
+    return QDir::cleanPath(
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+        + "/hypernucleus");
+#else
+    return QDir::cleanPath(
+        QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)
+        + "/hypernucleus");
+#endif
 }
 
 QString PathManager::dataDir() const { return m_dataDir; }
-QString PathManager::gamesDir() const { return m_gamesDir; }
-QString PathManager::depsDir() const { return m_depsDir; }
-QString PathManager::picturesDir() const { return m_picturesDir; }
-QString PathManager::archivesDir() const { return m_archivesDir; }
+QString PathManager::configDir() const { return m_configDir; }
+QString PathManager::gamesDir() const { return m_dataDir + "/games"; }
+QString PathManager::depsDir() const { return m_dataDir + "/dependencies"; }
+QString PathManager::picturesDir() const { return m_dataDir + "/pictures"; }
+QString PathManager::archivesDir() const { return m_dataDir + "/archives"; }
+QString PathManager::logsDir() const { return m_configDir + "/logs"; }
+QString PathManager::pylibsDir() const { return m_dataDir + "/pylibs"; }
+QString PathManager::stateFile() const { return m_configDir + "/installed.json"; }
+QString PathManager::legacyIniFile() const { return m_configDir + "/config.ini"; }
 
-QString PathManager::gameDir(const QString& name, const QString& version) const
+void PathManager::setDataDir(const QString& dir)
 {
-    return m_gamesDir + "/" + name + "/" + version;
+    const QString target = dir.trimmed().isEmpty() ? m_configDir
+                                                    : QDir::cleanPath(dir.trimmed());
+    if (target == m_dataDir)
+        return;
+    apply(target);
+    emit pathsChanged();
 }
 
-QString PathManager::depDir(const QString& name, const QString& version) const
+QString PathManager::gameDir(const QString& name, const QString& /*version*/) const
 {
-    return m_depsDir + "/" + name + "/" + version;
+    return gamesDir() + "/" + name;
+}
+
+QString PathManager::depDir(const QString& name, const QString& /*version*/) const
+{
+    return depsDir() + "/" + name;
+}
+
+QString PathManager::pipTargetDir(const QString& gameName) const
+{
+    return pylibsDir() + "/" + gameName;
 }
 
 QString PathManager::archivePath(const QString& filename) const
 {
-    return m_archivesDir + "/" + filename;
+    return archivesDir() + "/" + filename;
+}
+
+void PathManager::apply(const QString& dir)
+{
+    m_dataDir = QDir::cleanPath(dir);
+    ensureDirectories();
 }
 
 void PathManager::ensureDirectories()
 {
     QDir dir;
-    dir.mkpath(m_dataDir);
-    dir.mkpath(m_gamesDir);
-    dir.mkpath(m_depsDir);
-    dir.mkpath(m_picturesDir);
-    dir.mkpath(m_archivesDir);
+    for (const QString& p : {m_dataDir, m_configDir, gamesDir(), depsDir(), picturesDir(),
+                             archivesDir(), logsDir(), pylibsDir()})
+        dir.mkpath(p);
 }
 
 } // namespace Hypernucleus

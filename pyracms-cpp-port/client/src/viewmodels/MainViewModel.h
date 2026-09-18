@@ -1,118 +1,167 @@
 #pragma once
 
+#include <QJSEngine>
 #include <QObject>
-#include <QJsonObject>
-#include <QModelIndex>
-#include <QString>
+#include <QQmlEngine>
+#include <QStringList>
+#include <QTimer>
+#include <QVariantMap>
+#include <QtQml/qqmlregistration.h>
 
-#include "models/Constants.h"
+// Complete types are required by moc for pointer-typed Q_PROPERTYs.
+#include "models/DependencyModel.h"
+#include "models/GameFilterModel.h"
+#include "services/AuthService.h"
+#include "services/GameManager.h"
+#include "services/PathManager.h"
+#include "services/SettingsManager.h"
+#include "viewmodels/DeepLinkController.h"
+#include "viewmodels/DownloadCenter.h"
+#include "viewmodels/SettingsViewModel.h"
 
 namespace Hypernucleus {
 
 class ApiClient;
-class AuthService;
+class EntryRepository;
 class GameDepModel;
-class DependencyModel;
+class InstallPlanner;
+class InstallRunner;
 class ModuleInstaller;
-class GameManager;
-class PathManager;
-class SettingsManager;
+class PipInstaller;
+class PipResolver;
 
+// The one object QML talks to: owns the services and models, tracks the
+// selected game and turns button presses into installs / launches.
 class MainViewModel : public QObject {
     Q_OBJECT
-    Q_PROPERTY(GameDepModel* gameDepModel READ gameDepModel CONSTANT)
-    Q_PROPERTY(DependencyModel* dependencyModel READ dependencyModel CONSTANT)
-    Q_PROPERTY(QJsonObject selectedItem READ selectedItem NOTIFY selectedItemChanged)
-    Q_PROPERTY(int selectedType READ selectedType NOTIFY selectedTypeChanged)
-    Q_PROPERTY(QString searchText READ searchText WRITE setSearchText NOTIFY searchTextChanged)
-    Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
-    Q_PROPERTY(QString statusMessage READ statusMessage NOTIFY statusMessageChanged)
-    Q_PROPERTY(bool gameRunning READ gameRunning NOTIFY gameRunningChanged)
-    Q_PROPERTY(QString currentGameName READ currentGameName NOTIFY currentGameNameChanged)
-    Q_PROPERTY(QString progressName READ progressName NOTIFY progressChanged)
-    Q_PROPERTY(double progressValue READ progressValue NOTIFY progressChanged)
-    Q_PROPERTY(QString progressText READ progressText NOTIFY progressChanged)
-    Q_PROPERTY(bool showProgress READ showProgress NOTIFY progressChanged)
+    QML_ELEMENT
+    QML_SINGLETON
 
-    // Expose sub-objects to QML
-    Q_PROPERTY(ApiClient* apiClient READ apiClient CONSTANT)
-    Q_PROPERTY(AuthService* authService READ authService CONSTANT)
-    Q_PROPERTY(SettingsManager* settingsManager READ settingsManager CONSTANT)
-    Q_PROPERTY(PathManager* pathManager READ pathManager CONSTANT)
-    Q_PROPERTY(GameManager* gameManager READ gameManager CONSTANT)
+    Q_PROPERTY(GameFilterModel* library READ library CONSTANT)
+    Q_PROPERTY(GameFilterModel* store READ store CONSTANT)
+    Q_PROPERTY(DependencyModel* dependencies READ dependencies CONSTANT)
+    Q_PROPERTY(DownloadCenter* downloads READ downloads CONSTANT)
+    Q_PROPERTY(DeepLinkController* deepLinks READ deepLinks CONSTANT)
+    Q_PROPERTY(SettingsViewModel* settingsEditor READ settingsEditor CONSTANT)
+    Q_PROPERTY(SettingsManager* settings READ settings CONSTANT)
+    Q_PROPERTY(AuthService* auth READ auth CONSTANT)
+    Q_PROPERTY(GameManager* games READ games CONSTANT)
+    Q_PROPERTY(PathManager* paths READ paths CONSTANT)
+
+    Q_PROPERTY(QStringList categories READ categories NOTIFY categoriesChanged)
+    Q_PROPERTY(QString favouritesCategory READ favouritesCategory CONSTANT)
+    Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
+    Q_PROPERTY(QString catalogError READ catalogError NOTIFY catalogErrorChanged)
+    Q_PROPERTY(QString selectedName READ selectedName NOTIFY selectedChanged)
+    Q_PROPERTY(QVariantMap selected READ selected NOTIFY selectedChanged)
+    Q_PROPERTY(QString gameLog READ gameLog NOTIFY gameLogChanged)
+    Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
+    Q_PROPERTY(QString osName READ osName CONSTANT)
 
 public:
     explicit MainViewModel(QObject* parent = nullptr);
     ~MainViewModel() override;
 
-    // Property accessors
-    GameDepModel* gameDepModel() const;
-    DependencyModel* dependencyModel() const;
-    QJsonObject selectedItem() const;
-    int selectedType() const;
-    QString searchText() const;
-    void setSearchText(const QString& text);
-    bool isLoading() const;
-    QString statusMessage() const;
-    bool gameRunning() const;
-    QString currentGameName() const;
-    QString progressName() const;
-    double progressValue() const;
-    QString progressText() const;
-    bool showProgress() const;
+    // QML_SINGLETON hooks: main() creates the instance and registers it.
+    static void setInstance(MainViewModel* instance);
+    static MainViewModel* create(QQmlEngine* engine, QJSEngine* scriptEngine);
 
-    ApiClient* apiClient() const;
-    AuthService* authService() const;
-    SettingsManager* settingsManager() const;
-    PathManager* pathManager() const;
-    GameManager* gameManager() const;
+    GameFilterModel* library() const { return m_library; }
+    GameFilterModel* store() const { return m_store; }
+    DependencyModel* dependencies() const { return m_deps; }
+    DownloadCenter* downloads() const { return m_downloads; }
+    DeepLinkController* deepLinks() const { return m_deepLinks; }
+    SettingsViewModel* settingsEditor() const { return m_settingsEditor; }
+    SettingsManager* settings() const { return m_settings; }
+    AuthService* auth() const { return m_auth; }
+    GameManager* games() const { return m_games; }
+    PathManager* paths() const { return m_paths; }
 
-    // Public slots
-    Q_INVOKABLE void refreshCatalog();
-    Q_INVOKABLE void selectItem(int row, int parentRow);
-    Q_INVOKABLE void installSelected();
-    Q_INVOKABLE void uninstallSelected();
-    Q_INVOKABLE void launchSelected();
-    Q_INVOKABLE void stopGame();
-    Q_INVOKABLE void search(const QString& text);
+    QStringList categories() const;
+    QString favouritesCategory() const;
+    bool loading() const;
+    QString catalogError() const { return m_catalogError; }
+    QString selectedName() const { return m_selectedName; }
+    QVariantMap selected() const { return m_selected; }
+    QString gameLog() const;
+    QString appVersion() const;
+    QString osName() const;
+
+    Q_INVOKABLE void refresh();
+    Q_INVOKABLE void select(const QString& name);
+    Q_INVOKABLE void selectVersion(const QString& version);
+
+    // Primary button of the selected game / of any game card.
+    Q_INVOKABLE void primaryAction();
+    Q_INVOKABLE void primaryActionFor(const QString& name);
+    Q_INVOKABLE void install(const QString& name, const QString& version);
+    Q_INVOKABLE void uninstall(const QString& name);
+    Q_INVOKABLE void launch(const QString& name);
+    Q_INVOKABLE void stop();
+    Q_INVOKABLE void cancelDownload(const QString& name);
+    Q_INVOKABLE void toggleFavourite(const QString& name);
+    Q_INVOKABLE void openInstallFolder(const QString& name);
+    Q_INVOKABLE void openLogFile(const QString& name);
+    Q_INVOKABLE void logout();
+
+    // pyracms://launch/<slug>/<name>, pyracms://install/<slug>/<name>
+    Q_INVOKABLE void handleUrl(const QString& url);
+    Q_INVOKABLE void registerUrlScheme();
 
 signals:
-    void selectedItemChanged();
-    void selectedTypeChanged();
-    void searchTextChanged();
-    void isLoadingChanged();
-    void statusMessageChanged();
-    void gameRunningChanged();
-    void currentGameNameChanged();
-    void progressChanged();
-    void errorOccurred(const QString& title, const QString& message);
+    void categoriesChanged();
+    void loadingChanged();
+    void catalogErrorChanged();
+    void selectedChanged();
+    void gameLogChanged();
+    void notify(const QString& message, bool isError);
+    void raiseWindow();
+    void showGame(const QString& name);
 
 private:
-    void setStatusMessage(const QString& msg);
-    void onCatalogFetched(const QJsonObject& catalog);
-    void updateDependencyModel();
+    struct LinkAction {
+        QString action;
+        QString name;
+        bool valid() const { return !action.isEmpty(); }
+    };
 
-    ApiClient* m_apiClient;
-    AuthService* m_authService;
-    SettingsManager* m_settingsManager;
-    PathManager* m_pathManager;
+    void applyPlatformSettings();
+    void wireInstallSignals();
+    void wireGameSignals();
+    void refreshSelected();
+    void dispatch(const QString& name, const QString& kind, const QString& version);
+    void onLinkAccepted(const QString& action, const QString& slug, const QString& name);
+    void runLinkAction(const LinkAction& link);
+    void setCatalogError(const QString& error);
+
+    SettingsManager* m_settings;
+    PathManager* m_paths;
+    ApiClient* m_api;
+    AuthService* m_auth;
+    EntryRepository* m_repo;
     ModuleInstaller* m_installer;
-    GameManager* m_gameManager;
-    GameDepModel* m_gameDepModel;
-    DependencyModel* m_dependencyModel;
+    PipInstaller* m_pip;
+    PipResolver* m_pipResolver;
+    InstallPlanner* m_planner;
+    InstallRunner* m_runner;
+    DownloadCenter* m_downloads;
+    GameManager* m_games;
+    GameDepModel* m_model;
+    GameFilterModel* m_library;
+    GameFilterModel* m_store;
+    DependencyModel* m_deps;
+    DeepLinkController* m_deepLinks;
+    SettingsViewModel* m_settingsEditor;
 
-    QJsonObject m_selectedItem;
-    int m_selectedType = static_cast<int>(ItemType::Game);
-    QString m_searchText;
-    bool m_isLoading = false;
-    QString m_statusMessage;
-    QJsonObject m_catalog;
+    QString m_catalogError;
+    QString m_selectedName;
+    QString m_selectedVersion;
+    QVariantMap m_selected;
+    QTimer m_selectedTimer;
+    LinkAction m_pendingLink;       // waits for the catalog to load
+    QString m_launchAfterInstall;
 
-    // Progress tracking
-    QString m_progressName;
-    double m_progressValue = 0.0;
-    QString m_progressText;
-    bool m_showProgress = false;
+    static MainViewModel* s_instance;
 };
 
 } // namespace Hypernucleus

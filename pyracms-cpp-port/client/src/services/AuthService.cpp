@@ -19,6 +19,7 @@ AuthService::AuthService(ApiClient* apiClient, SettingsManager* settings,
             m_apiClient->setToken(tokenOrError);
             setAuthenticated(true);
             saveSession();
+            m_settings->save();
             emit loginSuccess();
         } else {
             setAuthenticated(false);
@@ -51,10 +52,12 @@ QString AuthService::token() const
     return m_token;
 }
 
-void AuthService::login(const QString& username, const QString& password)
+void AuthService::login(const QString& username, const QString& password,
+                        const QString& tenant)
 {
     setUsername(username);
-    m_apiClient->login(username, password);
+    m_settings->setTenantSlug(tenant);
+    m_apiClient->loginWithTenant(username, password, tenant);
 }
 
 void AuthService::registerUser(const QString& username, const QString& email,
@@ -79,6 +82,7 @@ void AuthService::restoreSession()
     QString savedToken = qsettings.value("auth/token").toString();
     QString savedUsername = qsettings.value("auth/username").toString();
 
+    m_apiClient->setTenant(m_settings->tenantSlug());
     if (!savedToken.isEmpty() && !savedUsername.isEmpty()) {
         setToken(savedToken);
         setUsername(savedUsername);
