@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  Box, Container,
-  useMediaQuery, useTheme,
-} from '@mui/material'
+import { Box, Container } from '@mui/material'
 import TenantAppBar
   from '@/components/layout/TenantAppBar'
 import TenantDrawer
@@ -19,13 +16,9 @@ export default function TenantSiteLayout({
 }: {
   children: React.ReactNode
 }) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(
-    theme.breakpoints.down('md'),
-  )
   const {
-    slug, siteName,
-    drawerOpen, openDrawer, closeDrawer,
+    slug, siteName, tenant, canAdmin,
+    drawerOpen, toggleDrawer, closeDrawer,
   } = useTenantNav()
 
   return (
@@ -94,12 +87,14 @@ export default function TenantSiteLayout({
       <TenantAppBar
         slug={slug}
         siteName={siteName}
-        isMobile={isMobile}
-        onMenuClick={openDrawer}
+        drawerOpen={drawerOpen}
+        onMenuClick={toggleDrawer}
       />
       <TenantDrawer
         slug={slug}
         siteName={siteName}
+        description={tenant?.description}
+        canAdmin={canAdmin}
         open={drawerOpen}
         onClose={closeDrawer}
       />

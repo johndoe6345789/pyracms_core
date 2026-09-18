@@ -1,6 +1,8 @@
 'use client'
 
 import { Box } from '@mui/material'
+import PortalShell from
+  '@/components/layout/PortalShell'
 import HeroSection from
   '@/components/portal/HeroSection'
 import TenantGrid from
@@ -21,6 +23,7 @@ export default function PortalPage() {
       role="main"
       aria-label="Portal homepage"
     >
+      <PortalShell />
       <HeroSection />
       <TenantGrid
         sites={sites}

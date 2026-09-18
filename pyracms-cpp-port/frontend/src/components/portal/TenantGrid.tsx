@@ -24,7 +24,7 @@ function SkeletonCard() {
 
 export default function TenantGrid({ sites, loading }: TenantGridProps) {
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
+    <Container id="sites" maxWidth="lg" sx={{ py: 8, scrollMarginTop: 64 }}>
       <Typography variant="h3" component="h2" sx={{ mb: 1, color: 'text.primary' }}>
         Available Sites
       </Typography>

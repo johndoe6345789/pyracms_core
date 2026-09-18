@@ -1,16 +1,31 @@
 'use client'
 
-import { useParams } from 'next/navigation'
-import { Container, Typography, Box } from '@mui/material'
+import { Container, Typography, Box, Alert, Button } from '@mui/material'
+import Link from 'next/link'
 import TenantModuleCards from '@/components/layout/TenantModuleCards'
+import { useTenantNav } from '@/hooks/useTenantNav'
+import { useTenant } from '@/hooks/useTenant'
 
 export default function SiteHomePage() {
-  const params = useParams()
-  const slug = params.slug as string
-  const siteName = slug
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
+  const { slug, siteName, tenant, canAdmin } = useTenantNav()
+  const { notFound } = useTenant(slug)
+
+  if (notFound) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8 }}>
+        <Alert
+          severity="warning"
+          action={
+            <Button component={Link} href="/" color="inherit" size="small">
+              Portal
+            </Button>
+          }
+        >
+          There is no site called <strong>{slug}</strong>.
+        </Alert>
+      </Container>
+    )
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -19,11 +34,11 @@ export default function SiteHomePage() {
           {siteName}
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600 }}>
-          Welcome to {siteName}. Explore the modules below to get started with
-          articles, forums, galleries, and more.
+          {tenant?.description
+            || `Welcome to ${siteName}. Explore the modules below to get started with articles, forums, galleries, games, code and more.`}
         </Typography>
       </Box>
-      <TenantModuleCards slug={slug} />
+      <TenantModuleCards slug={slug} canAdmin={canAdmin} />
     </Container>
   )
 }

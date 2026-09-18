@@ -5,6 +5,13 @@ import { Provider } from 'react-redux'
 import { makeStore } from '@/store/store'
 import Home from '@/app/page'
 
+// The shared top bar reads the route and the router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useParams: () => ({}),
+  usePathname: () => '/',
+}))
+
 jest.mock('@/hooks/useTenantList', () => ({
   useTenantList: () => ({ sites: [], loading: false }),
 }))
