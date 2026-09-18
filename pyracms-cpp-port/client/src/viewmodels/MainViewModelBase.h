@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QVariantMap>
+#include <QtQml/qqmlregistration.h>
 
 // Complete types are required by moc for pointer-typed Q_PROPERTYs.
 #include "models/DependencyModel.h"
@@ -19,18 +20,20 @@
 namespace Hypernucleus {
 
 // The properties QML binds to; actions live in MainViewModel.
-class MainViewModelBase : public QObject, protected ServiceHolder {
+class MainViewModelBase : public Hypernucleus::ServiceHolder {
     Q_OBJECT
-    Q_PROPERTY(GameFilterModel* library READ library CONSTANT)
-    Q_PROPERTY(GameFilterModel* store READ store CONSTANT)
-    Q_PROPERTY(DependencyModel* dependencies READ dependencies CONSTANT)
-    Q_PROPERTY(DownloadCenter* downloads READ downloads CONSTANT)
-    Q_PROPERTY(DeepLinkController* deepLinks READ deepLinks CONSTANT)
-    Q_PROPERTY(SettingsViewModel* settingsEditor READ settingsEditor CONSTANT)
-    Q_PROPERTY(SettingsManager* settings READ settings CONSTANT)
-    Q_PROPERTY(AuthService* auth READ auth CONSTANT)
-    Q_PROPERTY(GameManager* games READ games CONSTANT)
-    Q_PROPERTY(PathManager* paths READ paths CONSTANT)
+    QML_ELEMENT
+    QML_UNCREATABLE("Base of MainViewModel")
+    Q_PROPERTY(Hypernucleus::GameFilterModel* library READ library CONSTANT)
+    Q_PROPERTY(Hypernucleus::GameFilterModel* store READ store CONSTANT)
+    Q_PROPERTY(Hypernucleus::DependencyModel* dependencies READ dependencies CONSTANT)
+    Q_PROPERTY(Hypernucleus::DownloadCenter* downloads READ downloads CONSTANT)
+    Q_PROPERTY(Hypernucleus::DeepLinkController* deepLinks READ deepLinks CONSTANT)
+    Q_PROPERTY(Hypernucleus::SettingsViewModel* settingsEditor READ settingsEditor CONSTANT)
+    Q_PROPERTY(Hypernucleus::SettingsManager* settings READ settings CONSTANT)
+    Q_PROPERTY(Hypernucleus::AuthService* auth READ auth CONSTANT)
+    Q_PROPERTY(Hypernucleus::GameManager* games READ games CONSTANT)
+    Q_PROPERTY(Hypernucleus::PathManager* paths READ paths CONSTANT)
     Q_PROPERTY(QStringList categories READ categories NOTIFY categoriesChanged)
     Q_PROPERTY(QString favouritesCategory READ favouritesCategory CONSTANT)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)

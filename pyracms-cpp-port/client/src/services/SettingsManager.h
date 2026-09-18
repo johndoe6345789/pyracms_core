@@ -4,7 +4,7 @@
 
 namespace Hypernucleus {
 
-class SettingsManager : public SettingsBase {
+class SettingsManager : public Hypernucleus::SettingsBase {
     Q_OBJECT
     Q_PROPERTY(
         bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)

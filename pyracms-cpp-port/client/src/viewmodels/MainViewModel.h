@@ -10,7 +10,7 @@
 namespace Hypernucleus {
 
 // The one object QML talks to: turns button presses into installs/launches.
-class MainViewModel : public MainViewModelBase {
+class MainViewModel : public Hypernucleus::MainViewModelBase {
     Q_OBJECT
     QML_ELEMENT
     QML_SINGLETON

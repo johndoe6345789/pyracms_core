@@ -163,6 +163,8 @@ target_link_libraries(hypernucleus_lib
     QuaZip::QuaZip
 )
 target_include_directories(hypernucleus_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# Lets the QML module (and qmllint) see the services used from QML.
+qt_extract_metatypes(hypernucleus_lib)
 
 # Main executable
 qt_add_executable(hypernucleus src/main.cpp)
@@ -295,7 +297,6 @@ qt_add_qml_module(hypernucleus
         src/viewmodels/SettingsViewModel_preferPip.cpp
         src/models/Constants.h
         src/models/DependencyModel.h
-        src/models/ForeignTypes.h
         src/models/GameDepModel.h
         src/models/GameDepRows.h
         src/models/GameFilterModel.h

@@ -5,7 +5,8 @@
 
 namespace Hypernucleus {
 
-MainViewModelBase::MainViewModelBase(QObject* parent) : QObject(parent)
+MainViewModelBase::MainViewModelBase(QObject* parent)
+    : ServiceHolder(parent)
 {
     createServices(this);
 }

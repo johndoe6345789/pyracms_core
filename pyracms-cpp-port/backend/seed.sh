@@ -6,7 +6,18 @@ API="http://localhost:8080"
 echo "Checking if seed data already exists..."
 TENANTS=$(curl -s "$API/api/tenants" 2>/dev/null || echo "[]")
 if [ "$TENANTS" != "[]" ]; then
-  echo "Seed data already exists, skipping."
+  echo "Seed data already exists, only topping up the games catalog."
+  TOKEN=$(curl -s -X POST "$API/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"username":"admin","password":"password123"}' |
+    sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+  TENANT_ID=$(curl -s "$API/api/tenants/demo" |
+    sed -n 's/.*"id":\([0-9]*\).*/\1/p')
+  AUTH="Authorization: Bearer $TOKEN"
+  if [ -n "$TOKEN" ] && [ -n "$TENANT_ID" ]; then
+    source /app/seed_games.sh
+    seed_games
+  fi
   exit 0
 fi
 
@@ -180,5 +191,10 @@ curl -s -X POST "$API/api/tenants"   -H "Content-Type: application/json" -H "$AU
 curl -s -X POST "$API/api/auth/register" -H "Content-Type: application/json"   -d '{"tenant":"demo","username":"richard","email":"richard@demo.test","password":"demo-password","fullName":"Richard (demo)"}' > /dev/null 2>&1
 curl -s -X POST "$API/api/auth/register" -H "Content-Type: application/json"   -d '{"tenant":"acme","username":"richard","email":"richard@acme.test","password":"acme-password","fullName":"Richard (acme)"}' > /dev/null 2>&1
 echo "    richard@demo / richard@acme created"
+
+# -- Games catalog (demo tenant) --------------------------------------
+echo "  Registering games..."
+source /app/seed_games.sh
+seed_games
 
 echo "Seed complete!"

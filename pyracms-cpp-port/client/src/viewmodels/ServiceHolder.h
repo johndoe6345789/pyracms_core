@@ -1,6 +1,7 @@
 #pragma once
 
-class QObject;
+#include <QObject>
+#include <QtQml/qqmlregistration.h>
 
 namespace Hypernucleus {
 
@@ -24,7 +25,13 @@ class SettingsViewModel;
 
 // Owns nothing itself: createServices() builds every service and model as a
 // child of `owner`, in dependency order.
-class ServiceHolder {
+class ServiceHolder : public QObject {
+    Q_OBJECT
+    QML_ANONYMOUS
+
+public:
+    using QObject::QObject;
+
 protected:
     void createServices(QObject* owner);
 

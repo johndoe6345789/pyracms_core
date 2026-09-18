@@ -13,7 +13,7 @@ class ModuleInstaller;
 // One row per game of the tenant. Combines catalog data, the installed
 // state and a transient per-game state (downloading, launching, failed ...)
 // into the state that the primary button shows.
-class GameDepModel : public GameDepRows {
+class GameDepModel : public Hypernucleus::GameDepRows {
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Owned by MainViewModel")

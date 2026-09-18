@@ -122,7 +122,6 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SettingsViewModel_preferPip.cpp
     ${CMAKE_SOURCE_DIR}/src/models/Constants.h
     ${CMAKE_SOURCE_DIR}/src/models/DependencyModel.h
-    ${CMAKE_SOURCE_DIR}/src/models/ForeignTypes.h
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel.h
     ${CMAKE_SOURCE_DIR}/src/models/GameDepRows.h
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel.h

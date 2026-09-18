@@ -17,6 +17,10 @@ endif()
 # Auto-generated test sources — run `python generate_cmake.py` to update
 set(TEST_SOURCES
 
+    http_accounts.cpp
+
+    http_harness.cpp
+
     test_admin_filter.cpp
 
     test_auth_service.cpp
@@ -32,6 +36,10 @@ set(TEST_SOURCES
     test_forum_scope_db_1.cpp
 
     test_forum_scope_db_2.cpp
+
+    test_gamedep_http_1.cpp
+
+    test_gamedep_http_2.cpp
 
     test_jwt_filter_1.cpp
 
@@ -67,9 +75,13 @@ set(TEST_SOURCES
 
 add_executable(pyracms_tests ${TEST_SOURCES})
 
+# --whole-archive keeps controller/filter static initializers, so the
+# HTTP tests (http_harness.h) see every route like the real server.
 target_link_libraries(pyracms_tests
     PRIVATE
+    "-Wl,--whole-archive"
     pyracms_lib
+    "-Wl,--no-whole-archive"
     GTest::gtest_main
     GTest::gmock
 )

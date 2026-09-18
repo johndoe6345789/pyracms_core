@@ -165,7 +165,6 @@
   "module_headers": [
     "src/models/Constants.h",
     "src/models/DependencyModel.h",
-    "src/models/ForeignTypes.h",
     "src/models/GameDepModel.h",
     "src/models/GameDepRows.h",
     "src/models/GameFilterModel.h",

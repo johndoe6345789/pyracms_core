@@ -24,6 +24,8 @@ STATUS=0
 gcovr -r /app --object-directory /app/build \
   --filter '/app/src/' --exclude '/app/src/main.cpp' \
   --print-summary --txt /coverage.txt >/dev/null 2>&1 || true
+echo "=== coverage: per file (<80%) ==="
+awk 'NF>=4 && $2+0>0 && $3+0*1>=0 && $4 ~ /%/ && $4+0<80   {print $1, $2, $3, $4}' /coverage.txt
 echo "=== coverage: whole backend ==="; tail -n 4 /coverage.txt
 echo "=== coverage: filters, auth, user, tenant, forum, menu, snippet ==="
 gcovr -r /app --object-directory /app/build \

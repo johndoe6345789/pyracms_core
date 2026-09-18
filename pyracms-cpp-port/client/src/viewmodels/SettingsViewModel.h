@@ -11,7 +11,7 @@ class SettingsManager;
 class ApiClient;
 
 // Editable copy of the settings; nothing is applied until save().
-class SettingsViewModel : public SettingsEditBase {
+class SettingsViewModel : public Hypernucleus::SettingsEditBase {
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Owned by MainViewModel")
