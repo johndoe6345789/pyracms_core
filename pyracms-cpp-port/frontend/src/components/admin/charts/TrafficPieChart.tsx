@@ -11,6 +11,7 @@ import {
   TrafficEntry, DEFAULT_DATA,
   mapTraffic, fetchFallback,
 } from './trafficFetcher'
+import { renderLabel } from './trafficLabel'
 
 export function TrafficPieChart({ tenantId }: {
   tenantId?: number | null
@@ -35,16 +36,6 @@ export function TrafficPieChart({ tenantId }: {
           .then(setData)
       })
   }, [tenantId])
-
-  const renderLabel = ({
-    name, percent,
-  }: {
-    name: string
-    percent: number
-  }) => {
-    const pct = (percent * 100).toFixed(0)
-    return `${name} ${pct}%`
-  }
 
   return (
     <Paper

@@ -2,8 +2,7 @@
 
 namespace Hypernucleus {
 
-DependencyModel::DependencyModel(QObject* parent)
-    : QAbstractListModel(parent)
+DependencyModel::DependencyModel(QObject* parent) : QAbstractListModel(parent)
 {
 }
 
@@ -20,23 +19,27 @@ QVariant DependencyModel::data(const QModelIndex& index, int role) const
     const DependencyEntry& entry = m_entries.at(index.row());
     switch (role) {
     case Qt::DisplayRole:
-        return entry.version.isEmpty() ? entry.name
-                                       : QStringLiteral("%1 (%2)").arg(entry.name, entry.version);
-    case DepNameRole: return entry.name;
-    case DepVersionRole: return entry.version;
-    case DepSourceRole: return entry.source;
-    case DepInstalledRole: return entry.installed;
-    default: return {};
+        return entry.version.isEmpty()
+                   ? entry.name
+                   : QStringLiteral("%1 (%2)").arg(entry.name, entry.version);
+    case DepNameRole:
+        return entry.name;
+    case DepVersionRole:
+        return entry.version;
+    case DepSourceRole:
+        return entry.source;
+    case DepInstalledRole:
+        return entry.installed;
+    default:
+        return {};
     }
 }
 
 QHash<int, QByteArray> DependencyModel::roleNames() const
 {
     return {
-        {Qt::DisplayRole, "display"},
-        {DepNameRole, "name"},
-        {DepVersionRole, "version"},
-        {DepSourceRole, "source"},
+        {Qt::DisplayRole, "display"},    {DepNameRole, "name"},
+        {DepVersionRole, "version"},     {DepSourceRole, "source"},
         {DepInstalledRole, "installed"},
     };
 }
@@ -66,9 +69,6 @@ void DependencyModel::clear()
     emit countChanged();
 }
 
-int DependencyModel::count() const
-{
-    return m_entries.size();
-}
+int DependencyModel::count() const { return m_entries.size(); }
 
 } // namespace Hypernucleus

@@ -1,13 +1,10 @@
 import {
-  TableCell, TextField,
-  FormControl, Select, MenuItem,
+  TableCell, TextField, FormControl, Select, MenuItem,
 } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 
 type Updater = (
-  fn: (
-    p: MenuItemRow | null
-  ) => MenuItemRow | null
+  fn: (p: MenuItemRow | null) => MenuItemRow | null
 ) => void
 
 interface Props {
@@ -15,9 +12,13 @@ interface Props {
   onEditRowChange: Updater
 }
 
+const PERMS = ['public', 'authenticated', 'admin']
+
 export default function MenuItemEditCells({
   editRow, onEditRowChange,
 }: Props) {
+  const set = (patch: Partial<MenuItemRow>) =>
+    onEditRowChange((p) => (p ? { ...p, ...patch } : p))
   return (
     <>
       <TableCell>
@@ -26,11 +27,7 @@ export default function MenuItemEditCells({
           value={editRow?.name ?? ''}
           fullWidth
           data-testid="name-input"
-          onChange={(e) =>
-            onEditRowChange((p) =>
-              p ? {
-                ...p, name: e.target.value,
-              } : p)}
+          onChange={(e) => set({ name: e.target.value })}
         />
       </TableCell>
       <TableCell>
@@ -39,11 +36,7 @@ export default function MenuItemEditCells({
           value={editRow?.route ?? ''}
           fullWidth
           data-testid="route-input"
-          onChange={(e) =>
-            onEditRowChange((p) =>
-              p ? {
-                ...p, route: e.target.value,
-              } : p)}
+          onChange={(e) => set({ route: e.target.value })}
         />
       </TableCell>
       <TableCell>
@@ -52,42 +45,22 @@ export default function MenuItemEditCells({
           value={editRow?.position ?? 0}
           sx={{ width: 80 }}
           data-testid="position-input"
-          onChange={(e) =>
-            onEditRowChange((p) =>
-              p ? {
-                ...p,
-                position: parseInt(
-                  e.target.value, 10,
-                ) || 0,
-              } : p)}
+          onChange={(e) => set({
+            position: parseInt(e.target.value, 10) || 0,
+          })}
         />
       </TableCell>
       <TableCell>
-        <FormControl
-          size="small"
-          sx={{ minWidth: 130 }}
-        >
+        <FormControl size="small" sx={{ minWidth: 130 }}>
           <Select
-            value={
-              editRow?.permissions ?? 'public'
-            }
+            value={editRow?.permissions ?? 'public'}
             data-testid="perms-select"
             onChange={(e) =>
-              onEditRowChange((p) =>
-                p ? {
-                  ...p,
-                  permissions: e.target.value,
-                } : p)}
+              set({ permissions: e.target.value })}
           >
-            <MenuItem value="public">
-              public
-            </MenuItem>
-            <MenuItem value="authenticated">
-              authenticated
-            </MenuItem>
-            <MenuItem value="admin">
-              admin
-            </MenuItem>
+            {PERMS.map((v) => (
+              <MenuItem key={v} value={v}>{v}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </TableCell>

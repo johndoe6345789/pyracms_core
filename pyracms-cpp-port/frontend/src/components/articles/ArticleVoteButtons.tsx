@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  Box,
-  IconButton,
-  Typography,
-} from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 import {
   ThumbUpOutlined,
   ThumbDownOutlined,
@@ -16,35 +12,25 @@ interface ArticleVoteButtonsProps {
   onVote?: (isLike: boolean) => void
 }
 
+const itemSx = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0.5,
+}
+
 export function ArticleVoteButtons(
-  {
-    likes,
-    dislikes,
-    onVote,
-  }: ArticleVoteButtonsProps
+  { likes, dislikes, onVote }: ArticleVoteButtonsProps
 ) {
   return (
     <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-      }}
+      sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
       data-testid="article-vote-buttons"
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-        }}
-      >
+      <Box sx={itemSx}>
         <IconButton
           color="primary"
           size="small"
-          onClick={
-            () => onVote?.(true)
-          }
+          onClick={() => onVote?.(true)}
           aria-label="Like article"
           data-testid="like-btn"
         >
@@ -58,19 +44,11 @@ export function ArticleVoteButtons(
           {likes}
         </Typography>
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-        }}
-      >
+      <Box sx={itemSx}>
         <IconButton
           color="default"
           size="small"
-          onClick={
-            () => onVote?.(false)
-          }
+          onClick={() => onVote?.(false)}
           aria-label="Dislike article"
           data-testid="dislike-btn"
         >

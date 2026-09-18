@@ -1,65 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import {
-  useParams,
-  useRouter,
-} from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
+  Container, Typography, Box, Button, Alert,
 } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import Link from 'next/link'
-import {
-  useArticleEditor,
-} from '@/hooks/useArticleEditor'
-import {
-  useTenantId,
-} from '@/hooks/useTenantId'
-import {
-  BackButton,
-} from '@/components/common/BackButton'
+import { useTenantId } from '@/hooks/useTenantId'
+import { BackButton } from '@/components/common/BackButton'
 import {
   ArticleEditorForm,
 } from '@/components/articles/ArticleEditorForm'
-import api from '@/lib/api'
+import { useCreateArticle } from './useCreateArticle'
 
 export default function CreateArticlePage() {
   const params = useParams()
-  const router = useRouter()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
-  const editor = useArticleEditor()
-  const [saving, setSaving] = useState(false)
-
-  const handleCreate = () => {
-    if (
-      !editor.title.trim() ||
-      !editor.content.trim() ||
-      !tenantId
-    ) return
-    setSaving(true)
-    const name = editor.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-    api.post('/api/articles', {
-      name,
-      displayName: editor.title,
-      content: editor.content,
-      renderer:
-        editor.renderer.toLowerCase(),
-      tenant_id: tenantId,
-    })
-      .then(() => router.push(
-        `/site/${slug}/articles/${name}`
-      ))
-      .catch(() => {})
-      .finally(() => setSaving(false))
-  }
+  const { editor, saving, error, create } =
+    useCreateArticle(slug, tenantId)
+  const back = `/site/${slug}/articles`
 
   return (
     <Container
@@ -69,55 +29,39 @@ export default function CreateArticlePage() {
     >
       <Box sx={{ mb: 4 }}>
         <BackButton
-          href={
-            `/site/${slug}/articles`
-          }
+          href={back}
           label="Back to Articles"
           data-testid="back-to-articles-btn"
         />
       </Box>
       <section aria-label="Create article form">
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-        >
+        <Typography variant="h3" component="h1" gutterBottom>
           Create Article
         </Typography>
+        {error && (
+          <Alert severity="error" data-testid="create-article-error">
+            {error}
+          </Alert>
+        )}
         <ArticleEditorForm
           editor={editor}
-          contentPlaceholder={
-            'Write your article content here...'
-          }
+          contentPlaceholder="Write your article content here..."
         />
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            mt: 3,
-          }}
-        >
+        <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
           <Button
             variant="contained"
             startIcon={<SaveOutlined />}
             size="large"
-            onClick={handleCreate}
-            disabled={
-              saving ||
-              !editor.title.trim()
-            }
+            onClick={create}
+            disabled={saving || !editor.title.trim()}
             data-testid="create-article-submit"
           >
-            {saving
-              ? 'Creating...'
-              : 'Create Article'}
+            {saving ? 'Creating...' : 'Create Article'}
           </Button>
           <Button
             variant="outlined"
             component={Link}
-            href={
-              `/site/${slug}/articles`
-            }
+            href={back}
             data-testid="cancel-create-btn"
           >
             Cancel

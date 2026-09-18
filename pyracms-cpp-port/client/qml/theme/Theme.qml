@@ -1,62 +1,51 @@
 pragma Singleton
-import QtQuick 2.15
+import QtQuick
 
+// Steam-like palette. Dark is the default, light is an option
+// (Settings -> Appearance). Main.qml binds isDark to the saved setting.
 QtObject {
-    // Dark mode toggle — bound from SettingsManager
-    property bool isDark: false
+    property bool isDark: true
 
-    // Primary palette
-    readonly property color primary: isDark ? "#90CAF9" : "#1976D2"
-    readonly property color primaryDark: isDark ? "#42A5F5" : "#0D47A1"
-    readonly property color primaryLight: isDark ? "#E3F2FD" : "#BBDEFB"
-    readonly property color secondary: isDark ? "#FFB74D" : "#FF6F00"
-    readonly property color secondaryLight: isDark ? "#FFE0B2" : "#FFE082"
+    // Surfaces
+    readonly property color bg: isDark ? "#1b2838" : "#e8edf3"
+    readonly property color topBar: isDark ? "#171a21" : "#cfd7e1"
+    readonly property color sidebar: isDark ? "#16202d" : "#dbe2ea"
+    readonly property color panel: isDark ? "#1f3044" : "#ffffff"
+    readonly property color panelHover: isDark ? "#2a475e" : "#dfeaf5"
+    readonly property color rowSelected: isDark ? "#3d6c8e" : "#b9d3ec"
+    readonly property color field: isDark ? "#101822" : "#f7f9fb"
 
-    // Surface colors
-    readonly property color background: isDark ? "#121212" : "#FAFAFA"
-    readonly property color surface: isDark ? "#1E1E1E" : "#FFFFFF"
-    readonly property color surfaceVariant: isDark ? "#2C2C2C" : "#F5F5F5"
-    readonly property color error: isDark ? "#EF5350" : "#D32F2F"
-    readonly property color success: isDark ? "#66BB6A" : "#388E3C"
-    readonly property color warning: isDark ? "#FFA726" : "#F57C00"
+    // Accents
+    readonly property color accent: isDark ? "#1a9fff" : "#1478c8"
+    readonly property color accentDim: isDark ? "#2c6a99" : "#7fb0dd"
+    readonly property color green: isDark ? "#5c9e1f" : "#4a8a12"
+    readonly property color danger: isDark ? "#c14a3d" : "#b23a2e"
+    readonly property color warning: "#d8a31a"
+    readonly property color success: isDark ? "#7cc23b" : "#3f8a10"
+    readonly property color disabled: isDark ? "#3a4654" : "#b4bec9"
 
-    // Text colors
-    readonly property color textPrimary: isDark ? "#E0E0E0" : "#212121"
-    readonly property color textSecondary: isDark ? "#9E9E9E" : "#757575"
-    readonly property color textOnPrimary: "#FFFFFF"
-    readonly property color textOnSecondary: "#FFFFFF"
-    readonly property color textDisabled: isDark ? "#616161" : "#BDBDBD"
+    // Text
+    readonly property color textBright: isDark ? "#ffffff" : "#0d1822"
+    readonly property color text: isDark ? "#c6d4df" : "#22303d"
+    readonly property color textDim: isDark ? "#8f98a0" : "#5a6672"
+    readonly property color accentText: "#ffffff"
 
-    // Borders and dividers
-    readonly property color divider: isDark ? "#424242" : "#E0E0E0"
-    readonly property color border: isDark ? "#616161" : "#BDBDBD"
+    readonly property color divider: isDark ? "#2b3b4d" : "#c2ccd7"
+    readonly property color focusRing: isDark ? "#ffffff" : "#0d1822"
 
-    // Category colors
-    readonly property color installedColor: "#4CAF50"
-    readonly property color notInstalledColor: isDark ? "#616161" : "#9E9E9E"
+    // Type scale
+    readonly property int fontSmall: 11
+    readonly property int fontNormal: 13
+    readonly property int fontMedium: 15
+    readonly property int fontLarge: 18
+    readonly property int fontTitle: 26
+    readonly property int fontHero: 38
 
-    // Font sizes
-    readonly property int fontSizeSmall: 11
-    readonly property int fontSizeNormal: 13
-    readonly property int fontSizeMedium: 15
-    readonly property int fontSizeLarge: 18
-    readonly property int fontSizeTitle: 22
-    readonly property int fontSizeHeader: 28
-
-    // Spacing
-    readonly property int spacingSmall: 4
-    readonly property int spacingNormal: 8
-    readonly property int spacingMedium: 12
-    readonly property int spacingLarge: 16
-    readonly property int spacingXLarge: 24
-
-    // Border radius
-    readonly property int radiusSmall: 4
-    readonly property int radiusMedium: 8
-    readonly property int radiusLarge: 12
-
-    // Shadows
-    readonly property int elevationLow: 2
-    readonly property int elevationMedium: 4
-    readonly property int elevationHigh: 8
+    // Spacing / shape
+    readonly property int spaceS: 4
+    readonly property int spaceM: 8
+    readonly property int spaceL: 16
+    readonly property int spaceXL: 24
+    readonly property int radius: 3
+    readonly property int sidebarWidth: 300
 }

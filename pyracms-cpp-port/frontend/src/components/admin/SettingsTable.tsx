@@ -1,42 +1,24 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper,
 } from '@mui/material'
-import {
-  Setting,
-} from '@/hooks/useAdminSettings'
+import { Setting } from '@/hooks/useAdminSettings'
 import SettingRow from './SettingRow'
 
 interface SettingsTableProps {
   settings: Setting[]
   editingId: number | null
   editValue: string
-  onEditValueChange: (
-    val: string,
-  ) => void
-  onStartEdit: (
-    setting: Setting,
-  ) => void
+  onEditValueChange: (val: string) => void
+  onStartEdit: (setting: Setting) => void
   onSaveEdit: (id: number) => void
   onCancelEdit: () => void
   onDelete: (id: number) => void
 }
 
-export default function SettingsTable({
-  settings,
-  editingId,
-  editValue,
-  onEditValueChange,
-  onStartEdit,
-  onSaveEdit,
-  onCancelEdit,
-  onDelete,
-}: SettingsTableProps) {
+const HEADS = ['Key', 'Value']
+
+export default function SettingsTable(p: SettingsTableProps) {
   return (
     <TableContainer
       component={Paper}
@@ -44,23 +26,18 @@ export default function SettingsTable({
       sx={{ borderColor: 'divider' }}
       data-testid="settings-table"
     >
-      <Table
-        aria-label="Settings"
-      >
+      <Table aria-label="Settings">
         <TableHead>
           <TableRow>
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-            >
-              Key
-            </TableCell>
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-            >
-              Value
-            </TableCell>
+            {HEADS.map((h) => (
+              <TableCell
+                key={h}
+                scope="col"
+                sx={{ fontWeight: 700 }}
+              >
+                {h}
+              </TableCell>
+            ))}
             <TableCell
               scope="col"
               sx={{ fontWeight: 700 }}
@@ -71,26 +48,17 @@ export default function SettingsTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {settings.map((setting) => (
+          {p.settings.map((setting) => (
             <SettingRow
               key={setting.id}
               setting={setting}
-              isEditing={
-                editingId ===
-                setting.id
-              }
-              editValue={editValue}
-              onEditValueChange={
-                onEditValueChange
-              }
-              onStartEdit={
-                onStartEdit
-              }
-              onSaveEdit={onSaveEdit}
-              onCancelEdit={
-                onCancelEdit
-              }
-              onDelete={onDelete}
+              isEditing={p.editingId === setting.id}
+              editValue={p.editValue}
+              onEditValueChange={p.onEditValueChange}
+              onStartEdit={p.onStartEdit}
+              onSaveEdit={p.onSaveEdit}
+              onCancelEdit={p.onCancelEdit}
+              onDelete={p.onDelete}
             />
           ))}
         </TableBody>

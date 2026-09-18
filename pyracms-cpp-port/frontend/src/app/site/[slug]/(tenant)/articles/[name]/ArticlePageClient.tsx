@@ -1,40 +1,24 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Divider,
-} from '@mui/material'
+import { Container, Divider } from '@mui/material'
 import { useArticle } from '@/hooks/useArticle'
-import {
-  useTenantId,
-} from '@/hooks/useTenantId'
-import {
-  ArticleMetadata,
-} from '@/components/articles/ArticleMetadata'
-import {
-  ArticleTagChips,
-} from '@/components/articles/ArticleTagChips'
-import {
-  ArticleActions,
-} from '@/components/articles/ArticleActions'
+import { useTenantId } from '@/hooks/useTenantId'
 import {
   ArticleContent,
 } from '@/components/articles/ArticleContent'
 import {
   ArticleVoteButtons,
 } from '@/components/articles/ArticleVoteButtons'
-import PageTransition
-  from '@/components/common/PageTransition'
+import PageTransition from '@/components/common/PageTransition'
+import ArticleHeader from './ArticleHeader'
 
 export default function ArticlePageClient() {
   const params = useParams()
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
-  const { article, handleVote } =
-    useArticle(name, tenantId)
+  const { article, handleVote } = useArticle(name, tenantId)
 
   if (!article) return null
 
@@ -49,48 +33,16 @@ export default function ArticlePageClient() {
           aria-label={article.title}
           data-testid="article-content-wrapper"
         >
-          <section
-            aria-label="Article header"
-          >
-            <Typography
-              variant="h2"
-              component="h1"
-              gutterBottom
-            >
-              {article.title}
-            </Typography>
-            <ArticleMetadata
-              author={article.author}
-              date={article.createdDate}
-              renderer={article.renderer}
-              views={article.views}
-            />
-            <ArticleTagChips
-              tags={article.tags}
-              color="primary"
-              searchSlug={slug}
-            />
-            <ArticleActions
-              slug={slug}
-              name={name}
-              revisionCount={
-                article.revisionCount
-              }
-            />
-          </section>
+          <ArticleHeader article={article} slug={slug} name={name} />
           <Divider sx={{ mb: 4 }} />
-          <section
-            aria-label="Article body"
-          >
+          <section aria-label="Article body">
             <ArticleContent
               content={article.content}
               renderer={article.renderer}
             />
           </section>
           <Divider sx={{ mb: 3 }} />
-          <section
-            aria-label="Article voting"
-          >
+          <section aria-label="Article voting">
             <ArticleVoteButtons
               likes={article.likes}
               dislikes={article.dislikes}

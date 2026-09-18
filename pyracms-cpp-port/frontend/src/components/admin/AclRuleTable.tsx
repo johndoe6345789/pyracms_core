@@ -1,26 +1,16 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Tooltip,
-  Chip,
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper,
 } from '@mui/material'
-import {
-  DeleteOutlined,
-} from '@mui/icons-material'
-import {
-  AclRule,
-} from '@/hooks/useAclEditor'
+import { AclRule } from '@/hooks/useAclEditor'
+import AclRuleRow from './AclRuleRow'
 
 interface AclRuleTableProps {
   rules: AclRule[]
   onDelete: (id: number) => void
 }
+
+const HEADS = ['Action', 'Principal', 'Permission']
 
 export default function AclRuleTable({
   rules,
@@ -33,29 +23,18 @@ export default function AclRuleTable({
       sx={{ borderColor: 'divider' }}
       data-testid="acl-rule-table"
     >
-      <Table
-        aria-label="ACL rules"
-      >
+      <Table aria-label="ACL rules">
         <TableHead>
           <TableRow>
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-            >
-              Action
-            </TableCell>
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-            >
-              Principal
-            </TableCell>
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-            >
-              Permission
-            </TableCell>
+            {HEADS.map((h) => (
+              <TableCell
+                key={h}
+                scope="col"
+                sx={{ fontWeight: 700 }}
+              >
+                {h}
+              </TableCell>
+            ))}
             <TableCell
               scope="col"
               sx={{ fontWeight: 700 }}
@@ -67,64 +46,11 @@ export default function AclRuleTable({
         </TableHead>
         <TableBody>
           {rules.map((rule) => (
-            <TableRow
+            <AclRuleRow
               key={rule.id}
-              hover
-              data-testid={
-                `acl-row-${rule.id}`
-              }
-            >
-              <TableCell>
-                <Chip
-                  label={rule.action}
-                  size="small"
-                  color={
-                    rule.action ===
-                    'Allow'
-                      ? 'success'
-                      : 'error'
-                  }
-                  variant="outlined"
-                />
-              </TableCell>
-              <TableCell
-                sx={{ fontWeight: 600 }}
-              >
-                {rule.principal}
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontFamily:
-                    'monospace',
-                }}
-              >
-                {rule.permission}
-              </TableCell>
-              <TableCell align="right">
-                <Tooltip title="Delete">
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() =>
-                      onDelete(rule.id)
-                    }
-                    aria-label={
-                      `Delete rule ` +
-                      `for ` +
-                      rule.principal
-                    }
-                    data-testid={
-                      `delete-acl-` +
-                      `${rule.id}`
-                    }
-                  >
-                    <DeleteOutlined
-                      fontSize="small"
-                    />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
+              rule={rule}
+              onDelete={onDelete}
+            />
           ))}
         </TableBody>
       </Table>

@@ -38,10 +38,16 @@ private:
     void advance();
     void fail(const QString& error);
     void onEntryChanged(const QString& type, const QString& name);
-    void onDetailFailed(const QString& type, const QString& name, const QString& error);
+    void onDetailFailed(const QString& type, const QString& name,
+                        const QString& error);
     QList<DepRef> depsOf(const QString& moduleName) const;
     void collectFrontier(QStringList& unknown) const;
     InstallPlan build(QString* error) const;
+    QList<DepRef> orderedModules() const;
+    bool addDepStep(const DepRef& dep, InstallPlan& plan, QString* error) const;
+    bool addGameSteps(const GameEntry& root, const RevisionInfo& rev,
+                      const QStringList& walkSpecs, InstallPlan& plan,
+                      QString* error) const;
 
     EntryRepository* m_repo;
     ModuleInstaller* m_installer;
@@ -54,8 +60,8 @@ private:
     int m_generation = 0;
     QString m_game;
     QString m_version;
-    QMap<QString, bool> m_isPip;     // dep name -> resolved via pip?
-    QSet<QString> m_requested;       // detail fetches already issued
+    QMap<QString, bool> m_isPip; // dep name -> resolved via pip?
+    QSet<QString> m_requested;   // detail fetches already issued
     bool m_pipCheckRunning = false;
 };
 

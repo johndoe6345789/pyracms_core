@@ -10,7 +10,8 @@ class SettingsManager;
 
 class AuthService : public QObject {
     Q_OBJECT
-    Q_PROPERTY(bool authenticated READ isAuthenticated NOTIFY authenticatedChanged)
+    Q_PROPERTY(
+        bool authenticated READ isAuthenticated NOTIFY authenticatedChanged)
     Q_PROPERTY(QString username READ username NOTIFY usernameChanged)
     Q_PROPERTY(QString token READ token NOTIFY tokenChanged)
 
@@ -26,7 +27,7 @@ public:
     Q_INVOKABLE void login(const QString& username, const QString& password,
                            const QString& tenant);
     Q_INVOKABLE void registerUser(const QString& username, const QString& email,
-                                   const QString& password);
+                                  const QString& password);
     Q_INVOKABLE void logout();
     Q_INVOKABLE void restoreSession();
 

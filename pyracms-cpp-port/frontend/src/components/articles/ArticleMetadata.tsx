@@ -7,6 +7,7 @@ import {
   CodeOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material'
+import type { ElementType } from 'react'
 
 interface ArticleMetadataProps {
   author: string
@@ -15,83 +16,37 @@ interface ArticleMetadataProps {
   views: number
 }
 
+const rowSx = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: 3,
+  mb: 3,
+  color: 'text.secondary',
+}
+const itemSx = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0.5,
+}
+
 export function ArticleMetadata(
-  {
-    author,
-    date,
-    renderer,
-    views,
-  }: ArticleMetadataProps
+  { author, date, renderer, views }:
+    ArticleMetadataProps
 ) {
-  const items = [
-    {
-      icon: (
-        <PersonOutlined
-          sx={{ fontSize: 20 }}
-          aria-hidden="true"
-        />
-      ),
-      label: author,
-      testId: 'meta-author',
-    },
-    {
-      icon: (
-        <CalendarTodayOutlined
-          sx={{ fontSize: 20 }}
-          aria-hidden="true"
-        />
-      ),
-      label: date,
-      testId: 'meta-date',
-    },
-    {
-      icon: (
-        <CodeOutlined
-          sx={{ fontSize: 20 }}
-          aria-hidden="true"
-        />
-      ),
-      label: renderer,
-      testId: 'meta-renderer',
-    },
-    {
-      icon: (
-        <VisibilityOutlined
-          sx={{ fontSize: 20 }}
-          aria-hidden="true"
-        />
-      ),
-      label: `${views} views`,
-      testId: 'meta-views',
-    },
+  const items: [ElementType, string, string][] = [
+    [PersonOutlined, author, 'meta-author'],
+    [CalendarTodayOutlined, date, 'meta-date'],
+    [CodeOutlined, renderer, 'meta-renderer'],
+    [VisibilityOutlined, `${views} views`, 'meta-views'],
   ]
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: 3,
-        mb: 3,
-        color: 'text.secondary',
-      }}
-      data-testid="article-metadata"
-    >
-      {items.map((item) => (
-        <Box
-          key={item.testId}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-          }}
-          data-testid={item.testId}
-        >
-          {item.icon}
-          <Typography variant="body2">
-            {item.label}
-          </Typography>
+    <Box sx={rowSx} data-testid="article-metadata">
+      {items.map(([Icon, label, testId]) => (
+        <Box key={testId} sx={itemSx} data-testid={testId}>
+          <Icon sx={{ fontSize: 20 }} aria-hidden="true" />
+          <Typography variant="body2">{label}</Typography>
         </Box>
       ))}
     </Box>

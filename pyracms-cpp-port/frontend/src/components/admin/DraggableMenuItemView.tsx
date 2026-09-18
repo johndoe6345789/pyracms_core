@@ -1,6 +1,4 @@
-import {
-  Box, Typography, IconButton,
-} from '@mui/material'
+import { Box, Typography, IconButton } from '@mui/material'
 import {
   DeleteOutlined,
   EditOutlined,
@@ -31,10 +29,7 @@ export default function DraggableMenuItemView({
         >
           {label}
         </Typography>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-        >
+        <Typography variant="caption" color="text.secondary">
           {url}
         </Typography>
       </Box>
@@ -42,22 +37,12 @@ export default function DraggableMenuItemView({
         <IconButton
           size="small"
           onClick={onToggleExpand}
-          aria-label={
-            expanded ? 'Collapse' : 'Expand'
-          }
+          aria-label={expanded ? 'Collapse' : 'Expand'}
           data-testid="toggle-expand-btn"
         >
           {expanded
-            ? (
-              <ExpandLessOutlined
-                fontSize="small"
-              />
-            )
-            : (
-              <ExpandMoreOutlined
-                fontSize="small"
-              />
-            )}
+            ? <ExpandLessOutlined fontSize="small" />
+            : <ExpandMoreOutlined fontSize="small" />}
         </IconButton>
       )}
       <IconButton

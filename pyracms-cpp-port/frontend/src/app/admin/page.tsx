@@ -10,8 +10,9 @@ export default function AdminRedirectPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    api.get('/api/tenants')
-      .then(res => {
+    api
+      .get('/api/tenants')
+      .then((res) => {
         const tenants = res.data || []
         if (tenants.length > 0) {
           router.replace(`/site/${tenants[0].slug}/admin`)
@@ -23,7 +24,14 @@ export default function AdminRedirectPage() {
   }, [router])
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+      }}
+    >
       {error ? (
         <Typography color="error">{error}</Typography>
       ) : (

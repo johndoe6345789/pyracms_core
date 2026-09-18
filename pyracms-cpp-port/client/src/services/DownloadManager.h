@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QHash>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QUrl>
 
@@ -24,8 +25,8 @@ public:
         QString id;
         QUrl url;
         QString destPath;
-        qint64 expectedSize = 0;     // 0 = unknown
-        QString expectedSha256;      // empty = unknown
+        qint64 expectedSize = 0; // 0 = unknown
+        QString expectedSha256;  // empty = unknown
     };
 
     explicit DownloadManager(ApiClient* api, QObject* parent = nullptr);
@@ -46,13 +47,14 @@ signals:
 private:
     struct Job {
         Request req;
-        QNetworkReply* reply = nullptr;
+        QPointer<QNetworkReply> reply; // may die with the ApiClient
         QFile part;
         qint64 offset = 0;
         bool headerChecked = false;
         bool cancelled = false;
     };
 
+    void sendRequest(Job* job);
     void onReadyRead(Job* job);
     void onFinished(Job* job);
     void complete(Job* job);

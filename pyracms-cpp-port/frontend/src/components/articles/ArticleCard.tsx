@@ -5,16 +5,17 @@ import {
   CardContent,
   CardActionArea,
   Typography,
-  Box,
 } from '@mui/material'
 import Link from 'next/link'
 import { ArticleTagChips } from './ArticleTagChips'
+import { ArticleCardMeta } from './ArticleCardMeta'
 import {
-  ArticleCardMeta,
-} from './ArticleCardMeta'
-import type {
-  ArticleSummary,
-} from '@/hooks/useArticles'
+  cardSx,
+  actionSx,
+  titleSx,
+  excerptSx,
+} from './articleCardStyles'
+import type { ArticleSummary } from '@/hooks/useArticles'
 
 interface ArticleCardProps {
   article: ArticleSummary
@@ -27,76 +28,34 @@ export function ArticleCard(
   return (
     <Card
       variant="outlined"
-      data-testid={
-        `article-card-${article.name}`
-      }
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderColor: 'divider',
-        transition:
-          'all 0.2s ease-in-out',
-        '&:hover': {
-          borderColor: 'primary.main',
-          boxShadow: 3,
-          transform:
-            'translateY(-4px)',
-        },
-      }}
+      data-testid={`article-card-${article.name}`}
+      sx={cardSx}
     >
       <CardActionArea
         component={Link}
-        href={
-          `/site/${slug}` +
-          `/articles/${article.name}`
-        }
+        href={`/site/${slug}/articles/${article.name}`}
         data-testid={
-          `article-card-link-` +
-          `${article.name}`
+          `article-card-link-${article.name}`
         }
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          alignItems: 'flex-start',
-        }}
+        sx={actionSx}
       >
-        <CardContent
-          sx={{ p: 3, width: '100%' }}
-        >
+        <CardContent sx={{ p: 3, width: '100%' }}>
           <Typography
             variant="h5"
             component="h2"
             gutterBottom
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient:
-                'vertical',
-            }}
+            sx={titleSx}
           >
             {article.title}
           </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
-            sx={{
-              mb: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient:
-                'vertical',
-            }}
+            sx={excerptSx}
           >
             {article.excerpt}
           </Typography>
-          <ArticleTagChips
-            tags={article.tags}
-          />
+          <ArticleTagChips tags={article.tags} />
           <ArticleCardMeta
             author={article.author}
             date={article.date}

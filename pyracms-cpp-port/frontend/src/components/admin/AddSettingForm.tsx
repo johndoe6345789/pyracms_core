@@ -1,14 +1,7 @@
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  Typography,
+  Box, Button, Card, CardContent, TextField, Typography,
 } from '@mui/material'
-import {
-  AddCircleOutline,
-} from '@mui/icons-material'
+import { AddCircleOutline } from '@mui/icons-material'
 
 interface AddSettingFormProps {
   newKey: string
@@ -28,66 +21,39 @@ export default function AddSettingForm({
   return (
     <Card
       variant="outlined"
-      sx={{
-        borderColor: 'divider',
-        mb: 4,
-      }}
+      sx={{ borderColor: 'divider', mb: 4 }}
       data-testid="add-setting-form"
     >
       <CardContent>
-        <Typography
-          variant="h5"
-          sx={{ mb: 2 }}
-        >
+        <Typography variant="h5" sx={{ mb: 2 }}>
           Add New Setting
         </Typography>
         <Box sx={{
-          display: 'flex',
-          gap: 2,
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
+          display: 'flex', gap: 2,
+          alignItems: 'flex-start', flexWrap: 'wrap',
         }}>
           <TextField
             label="Key"
             size="small"
             value={newKey}
-            onChange={(e) =>
-              onKeyChange(
-                e.target.value,
-              )
-            }
+            onChange={(e) => onKeyChange(e.target.value)}
             sx={{ minWidth: 200 }}
-            data-testid={
-              'setting-key-input'
-            }
+            data-testid="setting-key-input"
           />
           <TextField
             label="Value"
             size="small"
             value={newValue}
-            onChange={(e) =>
-              onValueChange(
-                e.target.value,
-              )
-            }
+            onChange={(e) => onValueChange(e.target.value)}
             sx={{ minWidth: 300 }}
-            data-testid={
-              'setting-value-input'
-            }
+            data-testid="setting-value-input"
           />
           <Button
             variant="contained"
-            startIcon={
-              <AddCircleOutline />
-            }
+            startIcon={<AddCircleOutline />}
             onClick={onAdd}
-            disabled={
-              !newKey.trim() ||
-              !newValue.trim()
-            }
-            data-testid={
-              'add-setting-btn'
-            }
+            disabled={!newKey.trim() || !newValue.trim()}
+            data-testid="add-setting-btn"
           >
             Add Setting
           </Button>

@@ -2,10 +2,7 @@
 
 namespace Hypernucleus {
 
-DeepLinkController::DeepLinkController(QObject* parent)
-    : QObject(parent)
-{
-}
+DeepLinkController::DeepLinkController(QObject* parent) : QObject(parent) {}
 
 bool DeepLinkController::setUrl(const QString& url, const QString& currentSlug)
 {
@@ -22,8 +19,7 @@ bool DeepLinkController::setUrl(const QString& url, const QString& currentSlug)
 
 void DeepLinkController::clear()
 {
-    if (!m_link.isValid())
-        return;
+    if (!m_link.isValid()) return;
     m_link = DeepLink();
     m_siteMismatch = false;
     emit pendingChanged();
@@ -31,16 +27,12 @@ void DeepLinkController::clear()
 
 void DeepLinkController::accept()
 {
-    if (!m_link.isValid())
-        return;
+    if (!m_link.isValid()) return;
     const DeepLink link = m_link;
     clear();
     emit accepted(link.actionName(), link.slug, link.name);
 }
 
-void DeepLinkController::dismiss()
-{
-    clear();
-}
+void DeepLinkController::dismiss() { clear(); }
 
 } // namespace Hypernucleus

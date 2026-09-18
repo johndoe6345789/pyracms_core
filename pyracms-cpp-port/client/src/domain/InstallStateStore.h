@@ -11,14 +11,14 @@ namespace Hypernucleus {
 struct InstallRecord {
     QString name;
     QString version;
-    QString type;            // "game" | "dep"
-    QString path;            // install directory
-    QString moduleType;      // python layout: "file" | "folder"
-    QString kind;            // "python" | "native"
-    QString executable;      // native entry point (relative), optional
-    QStringList deps;        // names of PyraCMS dependency modules
-    QStringList pipSpecs;    // pip requirements installed for this module
-    QString installedAt;     // ISO-8601 UTC
+    QString type;         // "game" | "dep"
+    QString path;         // install directory
+    QString moduleType;   // python layout: "file" | "folder"
+    QString kind;         // "python" | "native"
+    QString executable;   // native entry point (relative), optional
+    QStringList deps;     // names of PyraCMS dependency modules
+    QStringList pipSpecs; // pip requirements installed for this module
+    QString installedAt;  // ISO-8601 UTC
     qint64 sizeBytes = 0;
 
     bool isValid() const { return !name.isEmpty() && !version.isEmpty(); }

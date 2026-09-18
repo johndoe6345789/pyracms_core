@@ -8,7 +8,8 @@ namespace Hypernucleus {
 // Special sidebar category (everything else is a tag name).
 constexpr const char* CATEGORY_FAVOURITES = "__favourites__";
 
-// Enums shared between C++ and QML: GameStates.Installed, GameStates.FilterAll ...
+// Enums shared between C++ and QML: GameStates.Installed, GameStates.FilterAll
+// ...
 class GameStates : public QObject {
     Q_OBJECT
     QML_ELEMENT

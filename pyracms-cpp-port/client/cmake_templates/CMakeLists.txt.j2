@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 project({{ project_name }} VERSION {{ version }} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD {{ cxx_standard }})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 
 # Conan-generated toolchain
 if(EXISTS "${CMAKE_BINARY_DIR}/conan_toolchain.cmake")
@@ -14,16 +13,22 @@ endif()
 
 # Options
 option(BUILD_TESTS "Build tests" ON)
+option(ENABLE_COVERAGE "Instrument with gcov (GCC/Clang)" OFF)
+
+if(ENABLE_COVERAGE)
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+endif()
 
 # Find dependencies
-find_package(Qt6 REQUIRED COMPONENTS Core Quick QuickControls2 Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2)
 find_package(QuaZip-Qt6 REQUIRED)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# Client library (shared between app and tests)
-# Auto-generated from source files — run `python generate_cmake.py` to update
+# Client library (shared between app and tests): domain + services, no QML.
+# Auto-generated from source files -- run `python generate_cmake.py` to update
 set(LIB_SOURCES
 {% for src in lib_sources %}
     {{ src }}
@@ -40,8 +45,6 @@ add_library(hypernucleus_lib STATIC ${LIB_SOURCES} ${LIB_HEADERS})
 target_link_libraries(hypernucleus_lib
     PUBLIC
     Qt6::Core
-    Qt6::Quick
-    Qt6::QuickControls2
     Qt6::Network
     QuaZip::QuaZip
 )
@@ -49,19 +52,46 @@ target_include_directories(hypernucleus_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/s
 
 # Main executable
 qt_add_executable({{ project_name }} {{ main_source }})
-target_link_libraries({{ project_name }} PRIVATE hypernucleus_lib)
+target_link_libraries({{ project_name }} PRIVATE
+    hypernucleus_lib
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+)
 
-# QML module
-# Auto-generated QML file list — run `python generate_cmake.py` to update
+# qmltyperegistrar includes the QML-facing headers by file name.
+target_include_directories({{ project_name }} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/models
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/viewmodels
+)
+
+# Singleton QML types must be flagged before the module is created.
+set_source_files_properties(
+{% for qml in singleton_qml %}
+    {{ qml }}
+{% endfor %}
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+)
+
+# QML module "Hypernucleus": QML files plus the QML-facing C++ types
+# (QML_ELEMENT / QML_SINGLETON) from src/models and src/viewmodels.
+# Auto-generated lists -- run `python generate_cmake.py` to update
 qt_add_qml_module({{ project_name }}
     URI Hypernucleus
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
 {% for qml in qml_sources %}
         {{ qml }}
 {% endfor %}
-    RESOURCES
-        resources/resources.qrc
+    SOURCES
+{% for src in module_sources %}
+        {{ src }}
+{% endfor %}
+{% for hdr in module_headers %}
+        {{ hdr }}
+{% endfor %}
 )
 
 # Testing

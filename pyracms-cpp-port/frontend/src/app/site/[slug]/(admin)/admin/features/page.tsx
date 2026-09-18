@@ -1,16 +1,10 @@
 'use client'
 
 import {
-  Typography,
-  Box,
-  Button,
-  Snackbar,
-  Alert,
+  Typography, Box, Button, Snackbar, Alert,
 } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
-import {
-  useFeatureToggles,
-} from '@/hooks/useFeatureToggles'
+import { useFeatureToggles } from '@/hooks/useFeatureToggles'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 import FeatureToggleCard from
@@ -21,19 +15,13 @@ export default function AdminFeaturesPage() {
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
   const {
-    features,
-    snackbarOpen,
-    handleToggle,
-    handleSave,
-    handleCloseSnackbar,
+    features, snackbarOpen, handleToggle,
+    handleSave, handleCloseSnackbar,
   } = useFeatureToggles(tenantId)
 
   return (
     <Box data-testid="admin-features-page">
-      <Typography
-        variant="h3"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="h3" sx={{ mb: 1 }}>
         Feature Toggles
       </Typography>
       <Typography
@@ -41,15 +29,16 @@ export default function AdminFeaturesPage() {
         color="text.secondary"
         sx={{ mb: 4 }}
       >
-        Enable or disable features across
-        the platform.
+        Enable or disable features across the platform.
       </Typography>
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        mb: 4,
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          mb: 4,
+        }}
+      >
         {features.map((feature) => (
           <FeatureToggleCard
             key={feature.id}
@@ -71,18 +60,14 @@ export default function AdminFeaturesPage() {
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity="success"
           variant="filled"
         >
-          Feature toggles saved
-          successfully.
+          Feature toggles saved successfully.
         </Alert>
       </Snackbar>
     </Box>

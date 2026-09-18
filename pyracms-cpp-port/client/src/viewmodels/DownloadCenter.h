@@ -12,9 +12,7 @@ namespace Hypernucleus {
 class InstallPlanner;
 class InstallRunner;
 
-// Steam-style download manager: a queue of installs/updates, one active
-// job with progress, speed and step information, cancel keeps partial files
-// so the next attempt resumes.
+// Steam-style download queue: one active job, cancel keeps partial files.
 class DownloadCenter : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -32,17 +30,15 @@ class DownloadCenter : public QObject {
 public:
     DownloadCenter(InstallPlanner* planner, InstallRunner* runner,
                    QObject* parent = nullptr);
-
     bool busy() const { return !m_active.isEmpty(); }
     QString activeName() const { return m_active; }
     QString label() const { return m_label; }
     QString stepText() const { return m_stepText; }
-    double progress() const { return m_progress; }   // -1 = indeterminate
+    double progress() const { return m_progress; } // -1 = indeterminate
     QString speedText() const { return m_speed; }
     QString sizeText() const { return m_size; }
     QStringList queue() const;
     QString log() const { return m_log; }
-
     Q_INVOKABLE void enqueue(const QString& name, const QString& version);
     Q_INVOKABLE void cancelActive();
     Q_INVOKABLE void removeQueued(const QString& name);
@@ -52,7 +48,6 @@ signals:
     void changed();
     void queueChanged();
     void logChanged();
-    // state is a GameStates::State value
     void gameStateChanged(const QString& name, int state, double progress,
                           const QString& text);
     void gameFinished(const QString& name, const QString& version);
@@ -61,25 +56,18 @@ signals:
 
 private:
     struct Job {
-        QString name;
-        QString version;
+        QString name, version;
     };
-
     void start(const Job& job);
     void finishJob();
     void onProgress(int phase, qint64 received, qint64 total);
     void fail(const QString& error);
-
     InstallPlanner* m_planner;
     InstallRunner* m_runner;
     QList<Job> m_queue;
     QString m_active;
     QString m_activeVersion;
-    QString m_label;
-    QString m_stepText;
-    QString m_speed;
-    QString m_size;
-    QString m_log;
+    QString m_label, m_stepText, m_speed, m_size, m_log;
     double m_progress = 0.0;
     bool m_cancelled = false;
     QElapsedTimer m_clock;

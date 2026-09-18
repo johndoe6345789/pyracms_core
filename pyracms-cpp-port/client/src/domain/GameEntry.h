@@ -13,17 +13,17 @@ namespace Hypernucleus {
 struct BinaryInfo {
     QString os;
     QString arch;
-    QString fileRef;      // uuid or numeric file id (resolved via /api/files)
-    QString url;          // absolute or server-relative download URL
-    qint64 size = 0;      // bytes, 0 = unknown
-    QString sha256;       // lowercase hex, empty = unknown
-    QString executable;   // optional entry point relative to install dir
+    QString fileRef;    // uuid or numeric file id (resolved via /api/files)
+    QString url;        // absolute or server-relative download URL
+    qint64 size = 0;    // bytes, 0 = unknown
+    QString sha256;     // lowercase hex, empty = unknown
+    QString executable; // optional entry point relative to install dir
 };
 
 struct RevisionInfo {
     QString version;
-    QString moduleType;   // "file" | "folder" (python module layout)
-    QString fileRef;      // source archive
+    QString moduleType; // "file" | "folder" (python module layout)
+    QString fileRef;    // source archive
     QString url;
     QString createdAt;
     bool published = true;
@@ -35,21 +35,21 @@ struct RevisionInfo {
 
 struct DepRef {
     QString name;
-    QString version;      // empty = latest
-    QString source;       // "", "pip" or "pyracms" (explicit override)
+    QString version; // empty = latest
+    QString source;  // "", "pip" or "pyracms" (explicit override)
 };
 
 struct GameEntry {
     QString name;
     QString displayName;
     QString description;
-    QString type;         // "game" | "dep"
-    QString hero;         // banner ref/url, may be empty
+    QString type; // "game" | "dep"
+    QString hero; // banner ref/url, may be empty
     QStringList tags;
-    QStringList screenshots;          // refs or urls
+    QStringList screenshots; // refs or urls
     QList<RevisionInfo> revisions;
-    QList<DepRef> dependencies;       // PyraCMS dependency pages
-    QStringList pipRequirements;      // explicit pip specifiers
+    QList<DepRef> dependencies;  // PyraCMS dependency pages
+    QStringList pipRequirements; // explicit pip specifiers
     int likes = 0;
     int dislikes = 0;
     int views = 0;

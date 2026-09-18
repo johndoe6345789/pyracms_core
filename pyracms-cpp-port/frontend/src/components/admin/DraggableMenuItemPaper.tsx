@@ -1,14 +1,9 @@
 'use client'
 
-import { Box, Paper } from '@mui/material'
-import {
-  DragIndicatorOutlined,
-  SubdirectoryArrowRightOutlined,
-} from '@mui/icons-material'
-import DraggableMenuEditFields
-  from './DraggableMenuEditFields'
-import DraggableMenuItemView
-  from './DraggableMenuItemView'
+import { Paper } from '@mui/material'
+import DragHandle from './DragHandle'
+import DraggableMenuEditFields from './DraggableMenuEditFields'
+import DraggableMenuItemView from './DraggableMenuItemView'
 
 interface Props {
   depth: number
@@ -30,54 +25,34 @@ interface Props {
   onDelete: () => void
 }
 
-export default function DraggableMenuItemPaper({
-  depth, isOver, dragRef, editing,
-  editLabel, editUrl, onLabelChange,
-  onUrlChange, onSave, onCancelEdit,
-  label, url, hasKids, expanded,
-  onToggleExpand, onEdit, onDelete,
-}: Props) {
+export default function DraggableMenuItemPaper(p: Props) {
   return (
     <Paper variant="outlined" sx={{
       display: 'flex', alignItems: 'center',
       gap: 1, px: 2, py: 1, mb: 0.5,
-      borderColor: isOver
-        ? 'primary.main' : 'divider',
-      bgcolor: isOver
+      borderColor: p.isOver ? 'primary.main' : 'divider',
+      bgcolor: p.isOver
         ? 'primary.main' + '08'
         : 'background.paper',
     }}>
-      <Box
-        ref={dragRef}
-        sx={{ cursor: 'grab', display: 'flex' }}
-      >
-        <DragIndicatorOutlined
-          sx={{ color: 'text.secondary' }}
-        />
-      </Box>
-      {depth > 0 && (
-        <SubdirectoryArrowRightOutlined sx={{
-          fontSize: 16,
-          color: 'text.secondary',
-        }} />
-      )}
-      {editing ? (
+      <DragHandle dragRef={p.dragRef} nested={p.depth > 0} />
+      {p.editing ? (
         <DraggableMenuEditFields
-          editLabel={editLabel}
-          editUrl={editUrl}
-          onLabelChange={onLabelChange}
-          onUrlChange={onUrlChange}
-          onSave={onSave}
-          onCancel={onCancelEdit}
+          editLabel={p.editLabel}
+          editUrl={p.editUrl}
+          onLabelChange={p.onLabelChange}
+          onUrlChange={p.onUrlChange}
+          onSave={p.onSave}
+          onCancel={p.onCancelEdit}
         />
       ) : (
         <DraggableMenuItemView
-          label={label} url={url}
-          hasChildren={hasKids}
-          expanded={expanded}
-          onToggleExpand={onToggleExpand}
-          onEdit={onEdit}
-          onDelete={onDelete}
+          label={p.label} url={p.url}
+          hasChildren={p.hasKids}
+          expanded={p.expanded}
+          onToggleExpand={p.onToggleExpand}
+          onEdit={p.onEdit}
+          onDelete={p.onDelete}
         />
       )}
     </Paper>

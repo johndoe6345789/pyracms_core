@@ -15,7 +15,8 @@ class SingleInstance : public QObject {
     Q_OBJECT
 
 public:
-    explicit SingleInstance(const QString& key = defaultKey(), QObject* parent = nullptr);
+    explicit SingleInstance(const QString& key = defaultKey(),
+                            QObject* parent = nullptr);
 
     static QString defaultKey();
     static constexpr int kMaxMessageBytes = 8192;

@@ -23,7 +23,8 @@ public:
 
     // `type` empty = all types.
     QList<GameEntry> entries(const QString& type = QString()) const;
-    const GameEntry* find(const QString& name, const QString& type = QString()) const;
+    const GameEntry* find(const QString& name,
+                          const QString& type = QString()) const;
     QStringList allTags(const QString& type = QString()) const;
 
     void refresh();
@@ -38,7 +39,8 @@ signals:
     void refreshed();
     void refreshFailed(const QString& error);
     void entryChanged(const QString& type, const QString& name);
-    void detailFailed(const QString& type, const QString& name, const QString& error);
+    void detailFailed(const QString& type, const QString& name,
+                      const QString& error);
 
 private:
     static QString keyOf(const QString& type, const QString& name);

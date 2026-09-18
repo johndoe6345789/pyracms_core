@@ -1,187 +1,72 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
-import QtQuick.Layouts 1.15
-import "../theme" as Theme
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Hypernucleus
 
-ToolBar {
+// Top bar: brand, LIBRARY / STORE tabs, refresh, theme, account menu.
+// (Referenced as HN.ToolBar from Main.qml to keep it apart from the
+// Qt Quick Controls ToolBar type.)
+Rectangle {
     id: root
 
-    Material.background: Theme.Theme.primary
-    Material.foreground: Theme.Theme.textOnPrimary
+    property int currentTab: 0
+    signal tabRequested(int index)
+    signal settingsRequested()
+    signal loginRequested()
+
+    implicitHeight: 52
+    color: Theme.topBar
 
     RowLayout {
         anchors.fill: parent
-        spacing: Theme.Theme.spacingSmall
+        anchors.leftMargin: Theme.spaceL
+        anchors.rightMargin: Theme.spaceM
+        spacing: 0
 
-        // App title
         Label {
-            text: qsTr("Hypernucleus")
-            font.pixelSize: Theme.Theme.fontSizeLarge
+            text: "HYPERNUCLEUS"
+            color: Theme.accent
+            font.pixelSize: Theme.fontLarge
             font.bold: true
-            color: Theme.Theme.textOnPrimary
-            Layout.leftMargin: Theme.Theme.spacingLarge
+            font.letterSpacing: 2
+            Layout.rightMargin: Theme.spaceXL
+        }
+
+        TopTab {
+            text: qsTr("LIBRARY")
+            selected: root.currentTab === 0
+            onClicked: root.tabRequested(0)
+        }
+        TopTab {
+            text: qsTr("STORE")
+            selected: root.currentTab === 1
+            onClicked: root.tabRequested(1)
         }
 
         Item { Layout.fillWidth: true }
 
-        // Run button
+        BusyIndicator {
+            running: MainViewModel.loading
+            visible: running
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 32
+        }
         ToolButton {
-            id: runButton
-            icon.name: "media-playback-start"
-            text: "\u25B6"
-            font.pixelSize: 16
-            enabled: mainViewModel.selectedItem.type === "game" &&
-                     mainViewModel.selectedItem.installed &&
-                     !mainViewModel.gameRunning
+            text: qsTr("Refresh")
+            onClicked: MainViewModel.refresh()
             ToolTip.visible: hovered
-            ToolTip.text: qsTr("Launch Game (Ctrl+Enter)")
-
-            onClicked: mainViewModel.launchSelected()
-
-            contentItem: Label {
-                text: parent.text
-                color: parent.enabled ? Theme.Theme.textOnPrimary : Theme.Theme.textDisabled
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
+            ToolTip.text: qsTr("Reload games (Ctrl+R)")
         }
-
-        // Stop button
+        ThemeToggle {}
+        AccountButton {
+            onSettingsRequested: root.settingsRequested()
+            onLoginRequested: root.loginRequested()
+        }
         ToolButton {
-            id: stopButton
-            text: "\u25A0"
-            font.pixelSize: 16
-            enabled: mainViewModel.gameRunning
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("Stop Game")
-
-            onClicked: mainViewModel.stopGame()
-
-            contentItem: Label {
-                text: parent.text
-                color: parent.enabled ? Theme.Theme.textOnPrimary : Theme.Theme.textDisabled
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
-
-        // Separator
-        Rectangle {
-            width: 1
-            Layout.fillHeight: true
-            Layout.topMargin: 8
-            Layout.bottomMargin: 8
-            color: Qt.rgba(1, 1, 1, 0.3)
-        }
-
-        // Uninstall button
-        ToolButton {
-            id: uninstallButton
-            text: "\u{1F5D1}"
-            font.pixelSize: 16
-            enabled: mainViewModel.selectedItem.installed === true
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("Uninstall Selected")
-
-            onClicked: mainViewModel.uninstallSelected()
-
-            contentItem: Label {
-                text: parent.text
-                color: parent.enabled ? Theme.Theme.textOnPrimary : Theme.Theme.textDisabled
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
-
-        // Refresh button
-        ToolButton {
-            id: refreshButton
-            text: "\u21BB"
-            font.pixelSize: 18
-            enabled: !mainViewModel.isLoading
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("Refresh Catalog (Ctrl+R)")
-
-            onClicked: mainViewModel.refreshCatalog()
-
-            contentItem: Label {
-                text: parent.text
-                color: parent.enabled ? Theme.Theme.textOnPrimary : Theme.Theme.textDisabled
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            // Spin animation when loading
-            RotationAnimation {
-                target: refreshButton.contentItem
-                from: 0
-                to: 360
-                duration: 1000
-                running: mainViewModel.isLoading
-                loops: Animation.Infinite
-            }
-        }
-
-        // Separator
-        Rectangle {
-            width: 1
-            Layout.fillHeight: true
-            Layout.topMargin: 8
-            Layout.bottomMargin: 8
-            color: Qt.rgba(1, 1, 1, 0.3)
-        }
-
-        // User info
-        Label {
-            text: authService.authenticated
-                ? authService.username
-                : qsTr("Not logged in")
-            font.pixelSize: Theme.Theme.fontSizeSmall
-            color: Qt.rgba(1, 1, 1, 0.8)
-        }
-
-        // Settings button
-        ToolButton {
-            id: settingsButton
-            text: "\u2699"
-            font.pixelSize: 18
+            text: qsTr("Settings")
+            onClicked: root.settingsRequested()
             ToolTip.visible: hovered
             ToolTip.text: qsTr("Settings (Ctrl+,)")
-
-            onClicked: settingsDialog.open()
-
-            contentItem: Label {
-                text: parent.text
-                color: Theme.Theme.textOnPrimary
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
-
-        // Exit button
-        ToolButton {
-            id: exitButton
-            text: "\u2715"
-            font.pixelSize: 16
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("Exit (Ctrl+Q)")
-            Layout.rightMargin: Theme.Theme.spacingNormal
-
-            onClicked: Qt.quit()
-
-            contentItem: Label {
-                text: parent.text
-                color: Theme.Theme.textOnPrimary
-                font: parent.font
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
         }
     }
 }

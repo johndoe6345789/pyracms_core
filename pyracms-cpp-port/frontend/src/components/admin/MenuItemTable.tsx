@@ -1,7 +1,6 @@
 import {
-  Table, TableBody, TableContainer,
-  TableHead, TableRow, TableCell,
-  Paper, Typography,
+  Table, TableBody, TableContainer, TableHead, TableRow,
+  TableCell, Paper, Typography,
 } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 import MenuItemTableRow from './MenuItemTableRow'
@@ -11,9 +10,7 @@ interface MenuItemTableProps {
   editingId: number | null
   editRow: MenuItemRow | null
   onEditRowChange: (
-    updater: (
-      prev: MenuItemRow | null
-    ) => MenuItemRow | null
+    updater: (prev: MenuItemRow | null) => MenuItemRow | null
   ) => void
   onStartEdit: (item: MenuItemRow) => void
   onSaveEdit: () => void
@@ -22,15 +19,11 @@ interface MenuItemTableProps {
 }
 
 const HEADERS = [
-  'Name', 'Route / URL',
-  'Position', 'Permissions',
+  'Name', 'Route / URL', 'Position', 'Permissions',
 ]
 
-export default function MenuItemTable({
-  items, editingId, editRow,
-  onEditRowChange, onStartEdit,
-  onSaveEdit, onCancelEdit, onDelete,
-}: MenuItemTableProps) {
+export default function MenuItemTable(p: MenuItemTableProps) {
+  const { items } = p
   return (
     <TableContainer
       component={Paper}
@@ -41,17 +34,11 @@ export default function MenuItemTable({
         <TableHead>
           <TableRow>
             {HEADERS.map((h) => (
-              <TableCell
-                key={h}
-                sx={{ fontWeight: 700 }}
-              >
+              <TableCell key={h} sx={{ fontWeight: 700 }}>
                 {h}
               </TableCell>
             ))}
-            <TableCell
-              sx={{ fontWeight: 700 }}
-              align="right"
-            >
+            <TableCell sx={{ fontWeight: 700 }} align="right">
               Actions
             </TableCell>
           </TableRow>
@@ -59,14 +46,8 @@ export default function MenuItemTable({
         <TableBody>
           {items.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={5}
-                align="center"
-                sx={{ py: 4 }}
-              >
-                <Typography
-                  color="text.secondary"
-                >
+              <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                <Typography color="text.secondary">
                   No items. Add one above.
                 </Typography>
               </TableCell>
@@ -76,17 +57,13 @@ export default function MenuItemTable({
               <MenuItemTableRow
                 key={item.id}
                 item={item}
-                editing={
-                  editingId === item.id
-                }
-                editRow={editRow}
-                onEditRowChange={
-                  onEditRowChange
-                }
-                onStartEdit={onStartEdit}
-                onSaveEdit={onSaveEdit}
-                onCancelEdit={onCancelEdit}
-                onDelete={onDelete}
+                editing={p.editingId === item.id}
+                editRow={p.editRow}
+                onEditRowChange={p.onEditRowChange}
+                onStartEdit={p.onStartEdit}
+                onSaveEdit={p.onSaveEdit}
+                onCancelEdit={p.onCancelEdit}
+                onDelete={p.onDelete}
               />
             ))
           )}

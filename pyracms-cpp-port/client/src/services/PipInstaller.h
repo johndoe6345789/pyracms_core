@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QStringList>
 
+#include "services/PythonLocator.h"
+
 class QProcess;
 
 namespace Hypernucleus {
@@ -48,6 +50,9 @@ signals:
 
 private:
     void setBusy(bool busy);
+    void startProcess(const PythonInfo& py, const QStringList& args,
+                      const QString& workDir);
+    void connectProcess();
 
     PathManager* m_paths;
     QString m_pythonPath;

@@ -13,7 +13,7 @@ namespace Hypernucleus {
 struct DependencyEntry {
     QString name;
     QString version;
-    QString source;        // "pip", "pyracms" or "" (decided at install time)
+    QString source; // "pip", "pyracms" or "" (decided at install time)
     bool installed = false;
 };
 
@@ -35,7 +35,8 @@ public:
     explicit DependencyModel(QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index,
+                  int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
     void populate(const QList<DepRef>& dependencies,

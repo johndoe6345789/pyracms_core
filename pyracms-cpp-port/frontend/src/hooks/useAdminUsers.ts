@@ -11,24 +11,28 @@ export interface UserRow {
   banned: boolean
 }
 
+function mapUser(u: Record<string, unknown>): UserRow {
+  const created = u.createdAt
+  return {
+    id: u.id as number,
+    username: (u.username as string) || '',
+    email: (u.email as string) || '',
+    created:
+      typeof created === 'string' ? created.split('T')[0] ?? '' : '',
+    banned: (u.banned as boolean) || false,
+  }
+}
+
 export function useAdminUsers() {
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null)
+  const [selectedUser, setSelectedUser] =
+    useState<UserRow | null>(null)
 
   useEffect(() => {
     api.get('/api/users')
-      .then(res => {
-        const mapped: UserRow[] = (res.data || []).map((u: Record<string, unknown>) => ({
-          id: u.id,
-          username: u.username || '',
-          email: u.email || '',
-          created: typeof u.createdAt === 'string' ? (u.createdAt as string).split('T')[0] : '',
-          banned: u.banned || false,
-        }))
-        setUsers(mapped)
-      })
+      .then(res => setUsers((res.data || []).map(mapUser)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
@@ -38,7 +42,8 @@ export function useAdminUsers() {
     if (!user) return
     api.put(`/api/users/${id}`, { banned: !user.banned })
       .then(() => {
-        setUsers(prev => prev.map(u => u.id === id ? { ...u, banned: !u.banned } : u))
+        setUsers(prev => prev.map(u =>
+          u.id === id ? { ...u, banned: !u.banned } : u))
       })
       .catch(() => {})
   }
@@ -48,27 +53,25 @@ export function useAdminUsers() {
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
-    if (selectedUser) {
-      setUsers(prev => prev.filter(u => u.id !== selectedUser.id))
-    }
-    setDeleteDialogOpen(false)
-    setSelectedUser(null)
-  }
-
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false)
     setSelectedUser(null)
   }
 
+  const handleDeleteConfirm = () => {
+    const target = selectedUser
+    handleDeleteCancel()
+    if (!target) return
+    api.delete(`/api/users/${target.id}`)
+      .then(() => {
+        setUsers(prev => prev.filter(u => u.id !== target.id))
+      })
+      .catch(() => {})
+  }
+
   return {
-    users,
-    loading,
-    deleteDialogOpen,
-    selectedUser,
-    handleToggleBan,
-    handleDeleteClick,
-    handleDeleteConfirm,
-    handleDeleteCancel,
+    users, loading, deleteDialogOpen, selectedUser,
+    handleToggleBan, handleDeleteClick,
+    handleDeleteConfirm, handleDeleteCancel,
   }
 }

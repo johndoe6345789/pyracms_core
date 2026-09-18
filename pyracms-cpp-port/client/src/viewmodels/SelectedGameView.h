@@ -12,13 +12,13 @@ namespace SelectedGameView {
 
 struct Input {
     const GameEntry* entry = nullptr;
-    InstallRecord record;            // invalid when not installed
-    int state = 0;                   // GameStates::State
+    InstallRecord record; // invalid when not installed
+    int state = 0;        // GameStates::State
     double progress = 0.0;
     QString statusText;
-    QString selectedVersion;         // version chosen in the selector
+    QString selectedVersion; // version chosen in the selector
     QColor accent;
-    std::function<QString(const QString&)> mediaUrl;   // ref -> absolute URL
+    std::function<QString(const QString&)> mediaUrl; // ref -> absolute URL
 };
 
 // Everything the detail page needs, as one QVariantMap. The primary button

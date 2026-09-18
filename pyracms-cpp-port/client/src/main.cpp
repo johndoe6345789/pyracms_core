@@ -11,34 +11,9 @@
 #include "services/SettingsManager.h"
 #include "services/SingleInstance.h"
 #include "viewmodels/MainViewModel.h"
+#include "viewmodels/UrlEventFilter.h"
 
 using namespace Hypernucleus;
-
-namespace {
-
-// macOS delivers pyracms:// URLs as QFileOpenEvent instead of arguments.
-class UrlEventFilter : public QObject {
-public:
-    explicit UrlEventFilter(MainViewModel* vm) : QObject(vm), m_vm(vm) {}
-
-protected:
-    bool eventFilter(QObject* watched, QEvent* event) override
-    {
-        if (event->type() == QEvent::FileOpen) {
-            const QUrl url = static_cast<QFileOpenEvent*>(event)->url();
-            if (url.isValid()) {
-                m_vm->handleUrl(url.toString());
-                return true;
-            }
-        }
-        return QObject::eventFilter(watched, event);
-    }
-
-private:
-    MainViewModel* m_vm;
-};
-
-} // namespace
 
 int main(int argc, char* argv[])
 {
@@ -61,8 +36,8 @@ int main(int argc, char* argv[])
     {
         SettingsManager tempSettings;
         const QString lang = tempSettings.language();
-        if (!lang.isEmpty() && lang != "en"
-            && translator.load("hypernucleus_" + lang, ":/translations")) {
+        if (!lang.isEmpty() && lang != "en" &&
+            translator.load("hypernucleus_" + lang, ":/translations")) {
             app.installTranslator(&translator);
         }
     }
@@ -73,27 +48,27 @@ int main(int argc, char* argv[])
 
     QObject::connect(&single, &SingleInstance::messageReceived, viewModel,
                      [viewModel](const QString& message) {
-        if (message == QLatin1String("focus"))
-            emit viewModel->raiseWindow();
-        else
-            viewModel->handleUrl(message);
-    });
+                         if (message == QLatin1String("focus"))
+                             emit viewModel->raiseWindow();
+                         else
+                             viewModel->handleUrl(message);
+                     });
 
     QQmlApplicationEngine engine;
     engine.addImportPath(QStringLiteral("qrc:/qt/qml"));
 
     const QUrl mainQml(QStringLiteral("qrc:/qt/qml/Hypernucleus/qml/Main.qml"));
     QObject::connect(
-        &engine, &QQmlApplicationEngine::objectCreated,
-        &app, [mainQml](QObject* obj, const QUrl& objUrl) {
-            if (!obj && mainQml == objUrl)
-                QCoreApplication::exit(-1);
+        &engine, &QQmlApplicationEngine::objectCreated, &app,
+        [mainQml](QObject* obj, const QUrl& objUrl) {
+            if (!obj && mainQml == objUrl) QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection);
     engine.load(mainQml);
 
     if (!link.isEmpty())
-        QTimer::singleShot(0, viewModel, [viewModel, link]() { viewModel->handleUrl(link); });
+        QTimer::singleShot(0, viewModel,
+                           [viewModel, link]() { viewModel->handleUrl(link); });
 
     return app.exec();
 }

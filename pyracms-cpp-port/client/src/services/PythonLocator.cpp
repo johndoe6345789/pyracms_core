@@ -8,7 +8,8 @@ namespace PythonLocator {
 
 QStringList managedCandidates()
 {
-    return {QStringLiteral("python/python.exe"), QStringLiteral("python/bin/python3"),
+    return {QStringLiteral("python/python.exe"),
+            QStringLiteral("python/bin/python3"),
             QStringLiteral("python/bin/python")};
 }
 
@@ -21,7 +22,8 @@ PythonInfo find(const QString& configuredPath, const QString& dataDir)
             info.exe = fi.absoluteFilePath();
             return info;
         }
-        const QString onPath = QStandardPaths::findExecutable(configuredPath.trimmed());
+        const QString onPath =
+            QStandardPaths::findExecutable(configuredPath.trimmed());
         if (!onPath.isEmpty()) {
             info.exe = onPath;
             return info;
@@ -36,19 +38,19 @@ PythonInfo find(const QString& configuredPath, const QString& dataDir)
     }
 
     QString storeStub;
-    for (const QString& cand : {QStringLiteral("python3"), QStringLiteral("python")}) {
+    for (const QString& cand :
+         {QStringLiteral("python3"), QStringLiteral("python")}) {
         const QString p = QStandardPaths::findExecutable(cand);
-        if (p.isEmpty())
-            continue;
+        if (p.isEmpty()) continue;
         if (p.contains("WindowsApps", Qt::CaseInsensitive)) {
-            if (storeStub.isEmpty())
-                storeStub = p;
+            if (storeStub.isEmpty()) storeStub = p;
             continue;
         }
         info.exe = p;
         return info;
     }
-    const QString launcher = QStandardPaths::findExecutable(QStringLiteral("py"));
+    const QString launcher =
+        QStandardPaths::findExecutable(QStringLiteral("py"));
     if (!launcher.isEmpty()) {
         info.exe = launcher;
         info.prefix = QStringList{QStringLiteral("-3")};

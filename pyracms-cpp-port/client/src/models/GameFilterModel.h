@@ -12,9 +12,11 @@ class GameFilterModel : public QSortFilterProxyModel {
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Owned by MainViewModel")
-    Q_PROPERTY(QString searchText READ searchText WRITE setSearchText NOTIFY searchTextChanged)
+    Q_PROPERTY(QString searchText READ searchText WRITE setSearchText NOTIFY
+                   searchTextChanged)
     Q_PROPERTY(int filter READ filter WRITE setFilter NOTIFY filterChanged)
-    Q_PROPERTY(QString category READ category WRITE setCategory NOTIFY categoryChanged)
+    Q_PROPERTY(
+        QString category READ category WRITE setCategory NOTIFY categoryChanged)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
@@ -41,8 +43,10 @@ signals:
     void countChanged();
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex& parent) const override;
-    bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+    bool filterAcceptsRow(int sourceRow,
+                          const QModelIndex& parent) const override;
+    bool lessThan(const QModelIndex& left,
+                  const QModelIndex& right) const override;
 
 private:
     QString m_search;

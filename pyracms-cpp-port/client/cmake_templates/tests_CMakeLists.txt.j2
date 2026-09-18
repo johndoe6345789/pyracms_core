@@ -1,38 +1,79 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 
-# Find Google Test
-find_package(GTest)
-
-if(NOT GTest_FOUND)
-    message(STATUS "Google Test not found, downloading from GitHub...")
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.14.0
-    )
-    FetchContent_MakeAvailable(googletest)
-endif()
-
-# Find Qt6 Test module
 find_package(Qt6 REQUIRED COMPONENTS Test)
 
-# Auto-generated test sources — run `python generate_cmake.py` to update
-set(TEST_SOURCES
-{% for src in test_sources %}
+# --- QtTest suites: one executable per file in tests/qt ---------------------
+# Auto-generated -- run `python generate_cmake.py` to update
+set(QT_TEST_SOURCES
+{% for src in qt_test_sources %}
     {{ src }}
 {% endfor %}
 )
 
-add_executable(hypernucleus_tests ${TEST_SOURCES})
-
-target_link_libraries(hypernucleus_tests
-    PRIVATE
-    hypernucleus_lib
-    Qt6::Test
-    GTest::gtest_main
-    GTest::gmock
+# QML-facing C++ types (models, view-models) compiled without the QML
+# module so QtTest can exercise them: suites named qtst_Ui*.cpp use it.
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml)
+set(UI_SOURCES
+{% for src in module_sources %}
+    ${CMAKE_SOURCE_DIR}/{{ src }}
+{% endfor %}
+{% for hdr in module_headers %}
+    ${CMAKE_SOURCE_DIR}/{{ hdr }}
+{% endfor %}
 )
+add_library(hypernucleus_ui_test STATIC ${UI_SOURCES})
+target_link_libraries(hypernucleus_ui_test PUBLIC
+    hypernucleus_lib Qt6::Gui Qt6::Qml)
+target_include_directories(hypernucleus_ui_test PUBLIC
+    ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/models
+    ${CMAKE_SOURCE_DIR}/src/viewmodels)
 
-include(GoogleTest)
-gtest_discover_tests(hypernucleus_tests)
+foreach(test_src ${QT_TEST_SOURCES})
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
+    target_link_libraries(${test_name} PRIVATE hypernucleus_lib Qt6::Test)
+    if(test_name MATCHES "^qtst_Ui")
+        target_link_libraries(${test_name} PRIVATE hypernucleus_ui_test)
+    endif()
+    add_test(NAME ${test_name} COMMAND ${test_name})
+    # The suites use their own QSettings / data folders, never the user's.
+    set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+endforeach()
+
+# --- GoogleTest suites (original tests, one executable) ---------------------
+option(BUILD_GTEST_TESTS "Build the GoogleTest suites (needs network or GTest)" ON)
+
+if(BUILD_GTEST_TESTS)
+    find_package(GTest)
+
+    if(NOT GTest_FOUND)
+        message(STATUS "Google Test not found, downloading from GitHub...")
+        include(FetchContent)
+        FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.14.0
+        )
+        FetchContent_MakeAvailable(googletest)
+    endif()
+
+    # Auto-generated test sources
+    set(TEST_SOURCES
+{% for src in test_sources %}
+        {{ src }}
+{% endfor %}
+    )
+
+    add_executable(hypernucleus_tests ${TEST_SOURCES})
+
+    target_link_libraries(hypernucleus_tests
+        PRIVATE
+        hypernucleus_lib
+        Qt6::Test
+        GTest::gtest_main
+        GTest::gmock
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(hypernucleus_tests)
+endif()

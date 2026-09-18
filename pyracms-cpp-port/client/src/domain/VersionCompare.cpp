@@ -8,7 +8,7 @@ namespace VersionCompare {
 
 int compare(const QString& a, const QString& b)
 {
-    static const QRegularExpression sep("[.\-_+]");
+    static const QRegularExpression sep(R"([.\-_+])");
     const QStringList pa = a.trimmed().split(sep, Qt::SkipEmptyParts);
     const QStringList pb = b.trimmed().split(sep, Qt::SkipEmptyParts);
     const int n = qMax(pa.size(), pb.size());
@@ -20,8 +20,7 @@ int compare(const QString& a, const QString& b)
         const qlonglong na = sa.toLongLong(&oka);
         const qlonglong nb = sb.toLongLong(&okb);
         if (oka && okb) {
-            if (na != nb)
-                return na < nb ? -1 : 1;
+            if (na != nb) return na < nb ? -1 : 1;
         } else if (sa != sb) {
             return sa < sb ? -1 : 1;
         }

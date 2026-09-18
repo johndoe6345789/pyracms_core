@@ -17,16 +17,15 @@ struct Walker {
 
     void visit(const DepRef& ref)
     {
-        if (done.contains(ref.name))
-            return;
+        if (done.contains(ref.name)) return;
         if (active.contains(ref.name)) {
-            if (cycles)
-                cycles->append(stack.last() + " -> " + ref.name);
+            if (cycles) cycles->append(stack.last() + " -> " + ref.name);
             return;
         }
         active.insert(ref.name);
         stack.append(ref.name);
-        const QList<DepRef> children = lookup ? lookup(ref.name) : QList<DepRef>();
+        const QList<DepRef> children =
+            lookup ? lookup(ref.name) : QList<DepRef>();
         for (const DepRef& child : children)
             visit(child);
         stack.removeLast();

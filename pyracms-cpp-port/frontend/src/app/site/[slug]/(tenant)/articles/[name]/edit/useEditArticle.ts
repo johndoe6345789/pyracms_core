@@ -1,0 +1,94 @@
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useArticleEditor } from '@/hooks/useArticleEditor'
+import api from '@/lib/api'
+import {
+  buildRevisionSummary, type ArticleEditSnapshot,
+} from './editSummary'
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+export function useEditArticle(
+  slug: string,
+  name: string,
+  tenantId: number | null,
+) {
+  const router = useRouter()
+  const editor = useArticleEditor()
+  const { content, renderer, tagsInput, setSummary } = editor
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [origRenderer, setOrigRenderer] = useState('')
+  const [original, setOriginal] =
+    useState<ArticleEditSnapshot | null>(null)
+  const [summaryEdited, setSummaryEdited] = useState(false)
+
+  useEffect(() => {
+    if (!tenantId) return
+    api
+      .get(`/api/articles/${name}?tenant_id=${tenantId}`)
+      .then((res) => {
+        const a = res.data
+        const r = cap((a.rendererName || 'html').toLowerCase())
+        const tags = (a.tags || []).join(', ')
+        editor.setTitle(a.displayName || '')
+        editor.setContent(a.content || '')
+        editor.setRenderer(r)
+        editor.setTagsInput(tags)
+        setOrigRenderer(r)
+        setOriginal({
+          content: a.content || '',
+          renderer: r,
+          tagsInput: tags,
+        })
+        setSummaryEdited(false)
+        editor.setSummary('')
+      })
+      .catch(() => setError('Failed to load article'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, tenantId])
+
+  useEffect(() => {
+    if (!original || summaryEdited) return
+    setSummary(
+      buildRevisionSummary(original, { content, renderer, tagsInput }),
+    )
+  }, [content, renderer, tagsInput, original, summaryEdited, setSummary])
+
+  const save = async () => {
+    if (!tenantId) return
+    setSaving(true)
+    setError('')
+    try {
+      await api.put(`/api/articles/${name}`, {
+        content: editor.content,
+        summary: editor.summary || 'Updated article',
+        tenant_id: tenantId,
+      })
+      await api
+        .put(`/api/articles/${name}/tags`, {
+          tags: editor.parsedTags,
+          tenant_id: tenantId,
+        })
+        .catch(() => {})
+      if (editor.renderer !== origRenderer) {
+        await api
+          .put(`/api/articles/${name}/renderer`, {
+            renderer: editor.renderer.toLowerCase(),
+            tenant_id: tenantId,
+          })
+          .catch(() => {})
+      }
+      router.push(`/site/${slug}/articles/${name}`)
+    } catch {
+      setError('Failed to save article')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return {
+    editor, saving, error, save,
+    markSummaryEdited: () => setSummaryEdited(true),
+  }
+}

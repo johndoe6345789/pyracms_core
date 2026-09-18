@@ -15,7 +15,7 @@ struct DownloadTarget {
     qint64 size = 0;
     QString sha256;
     QString executable;
-    QString moduleType;      // "file" | "folder" (python layout)
+    QString moduleType;       // "file" | "folder" (python layout)
     bool nativeBuild = false; // true: OS-specific binary, false: python source
     QString version;
 

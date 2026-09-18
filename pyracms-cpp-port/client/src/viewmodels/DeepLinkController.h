@@ -40,7 +40,8 @@ public:
 signals:
     void pendingChanged();
     void rejected(const QString& error);
-    void accepted(const QString& action, const QString& slug, const QString& name);
+    void accepted(const QString& action, const QString& slug,
+                  const QString& name);
 
 private:
     DeepLink m_link;

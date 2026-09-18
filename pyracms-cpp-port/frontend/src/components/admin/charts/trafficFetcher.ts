@@ -65,7 +65,7 @@ export function fetchFallback(
       .catch(() => 0),
     api.get(`/api/snippets${q}`)
       .then((r) =>
-        (r.data.items || r.data || []).length)
+        (r.data?.items || r.data || []).length)
       .catch(() => 0),
     api.get(`/api/gallery/albums${q}`)
       .then((r) => countPics(r.data || []))

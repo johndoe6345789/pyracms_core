@@ -1,14 +1,5 @@
+<!-- QML now ships inside the "Hypernucleus" QML module (qt_add_qml_module in
+     CMakeLists.txt). This file is intentionally empty and not referenced by
+     the build; it can be deleted. -->
 <RCC>
-    <qresource prefix="/">
-        <file>qml/Main.qml</file>
-        <file>qml/components/GameDepTab.qml</file>
-        <file>qml/components/InfoPanel.qml</file>
-        <file>qml/components/PicturesPanel.qml</file>
-        <file>qml/components/ToolBar.qml</file>
-        <file>qml/components/ProgressOverlay.qml</file>
-        <file>qml/dialogs/SettingsDialog.qml</file>
-        <file>qml/dialogs/LoginDialog.qml</file>
-        <file>qml/dialogs/RegisterDialog.qml</file>
-        <file>qml/theme/Theme.qml</file>
-    </qresource>
 </RCC>

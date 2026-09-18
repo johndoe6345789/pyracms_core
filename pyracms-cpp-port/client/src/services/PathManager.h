@@ -51,8 +51,10 @@ public:
     Q_INVOKABLE void setDataDir(const QString& dir);
 
     // `version` is accepted for API compatibility but not part of the path.
-    Q_INVOKABLE QString gameDir(const QString& name, const QString& version = QString()) const;
-    Q_INVOKABLE QString depDir(const QString& name, const QString& version = QString()) const;
+    Q_INVOKABLE QString gameDir(const QString& name,
+                                const QString& version = QString()) const;
+    Q_INVOKABLE QString depDir(const QString& name,
+                               const QString& version = QString()) const;
     QString pipTargetDir(const QString& gameName) const;
     Q_INVOKABLE QString archivePath(const QString& filename) const;
 

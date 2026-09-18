@@ -13,35 +13,47 @@ export interface ArticleSummary {
   tags: string[]
 }
 
+type Raw = Record<string, any>
+
+export function mapSummary(a: Raw): ArticleSummary {
+  const content = typeof a.content === 'string'
+    ? a.content.replace(/<[^>]*>/g, '').substring(0, 120)
+      + '...'
+    : ''
+  return {
+    name: a.name,
+    title: a.displayName ?? a.name ?? '',
+    excerpt: content,
+    author: a.authorUsername || 'Unknown',
+    date: typeof a.createdAt === 'string'
+      ? a.createdAt.split('T')[0] ?? ''
+      : '',
+    views: a.viewCount || 0,
+    tags: Array.isArray(a.tags) ? a.tags : [],
+  }
+}
+
 export function useArticles(tenantId: number | null) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [allArticles, setAllArticles] = useState<ArticleSummary[]>([])
+  const [allArticles, setAllArticles] =
+    useState<ArticleSummary[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
     api.get(`/api/articles?tenant_id=${tenantId}`)
-      .then(res => {
-        const mapped: ArticleSummary[] = (res.data || []).map((a: Record<string, unknown>) => ({
-          name: a.name,
-          title: a.displayName,
-          excerpt: typeof a.content === 'string' ? (a.content as string).replace(/<[^>]*>/g, '').substring(0, 120) + '...' : '',
-          author: (a as Record<string, unknown>).authorUsername || 'Unknown',
-          date: typeof a.createdAt === 'string' ? (a.createdAt as string).split('T')[0] : '',
-          views: a.viewCount || 0,
-          tags: Array.isArray(a.tags) ? a.tags : [],
-        }))
-        setAllArticles(mapped)
-      })
+      .then((res) =>
+        setAllArticles((res.data || []).map(mapSummary)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [tenantId])
 
+  const q = searchQuery.toLowerCase()
   const articles = allArticles.filter(
     (a) =>
-      a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
+      a.title.toLowerCase().includes(q) ||
+      a.tags.some((t) => t.toLowerCase().includes(q))
   )
 
   return { articles, searchQuery, setSearchQuery, loading }

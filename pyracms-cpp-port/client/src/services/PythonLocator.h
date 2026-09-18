@@ -6,8 +6,8 @@
 namespace Hypernucleus {
 
 struct PythonInfo {
-    QString exe;          // empty = not found
-    QStringList prefix;   // extra leading args (e.g. "-3" for the "py" launcher)
+    QString exe;        // empty = not found
+    QStringList prefix; // extra leading args (e.g. "-3" for the "py" launcher)
     bool found() const { return !exe.isEmpty(); }
 };
 

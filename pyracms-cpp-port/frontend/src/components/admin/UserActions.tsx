@@ -1,5 +1,4 @@
-import { IconButton, Tooltip } from
-  '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 import {
   EditOutlined,
   BlockOutlined,
@@ -21,59 +20,34 @@ export default function UserActions({
   onDelete,
   onEdit,
 }: UserActionsProps) {
+  const { id, username, banned } = user
   return (
     <>
       <Tooltip title="Edit">
         <IconButton
           size="small"
           color="primary"
-          onClick={
-            () => onEdit?.(user)
-          }
-          aria-label={
-            `Edit user ${user.username}`
-          }
-          data-testid={
-            `edit-user-${user.id}`
-          }
+          onClick={() => onEdit?.(user)}
+          aria-label={`Edit user ${username}`}
+          data-testid={`edit-user-${id}`}
         >
-          <EditOutlined
-            fontSize="small"
-          />
+          <EditOutlined fontSize="small" />
         </IconButton>
       </Tooltip>
-      <Tooltip
-        title={
-          user.banned ? 'Unban' : 'Ban'
-        }
-      >
+      <Tooltip title={banned ? 'Unban' : 'Ban'}>
         <IconButton
           size="small"
-          color={
-            user.banned
-              ? 'success'
-              : 'warning'
-          }
-          onClick={
-            () => onToggleBan(user.id)
-          }
+          color={banned ? 'success' : 'warning'}
+          onClick={() => onToggleBan(id)}
           aria-label={
-            user.banned
-              ? `Unban ${user.username}`
-              : `Ban ${user.username}`
+            banned ? `Unban ${username}` : `Ban ${username}`
           }
-          data-testid={
-            `ban-user-${user.id}`
-          }
+          data-testid={`ban-user-${id}`}
         >
-          {user.banned ? (
-            <CheckCircleOutlined
-              fontSize="small"
-            />
+          {banned ? (
+            <CheckCircleOutlined fontSize="small" />
           ) : (
-            <BlockOutlined
-              fontSize="small"
-            />
+            <BlockOutlined fontSize="small" />
           )}
         </IconButton>
       </Tooltip>
@@ -81,20 +55,11 @@ export default function UserActions({
         <IconButton
           size="small"
           color="error"
-          onClick={
-            () => onDelete(user)
-          }
-          aria-label={
-            `Delete user ` +
-            user.username
-          }
-          data-testid={
-            `delete-user-${user.id}`
-          }
+          onClick={() => onDelete(user)}
+          aria-label={`Delete user ${username}`}
+          data-testid={`delete-user-${id}`}
         >
-          <DeleteOutlined
-            fontSize="small"
-          />
+          <DeleteOutlined fontSize="small" />
         </IconButton>
       </Tooltip>
     </>

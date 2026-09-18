@@ -4,6 +4,9 @@
 #include <QFile>
 #include <QObject>
 #include <QProcess>
+#include <QProcessEnvironment>
+
+#include "domain/InstallStateStore.h"
 #include <QString>
 
 namespace Hypernucleus {
@@ -49,6 +52,10 @@ signals:
     void gameOutput(const QString& text);
 
 private:
+    bool prepareNative(const InstallRecord& rec, QString& program);
+    bool preparePython(const InstallRecord& rec, QString& program,
+                       QStringList& args, QProcessEnvironment& env);
+    void openLog(const InstallRecord& rec);
     void connectProcess(const QString& name);
     void append(const QString& text);
     void finishRun();

@@ -1,157 +1,80 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
-import QtQuick.Layouts 1.15
-import "../theme" as Theme
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Hypernucleus
 
+// Sign in to a PyraCMS site. Accounts are per site (tenant), so the site
+// slug is part of the login request: {username, password, tenant}.
 Dialog {
     id: root
 
-    title: qsTr("Login to Hypernucleus")
-    modal: true
-    width: 380
-    height: 340
-    closePolicy: Popup.NoAutoClose
-    standardButtons: Dialog.NoButton
-
     property string errorMessage: ""
+    property bool busy: false
+    signal registerRequested()
 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: Theme.Theme.spacingMedium
+    title: qsTr("Sign in to Hypernucleus")
+    modal: true
+    parent: Overlay.overlay
+    anchors.centerIn: parent
+    width: 420
+    closePolicy: Popup.CloseOnEscape
 
-        // Logo/header area
-        Label {
-            text: qsTr("Hypernucleus")
-            font.pixelSize: Theme.Theme.fontSizeHeader
-            font.bold: true
-            color: Theme.Theme.primary
-            Layout.alignment: Qt.AlignHCenter
+    function submit() {
+        const site = fields.site.text.trim()
+        const user = fields.user.text.trim()
+        const server = fields.server.text.trim()
+        if (site === "" || user === "" || fields.pass.text === "") {
+            errorMessage = qsTr("Site, username and password are required.")
+            return
         }
+        errorMessage = ""
+        busy = true
+        if (server !== MainViewModel.settings.repoUrl)
+            MainViewModel.settings.repoUrl = server
+        MainViewModel.auth.login(user, fields.pass.text, site)
+    }
 
-        Label {
-            text: qsTr("Sign in to manage your games and dependencies")
-            font.pixelSize: Theme.Theme.fontSizeSmall
-            color: Theme.Theme.textSecondary
-            Layout.alignment: Qt.AlignHCenter
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-        Item { Layout.preferredHeight: Theme.Theme.spacingNormal }
-
-        // Username
-        TextField {
-            id: usernameField
-            Layout.fillWidth: true
-            placeholderText: qsTr("Username")
-            font.pixelSize: Theme.Theme.fontSizeNormal
-            inputMethodHints: Qt.ImhNoAutoUppercase
-
-            Keys.onReturnPressed: passwordField.forceActiveFocus()
-            Keys.onEnterPressed: passwordField.forceActiveFocus()
-        }
-
-        // Password
-        TextField {
-            id: passwordField
-            Layout.fillWidth: true
-            placeholderText: qsTr("Password")
-            font.pixelSize: Theme.Theme.fontSizeNormal
-            echoMode: TextInput.Password
-
-            Keys.onReturnPressed: loginButton.clicked()
-            Keys.onEnterPressed: loginButton.clicked()
-        }
-
-        // Error message
-        Label {
-            text: root.errorMessage
-            visible: root.errorMessage !== ""
-            color: Theme.Theme.error
-            font.pixelSize: Theme.Theme.fontSizeSmall
-            Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-        }
-
-        Item { Layout.fillHeight: true }
-
-        // Login button
-        Button {
-            id: loginButton
-            text: apiClient.loading ? qsTr("Signing in...") : qsTr("Sign In")
-            Layout.fillWidth: true
-            enabled: usernameField.text.length > 0 &&
-                     passwordField.text.length > 0 &&
-                     !apiClient.loading
-            Material.background: Theme.Theme.primary
-            Material.foreground: Theme.Theme.textOnPrimary
-            font.pixelSize: Theme.Theme.fontSizeNormal
-
-            onClicked: {
-                root.errorMessage = ""
-                authService.login(usernameField.text, passwordField.text)
-            }
-        }
-
-        // Register link
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: Theme.Theme.spacingSmall
-
-            Label {
-                text: qsTr("Don't have an account?")
-                font.pixelSize: Theme.Theme.fontSizeSmall
-                color: Theme.Theme.textSecondary
-            }
-
-            Label {
-                text: qsTr("Register")
-                font.pixelSize: Theme.Theme.fontSizeSmall
-                color: Theme.Theme.primary
-                font.underline: true
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.close()
-                        registerDialog.open()
-                    }
-                }
-            }
-        }
-
-        // Skip login (for browsing without auth)
-        Button {
-            text: qsTr("Continue without login")
-            Layout.alignment: Qt.AlignHCenter
-            flat: true
-            font.pixelSize: Theme.Theme.fontSizeSmall
-            Material.foreground: Theme.Theme.textSecondary
-
-            onClicked: {
-                root.close()
-                mainViewModel.refreshCatalog()
-            }
-        }
+    onAboutToShow: {
+        fields.server.text = MainViewModel.settings.repoUrl
+        fields.site.text = MainViewModel.settings.tenantSlug
+        errorMessage = ""
+        busy = false
+        if (fields.site.text === "")
+            fields.site.forceActiveFocus()
+        else
+            fields.user.forceActiveFocus()
     }
 
     Connections {
-        target: authService
-        function onLoginFailed(error) {
-            root.errorMessage = error
-        }
+        target: MainViewModel.auth
         function onLoginSuccess() {
-            root.errorMessage = ""
-            usernameField.text = ""
-            passwordField.text = ""
+            root.busy = false
+            fields.pass.text = ""
+            root.close()
+        }
+        function onLoginFailed(error) {
+            root.busy = false
+            root.errorMessage = error
         }
     }
 
-    onOpened: {
-        root.errorMessage = ""
-        usernameField.forceActiveFocus()
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: Theme.spaceM
+
+        LoginFields { id: fields; onSubmitted: root.submit() }
+        ErrorLabel { text: root.errorMessage }
+
+        AuthButtons {
+            spacing: Theme.spaceM
+            backText: qsTr("Create account")
+            skipText: qsTr("Browse without signing in")
+            submitText: root.busy ? qsTr("Signing in...")
+                                  : qsTr("Sign in")
+            busy: root.busy
+            onBackClicked: { root.close(); root.registerRequested() }
+            onSkipClicked: root.close()
+            onSubmitClicked: root.submit()
+        }
     }
 }

@@ -1,21 +1,19 @@
 'use client'
 
-import { useState } from 'react'
 import {
-  Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Paper,
 } from '@mui/material'
-import DOMPurify from 'dompurify'
 import type { Revision } from '@/hooks/useRevisions'
-import api from '@/lib/api'
-import {
-  RevisionViewDialog,
-} from './RevisionViewDialog'
-import {
-  RevertConfirmDialog,
-} from './RevertConfirmDialog'
+import { RevisionViewDialog } from './RevisionViewDialog'
+import { RevertConfirmDialog } from './RevertConfirmDialog'
 import { RevisionRow } from './RevisionRow'
+import { useRevisionDialogs } from './useRevisionDialogs'
 
 interface RevisionTableProps {
   revisions: Revision[]
@@ -25,42 +23,20 @@ interface RevisionTableProps {
   onRevert?: (n: number) => Promise<void>
 }
 
+const hdr = { fontWeight: 600 }
+
 export function RevisionTable({
-  revisions, latestRevision,
-  articleName, tenantId, onRevert,
+  revisions,
+  latestRevision,
+  articleName,
+  tenantId,
+  onRevert,
 }: RevisionTableProps) {
-  const [dlgOpen, setDlgOpen] = useState(false)
-  const [content, setContent] = useState('')
-  const [viewRev, setViewRev] =
-    useState<Revision | null>(null)
-  const [revertNum, setRevertNum] =
-    useState<number | null>(null)
+  const d = useRevisionDialogs(articleName, tenantId, onRevert)
 
-  const handleView = (rev: Revision) => {
-    if (!articleName || !tenantId) return
-    const url = `/api/articles/${articleName}`
-      + `/revisions/${rev.number}`
-      + `?tenant_id=${tenantId}`
-    api.get(url).then((res) => {
-      setContent(DOMPurify.sanitize(
-        res.data.content || ''))
-      setViewRev(rev)
-      setDlgOpen(true)
-    }).catch(() => {})
-  }
-
-  const handleRevert = () => {
-    if (revertNum === null || !onRevert) return
-    onRevert(revertNum)
-      .then(() => setRevertNum(null))
-      .catch(() => {})
-  }
-
-  const hdr = { fontWeight: 600 }
   return (
     <>
-      <TableContainer
-        component={Paper} variant="outlined">
+      <TableContainer component={Paper} variant="outlined">
         <Table data-testid="revision-table">
           <TableHead>
             <TableRow>
@@ -69,30 +45,34 @@ export function RevisionTable({
               <TableCell sx={hdr}>Date</TableCell>
               <TableCell sx={hdr}>Summary</TableCell>
               <TableCell sx={hdr} align="right">
-                Actions</TableCell>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {revisions.map((rev) => (
-              <RevisionRow key={rev.number}
+              <RevisionRow
+                key={rev.number}
                 rev={rev}
-                isLatest={
-                  rev.number === latestRevision}
-                onView={handleView}
-                onRevert={setRevertNum} />
+                isLatest={rev.number === latestRevision}
+                onView={d.handleView}
+                onRevert={d.setRevertNum}
+              />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
       <RevisionViewDialog
-        open={dlgOpen}
-        onClose={() => setDlgOpen(false)}
-        revision={viewRev}
-        sanitizedContent={content} />
+        open={d.dlgOpen}
+        onClose={() => d.setDlgOpen(false)}
+        revision={d.viewRev}
+        sanitizedContent={d.content}
+      />
       <RevertConfirmDialog
-        revisionNumber={revertNum}
-        onClose={() => setRevertNum(null)}
-        onConfirm={handleRevert} />
+        revisionNumber={d.revertNum}
+        onClose={() => d.setRevertNum(null)}
+        onConfirm={d.handleRevert}
+      />
     </>
   )
 }

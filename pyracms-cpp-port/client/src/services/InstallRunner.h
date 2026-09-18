@@ -30,7 +30,8 @@ signals:
     // stepIndex is 0-based; label describes the current step.
     void stepChanged(const QString& root, int stepIndex, int stepCount,
                      const QString& label);
-    void progress(const QString& root, int phase, qint64 received, qint64 total);
+    void progress(const QString& root, int phase, qint64 received,
+                  qint64 total);
     void log(const QString& root, const QString& text);
     void finished(const QString& root);
     void failed(const QString& root, const QString& error);

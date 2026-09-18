@@ -3,6 +3,7 @@
 #include "domain/BinarySelector.h"
 
 #include <QList>
+#include <QMetaType>
 #include <QString>
 #include <QStringList>
 
@@ -12,16 +13,17 @@ struct PlanStep {
     enum class Kind { Module, Pip };
 
     Kind kind = Kind::Module;
-    QString name;             // module name, or the game a Pip step belongs to
+    QString name; // module name, or the game a Pip step belongs to
     QString version;
-    QString type;             // "game" | "dep" (Module steps)
-    DownloadTarget target;    // Module steps
-    QStringList pipSpecs;     // Pip steps
+    QString type;          // "game" | "dep" (Module steps)
+    DownloadTarget target; // Module steps
+    QStringList pipSpecs;  // Pip steps
 
     QString label() const
     {
-        return kind == Kind::Pip ? QStringLiteral("pip packages for %1").arg(name)
-                                 : QStringLiteral("%1 %2").arg(name, version);
+        return kind == Kind::Pip
+                   ? QStringLiteral("pip packages for %1").arg(name)
+                   : QStringLiteral("%1 %2").arg(name, version);
     }
 };
 
@@ -31,8 +33,10 @@ struct InstallPlan {
     QString rootName;
     QString rootVersion;
     QList<PlanStep> steps;
-    QStringList depNames;     // every PyraCMS dependency module (recursive)
-    QStringList pipSpecs;     // every pip requirement
+    QStringList depNames; // every PyraCMS dependency module (recursive)
+    QStringList pipSpecs; // every pip requirement
 };
 
 } // namespace Hypernucleus
+
+Q_DECLARE_METATYPE(Hypernucleus::InstallPlan)

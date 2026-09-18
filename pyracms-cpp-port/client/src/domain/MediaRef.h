@@ -12,11 +12,12 @@ namespace MediaRef {
 inline QString toPath(const QString& ref)
 {
     const QString r = ref.trimmed();
-    if (r.isEmpty())
-        return {};
-    if (r.startsWith("http://") || r.startsWith("https://") || r.startsWith('/'))
+    if (r.isEmpty()) return {};
+    if (r.startsWith("http://") || r.startsWith("https://") ||
+        r.startsWith('/'))
         return r;
-    return QStringLiteral("/api/files/") + QString::fromLatin1(QUrl::toPercentEncoding(r));
+    return QStringLiteral("/api/files/") +
+           QString::fromLatin1(QUrl::toPercentEncoding(r));
 }
 
 } // namespace MediaRef

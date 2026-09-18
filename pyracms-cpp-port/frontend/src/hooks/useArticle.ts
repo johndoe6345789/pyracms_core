@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { formatDay } from './articleDate'
 
 export interface Article {
   title: string
@@ -16,7 +17,25 @@ export interface Article {
   revisionCount: number
 }
 
-export function useArticle(name: string, tenantId: number | null) {
+function mapArticle(a: Record<string, any>): Article {
+  return {
+    title: a.displayName || a.name,
+    content: a.content || '',
+    author: a.authorUsername || 'Unknown',
+    createdDate: formatDay(a.createdAt || ''),
+    renderer: (a.rendererName || 'html').toLowerCase(),
+    views: a.viewCount || 0,
+    likes: a.likes || 0,
+    dislikes: a.dislikes || 0,
+    tags: a.tags || [],
+    revisionCount: a.revisionCount || 0,
+  }
+}
+
+export function useArticle(
+  name: string,
+  tenantId: number | null
+) {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -24,26 +43,7 @@ export function useArticle(name: string, tenantId: number | null) {
     if (!name || !tenantId) return
     setLoading(true)
     api.get(`/api/articles/${name}?tenant_id=${tenantId}`)
-      .then(res => {
-        const a = res.data
-        const rawDate = a.createdAt || ''
-        const parsedDate = rawDate
-          ? new Date(rawDate.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00'))
-              .toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-          : ''
-        setArticle({
-          title: a.displayName || a.name,
-          content: a.content || '',
-          author: a.authorUsername || 'Unknown',
-          createdDate: parsedDate,
-          renderer: (a.rendererName || 'html').toLowerCase(),
-          views: a.viewCount || 0,
-          likes: a.likes || 0,
-          dislikes: a.dislikes || 0,
-          tags: a.tags || [],
-          revisionCount: a.revisionCount || 0,
-        })
-      })
+      .then((res) => setArticle(mapArticle(res.data)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [name, tenantId])
@@ -52,7 +52,7 @@ export function useArticle(name: string, tenantId: number | null) {
     if (!tenantId) return
     api.post(`/api/articles/${name}/vote`, { like: isLike })
       .then(() => {
-        setArticle(prev => prev ? {
+        setArticle((prev) => prev ? {
           ...prev,
           likes: prev.likes + (isLike ? 1 : 0),
           dislikes: prev.dislikes + (isLike ? 0 : 1),
