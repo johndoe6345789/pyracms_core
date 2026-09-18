@@ -8,10 +8,10 @@ export enum UserRole {
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.Guest]: 'Guest',
-  [UserRole.User]: 'User',
+  [UserRole.User]: 'Normal User',
   [UserRole.Moderator]: 'Moderator',
-  [UserRole.SiteAdmin]: 'Site Admin',
-  [UserRole.SuperAdmin]: 'Super Admin',
+  [UserRole.SiteAdmin]: 'Administrator',
+  [UserRole.SuperAdmin]: 'Platform Owner',
 }
 
 export interface User {

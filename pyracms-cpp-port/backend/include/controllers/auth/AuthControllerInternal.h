@@ -25,6 +25,7 @@ Json::Value userJson(const UserDto &user, const std::string &tenantSlug) {
     j["fullName"] = user.fullName;
     j["email"] = user.email;
     j["role"] = static_cast<int>(user.role);
+    j["roleName"] = roleName(user.role);
     j["tenantId"] = user.tenantId;
     j["tenantSlug"] =
         tenantSlug.empty() ? Json::Value() : Json::Value(tenantSlug);

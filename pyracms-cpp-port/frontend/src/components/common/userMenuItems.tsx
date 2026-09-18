@@ -25,7 +25,7 @@ export function portalMenuItems(isSuper: boolean, close: () => void) {
   ]
   if (isSuper) {
     items.push(
-      <MenuLink key="super" href="/super-admin" label="Super admin"
+      <MenuLink key="super" href="/super-admin" label="Platform owner"
         testId="super-admin-link" onClick={close}
         icon={<ShieldOutlined fontSize="small" />} />,
     )

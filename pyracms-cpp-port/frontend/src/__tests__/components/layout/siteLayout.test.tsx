@@ -70,6 +70,6 @@ describe('tenant shells', () => {
       makeUser({ role: UserRole.SuperAdmin }))
     fireEvent.click(screen.getByTestId('menu-toggle'))
     expect(screen.getByTestId('portal-drawer')).toBeInTheDocument()
-    expect(screen.getByText('Super admin')).toBeInTheDocument()
+    expect(screen.getByText('Platform owner')).toBeInTheDocument()
   })
 })

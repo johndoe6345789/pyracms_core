@@ -36,7 +36,7 @@ export function portalSections(isSuperAdmin: boolean): NavSection[] {
     sections.push({
       title: 'Platform',
       items: [{
-        key: 'super-admin', label: 'Super admin',
+        key: 'super-admin', label: 'Platform owner',
         href: '/super-admin', icon: <ShieldOutlined />,
       }],
     })

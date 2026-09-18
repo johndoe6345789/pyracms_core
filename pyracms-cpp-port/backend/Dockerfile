@@ -66,6 +66,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Docker CLI (static) so the code runner can start sandbox containers via
+# the host's docker.sock
+COPY --from=docker:27-cli /usr/local/bin/docker /usr/local/bin/docker
+
 WORKDIR /app
 
 # Copy binary, migrations, and openapi spec
@@ -79,9 +83,9 @@ RUN ldconfig
 
 # Init script to run migrations then start server
 COPY docker-entrypoint.sh /app/
-COPY seed.sh /app/
+COPY seed.sh seed_games.sh /app/
 # Windows checkouts can hand us CRLF scripts, which break the shebang
-RUN sed -i 's/\r$//' /app/docker-entrypoint.sh /app/seed.sh && chmod +x /app/docker-entrypoint.sh /app/seed.sh
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh /app/seed.sh /app/seed_games.sh && chmod +x /app/docker-entrypoint.sh /app/seed.sh
 
 EXPOSE 8080
 

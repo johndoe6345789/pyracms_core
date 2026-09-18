@@ -83,6 +83,11 @@ services:
       # OAUTH_GOOGLE_CLIENT_SECRET: ""
       # OAUTH_DISCORD_CLIENT_ID: ""
       # OAUTH_DISCORD_CLIENT_SECRET: ""
+    volumes:
+      # The code runner starts sibling sandbox containers on the host daemon.
+      # NOTE: this gives the backend control of the host Docker daemon;
+      # only use on a trusted dev machine.
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       postgres:
         condition: service_healthy
@@ -133,6 +138,9 @@ services:
       - frontend
       - backend
 
+# Build the sandbox images once with: docker compose --profile runners build
+# (they are only built, never started)
+
 # To build code snippet runners:
 # docker build -t pyracms-runner-python docker/python/
 # docker build -t pyracms-runner-node docker/node/
@@ -142,6 +150,42 @@ services:
 # docker build -t pyracms-runner-java docker/java/
 # docker build -t pyracms-runner-ruby docker/ruby/
 # Or use: python cli.py build --docker
+
+  runner-python:
+    build: ./docker/python
+    image: pyracms-runner-python
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-node:
+    build: ./docker/node
+    image: pyracms-runner-node
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-cpp:
+    build: ./docker/cpp
+    image: pyracms-runner-cpp
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-rust:
+    build: ./docker/rust
+    image: pyracms-runner-rust
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-go:
+    build: ./docker/go
+    image: pyracms-runner-go
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-java:
+    build: ./docker/java
+    image: pyracms-runner-java
+    profiles: [runners]
+    entrypoint: ["true"]
+  runner-ruby:
+    build: ./docker/ruby
+    image: pyracms-runner-ruby
+    profiles: [runners]
+    entrypoint: ["true"]
 
 volumes:
   postgres_data:

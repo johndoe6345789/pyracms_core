@@ -57,11 +57,11 @@ void DockerExecutionService::executeCode(
         std::ostringstream cmdStream;
         cmdStream << "docker run --rm"
                   << " --network=none"
-                  << " --memory=128m"
-                  << " --cpus=0.5"
-                  << " --pids-limit=64"
+                  << " --memory=512m"
+                  << " --cpus=1"
+                  << " --pids-limit=256"
                   << " --read-only"
-                  << " --tmpfs /tmp:rw,noexec,nosuid,size=64m"
+                  << " --tmpfs /tmp:rw,exec,nosuid,size=256m"
                   << " --security-opt=no-new-privileges"
                   << " " << image
                   << " '" << escapedCode << "'"
@@ -70,7 +70,7 @@ void DockerExecutionService::executeCode(
         std::string cmd = cmdStream.str();
 
         // Execute with timeout using the timeout command
-        std::string timeoutCmd = "timeout 10 " + cmd;
+        std::string timeoutCmd = "timeout 30 " + cmd;
 
         std::array<char, 4096> buffer;
         std::string output;
