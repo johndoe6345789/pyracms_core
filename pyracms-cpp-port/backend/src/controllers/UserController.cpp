@@ -145,8 +145,9 @@ void UserController::changePassword(
     auto requesterUsername = req->attributes()->get<std::string>("username");
 
     AuthService authService;
+    auto requesterTenant = req->attributes()->get<int>("tenantId");
     userService_.getPasswordHash(
-        db, requesterUsername,
+        db, requesterTenant, requesterUsername,
         [this, db, id, currentPassword, newPassword, authService, callback](
             const std::optional<std::string> &hash) mutable {
             if (!hash || !authService.verifyPassword(currentPassword, *hash)) {

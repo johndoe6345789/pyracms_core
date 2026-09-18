@@ -6,10 +6,12 @@ import { LoginOutlined } from '@mui/icons-material'
 interface Props {
   /** Error message to display, if any */
   error: string
+  /** Site being signed in to; omitted for platform accounts */
+  tenant?: string | undefined
 }
 
 /** Icon, heading, subtitle, and error/info banners for LoginForm. */
-export default function LoginHeader({ error }: Props) {
+export default function LoginHeader({ error, tenant }: Props) {
   return (
     <>
       <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -26,7 +28,9 @@ export default function LoginHeader({ error }: Props) {
           Welcome Back
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Sign in to continue to PyraCMS
+          {tenant
+            ? `Sign in to continue to ${tenant}`
+            : 'Sign in to continue to PyraCMS'}
         </Typography>
       </Box>
 
@@ -43,14 +47,16 @@ export default function LoginHeader({ error }: Props) {
         </Alert>
       )}
 
-      <Alert
-        severity="info"
-        sx={{ mb: 3, borderRadius: 2 }}
-        data-testid="login-info"
-      >
-        Test credentials:{' '}
-        <strong>admin</strong> / <strong>password123</strong>
-      </Alert>
+      {!tenant && (
+        <Alert
+          severity="info"
+          sx={{ mb: 3, borderRadius: 2 }}
+          data-testid="login-info"
+        >
+          Test credentials:{' '}
+          <strong>admin</strong> / <strong>password123</strong>
+        </Alert>
+      )}
     </>
   )
 }

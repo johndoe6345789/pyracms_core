@@ -304,12 +304,16 @@ describe('RegisterForm – data-testid attributes', () => {
 describe('RegisterForm – redirectTo prop', () => {
   it('passes redirectTo to useRegister when provided', () => {
     renderForm('/dashboard')
-    expect(mockUseRegister).toHaveBeenCalledWith('/dashboard')
+    expect(mockUseRegister).toHaveBeenCalledWith(
+      '/dashboard', undefined,
+    )
   })
 
   it('passes undefined to useRegister when redirectTo is omitted', () => {
     renderForm()
-    expect(mockUseRegister).toHaveBeenCalledWith(undefined)
+    expect(mockUseRegister).toHaveBeenCalledWith(
+      undefined, undefined,
+    )
   })
 })
 

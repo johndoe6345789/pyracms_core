@@ -5,6 +5,7 @@
 #include "services/UserService.h"
 #include "services/EmailService.h"
 #include "services/OAuthService.h"
+#include "services/TenantService.h"
 
 namespace pyracms {
 
@@ -57,6 +58,12 @@ public:
                         std::function<void(const drogon::HttpResponsePtr &)> &&callback);
 
 private:
+    void withTenant(
+        const Json::Value &json,
+        const std::function<void(const drogon::HttpResponsePtr &)> &callback,
+        std::function<void(int, const std::string &)> next);
+
+    TenantService tenantService_;
     AuthService authService_;
     UserService userService_;
     EmailService emailService_;

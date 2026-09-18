@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useMemo } from 'react'
 import * as Y from 'yjs'
+import { currentToken } from '@/lib/session'
 import { WebsocketProvider } from 'y-websocket'
 
 interface UseCollabEditorOptions {
@@ -21,7 +22,7 @@ export function useCollabEditor({ roomName, enabled = true }: UseCollabEditorOpt
   useEffect(() => {
     if (!enabled) return
 
-    const token = localStorage.getItem('token')
+    const token = currentToken()
     if (!token) return
 
     const ydoc = new Y.Doc()

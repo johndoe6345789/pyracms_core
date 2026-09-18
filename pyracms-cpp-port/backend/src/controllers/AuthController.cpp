@@ -2,63 +2,108 @@
 
 namespace pyracms {
 
+namespace {
+
+using Callback = std::function<void(const drogon::HttpResponsePtr &)>;
+
+void sendError(const Callback &callback, const std::string &message,
+               drogon::HttpStatusCode code) {
+    auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+    (*resp->jsonObject())["error"] = message;
+    resp->setStatusCode(code);
+    callback(resp);
+}
+
+// Shape shared by login / register / me. `tenantSlug` is empty for
+// platform accounts.
+Json::Value userJson(const UserDto &user, const std::string &tenantSlug) {
+    Json::Value j;
+    j["id"] = user.id;
+    j["username"] = user.username;
+    j["fullName"] = user.fullName;
+    j["email"] = user.email;
+    j["role"] = static_cast<int>(user.role);
+    j["tenantId"] = user.tenantId;
+    j["tenantSlug"] = tenantSlug.empty() ? Json::Value() : Json::Value(tenantSlug);
+    return j;
+}
+
+} // namespace
+
+// Accounts are scoped per tenant. The optional "tenant" field (a slug)
+// selects the scope; absent/empty means the platform scope (portal
+// accounts, site owners, super-admins). Calls `next(tenantId, slug)` with
+// tenantId 0 for the platform, or replies 404 for an unknown slug.
+void AuthController::withTenant(
+    const Json::Value &json,
+    const std::function<void(const drogon::HttpResponsePtr &)> &callback,
+    std::function<void(int, const std::string &)> next) {
+    auto slug = json.get("tenant", "").asString();
+    if (slug.empty()) {
+        next(0, "");
+        return;
+    }
+    tenantService_.findBySlug(
+        drogon::app().getDbClient(), slug,
+        [callback, next, slug](const std::optional<TenantDto> &tenant) {
+            if (!tenant) {
+                sendError(callback, "Unknown site: " + slug,
+                          drogon::k404NotFound);
+                return;
+            }
+            next(tenant->id, tenant->slug);
+        });
+}
+
 void AuthController::login(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
 
     auto json = req->getJsonObject();
     if (!json || !(*json).isMember("username") || !(*json).isMember("password")) {
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "username and password required";
-        resp->setStatusCode(drogon::k400BadRequest);
-        callback(resp);
+        sendError(callback, "username and password required",
+                  drogon::k400BadRequest);
         return;
     }
 
     auto username = (*json)["username"].asString();
     auto password = (*json)["password"].asString();
-    auto db = drogon::app().getDbClient();
 
-    // Get password hash, then verify
-    userService_.getPasswordHash(
-        db, username,
+    withTenant(*json, callback,
         [this, username, password, callback](
-            const std::optional<std::string> &hash) {
-            if (!hash || !authService_.verifyPassword(password, *hash)) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(
-                    Json::Value{});
-                (*resp->jsonObject())["error"] = "Invalid credentials";
-                resp->setStatusCode(drogon::k401Unauthorized);
-                callback(resp);
-                return;
-            }
-
-            // Get full user for the token
+            int tenantId, const std::string &slug) {
             auto db = drogon::app().getDbClient();
-            userService_.findByUsername(
-                db, username,
-                [this, callback](const std::optional<UserDto> &user) {
-                    if (!user) {
-                        auto resp =
-                            drogon::HttpResponse::newHttpJsonResponse(
-                                Json::Value{});
-                        (*resp->jsonObject())["error"] = "User not found";
-                        resp->setStatusCode(drogon::k404NotFound);
-                        callback(resp);
+            userService_.getPasswordHash(
+                db, tenantId, username,
+                [this, db, tenantId, slug, username, password, callback](
+                    const std::optional<std::string> &hash) {
+                    if (!hash ||
+                        !authService_.verifyPassword(password, *hash)) {
+                        sendError(callback, "Invalid credentials",
+                                  drogon::k401Unauthorized);
                         return;
                     }
-
-                    auto token = authService_.generateToken(
-                        user->id, user->username);
-
-                    Json::Value result;
-                    result["token"] = token;
-                    result["user"]["id"] = user->id;
-                    result["user"]["username"] = user->username;
-                    result["user"]["fullName"] = user->fullName;
-                    result["user"]["email"] = user->email;
-                    callback(
-                        drogon::HttpResponse::newHttpJsonResponse(result));
+                    userService_.findByUsername(
+                        db, tenantId, username,
+                        [this, slug, callback](
+                            const std::optional<UserDto> &user) {
+                            if (!user) {
+                                sendError(callback, "User not found",
+                                          drogon::k404NotFound);
+                                return;
+                            }
+                            if (user->banned) {
+                                sendError(callback, "Account is banned",
+                                          drogon::k403Forbidden);
+                                return;
+                            }
+                            Json::Value result;
+                            result["token"] = authService_.generateToken(
+                                user->id, user->username, user->tenantId);
+                            result["user"] = userJson(*user, slug);
+                            callback(drogon::HttpResponse::
+                                         newHttpJsonResponse(result));
+                        });
                 });
         });
 }
@@ -70,10 +115,8 @@ void AuthController::registerUser(
     auto json = req->getJsonObject();
     if (!json || !(*json).isMember("username") || !(*json).isMember("password") ||
         !(*json).isMember("email")) {
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "username, email, and password required";
-        resp->setStatusCode(drogon::k400BadRequest);
-        callback(resp);
+        sendError(callback, "username, email, and password required",
+                  drogon::k400BadRequest);
         return;
     }
 
@@ -83,73 +126,66 @@ void AuthController::registerUser(
     auto fullName = (*json).get("fullName", "").asString();
 
     if (username.length() < 3 || username.length() > 32) {
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "Username must be 3-32 characters";
-        resp->setStatusCode(drogon::k400BadRequest);
-        callback(resp);
+        sendError(callback, "Username must be 3-32 characters",
+                  drogon::k400BadRequest);
         return;
     }
 
     if (password.length() < 8) {
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "Password must be at least 8 characters";
-        resp->setStatusCode(drogon::k400BadRequest);
-        callback(resp);
+        sendError(callback, "Password must be at least 8 characters",
+                  drogon::k400BadRequest);
         return;
     }
 
-    auto db = drogon::app().getDbClient();
     auto passwordHash = authService_.hashPassword(password);
 
-    // Check if this is the first user (auto-promote to admin)
-    userService_.countUsers(db, [this, db, username, fullName, email,
-                                  passwordHash, callback](int count) {
-        userService_.createUser(
-            db, username, fullName, email, passwordHash,
-            [this, username, count, callback](bool success,
-                                               const std::string &error) {
-                if (!success) {
-                    auto resp =
-                        drogon::HttpResponse::newHttpJsonResponse(
-                            Json::Value{});
-                    (*resp->jsonObject())["error"] = error;
-                    resp->setStatusCode(drogon::k409Conflict);
-                    callback(resp);
-                    return;
-                }
-
-                // Get the created user to generate token
-                auto db = drogon::app().getDbClient();
-                userService_.findByUsername(
-                    db, username,
-                    [this, count, callback](
-                        const std::optional<UserDto> &user) {
-                        if (!user) {
-                            auto resp =
-                                drogon::HttpResponse::newHttpJsonResponse(
-                                    Json::Value{});
-                            (*resp->jsonObject())["error"] = "Registration failed";
-                            resp->setStatusCode(drogon::k500InternalServerError);
-                            callback(resp);
+    withTenant(*json, callback,
+        [this, username, fullName, email, passwordHash, callback](
+            int tenantId, const std::string &slug) {
+            auto db = drogon::app().getDbClient();
+            // Counting the scope's accounts lets the UI greet the first one
+            userService_.countUsers(db, tenantId,
+                [this, db, tenantId, slug, username, fullName, email,
+                 passwordHash, callback](int count) {
+                userService_.createUser(
+                    db, tenantId, username, fullName, email, passwordHash,
+                    [this, tenantId, slug, username, count, callback](
+                        bool success, const std::string &) {
+                        if (!success) {
+                            // A unique-index violation is the common case
+                            sendError(callback,
+                                      slug.empty()
+                                          ? "That username or email is already taken"
+                                          : "That username or email is already taken on this site",
+                                      drogon::k409Conflict);
                             return;
                         }
-
-                        auto token = authService_.generateToken(
-                            user->id, user->username);
-
-                        Json::Value result;
-                        result["token"] = token;
-                        result["user"]["id"] = user->id;
-                        result["user"]["username"] = user->username;
-                        result["user"]["fullName"] = user->fullName;
-                        result["user"]["email"] = user->email;
-                        result["firstUser"] = (count == 0);
-                        auto resp = drogon::HttpResponse::newHttpJsonResponse(result);
-                        resp->setStatusCode(drogon::k201Created);
-                        callback(resp);
+                        auto db = drogon::app().getDbClient();
+                        userService_.findByUsername(
+                            db, tenantId, username,
+                            [this, slug, count, callback](
+                                const std::optional<UserDto> &user) {
+                                if (!user) {
+                                    sendError(
+                                        callback, "Registration failed",
+                                        drogon::k500InternalServerError);
+                                    return;
+                                }
+                                Json::Value result;
+                                result["token"] =
+                                    authService_.generateToken(
+                                        user->id, user->username,
+                                        user->tenantId);
+                                result["user"] = userJson(*user, slug);
+                                result["firstUser"] = (count == 0);
+                                auto resp = drogon::HttpResponse::
+                                    newHttpJsonResponse(result);
+                                resp->setStatusCode(drogon::k201Created);
+                                callback(resp);
+                            });
                     });
             });
-    });
+        });
 }
 
 void AuthController::me(
@@ -160,31 +196,34 @@ void AuthController::me(
     auto db = drogon::app().getDbClient();
 
     userService_.findById(db, userId,
-                          [callback](const std::optional<UserDto> &user) {
-                              if (!user) {
-                                  auto resp =
-                                      drogon::HttpResponse::newHttpJsonResponse(
-                                          Json::Value{});
-                                  (*resp->jsonObject())["error"] = "User not found";
-                                  resp->setStatusCode(drogon::k404NotFound);
-                                  callback(resp);
-                                  return;
-                              }
-
-                              Json::Value result;
-                              result["id"] = user->id;
-                              result["username"] = user->username;
-                              result["fullName"] = user->fullName;
-                              result["email"] = user->email;
-                              result["website"] = user->website;
-                              result["aboutme"] = user->aboutme;
-                              result["timezone"] = user->timezone;
-                              result["banned"] = user->banned;
-                              result["createdAt"] = user->createdAt;
-                              callback(
-                                  drogon::HttpResponse::newHttpJsonResponse(
-                                      result));
-                          });
+        [db, callback](const std::optional<UserDto> &user) {
+            if (!user) {
+                sendError(callback, "User not found", drogon::k404NotFound);
+                return;
+            }
+            auto finish = [user, callback](const std::string &slug) {
+                Json::Value result = userJson(*user, slug);
+                result["website"] = user->website;
+                result["aboutme"] = user->aboutme;
+                result["timezone"] = user->timezone;
+                result["banned"] = user->banned;
+                result["createdAt"] = user->createdAt;
+                callback(drogon::HttpResponse::newHttpJsonResponse(result));
+            };
+            if (user->tenantId == 0) {
+                finish("");
+                return;
+            }
+            db->execSqlAsync(
+                "SELECT slug FROM tenants WHERE id = $1",
+                [finish](const drogon::orm::Result &r) {
+                    finish(r.empty() ? "" : r[0]["slug"].as<std::string>());
+                },
+                [finish](const drogon::orm::DrogonDbException &) {
+                    finish("");
+                },
+                user->tenantId);
+        });
 }
 
 void AuthController::forgotPassword(
@@ -203,9 +242,11 @@ void AuthController::forgotPassword(
     auto email = (*json)["email"].asString();
     auto db = drogon::app().getDbClient();
 
+    withTenant(*json, callback,
+        [this, db, email, callback](int tenantId, const std::string &) {
     // Always return success to prevent email enumeration
     userService_.findByEmail(
-        db, email,
+        db, tenantId, email,
         [this, db, email, callback](const std::optional<UserDto> &user) {
             if (!user) {
                 // Don't reveal that the email doesn't exist
@@ -236,6 +277,7 @@ void AuthController::forgotPassword(
                     callback(drogon::HttpResponse::newHttpJsonResponse(result));
                 },
                 userId, token);
+        });
         });
 }
 
@@ -439,7 +481,7 @@ void AuthController::oauthCallback(
                                             callback(resp);
                                             return;
                                         }
-                                        auto token = authService_.generateToken(user->id, user->username);
+                                        auto token = authService_.generateToken(user->id, user->username, user->tenantId);
                                         Json::Value result;
                                         result["token"] = token;
                                         result["user"]["id"] = user->id;
@@ -454,7 +496,7 @@ void AuthController::oauthCallback(
                                 auto password = authService_.generateRandomToken();
                                 auto passwordHash = authService_.hashPassword(password);
 
-                                userService_.createUser(db, username, username, email, passwordHash,
+                                userService_.createUser(db, 0, username, username, email, passwordHash,
                                     [this, db, provider, accessToken, info, callback](bool success, const std::string &error) {
                                         if (!success) {
                                             auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -464,7 +506,7 @@ void AuthController::oauthCallback(
                                             return;
                                         }
 
-                                        userService_.findByUsername(db, info->displayName,
+                                        userService_.findByUsername(db, 0, info->displayName,
                                             [this, db, provider, accessToken, info, callback](const auto &user) {
                                                 if (!user) {
                                                     auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -484,7 +526,7 @@ void AuthController::oauthCallback(
                                                             return;
                                                         }
 
-                                                        auto token = authService_.generateToken(user->id, user->username);
+                                                        auto token = authService_.generateToken(user->id, user->username, user->tenantId);
                                                         Json::Value result;
                                                         result["token"] = token;
                                                         result["user"]["id"] = user->id;

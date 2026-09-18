@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
+import { setToken } from '@/lib/session'
 import type { LoginRequest } from '@/types'
 
 export function validateLoginForm(data: LoginRequest): string {
@@ -13,7 +14,13 @@ export function validateLoginForm(data: LoginRequest): string {
   return ''
 }
 
-export function useLogin(redirectTo = '/') {
+/**
+ * @param redirectTo - where to go after a successful sign-in
+ * @param tenant - site slug to sign in to. Accounts are per-site, so the
+ *   same username on two sites is two different accounts. Omit for a
+ *   platform account.
+ */
+export function useLogin(redirectTo = '/', tenant?: string) {
   const router = useRouter()
   const dispatch = useDispatch()
   const [formData, setFormData] = useState<LoginRequest>({
@@ -34,10 +41,14 @@ export function useLogin(redirectTo = '/') {
     setError('')
     setLoading(true)
     try {
-      const response = await api.post('/api/auth/login', { username, password })
+      const response = await api.post('/api/auth/login', {
+        username,
+        password,
+        ...(tenant ? { tenant } : {}),
+      })
       const { token, user } = response.data
       if (token) {
-        localStorage.setItem('token', token)
+        setToken(tenant ?? null, token)
         dispatch(setCredentials({ user, token }))
         return true
       }

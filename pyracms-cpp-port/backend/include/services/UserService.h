@@ -22,6 +22,8 @@ struct UserDto {
     std::string apiUuid;
     // Role stored as the integer value of UserRole; defaults to User (1)
     UserRole role{UserRole::User};
+    // 0 = platform account, otherwise the tenant the account belongs to
+    int tenantId{0};
 };
 
 class UserService {
@@ -31,7 +33,10 @@ public:
     using ListCallback = std::function<void(const std::vector<UserDto> &)>;
     using BoolCallback = std::function<void(bool success, const std::string &error)>;
 
+    // Accounts are scoped by tenantId (0 = platform). The same username or
+    // email may exist once per scope.
     void createUser(const DbClientPtr &db,
+                    int tenantId,
                     const std::string &username,
                     const std::string &fullName,
                     const std::string &email,
@@ -39,12 +44,14 @@ public:
                     BoolCallback cb);
 
     void findByUsername(const DbClientPtr &db,
+                       int tenantId,
                        const std::string &username,
                        Callback cb);
 
     void findById(const DbClientPtr &db, int id, Callback cb);
 
     void findByEmail(const DbClientPtr &db,
+                     int tenantId,
                      const std::string &email,
                      Callback cb);
 
@@ -58,6 +65,7 @@ public:
     void deleteUser(const DbClientPtr &db, int id, BoolCallback cb);
 
     void getPasswordHash(const DbClientPtr &db,
+                         int tenantId,
                          const std::string &username,
                          std::function<void(const std::optional<std::string> &)> cb);
 
@@ -66,6 +74,7 @@ public:
                         BoolCallback cb);
 
     void countUsers(const DbClientPtr &db,
+                    int tenantId,
                     std::function<void(int)> cb);
 
     // Role management — persists role as integer in the `role` column.

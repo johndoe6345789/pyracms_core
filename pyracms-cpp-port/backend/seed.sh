@@ -173,4 +173,13 @@ for kv in "site_name:Demo Site" "site_description:A demo PyraCMS site" "default_
 done
 echo "    4 settings created"
 
+# -- Tenant-scoped accounts ------------------------------------------
+# Accounts are per site: "richard" on demo and "richard" on acme are two
+# different people with independent passwords.
+echo "  Creating a second site and per-site accounts..."
+curl -s -X POST "$API/api/tenants"   -H "Content-Type: application/json" -H "$AUTH"   -d '{"slug":"acme","displayName":"Acme Corp","description":"A second tenant to show per-site accounts"}' > /dev/null 2>&1
+curl -s -X POST "$API/api/auth/register" -H "Content-Type: application/json"   -d '{"tenant":"demo","username":"richard","email":"richard@demo.test","password":"demo-password","fullName":"Richard (demo)"}' > /dev/null 2>&1
+curl -s -X POST "$API/api/auth/register" -H "Content-Type: application/json"   -d '{"tenant":"acme","username":"richard","email":"richard@acme.test","password":"acme-password","fullName":"Richard (acme)"}' > /dev/null 2>&1
+echo "    richard@demo / richard@acme created"
+
 echo "Seed complete!"

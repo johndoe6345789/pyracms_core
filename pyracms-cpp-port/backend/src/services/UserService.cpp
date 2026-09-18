@@ -13,6 +13,8 @@ UserDto UserService::rowToDto(const drogon::orm::Row &row) {
     dto.timezone = row["timezone"].as<std::string>();
     dto.banned = row["banned"].as<bool>();
     dto.createdAt = row["created_at"].as<std::string>();
+    dto.tenantId =
+        row["tenant_id"].isNull() ? 0 : row["tenant_id"].as<int>();
     dto.apiUuid =
         row["api_uuid"].isNull() ? "" : row["api_uuid"].as<std::string>();
     // role column defaults to 1 (User) if absent or NULL
@@ -23,6 +25,7 @@ UserDto UserService::rowToDto(const drogon::orm::Row &row) {
 }
 
 void UserService::createUser(const DbClientPtr &db,
+                              int tenantId,
                               const std::string &username,
                               const std::string &fullName,
                               const std::string &email,
@@ -30,8 +33,9 @@ void UserService::createUser(const DbClientPtr &db,
                               BoolCallback cb) {
     db->execSqlAsync(
         "INSERT INTO users (username, full_name, email, password_hash, "
-        "timezone, banned, created_at, api_uuid) "
-        "VALUES ($1, $2, $3, $4, 'UTC', false, NOW(), gen_random_uuid()::text) "
+        "timezone, banned, created_at, api_uuid, tenant_id) "
+        "VALUES ($1, $2, $3, $4, 'UTC', false, NOW(), "
+        "gen_random_uuid()::text, NULLIF($5, 0)) "
         "RETURNING id",
         [cb](const drogon::orm::Result &result) {
             cb(true, "");
@@ -39,14 +43,16 @@ void UserService::createUser(const DbClientPtr &db,
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, e.base().what());
         },
-        username, fullName, email, passwordHash);
+        username, fullName, email, passwordHash, tenantId);
 }
 
 void UserService::findByUsername(const DbClientPtr &db,
+                                 int tenantId,
                                  const std::string &username,
                                  Callback cb) {
     db->execSqlAsync(
-        "SELECT * FROM users WHERE username = $1",
+        "SELECT * FROM users WHERE username = $1 "
+        "AND COALESCE(tenant_id, 0) = $2",
         [this, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(std::nullopt);
@@ -57,7 +63,7 @@ void UserService::findByUsername(const DbClientPtr &db,
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt);
         },
-        username);
+        username, tenantId);
 }
 
 void UserService::findById(const DbClientPtr &db, int id, Callback cb) {
@@ -77,10 +83,12 @@ void UserService::findById(const DbClientPtr &db, int id, Callback cb) {
 }
 
 void UserService::findByEmail(const DbClientPtr &db,
+                               int tenantId,
                                const std::string &email,
                                Callback cb) {
     db->execSqlAsync(
-        "SELECT * FROM users WHERE email = $1",
+        "SELECT * FROM users WHERE email = $1 "
+        "AND COALESCE(tenant_id, 0) = $2",
         [this, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(std::nullopt);
@@ -91,7 +99,7 @@ void UserService::findByEmail(const DbClientPtr &db,
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt);
         },
-        email);
+        email, tenantId);
 }
 
 void UserService::listUsers(const DbClientPtr &db, int limit, int offset,
@@ -187,10 +195,12 @@ void UserService::deleteUser(const DbClientPtr &db, int id, BoolCallback cb) {
 
 void UserService::getPasswordHash(
     const DbClientPtr &db,
+    int tenantId,
     const std::string &username,
     std::function<void(const std::optional<std::string> &)> cb) {
     db->execSqlAsync(
-        "SELECT password_hash FROM users WHERE username = $1",
+        "SELECT password_hash FROM users WHERE username = $1 "
+        "AND COALESCE(tenant_id, 0) = $2",
         [cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(std::nullopt);
@@ -201,7 +211,7 @@ void UserService::getPasswordHash(
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt);
         },
-        username);
+        username, tenantId);
 }
 
 void UserService::updatePassword(const DbClientPtr &db, int id,
@@ -219,15 +229,18 @@ void UserService::updatePassword(const DbClientPtr &db, int id,
 }
 
 void UserService::countUsers(const DbClientPtr &db,
+                              int tenantId,
                               std::function<void(int)> cb) {
     db->execSqlAsync(
-        "SELECT COUNT(*) as cnt FROM users",
+        "SELECT COUNT(*) as cnt FROM users "
+        "WHERE COALESCE(tenant_id, 0) = $1",
         [cb](const drogon::orm::Result &result) {
             cb(result[0]["cnt"].as<int>());
         },
         [cb](const drogon::orm::DrogonDbException &) {
             cb(0);
-        });
+        },
+        tenantId);
 }
 
 void UserService::setUserRole(const DbClientPtr &db,

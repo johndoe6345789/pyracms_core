@@ -26,6 +26,9 @@ export interface User {
   isAdmin: boolean
   /** Numeric role level (0-4). Falls back to isAdmin if absent. */
   role?: UserRole
+  /** Site this account belongs to; absent/null = platform account. */
+  tenantId?: number
+  tenantSlug?: string | null
   createdAt: string
   updatedAt: string
 }

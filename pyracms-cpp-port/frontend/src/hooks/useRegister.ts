@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
+import { setToken } from '@/lib/session'
 import type { RegisterRequest } from '@/types'
 
 /** Minimal valid e-mail pattern used for registration validation. */
@@ -53,8 +54,10 @@ export function validateRegisterForm(data: RegisterRequest): string {
  *
  * @param redirectTo - Path to navigate to on successful registration.
  *   Defaults to `'/'`.
+ * @param tenant - Site slug to create the account on (accounts are
+ *   scoped per site). Omit for a platform account.
  */
-export function useRegister(redirectTo = '/') {
+export function useRegister(redirectTo = '/', tenant?: string) {
   const router = useRouter()
   const dispatch = useDispatch()
   const [formData, setFormData] = useState<RegisterRequest>({
@@ -94,6 +97,7 @@ export function useRegister(redirectTo = '/') {
       ...rest,
       username: rest.username.trim(),
       email: rest.email.trim(),
+      ...(tenant ? { tenant } : {}),
     }
 
     try {
@@ -104,7 +108,7 @@ export function useRegister(redirectTo = '/') {
       const { token, user } = response.data
 
       if (token) {
-        localStorage.setItem('token', token)
+        setToken(tenant ?? null, token)
         dispatch(setCredentials({ user, token }))
         router.push(redirectTo)
       } else {

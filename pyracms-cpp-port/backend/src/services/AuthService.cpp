@@ -89,12 +89,15 @@ bool AuthService::verifyPassword(const std::string &password,
 }
 
 std::string AuthService::generateToken(int userId,
-                                        const std::string &username) {
+                                        const std::string &username,
+                                        int tenantId) {
     auto now = std::chrono::system_clock::now();
     auto token = jwt::create()
         .set_issuer("pyracms")
         .set_subject(std::to_string(userId))
         .set_payload_claim("username", jwt::claim(username))
+        .set_payload_claim("tenantId",
+                           jwt::claim(std::to_string(tenantId)))
         .set_issued_at(now)
         .set_expires_at(now + std::chrono::seconds(tokenExpirySeconds_))
         .sign(jwt::algorithm::hs256{jwtSecret_});
@@ -113,6 +116,9 @@ std::optional<TokenPayload> AuthService::verifyToken(const std::string &token) {
         TokenPayload payload;
         payload.userId = std::stoi(decoded.get_subject());
         payload.username = decoded.get_payload_claim("username").as_string();
+        payload.tenantId = decoded.has_payload_claim("tenantId")
+            ? std::stoi(decoded.get_payload_claim("tenantId").as_string())
+            : 0;
         return payload;
     } catch (const std::exception &) {
         return std::nullopt;

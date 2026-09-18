@@ -32,6 +32,35 @@ void JwtAuthFilter::doFilter(const drogon::HttpRequestPtr &req,
     // Attach user info to request attributes for downstream handlers
     req->attributes()->insert("userId", payload->userId);
     req->attributes()->insert("username", payload->username);
+    req->attributes()->insert("tenantId", payload->tenantId);
+
+    // A tenant-scoped account may only act inside its own tenant. Reject
+    // requests that name a different tenant explicitly.
+    if (payload->tenantId != 0) {
+        auto named = [&](const std::string &v) {
+            return !v.empty() && v != std::to_string(payload->tenantId);
+        };
+        bool foreign = named(req->getParameter("tenant_id"))
+                    || named(req->getParameter("tenantId"));
+        if (auto body = req->getJsonObject()) {
+            for (const char *k : {"tenant_id", "tenantId"}) {
+                if (body->isMember(k) && (*body)[k].isConvertibleTo(
+                        Json::stringValue) &&
+                    named((*body)[k].asString())) {
+                    foreign = true;
+                }
+            }
+        }
+        if (foreign) {
+            auto resp = drogon::HttpResponse::newHttpJsonResponse(
+                Json::Value{});
+            (*resp->jsonObject())["error"] =
+                "This account belongs to a different site";
+            resp->setStatusCode(drogon::k403Forbidden);
+            fcb(resp);
+            return;
+        }
+    }
 
     // Continue to the next filter/handler
     fccb();

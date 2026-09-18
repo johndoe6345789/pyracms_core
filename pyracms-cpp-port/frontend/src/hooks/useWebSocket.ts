@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { currentToken } from '@/lib/session'
 
 interface UseWebSocketOptions {
   url: string
@@ -24,7 +25,7 @@ export function useWebSocket({
   const [connected, setConnected] = useState(false)
 
   const connect = useCallback(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    const token = currentToken()
     if (!token) return
 
     const separator = url.includes('?') ? '&' : '?'

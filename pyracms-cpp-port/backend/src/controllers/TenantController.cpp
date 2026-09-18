@@ -71,6 +71,17 @@ void TenantController::create(
     auto description = (*json).get("description", "").asString();
     auto ownerId = req->attributes()->get<int>("userId");
 
+    // Only platform accounts may create sites; a site's own accounts are
+    // confined to that site.
+    if (req->attributes()->get<int>("tenantId") != 0) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] =
+            "Site accounts cannot create sites; use a platform account";
+        resp->setStatusCode(drogon::k403Forbidden);
+        callback(resp);
+        return;
+    }
+
     auto db = drogon::app().getDbClient();
     tenantService_.createTenant(
         db, slug, displayName, description, ownerId,

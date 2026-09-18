@@ -7,16 +7,19 @@ import { useRouter } from 'next/navigation'
 import PasswordField from './PasswordField'
 import LoginHeader from './LoginHeader'
 import TurboErrorDialog from './TurboErrorDialog'
+import AuthScopeNotice from './AuthScopeNotice'
 import { useLogin } from '@/hooks/useLogin'
 
 interface Props {
-  redirectTo?: string
+  redirectTo?: string | undefined
+  /** Site slug: sign in to that site's own accounts */
+  tenant?: string | undefined
 }
 
-export default function LoginForm({ redirectTo }: Props) {
+export default function LoginForm({ redirectTo, tenant }: Props) {
   const {
     formData, updateField, error, loading, handleSubmit, loginDirect,
-  } = useLogin(redirectTo)
+  } = useLogin(redirectTo, tenant)
   const router = useRouter()
   const [turboError, setTurboError] = useState<string | null>(null)
 
@@ -52,7 +55,13 @@ export default function LoginForm({ redirectTo }: Props) {
         message={turboError ?? ''}
         onClose={() => setTurboError(null)}
       />
-      <LoginHeader error={error} />
+      <LoginHeader error={error} tenant={tenant} />
+      {tenant && (
+        <AuthScopeNotice
+          tenant={tenant}
+          platformHref="/auth/login"
+        />
+      )}
       <form onSubmit={handleSubmit} data-testid="login-form" aria-label="Login form">
         <TextField
           fullWidth label="Username" margin="normal" required
@@ -107,7 +116,11 @@ export default function LoginForm({ redirectTo }: Props) {
         <Typography variant="body2" color="text.secondary">
           Don&apos;t have an account?{' '}
           <Link
-            href="/auth/register"
+            href={
+              tenant
+                ? `/auth/register?tenant=${encodeURIComponent(tenant)}`
+                : '/auth/register'
+            }
             data-testid="register-link"
             aria-label="Sign up for an account"
             style={{ color: '#667eea', textDecoration: 'none', fontWeight: 600 }}
