@@ -61,7 +61,13 @@ services:
     image: ghcr.io/johndoe6345789/pyracms-backend:${PYRACMS_VERSION:-latest}
     ports:
       - "8099:8080"
+    volumes:
+      # Code runner starts sandbox containers on the host Docker daemon
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      # Pre-pull once: for l in python node go cpp rust java ruby; do
+      #   docker pull ghcr.io/johndoe6345789/pyracms-runner-$$l; done
+      RUNNER_IMAGE_PREFIX: ghcr.io/johndoe6345789/pyracms-runner-
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: pyracms

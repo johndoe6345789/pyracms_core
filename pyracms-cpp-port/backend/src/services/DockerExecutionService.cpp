@@ -6,6 +6,8 @@
 #include <sstream>
 #include <thread>
 
+#include <cstdlib>
+
 namespace pyracms {
 
 DockerExecutionService::DockerExecutionService() {
@@ -21,6 +23,14 @@ DockerExecutionService::DockerExecutionService() {
         {"java",       "pyracms-runner-java"},
         {"ruby",       "pyracms-runner-ruby"},
     };
+    // RUNNER_IMAGE_PREFIX lets a deployment pull the sandbox images from a
+    // registry, e.g. ghcr.io/johndoe6345789/pyracms-runner-
+    if (const char *prefix = std::getenv("RUNNER_IMAGE_PREFIX")) {
+        const std::string local = "pyracms-runner-";
+        for (auto &entry : languageImages_) {
+            entry.second = prefix + entry.second.substr(local.size());
+        }
+    }
 }
 
 bool DockerExecutionService::isLanguageSupported(const std::string &language) const {
