@@ -22,7 +22,7 @@ pip install pytest
 SDL_VIDEODRIVER=dummy python -m pytest
 ```
 
-Game rules live in `snake_logic.py` (no rendering imports), so the tests need no display.
+Game rules live in `snake_logic.py` (no rendering imports); `snake_render.py` and `main.py` are thin pygame glue. Tests need no display.
 
 ## Package
 

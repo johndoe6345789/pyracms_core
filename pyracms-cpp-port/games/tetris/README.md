@@ -22,7 +22,7 @@ pip install pytest
 SDL_VIDEODRIVER=dummy python -m pytest
 ```
 
-Game rules live in `tetris_logic.py` (no rendering imports), so the tests need no display.
+Game rules live in the pyglet-free `tetris_logic.py`, `tetris_moves.py`, `tetris_board.py` and `tetris_shapes.py`; `tetris_view.py`, `tetris_window.py` and `main.py` are thin pyglet glue. Tests need no display.
 
 ## Package
 

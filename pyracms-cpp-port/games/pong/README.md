@@ -22,7 +22,7 @@ pip install pytest
 SDL_VIDEODRIVER=dummy python -m pytest
 ```
 
-Game rules live in `pong_logic.py` (no rendering imports), so the tests need no display.
+Game rules live in the pyglet-free `pong_logic.py`, `pong_ball.py` and `pong_consts.py`; `pong_view.py`, `pong_window.py` and `main.py` are thin pyglet glue. Tests need no display.
 
 ## Package
 

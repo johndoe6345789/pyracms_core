@@ -317,6 +317,15 @@ jobs:
           cache: pip
           cache-dependency-path: pyracms-cpp-port/games/*/requirements.txt
 
+      - name: Test games and scripts (coverage must be >= 80%)
+        shell: bash
+        working-directory: pyracms-cpp-port
+        run: |
+          set -euo pipefail
+          python -m pip install -r games/requirements-dev.txt
+          (cd games && python -m pytest -q --cov --cov-config=.coveragerc --cov-fail-under=80)
+          (cd scripts && python -m pytest -q --cov --cov-config=.coveragerc --cov-fail-under=80)
+
       - name: Build, test and package every game
         shell: bash
         env:

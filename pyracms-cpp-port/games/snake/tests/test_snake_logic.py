@@ -1,8 +1,4 @@
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from snake_logic import DOWN, LEFT, RIGHT, UP, SnakeGame  # noqa: E402
+from snake_logic import DOWN, LEFT, RIGHT, UP, SnakeGame
 
 
 def test_moves_right_and_keeps_length():
@@ -67,7 +63,7 @@ def test_speed_ramps():
 
 def test_tail_cell_is_safe_when_not_eating():
     g = SnakeGame(seed=1)
-    g.snake = [(2, 2), (2, 3), (3, 3), (3, 2)]  # head chasing tail in a 2x2 loop
+    g.snake = [(2, 2), (2, 3), (3, 3), (3, 2)]  # 2x2 loop
     g.direction = g._pending = UP
     g.food = (9, 9)
     g.turn(RIGHT)

@@ -1,0 +1,19 @@
+{
+  "name": "twenty48",
+  "displayName": "2048",
+  "description": "Slide and merge numbered tiles to reach 2048. Pure shapes, no assets.",
+  "version": "1.0.0",
+  "engine": "pyglet",
+  "tags": [
+    "arcade",
+    "puzzle",
+    "pyglet"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pyglet==2.1.16"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

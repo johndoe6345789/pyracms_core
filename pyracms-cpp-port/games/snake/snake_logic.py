@@ -1,4 +1,4 @@
-"""Pure game logic for Snake. No pygame import, fully deterministic given a seed."""
+"""Pure Snake logic. No pygame import; deterministic given a seed."""
 from __future__ import annotations
 
 import random
@@ -60,8 +60,10 @@ class SnakeGame:
         hx, hy = self.snake[0]
         head = (hx + self.direction[0], hy + self.direction[1])
         eating = head == self.food
-        body = self.snake if eating else self.snake[:-1]  # tail moves away unless growing
-        if not (0 <= head[0] < self.cols and 0 <= head[1] < self.rows) or head in body:
+        # the tail moves away unless we are growing
+        body = self.snake if eating else self.snake[:-1]
+        inside = 0 <= head[0] < self.cols and 0 <= head[1] < self.rows
+        if not inside or head in body:
             self.game_over = True
             return
         self.snake.insert(0, head)

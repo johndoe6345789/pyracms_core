@@ -1,0 +1,19 @@
+{
+  "name": "breakout",
+  "displayName": "Breakout",
+  "description": "Bounce the ball off your paddle and clear every brick. Pure shapes, no assets.",
+  "version": "1.0.0",
+  "engine": "pygame",
+  "tags": [
+    "arcade",
+    "classic",
+    "pygame"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pygame==2.6.1"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

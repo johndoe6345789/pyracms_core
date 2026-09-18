@@ -22,7 +22,7 @@ pip install pytest
 SDL_VIDEODRIVER=dummy python -m pytest
 ```
 
-Game rules live in `asteroids_logic.py` (no rendering imports), so the tests need no display.
+Game rules live in the pygame-free `asteroids_*.py` modules (`_game`, `_geom`, `_ship`, `_spawn`, `_collide`); `_render.py` and `main.py` are thin pygame glue. Tests need no display.
 
 ## Package
 
