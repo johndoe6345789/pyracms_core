@@ -62,7 +62,7 @@ QHash<int, QByteArray> GameDepModel::roleNames() const
         {InstalledVersionRole, "installedVersion"},
         {LatestVersionRole, "latestVersion"},
         {UpdateAvailableRole, "updateAvailable"},
-        {StateRole, "state"},
+        {StateRole, "gameState"},   // not "state": Item.state would shadow it
         {ProgressRole, "progress"},
         {StatusTextRole, "statusText"},
         {FavouriteRole, "favourite"},

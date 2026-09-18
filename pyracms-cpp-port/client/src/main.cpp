@@ -1,22 +1,44 @@
+#include <QFileOpenEvent>
 #include <QGuiApplication>
+#include <QLocale>
 #include <QQmlApplicationEngine>
-#include <QQmlContext>
 #include <QQuickStyle>
-#include <QIcon>
-#include <QSysInfo>
+#include <QTimer>
 #include <QTranslator>
+#include <QUrl>
 
-#include "viewmodels/MainViewModel.h"
-#include "viewmodels/SettingsViewModel.h"
-#include "models/GameDepModel.h"
-#include "models/DependencyModel.h"
-#include "models/Constants.h"
-#include "services/ApiClient.h"
-#include "services/AuthService.h"
+#include "domain/DeepLinkParser.h"
 #include "services/SettingsManager.h"
-#include "services/PathManager.h"
-#include "services/ModuleInstaller.h"
-#include "services/GameManager.h"
+#include "services/SingleInstance.h"
+#include "viewmodels/MainViewModel.h"
+
+using namespace Hypernucleus;
+
+namespace {
+
+// macOS delivers pyracms:// URLs as QFileOpenEvent instead of arguments.
+class UrlEventFilter : public QObject {
+public:
+    explicit UrlEventFilter(MainViewModel* vm) : QObject(vm), m_vm(vm) {}
+
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+        if (event->type() == QEvent::FileOpen) {
+            const QUrl url = static_cast<QFileOpenEvent*>(event)->url();
+            if (url.isValid()) {
+                m_vm->handleUrl(url.toString());
+                return true;
+            }
+        }
+        return QObject::eventFilter(watched, event);
+    }
+
+private:
+    MainViewModel* m_vm;
+};
+
+} // namespace
 
 int main(int argc, char* argv[])
 {
@@ -24,79 +46,54 @@ int main(int argc, char* argv[])
     app.setOrganizationName("PyraCMS");
     app.setOrganizationDomain("pyracms.com");
     app.setApplicationName("Hypernucleus");
-    app.setApplicationVersion("0.1.0");
+    app.setApplicationVersion("0.2.0");
 
-    // Set Material Design style
+    // One launcher per user: hand pyracms:// links to the running one.
+    const QString link = DeepLinkParser::findInArguments(app.arguments());
+    SingleInstance single;
+    if (single.sendToPrimary(link.isEmpty() ? QStringLiteral("focus") : link))
+        return 0;
+    single.listenAsPrimary();
+
     QQuickStyle::setStyle("Material");
 
-    // Load translation based on saved language setting
     QTranslator translator;
     {
-        Hypernucleus::SettingsManager tempSettings;
-        QString lang = tempSettings.language();
-        if (!lang.isEmpty() && lang != "en") {
-            if (translator.load("hypernucleus_" + lang, ":/translations")) {
-                app.installTranslator(&translator);
-            }
+        SettingsManager tempSettings;
+        const QString lang = tempSettings.language();
+        if (!lang.isEmpty() && lang != "en"
+            && translator.load("hypernucleus_" + lang, ":/translations")) {
+            app.installTranslator(&translator);
         }
     }
 
-    // Register enums for QML access
-    qmlRegisterUncreatableMetaObject(
-        Hypernucleus::staticMetaObject,
-        "Hypernucleus", 1, 0,
-        "Hypernucleus",
-        "Access to enums only"
-    );
+    auto* viewModel = new MainViewModel(&app);
+    MainViewModel::setInstance(viewModel);
+    app.installEventFilter(new UrlEventFilter(viewModel));
 
-    // Register types for QML
-    qmlRegisterType<Hypernucleus::GameDepModel>(
-        "Hypernucleus", 1, 0, "GameDepModel");
-    qmlRegisterType<Hypernucleus::DependencyModel>(
-        "Hypernucleus", 1, 0, "DependencyModel");
+    QObject::connect(&single, &SingleInstance::messageReceived, viewModel,
+                     [viewModel](const QString& message) {
+        if (message == QLatin1String("focus"))
+            emit viewModel->raiseWindow();
+        else
+            viewModel->handleUrl(message);
+    });
 
-    // Create the main view model (owns all services)
-    auto* mainViewModel = new Hypernucleus::MainViewModel(&app);
-
-    // Create settings view model
-    auto* settingsViewModel = new Hypernucleus::SettingsViewModel(
-        mainViewModel->settingsManager(),
-        mainViewModel->apiClient(),
-        &app
-    );
-
-    // Set up QML engine
     QQmlApplicationEngine engine;
+    engine.addImportPath(QStringLiteral("qrc:/qt/qml"));
 
-    // Expose singletons to QML context
-    QQmlContext* ctx = engine.rootContext();
-    ctx->setContextProperty("mainViewModel", mainViewModel);
-    ctx->setContextProperty("settingsViewModel", settingsViewModel);
-    ctx->setContextProperty("apiClient", mainViewModel->apiClient());
-    ctx->setContextProperty("authService", mainViewModel->authService());
-    ctx->setContextProperty("settingsManager", mainViewModel->settingsManager());
-    ctx->setContextProperty("pathManager", mainViewModel->pathManager());
-    ctx->setContextProperty("gameManager", mainViewModel->gameManager());
-
-    // Expose OS/arch info
-    ctx->setContextProperty("detectedOs",
-                             Hypernucleus::SettingsManager::detectOs());
-    ctx->setContextProperty("detectedArch",
-                             Hypernucleus::SettingsManager::detectArch());
-    ctx->setContextProperty("appVersion", app.applicationVersion());
-
-    // Load QML
-    const QUrl mainQml(QStringLiteral("qrc:/qml/Main.qml"));
+    const QUrl mainQml(QStringLiteral("qrc:/qt/qml/Hypernucleus/qml/Main.qml"));
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated,
         &app, [mainQml](QObject* obj, const QUrl& objUrl) {
             if (!obj && mainQml == objUrl)
                 QCoreApplication::exit(-1);
         },
-        Qt::QueuedConnection
-    );
-
+        Qt::QueuedConnection);
     engine.load(mainQml);
+
+    if (!link.isEmpty())
+        QTimer::singleShot(0, viewModel, [viewModel, link]() { viewModel->handleUrl(link); });
 
     return app.exec();
 }
