@@ -1,13 +1,9 @@
 'use client'
 
 import {
-  Paper,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Paper, TextField, FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material'
+import { FilterDate } from './FilterDate'
 
 interface SearchFiltersProps {
   author: string
@@ -21,73 +17,41 @@ interface SearchFiltersProps {
   availableForums: string[]
 }
 
-export function SearchFilters({
-  author,
-  onAuthorChange,
-  forum,
-  onForumChange,
-  dateFrom,
-  onDateFromChange,
-  dateTo,
-  onDateToChange,
-  availableForums,
-}: SearchFiltersProps) {
+export function SearchFilters(p: SearchFiltersProps) {
   return (
     <Paper
       variant="outlined"
       sx={{
-        p: 2,
-        display: 'flex',
-        gap: 2,
-        flexWrap: 'wrap',
+        p: 2, display: 'flex', gap: 2, flexWrap: 'wrap',
         borderColor: 'divider',
       }}
     >
       <TextField
         label="Author"
-        value={author}
-        onChange={(e) => onAuthorChange(e.target.value)}
+        value={p.author}
+        onChange={(e) => p.onAuthorChange(e.target.value)}
         size="small"
         sx={{ minWidth: 150 }}
         data-testid="search-filter-author"
       />
-      <FormControl
-        size="small"
-        sx={{ minWidth: 180 }}
-      >
+      <FormControl size="small" sx={{ minWidth: 180 }}>
         <InputLabel>Forum</InputLabel>
         <Select
-          value={forum}
+          value={p.forum}
           label="Forum"
-          onChange={(e) => onForumChange(e.target.value)}
+          onChange={(e) => p.onForumChange(e.target.value)}
           data-testid="search-filter-forum"
         >
           <MenuItem value="">All Forums</MenuItem>
-          {availableForums.map((f) => (
-            <MenuItem key={f} value={f}>
-              {f}
-            </MenuItem>
+          {p.availableForums.map((f) => (
+            <MenuItem key={f} value={f}>{f}</MenuItem>
           ))}
         </Select>
       </FormControl>
-      <TextField
-        label="Date From"
-        type="date"
-        value={dateFrom}
-        onChange={(e) => onDateFromChange(e.target.value)}
-        size="small"
-        InputLabelProps={{ shrink: true }}
-        data-testid="search-filter-date-from"
-      />
-      <TextField
-        label="Date To"
-        type="date"
-        value={dateTo}
-        onChange={(e) => onDateToChange(e.target.value)}
-        size="small"
-        InputLabelProps={{ shrink: true }}
-        data-testid="search-filter-date-to"
-      />
+      <FilterDate label="Date From" value={p.dateFrom}
+        testId="search-filter-date-from" onChange={p.onDateFromChange} />
+      <FilterDate label="Date To" value={p.dateTo}
+        testId="search-filter-date-to" onChange={p.onDateToChange} />
     </Paper>
   )
 }

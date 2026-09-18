@@ -1,4 +1,4 @@
-FROM ubuntu:24.04 AS builder
+FROM ubuntu:24.04 AS deps
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -32,13 +32,29 @@ COPY include/ ./include/
 COPY tests/ ./tests/
 COPY sql/ ./sql/
 
-# Build with CMake + Ninja
+# ---- Release build of the server ----
+FROM deps AS builder
 RUN cd build && cmake .. \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
     -DBUILD_TESTS=OFF \
     && ninja
+
+# ---- Test stage: docker build --target tests (see run-tests.sh) ----
+# Builds pyracms_tests with gcov instrumentation. Running the image needs
+# PostgreSQL (compose profile "tests" wires it up).
+FROM deps AS tests
+RUN apt-get update && apt-get install -y \
+    libgtest-dev libgmock-dev gcovr postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+RUN cd build && cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+    -DBUILD_TESTS=ON -DCOVERAGE=ON \
+    && ninja pyracms_tests
+COPY run-tests.sh /app/
+RUN sed -i 's/\r$//' /app/run-tests.sh && chmod +x /app/run-tests.sh
+CMD ["/app/run-tests.sh"]
 
 # Production stage
 FROM ubuntu:24.04

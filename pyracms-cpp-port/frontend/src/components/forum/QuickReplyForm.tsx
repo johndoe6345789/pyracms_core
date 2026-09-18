@@ -1,20 +1,14 @@
 'use client'
 
-import {
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-} from '@mui/material'
+import { Paper, Typography, TextField, Button, Alert } from '@mui/material'
 import { SendOutlined } from '@mui/icons-material'
-import type { ReactNode } from 'react'
-import Link from 'next/link'
+import { replyNotice } from './ReplyNotice'
 
 interface QuickReplyFormProps {
   value: string
   onChange: (value: string) => void
   onSubmit?: () => void
+  onTyping?: () => void
   submitting?: boolean
   error?: string
   locked?: boolean
@@ -22,20 +16,10 @@ interface QuickReplyFormProps {
 }
 
 export function QuickReplyForm({
-  value, onChange, onSubmit, submitting = false,
+  value, onChange, onSubmit, onTyping, submitting = false,
   error, locked = false, isAuthenticated = true,
 }: QuickReplyFormProps) {
-  let notice: ReactNode = null
-  if (locked) {
-    notice = 'This thread is locked. New replies are disabled.'
-  } else if (!isAuthenticated) {
-    notice = (
-      <>
-        <Link href="/auth/login">Sign in</Link>
-        {' '}to reply to this thread.
-      </>
-    )
-  }
+  const notice = replyNotice(locked, isAuthenticated)
   return (
     <Paper
       variant="outlined"
@@ -63,7 +47,10 @@ export function QuickReplyForm({
           maxRows={8}
           placeholder="Write your reply..."
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            onChange(e.target.value)
+            onTyping?.()
+          }}
           sx={{ mb: 2 }}
           inputProps={{
             'aria-label': 'Reply content',

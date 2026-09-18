@@ -34,6 +34,8 @@ CREATE INDEX IF NOT EXISTS idx_gallery_pictures_file_id ON gallery_pictures(file
 CREATE INDEX IF NOT EXISTS idx_gallery_pictures_user_id ON gallery_pictures(user_id);
 
 -- Add FK constraint for default_picture_id now that gallery_pictures exists
+ALTER TABLE gallery_albums DROP CONSTRAINT IF EXISTS
+    fk_gallery_albums_default_picture;
 ALTER TABLE gallery_albums
     ADD CONSTRAINT fk_gallery_albums_default_picture
     FOREIGN KEY (default_picture_id) REFERENCES gallery_pictures(id)

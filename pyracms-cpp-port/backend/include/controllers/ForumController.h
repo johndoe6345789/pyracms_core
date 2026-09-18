@@ -10,15 +10,15 @@ public:
     METHOD_LIST_BEGIN
     // Categories
     ADD_METHOD_TO(ForumController::listCategories, "/api/forum/categories", drogon::Get);
-    ADD_METHOD_TO(ForumController::createCategory, "/api/forum/categories", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ForumController::updateCategory, "/api/forum/categories/{id}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ForumController::deleteCategory, "/api/forum/categories/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ForumController::createCategory, "/api/forum/categories", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(ForumController::updateCategory, "/api/forum/categories/{id}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(ForumController::deleteCategory, "/api/forum/categories/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
 
     // Forums
     ADD_METHOD_TO(ForumController::getForum, "/api/forum/forums/{id}", drogon::Get);
-    ADD_METHOD_TO(ForumController::createForum, "/api/forum/forums", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ForumController::updateForum, "/api/forum/forums/{id}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ForumController::deleteForum, "/api/forum/forums/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ForumController::createForum, "/api/forum/forums", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(ForumController::updateForum, "/api/forum/forums/{id}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(ForumController::deleteForum, "/api/forum/forums/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
 
     // Threads
     ADD_METHOD_TO(ForumController::getThread, "/api/forum/threads/{id}", drogon::Get);

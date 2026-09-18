@@ -53,7 +53,9 @@ public:
 
     void listTenants(const DbClientPtr &db, ListCallback cb);
 
-    void deleteTenant(const DbClientPtr &db, int id, BoolCallback cb);
+    // Owner or super-admin only; "Not found" when nothing was deleted.
+    void deleteTenant(const DbClientPtr &db, int id, int actingUserId,
+                      BoolCallback cb);
 
 private:
     TenantDto rowToDto(const drogon::orm::Row &row);

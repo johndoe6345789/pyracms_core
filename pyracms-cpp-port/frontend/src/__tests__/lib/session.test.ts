@@ -1,5 +1,5 @@
 import {
-  scopeFromPath, setToken, getToken, clearToken,
+  scopeFromPath, setToken, getToken, clearToken, currentToken,
 } from '@/lib/session'
 
 describe('per-scope sessions', () => {
@@ -42,5 +42,21 @@ describe('per-scope sessions', () => {
     setToken('demo', 'demo-token')
     clearToken('demo')
     expect(getToken(null)).toBe('platform-token')
+  })
+})
+
+describe('session helpers', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('currentToken reads the token for the window path', () => {
+    setToken(null, 'p')
+    expect(currentToken()).toBe('p')
+  })
+
+  it('returns null when storage throws', () => {
+    const spy = jest.spyOn(Storage.prototype, 'getItem')
+      .mockImplementation(() => { throw new Error('x') })
+    expect(getToken('a')).toBeNull()
+    spy.mockRestore()
   })
 })

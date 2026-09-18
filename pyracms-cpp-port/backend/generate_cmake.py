@@ -33,7 +33,9 @@ def main():
     all_sources = find_sources(src_dir)
     main_source = "src/main.cpp"
     lib_sources = [f"src/{s}" for s in all_sources if s != "main.cpp"]
-    test_sources = find_sources(test_dir)
+    # *_standalone.cpp files build via tests/CMakeLists_standalone.txt
+    test_sources = [t for t in find_sources(test_dir)
+                    if "standalone" not in t]
 
     config = {
         "project_name": "pyracms_server",
@@ -46,7 +48,7 @@ def main():
 
     # Write config for reference
     config_path = BACKEND_DIR / "cmake_config.json"
-    with open(config_path, "w") as f:
+    with open(config_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
 
     # Render CMakeLists.txt
@@ -58,7 +60,7 @@ def main():
     output = template.render(**config)
 
     cmake_path = BACKEND_DIR / "CMakeLists.txt"
-    with open(cmake_path, "w") as f:
+    with open(cmake_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(output)
 
     print(f"Generated {cmake_path}")
@@ -70,7 +72,7 @@ def main():
     test_output = test_template.render(**config)
 
     test_cmake_path = BACKEND_DIR / "tests" / "CMakeLists.txt"
-    with open(test_cmake_path, "w") as f:
+    with open(test_cmake_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(test_output)
 
     print(f"Generated {test_cmake_path}")

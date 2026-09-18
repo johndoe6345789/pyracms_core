@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
 import { setToken } from '@/lib/session'
+import { apiErrorMessage } from '@/lib/apiError'
 import type { LoginRequest } from '@/types'
 
 export function validateLoginForm(data: LoginRequest): string {
@@ -55,12 +56,7 @@ export function useLogin(redirectTo = '/', tenant?: string) {
       setError(response.data.error || 'Login failed')
       return false
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response: { data?: { error?: string } } }
-        setError(axiosErr.response?.data?.error || 'Login failed')
-      } else {
-        setError('Unable to connect to server')
-      }
+      setError(apiErrorMessage(err, 'Login failed'))
       return false
     } finally {
       setLoading(false)

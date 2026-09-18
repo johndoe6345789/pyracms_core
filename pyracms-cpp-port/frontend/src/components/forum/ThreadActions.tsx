@@ -2,14 +2,10 @@
 
 import { useState } from 'react'
 import { IconButton } from '@mui/material'
-import { MoreVertOutlined } from
-  '@mui/icons-material'
-import { ThreadActionsMenu } from
-  './ThreadActionsMenu'
-import { MoveThreadDialog } from
-  './MoveThreadDialog'
-import { DeleteThreadDialog } from
-  './DeleteThreadDialog'
+import { MoreVertOutlined } from '@mui/icons-material'
+import { ThreadActionsMenu } from './ThreadActionsMenu'
+import { MoveThreadDialog } from './MoveThreadDialog'
+import { DeleteThreadDialog } from './DeleteThreadDialog'
 
 interface ThreadActionsProps {
   threadId: string
@@ -22,13 +18,6 @@ interface ThreadActionsProps {
   onMove?: (forumId: string) => void
   onDelete?: () => void
 }
-
-const DEFAULT_FORUMS = [
-  { id: 'general', name: 'General' },
-  { id: 'tech', name: 'Technology' },
-  { id: 'help', name: 'Help & Support' },
-  { id: 'off-topic', name: 'Off Topic' },
-]
 
 export function ThreadActions({
   threadId, isPinned, isLocked,
@@ -46,8 +35,6 @@ export function ThreadActions({
   if (!isModerator) return null
 
   const close = () => setAnchor(null)
-  const pf = forums.length > 0
-    ? forums : DEFAULT_FORUMS
 
   return (<>
     <IconButton size="small"
@@ -74,7 +61,7 @@ export function ThreadActions({
         if (id) onMove?.(id)
         setMoveOpen(false); setMoveTo('')
       }}
-      forums={pf} targetForum={moveTo}
+      forums={forums} targetForum={moveTo}
       onTargetForumChange={setMoveTo} />
     <DeleteThreadDialog open={delOpen}
       onClose={() => setDelOpen(false)}

@@ -6,6 +6,7 @@
 #include "services/EmailService.h"
 #include "services/OAuthService.h"
 #include "services/TenantService.h"
+#include "controllers/BoolReply.h"
 
 namespace pyracms {
 
@@ -58,6 +59,27 @@ public:
                         std::function<void(const drogon::HttpResponsePtr &)> &&callback);
 
 private:
+    struct NewAccount {
+        std::string username, fullName, email, passwordHash;
+    };
+    void registerIn(int tenantId, const std::string &slug,
+                    const NewAccount &acct, HttpCb callback);
+    void registerDone(int tenantId, const std::string &slug,
+                      const std::string &username, int count,
+                      HttpCb callback);
+    void applyReset(int userId, const std::string &token,
+                    const std::string &password, HttpCb callback);
+    // OAuth callback steps (see AuthControllerOauth*.cpp)
+    void oauthProfile(const std::string &provider,
+                      const std::string &accessToken, HttpCb callback);
+    void oauthKnownUser(int userId, HttpCb callback);
+    void oauthNewUser(const std::string &provider,
+                      const std::string &accessToken,
+                      const OAuthUserInfo &info, HttpCb callback);
+    void oauthLink(const UserDto &user, const std::string &provider,
+                   const std::string &accessToken,
+                   const OAuthUserInfo &info, HttpCb callback);
+
     void withTenant(
         const Json::Value &json,
         const std::function<void(const drogon::HttpResponsePtr &)> &callback,

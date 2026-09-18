@@ -8,6 +8,8 @@ done
 echo "PostgreSQL is ready."
 
 echo "Running database migrations..."
+# Re-run on every start: hide "already exists" notices, fail on real errors.
+export PGOPTIONS='-c client_min_messages=warning'
 for migration in /app/sql/*.sql; do
     echo "  Applying $(basename "$migration")..."
     PGPASSWORD="${DB_PASSWORD:-pyracms}" psql \
@@ -17,6 +19,7 @@ for migration in /app/sql/*.sql; do
         -d "${DB_NAME:-pyracms}" \
         -f "$migration" \
         --no-password \
+        -v ON_ERROR_STOP=1 \
         -q
 done
 echo "Migrations complete."

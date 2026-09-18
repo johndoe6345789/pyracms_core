@@ -1,12 +1,11 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { Container, Typography, Box, Button } from '@mui/material'
-import { AddOutlined } from '@mui/icons-material'
-import Link from 'next/link'
+import { Container } from '@mui/material'
 import { useThreadList } from '@/hooks/useThreadList'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useForumUser } from '@/hooks/useForumUser'
+import { ThreadListHeader } from '@/components/forum/ThreadListHeader'
 import { ThreadTable } from '@/components/forum/ThreadTable'
 import { ForumBreadcrumbs } from '@/components/forum/ForumBreadcrumbs'
 import {
@@ -47,38 +46,12 @@ export default function ThreadListPage() {
           { label: forum.name || 'Threads' },
         ]}
       />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 4,
-          flexWrap: 'wrap',
-          gap: 2,
-        }}
-      >
-        <Box>
-          <Typography variant="h3" component="h1" gutterBottom>
-            {forum.name}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {forum.description}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlined />}
-          component={Link}
-          href={
-            isAuthenticated
-              ? `${base}/thread/create?forumId=${forumId}`
-              : '/auth/login'
-          }
-          data-testid="new-thread-button"
-        >
-          {isAuthenticated ? 'New Thread' : 'Sign in to post'}
-        </Button>
-      </Box>
+      <ThreadListHeader
+        name={forum.name}
+        description={forum.description}
+        href={`${base}/thread/create?forumId=${forumId}`}
+        isAuthenticated={isAuthenticated}
+      />
       {body}
     </Container>
   )

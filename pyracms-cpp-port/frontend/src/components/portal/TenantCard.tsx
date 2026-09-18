@@ -1,6 +1,8 @@
 'use client'
 
-import { Card, CardContent, CardActionArea, Typography, Box, Chip } from '@mui/material'
+import {
+  Card, CardContent, CardActionArea, Typography, Box, Chip,
+} from '@mui/material'
 import { LanguageOutlined, PersonOutline } from '@mui/icons-material'
 import Link from 'next/link'
 import type { Site } from '@/hooks/useTenantList'

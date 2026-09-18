@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Button, Tooltip } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import {
-  PlayArrowOutlined, ForkRightOutlined,
-  ShareOutlined, ContentCopyOutlined,
-  EditOutlined, DeleteOutlined, CheckOutlined,
+  ForkRightOutlined, ShareOutlined, ContentCopyOutlined, CheckOutlined,
 } from '@mui/icons-material'
+import { RunButton } from './RunButton'
+import { OwnerButtons } from './OwnerButtons'
 
 interface Props {
   runnable: boolean
@@ -20,8 +20,7 @@ interface Props {
 }
 
 export function SnippetToolbar({
-  runnable, running, isOwner, code,
-  onRun, onFork, onEdit, onDelete,
+  runnable, running, isOwner, code, onRun, onFork, onEdit, onDelete,
 }: Props) {
   const [copied, setCopied] = useState('')
 
@@ -36,22 +35,9 @@ export function SnippetToolbar({
 
   return (
     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-      <Tooltip title={runnable ? '' :
-        'Running is not supported for this language'}>
-        <span>
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<PlayArrowOutlined />}
-            onClick={onRun}
-            disabled={running || !runnable}
-            data-testid="run-snippet-btn"
-            aria-label="Run snippet"
-          >
-            {running ? 'Running...' : 'Run'}
-          </Button>
-        </span>
-      </Tooltip>
+      <RunButton label="Run" runningLabel="Running..."
+        testId="run-snippet-btn" running={running}
+        runnable={runnable} onClick={onRun} />
       <Button
         variant="outlined"
         startIcon={copied === 'code'
@@ -62,13 +48,9 @@ export function SnippetToolbar({
       >
         {copied === 'code' ? 'Copied' : 'Copy'}
       </Button>
-      <Button
-        variant="outlined"
-        startIcon={<ForkRightOutlined />}
-        onClick={onFork}
-        data-testid="fork-snippet-btn"
-        aria-label="Fork snippet"
-      >
+      <Button variant="outlined" startIcon={<ForkRightOutlined />}
+        onClick={onFork} data-testid="fork-snippet-btn"
+        aria-label="Fork snippet">
         Fork
       </Button>
       <Button
@@ -81,27 +63,7 @@ export function SnippetToolbar({
       >
         {copied === 'link' ? 'Link copied' : 'Share'}
       </Button>
-      {isOwner && (
-        <>
-          <Button
-            variant="outlined"
-            startIcon={<EditOutlined />}
-            onClick={onEdit}
-            data-testid="edit-snippet-btn"
-          >
-            Edit
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteOutlined />}
-            onClick={onDelete}
-            data-testid="delete-snippet-btn"
-          >
-            Delete
-          </Button>
-        </>
-      )}
+      {isOwner && <OwnerButtons onEdit={onEdit} onDelete={onDelete} />}
     </Box>
   )
 }

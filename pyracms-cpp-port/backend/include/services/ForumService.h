@@ -80,11 +80,13 @@ public:
                         const std::string &name,
                         BoolCallback cb);
 
+    // scopeTenant: 0 = any tenant, else the row must belong to it.
     void updateCategory(const DbClientPtr &db, int id,
-                        const std::string &name,
+                        const std::string &name, int scopeTenant,
                         BoolCallback cb);
 
-    void deleteCategory(const DbClientPtr &db, int id, BoolCallback cb);
+    void deleteCategory(const DbClientPtr &db, int id, int scopeTenant,
+                        BoolCallback cb);
 
     // Forums
     void getForum(const DbClientPtr &db, int forumId, int tenantId,
@@ -93,14 +95,15 @@ public:
     void createForum(const DbClientPtr &db, int categoryId,
                      const std::string &name,
                      const std::string &description,
-                     BoolCallback cb);
+                     int scopeTenant, BoolCallback cb);
 
     void updateForum(const DbClientPtr &db, int id,
                      const std::string &name,
                      const std::string &description,
-                     BoolCallback cb);
+                     int scopeTenant, BoolCallback cb);
 
-    void deleteForum(const DbClientPtr &db, int id, BoolCallback cb);
+    void deleteForum(const DbClientPtr &db, int id, int scopeTenant,
+                     BoolCallback cb);
 
     // Threads
     void getThread(const DbClientPtr &db, int threadId, int tenantId,

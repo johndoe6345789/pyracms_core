@@ -12,6 +12,11 @@ endif()
 
 # Options
 option(BUILD_TESTS "Build tests" ON)
+option(COVERAGE "Instrument code for gcov/gcovr" OFF)
+if(COVERAGE)
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+endif()
 
 # Find dependencies
 find_package(Drogon REQUIRED)
@@ -35,6 +40,38 @@ set(LIB_SOURCES
     src/controllers/AnalyticsController.cpp
 
     src/controllers/ArticleController.cpp
+
+    src/controllers/ArticleTagController.cpp
+
+    src/controllers/BoolReply.cpp
+
+    src/controllers/CommentController.cpp
+
+    src/controllers/DocsController.cpp
+
+    src/controllers/FileController.cpp
+
+    src/controllers/GalleryController.cpp
+
+    src/controllers/GameDepController.cpp
+
+    src/controllers/NotificationController.cpp
+
+    src/controllers/SearchController.cpp
+
+    src/controllers/SeoController.cpp
+
+    src/controllers/SettingsController.cpp
+
+    src/controllers/SocialController.cpp
+
+    src/controllers/UserController.cpp
+
+    src/controllers/WebSocketCollabController.cpp
+
+    src/controllers/WebSocketNotificationController.cpp
+
+    src/controllers/WebhookController.cpp
 
     src/controllers/article/ArticleControllerCreateArticle.cpp
 
@@ -66,51 +103,159 @@ set(LIB_SOURCES
 
     src/controllers/article/ArticleControllerVoteArticle.cpp
 
-    src/controllers/ArticleTagController.cpp
+    src/controllers/auth/AuthControllerApplyReset.cpp
 
-    src/controllers/AuthController.cpp
+    src/controllers/auth/AuthControllerForgotPassword.cpp
 
-    src/controllers/CodeSnippetController.cpp
+    src/controllers/auth/AuthControllerLogin.cpp
 
-    src/controllers/CommentController.cpp
+    src/controllers/auth/AuthControllerMe.cpp
 
-    src/controllers/DocsController.cpp
+    src/controllers/auth/AuthControllerOauthCallback.cpp
 
-    src/controllers/FileController.cpp
+    src/controllers/auth/AuthControllerOauthKnownUser.cpp
 
-    src/controllers/ForumController.cpp
+    src/controllers/auth/AuthControllerOauthLink.cpp
 
-    src/controllers/GalleryController.cpp
+    src/controllers/auth/AuthControllerOauthNewUser.cpp
 
-    src/controllers/GameDepController.cpp
+    src/controllers/auth/AuthControllerOauthProfile.cpp
 
-    src/controllers/MenuController.cpp
+    src/controllers/auth/AuthControllerOauthProviders.cpp
 
-    src/controllers/NotificationController.cpp
+    src/controllers/auth/AuthControllerOauthUnlink.cpp
 
-    src/controllers/SearchController.cpp
+    src/controllers/auth/AuthControllerOauthUrl.cpp
 
-    src/controllers/SeoController.cpp
+    src/controllers/auth/AuthControllerRegisterDone.cpp
 
-    src/controllers/SettingsController.cpp
+    src/controllers/auth/AuthControllerRegisterIn.cpp
 
-    src/controllers/SocialController.cpp
+    src/controllers/auth/AuthControllerRegisterUser.cpp
 
-    src/controllers/TenantController.cpp
+    src/controllers/auth/AuthControllerResetPassword.cpp
 
-    src/controllers/UserController.cpp
+    src/controllers/auth/AuthControllerVerifyEmail.cpp
 
-    src/controllers/WebSocketCollabController.cpp
+    src/controllers/auth/AuthControllerWithTenant.cpp
 
-    src/controllers/WebSocketNotificationController.cpp
+    src/controllers/forum/ForumControllerCreateCategory.cpp
 
-    src/controllers/WebhookController.cpp
+    src/controllers/forum/ForumControllerCreateForum.cpp
+
+    src/controllers/forum/ForumControllerCreatePost.cpp
+
+    src/controllers/forum/ForumControllerCreateThread.cpp
+
+    src/controllers/forum/ForumControllerDeleteCategory.cpp
+
+    src/controllers/forum/ForumControllerDeleteForum.cpp
+
+    src/controllers/forum/ForumControllerDeletePost.cpp
+
+    src/controllers/forum/ForumControllerDeleteThread.cpp
+
+    src/controllers/forum/ForumControllerGetForum.cpp
+
+    src/controllers/forum/ForumControllerGetPostById.cpp
+
+    src/controllers/forum/ForumControllerGetThread.cpp
+
+    src/controllers/forum/ForumControllerListCategories.cpp
+
+    src/controllers/forum/ForumControllerSetThreadFlags.cpp
+
+    src/controllers/forum/ForumControllerUpdateCategory.cpp
+
+    src/controllers/forum/ForumControllerUpdateForum.cpp
+
+    src/controllers/forum/ForumControllerUpdatePost.cpp
+
+    src/controllers/forum/ForumControllerUpdateThread.cpp
+
+    src/controllers/forum/ForumControllerVotePost.cpp
+
+    src/controllers/menu/MenuControllerCreateGroup.cpp
+
+    src/controllers/menu/MenuControllerCreateItem.cpp
+
+    src/controllers/menu/MenuControllerDeleteGroup.cpp
+
+    src/controllers/menu/MenuControllerDeleteItem.cpp
+
+    src/controllers/menu/MenuControllerListGroups.cpp
+
+    src/controllers/menu/MenuControllerListItems.cpp
+
+    src/controllers/menu/MenuControllerUpdateItem.cpp
+
+    src/controllers/snippet/CodeSnippetControllerCreateSnippet.cpp
+
+    src/controllers/snippet/CodeSnippetControllerDeleteSnippet.cpp
+
+    src/controllers/snippet/CodeSnippetControllerForkSnippet.cpp
+
+    src/controllers/snippet/CodeSnippetControllerGetSnippet.cpp
+
+    src/controllers/snippet/CodeSnippetControllerListSnippets.cpp
+
+    src/controllers/snippet/CodeSnippetControllerRunSnippet.cpp
+
+    src/controllers/snippet/CodeSnippetControllerUpdateSnippet.cpp
+
+    src/controllers/tenant/TenantControllerCreate.cpp
+
+    src/controllers/tenant/TenantControllerGetBySlug.cpp
+
+    src/controllers/tenant/TenantControllerList.cpp
+
+    src/controllers/tenant/TenantControllerRemove.cpp
+
+    src/filters/AdminFilter.cpp
 
     src/filters/JwtAuthFilter.cpp
+
+    src/filters/TenantGuard.cpp
+
+    src/filters/Viewer.cpp
 
     src/services/AnalyticsService.cpp
 
     src/services/ArticleService.cpp
+
+    src/services/ArticleTagService.cpp
+
+    src/services/AuthService.cpp
+
+    src/services/CacheService.cpp
+
+    src/services/CommentService.cpp
+
+    src/services/DockerExecutionService.cpp
+
+    src/services/ElasticsearchService.cpp
+
+    src/services/EmailService.cpp
+
+    src/services/FileService.cpp
+
+    src/services/GalleryService.cpp
+
+    src/services/GameDepService.cpp
+
+    src/services/NotificationService.cpp
+
+    src/services/OAuthService.cpp
+
+    src/services/SearchService.cpp
+
+    src/services/SeoService.cpp
+
+    src/services/SettingsService.cpp
+
+    src/services/SocialService.cpp
+
+    src/services/WebhookService.cpp
 
     src/services/article/ArticleServiceCreateArticle.cpp
 
@@ -152,49 +297,125 @@ set(LIB_SOURCES
 
     src/services/article/ArticleServiceVoteArticle.cpp
 
-    src/services/ArticleTagService.cpp
+    src/services/forum/ForumServiceCreateCategory.cpp
 
-    src/services/AuthService.cpp
+    src/services/forum/ForumServiceCreateForum.cpp
 
-    src/services/CacheService.cpp
+    src/services/forum/ForumServiceCreatePost.cpp
 
-    src/services/CodeSnippetService.cpp
+    src/services/forum/ForumServiceCreateThread.cpp
 
-    src/services/CommentService.cpp
+    src/services/forum/ForumServiceDeleteCategory.cpp
 
-    src/services/DockerExecutionService.cpp
+    src/services/forum/ForumServiceDeleteForum.cpp
 
-    src/services/ElasticsearchService.cpp
+    src/services/forum/ForumServiceDeletePost.cpp
 
-    src/services/EmailService.cpp
+    src/services/forum/ForumServiceDeleteThread.cpp
 
-    src/services/FileService.cpp
+    src/services/forum/ForumServiceGetForum.cpp
 
-    src/services/ForumService.cpp
+    src/services/forum/ForumServiceGetPost.cpp
 
-    src/services/GalleryService.cpp
+    src/services/forum/ForumServiceGetThread.cpp
 
-    src/services/GameDepService.cpp
+    src/services/forum/ForumServiceListCategories.cpp
 
-    src/services/MenuService.cpp
+    src/services/forum/ForumServiceRowToCategoryDto.cpp
 
-    src/services/NotificationService.cpp
+    src/services/forum/ForumServiceRowToForumDto.cpp
 
-    src/services/OAuthService.cpp
+    src/services/forum/ForumServiceRowToPostDto.cpp
 
-    src/services/SearchService.cpp
+    src/services/forum/ForumServiceRowToThreadDto.cpp
 
-    src/services/SeoService.cpp
+    src/services/forum/ForumServiceSetThreadFlags.cpp
 
-    src/services/SettingsService.cpp
+    src/services/forum/ForumServiceUpdateCategory.cpp
 
-    src/services/SocialService.cpp
+    src/services/forum/ForumServiceUpdateForum.cpp
 
-    src/services/TenantService.cpp
+    src/services/forum/ForumServiceUpdatePost.cpp
 
-    src/services/UserService.cpp
+    src/services/forum/ForumServiceUpdateThread.cpp
 
-    src/services/WebhookService.cpp
+    src/services/forum/ForumServiceVotePost.cpp
+
+    src/services/menu/MenuServiceCreateMenuGroup.cpp
+
+    src/services/menu/MenuServiceCreateMenuItem.cpp
+
+    src/services/menu/MenuServiceDeleteMenuGroup.cpp
+
+    src/services/menu/MenuServiceDeleteMenuItem.cpp
+
+    src/services/menu/MenuServiceListMenuGroups.cpp
+
+    src/services/menu/MenuServiceListMenuItems.cpp
+
+    src/services/menu/MenuServiceRowToGroupDto.cpp
+
+    src/services/menu/MenuServiceRowToItemDto.cpp
+
+    src/services/menu/MenuServiceUpdateMenuItem.cpp
+
+    src/services/snippet/CodeSnippetServiceCreateSnippet.cpp
+
+    src/services/snippet/CodeSnippetServiceDeleteSnippet.cpp
+
+    src/services/snippet/CodeSnippetServiceForkSnippet.cpp
+
+    src/services/snippet/CodeSnippetServiceGetSnippet.cpp
+
+    src/services/snippet/CodeSnippetServiceListSnippets.cpp
+
+    src/services/snippet/CodeSnippetServiceRecordExecution.cpp
+
+    src/services/snippet/CodeSnippetServiceRowToDto.cpp
+
+    src/services/snippet/CodeSnippetServiceUpdateSnippet.cpp
+
+    src/services/tenant/TenantServiceCreateTenant.cpp
+
+    src/services/tenant/TenantServiceDeleteTenant.cpp
+
+    src/services/tenant/TenantServiceFindBySlug.cpp
+
+    src/services/tenant/TenantServiceIsValidDisplayName.cpp
+
+    src/services/tenant/TenantServiceIsValidSlug.cpp
+
+    src/services/tenant/TenantServiceListTenants.cpp
+
+    src/services/tenant/TenantServiceNormalizeSlug.cpp
+
+    src/services/tenant/TenantServiceRowToDto.cpp
+
+    src/services/user/UserServiceCountUsers.cpp
+
+    src/services/user/UserServiceCreateUser.cpp
+
+    src/services/user/UserServiceDeleteUser.cpp
+
+    src/services/user/UserServiceFindByEmail.cpp
+
+    src/services/user/UserServiceFindById.cpp
+
+    src/services/user/UserServiceFindByUsername.cpp
+
+    src/services/user/UserServiceGetPasswordHash.cpp
+
+    src/services/user/UserServiceGetUserRole.cpp
+
+    src/services/user/UserServiceListUsers.cpp
+
+    src/services/user/UserServiceRowToDto.cpp
+
+    src/services/user/UserServiceSetUserRole.cpp
+
+    src/services/user/UserServiceUpdatePassword.cpp
+
+    src/services/user/UserServiceUpdateUser.cpp
 
 )
 
@@ -202,16 +423,16 @@ add_library(pyracms_lib STATIC ${LIB_SOURCES})
 target_link_libraries(pyracms_lib
     PUBLIC
     Drogon::Drogon
-    jwt-cpp::jwt-cpp
     nlohmann_json::nlohmann_json
+    jwt-cpp::jwt-cpp
     CURL::libcurl
 )
 target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Main executable
+add_executable(pyracms_server src/main.cpp)
 # --whole-archive is required so Drogon controller static initializers
 # (which register routes) are not stripped from the static lib by the linker.
-add_executable(pyracms_server src/main.cpp)
 target_link_libraries(pyracms_server PRIVATE
     "-Wl,--whole-archive"
     pyracms_lib

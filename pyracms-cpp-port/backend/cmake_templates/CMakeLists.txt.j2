@@ -12,11 +12,23 @@ endif()
 
 # Options
 option(BUILD_TESTS "Build tests" ON)
+option(COVERAGE "Instrument code for gcov/gcovr" OFF)
+if(COVERAGE)
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+endif()
 
 # Find dependencies
 find_package(Drogon REQUIRED)
 find_package(jwt-cpp REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(CURL REQUIRED)
+
+# Bridge: Conan exports jsoncpp_lib (lowercase) but Homebrew Drogon's
+# DrogonTargets.cmake references Jsoncpp_lib (capital J). Create an alias.
+if(TARGET jsoncpp_lib AND NOT TARGET Jsoncpp_lib)
+    add_library(Jsoncpp_lib ALIAS jsoncpp_lib)
+endif()
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -33,6 +45,7 @@ add_library(pyracms_lib STATIC ${LIB_SOURCES})
 target_link_libraries(pyracms_lib
     PUBLIC
     Drogon::Drogon
+    nlohmann_json::nlohmann_json
     jwt-cpp::jwt-cpp
     CURL::libcurl
 )
@@ -40,7 +53,13 @@ target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includ
 
 # Main executable
 add_executable({{ project_name }} {{ main_source }})
-target_link_libraries({{ project_name }} PRIVATE pyracms_lib)
+# --whole-archive is required so Drogon controller static initializers
+# (which register routes) are not stripped from the static lib by the linker.
+target_link_libraries({{ project_name }} PRIVATE
+    "-Wl,--whole-archive"
+    pyracms_lib
+    "-Wl,--no-whole-archive"
+)
 
 # Testing
 if(BUILD_TESTS)

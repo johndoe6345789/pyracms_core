@@ -1,13 +1,9 @@
 'use client'
 
-import {
-  Alert, Box, Button, Divider, TextField, Tooltip,
-} from '@mui/material'
-import {
-  PlayArrowOutlined, SaveOutlined,
-} from '@mui/icons-material'
+import { Alert, Box, Divider, TextField } from '@mui/material'
 import { CodeEditor } from './CodeEditor'
 import { CodeOutput } from './CodeOutput'
+import { SnippetEditorButtons } from './SnippetEditorButtons'
 import { isRunnable } from '@/lib/snippets'
 import { useSnippetRun } from '@/hooks/useSnippetRun'
 import type { SnippetEditor } from '@/hooks/useSnippetEditor'
@@ -23,7 +19,6 @@ export function SnippetEditorForm({
   editor: e, saveLabel, onSaved, onCancel,
 }: Props) {
   const { running, result, run } = useSnippetRun()
-  const canRun = isRunnable(e.language)
 
   const handleSave = async () => {
     const id = await e.save()
@@ -35,9 +30,7 @@ export function SnippetEditorForm({
   }
 
   return (
-    <Box sx={{
-      display: 'flex', flexDirection: 'column', gap: 3,
-    }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <TextField
         label="Title"
         value={e.title}
@@ -53,42 +46,17 @@ export function SnippetEditorForm({
         onLanguageChange={e.setLanguage}
       />
       {e.error && <Alert severity="error">{e.error}</Alert>}
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Tooltip title={canRun ? '' :
-          'Running is not supported for this language'}>
-          <span>
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<PlayArrowOutlined />}
-              onClick={handleRun}
-              disabled={
-                !e.code || running || e.saving || !canRun}
-              data-testid="run-btn"
-              aria-label="Run snippet"
-            >
-              {running ? 'Running...' : 'Save & Run'}
-            </Button>
-          </span>
-        </Tooltip>
-        <Button
-          variant="contained"
-          startIcon={<SaveOutlined />}
-          onClick={handleSave}
-          disabled={!e.title.trim() || !e.code || e.saving}
-          data-testid="save-btn"
-          aria-label="Save snippet"
-        >
-          {e.saving ? 'Saving...' : saveLabel}
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={onCancel}
-          data-testid="cancel-btn"
-        >
-          Cancel
-        </Button>
-      </Box>
+      <SnippetEditorButtons
+        canRun={isRunnable(e.language)}
+        running={running}
+        saving={e.saving}
+        hasCode={Boolean(e.code)}
+        hasTitle={Boolean(e.title.trim())}
+        saveLabel={saveLabel}
+        onRun={handleRun}
+        onSave={handleSave}
+        onCancel={onCancel}
+      />
       {(running || result) && (
         <>
           <Divider />

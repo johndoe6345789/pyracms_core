@@ -1,16 +1,8 @@
 'use client'
 
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Dialog, DialogTitle, DialogContent, DialogContentText,
+  DialogActions, Button, FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material'
 
 interface MoveThreadDialogProps {
@@ -47,11 +39,7 @@ export function MoveThreadDialog({
           <Select
             value={targetForum}
             label="Target Forum"
-            onChange={(e) =>
-              onTargetForumChange(
-                e.target.value
-              )
-            }
+            onChange={(e) => onTargetForumChange(e.target.value)}
             data-testid="move-thread-select"
           >
             {forums.map((f) => (

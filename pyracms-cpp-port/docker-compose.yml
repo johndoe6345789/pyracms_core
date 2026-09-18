@@ -91,6 +91,22 @@ services:
       elasticsearch:
         condition: service_healthy
 
+  # C++ unit + integration tests with gcov coverage:
+  #   docker compose --profile tests run --rm backend-tests
+  backend-tests:
+    profiles: ["tests"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: tests
+    environment:
+      DB_HOST: postgres
+      DB_USER: pyracms
+      DB_PASSWORD: pyracms
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend

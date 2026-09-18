@@ -1,0 +1,45 @@
+import {
+  HomeOutlined,
+  SearchOutlined,
+  AddCircleOutlineOutlined,
+  GridViewOutlined,
+  ShieldOutlined,
+} from '@mui/icons-material'
+import type { NavEntry, NavSection } from './navTypes'
+
+export function portalEntries(): NavEntry[] {
+  return [
+    {
+      key: 'home', label: 'Home', href: '/',
+      icon: <HomeOutlined />, exact: true,
+    },
+    {
+      key: 'sites', label: 'Sites', href: '/#sites',
+      icon: <GridViewOutlined />, exact: true,
+    },
+    {
+      key: 'create-site', label: 'Create a site',
+      href: '/create-site', icon: <AddCircleOutlineOutlined />,
+    },
+    {
+      key: 'search', label: 'Search', href: '/search',
+      icon: <SearchOutlined />,
+    },
+  ]
+}
+
+export function portalSections(isSuperAdmin: boolean): NavSection[] {
+  const sections: NavSection[] = [
+    { title: 'Portal', items: portalEntries() },
+  ]
+  if (isSuperAdmin) {
+    sections.push({
+      title: 'Platform',
+      items: [{
+        key: 'super-admin', label: 'Super admin',
+        href: '/super-admin', icon: <ShieldOutlined />,
+      }],
+    })
+  }
+  return sections
+}

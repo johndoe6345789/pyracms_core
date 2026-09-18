@@ -1,24 +1,13 @@
 'use client'
 
 import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Box,
-  Chip,
-  IconButton,
-  Tooltip,
-  Button,
+  Card, CardContent, Typography, Box, Chip,
 } from '@mui/material'
-import {
-  ForkRightOutlined,
-  ShareOutlined,
-  PlayArrowOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material'
 import Link from 'next/link'
-import { langColor as colorFor } from '@/lib/snippets'
+import { langColor } from '@/lib/snippets'
+import { SnippetCardMeta } from './SnippetCardMeta'
+import { SnippetPreview } from './SnippetPreview'
+import { SnippetCardActions } from './SnippetCardActions'
 
 interface SnippetCardProps {
   id: string
@@ -34,232 +23,57 @@ interface SnippetCardProps {
 }
 
 export function SnippetCard({
-  id,
-  title,
-  language,
-  code,
-  author,
-  date,
-  runCount,
-  siteSlug,
-  onFork,
-  onShare,
+  id, title, language, code, author, date, runCount, siteSlug,
+  onFork, onShare,
 }: SnippetCardProps) {
-  const previewLines = code
-    .split('\n')
-    .slice(0, 6)
-    .join('\n')
-  const langColor = colorFor(language)
+  const color = langColor(language)
+  const snippetUrl = `/site/${siteSlug}/snippets/${id}`
 
   const handleShare = () => {
-    if (onShare) {
-      onShare()
-    } else {
-      const url =
-        `${window.location.origin}`
-        + `/site/${siteSlug}`
-        + `/snippets/${id}`
-      navigator.clipboard.writeText(url)
-    }
+    if (onShare) return onShare()
+    navigator.clipboard.writeText(
+      `${window.location.origin}${snippetUrl}`,
+    )
   }
-
-  const snippetUrl =
-    `/site/${siteSlug}/snippets/${id}`
 
   return (
     <Card
       variant="outlined"
-      data-testid={
-        `snippet-card-${id}`
-      }
+      data-testid={`snippet-card-${id}`}
       sx={{
-        borderColor: 'divider',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
+        borderColor: 'divider', display: 'flex',
+        flexDirection: 'column', height: '100%',
       }}
     >
-      <CardContent
-        sx={{ flexGrow: 1, pb: 1 }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent:
-              'space-between',
-            alignItems:
-              'flex-start',
-            mb: 1,
-          }}
-        >
+      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+        <Box sx={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'flex-start', mb: 1,
+        }}>
           <Typography
             variant="subtitle1"
             component={Link}
             href={snippetUrl}
-            data-testid={
-              `snippet-link-${id}`
-            }
+            data-testid={`snippet-link-${id}`}
             sx={{
-              fontWeight: 600,
-              textDecoration: 'none',
+              fontWeight: 600, textDecoration: 'none',
               color: 'text.primary',
-              '&:hover': {
-                color: 'primary.main',
-              },
+              '&:hover': { color: 'primary.main' },
             }}
           >
             {title}
           </Typography>
-          <Chip
-            label={language}
-            size="small"
-            sx={{
-              bgcolor:
-                langColor + '20',
-              color: langColor,
-              fontWeight: 600,
-              fontSize: '0.7rem',
-              height: 22,
-            }}
-          />
+          <Chip label={language} size="small" sx={{
+            bgcolor: color + '20', color, fontWeight: 600,
+            fontSize: '0.7rem', height: 22,
+          }} />
         </Box>
-        <Box
-          component="pre"
-          sx={{
-            m: 0,
-            p: 1.5,
-            bgcolor: '#1e293b',
-            color: '#e2e8f0',
-            fontFamily:
-              '"Fira Code", '
-              + 'monospace',
-            fontSize: '0.75rem',
-            lineHeight: 1.5,
-            overflow: 'hidden',
-            whiteSpace: 'pre',
-            borderRadius: 1,
-            maxHeight: 120,
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 24,
-              background:
-                'linear-gradient('
-                + 'transparent, '
-                + '#1e293b)',
-            },
-          }}
-        >
-          <code>{previewLines}</code>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            mt: 1.5,
-          }}
-        >
-          <Typography
-            variant="caption"
-            color="text.secondary"
-          >
-            {author}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-          >
-            {date}
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              ml: 'auto',
-            }}
-          >
-            <PlayArrowOutlined
-              sx={{
-                fontSize: 14,
-                color:
-                  'text.secondary',
-              }}
-              aria-hidden="true"
-            />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-            >
-              {runCount} runs
-            </Typography>
-          </Box>
-        </Box>
+        <SnippetPreview code={code} />
+        <SnippetCardMeta author={author} date={date}
+          runCount={runCount} />
       </CardContent>
-      <CardActions
-        sx={{
-          px: 2,
-          py: 1,
-          borderTop: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Button
-          size="small"
-          component={Link}
-          href={snippetUrl}
-          startIcon={
-            <VisibilityOutlined />
-          }
-          data-testid={
-            `view-snippet-${id}`
-          }
-          aria-label={
-            `View ${title}`
-          }
-        >
-          View
-        </Button>
-        {onFork && (
-        <Tooltip title="Fork snippet">
-          <IconButton
-            size="small"
-            onClick={onFork}
-            data-testid={
-              `fork-snippet-${id}`
-            }
-            aria-label={
-              `Fork ${title}`
-            }
-          >
-            <ForkRightOutlined
-              fontSize="small"
-            />
-          </IconButton>
-        </Tooltip>
-        )}
-        <Tooltip title="Share">
-          <IconButton
-            size="small"
-            onClick={handleShare}
-            data-testid={
-              `share-snippet-${id}`
-            }
-            aria-label={
-              `Share ${title}`
-            }
-          >
-            <ShareOutlined
-              fontSize="small"
-            />
-          </IconButton>
-        </Tooltip>
-      </CardActions>
+      <SnippetCardActions id={id} title={title} href={snippetUrl}
+        onFork={onFork} onShare={handleShare} />
     </Card>
   )
 }

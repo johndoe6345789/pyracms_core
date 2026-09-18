@@ -1,22 +1,12 @@
 'use client'
 
 import {
-  Card,
-  CardActionArea,
-  CardContent,
-  Typography,
-  Box,
-  Chip,
+  Card, CardActionArea, CardContent, Typography, Box,
 } from '@mui/material'
-import {
-  ForumOutlined,
-  TopicOutlined,
-  ChatBubbleOutlineOutlined,
-} from '@mui/icons-material'
+import { ForumOutlined } from '@mui/icons-material'
 import Link from 'next/link'
-import type {
-  Forum,
-} from '@/hooks/useForumCategories'
+import type { Forum } from '@/hooks/useForumCategories'
+import { ForumCardStats } from './ForumCardStats'
 
 interface ForumCardProps {
   forum: Forum
@@ -26,8 +16,7 @@ interface ForumCardProps {
 }
 
 export function ForumCard(
-  { forum, slug, isFirst, isLast }:
-  ForumCardProps,
+  { forum, slug, isFirst, isLast }: ForumCardProps,
 ) {
   return (
     <Card
@@ -38,27 +27,16 @@ export function ForumCard(
         borderTop: isFirst ? 0 : undefined,
         borderBottom: isLast ? 0 : undefined,
         borderRadius: 0,
-        transition:
-          'background-color 0.15s',
-        '&:hover': {
-          bgcolor: 'action.hover',
-        },
+        transition: 'background-color 0.15s',
+        '&:hover': { bgcolor: 'action.hover' },
       }}
-      data-testid={
-        `forum-card-${forum.id}`
-      }
+      data-testid={`forum-card-${forum.id}`}
     >
       <CardActionArea
         component={Link}
-        href={
-          `/site/${slug}/forum/${forum.id}`
-        }
-        aria-label={
-          `Open forum: ${forum.name}`
-        }
-        data-testid={
-          `forum-link-${forum.id}`
-        }
+        href={`/site/${slug}/forum/${forum.id}`}
+        aria-label={`Open forum: ${forum.name}`}
+        data-testid={`forum-link-${forum.id}`}
       >
         <CardContent
           sx={{
@@ -69,61 +47,21 @@ export function ForumCard(
             px: 3,
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <ForumOutlined
-              sx={{
-                color: 'primary.main',
-                fontSize: 28,
-              }}
+              sx={{ color: 'primary.main', fontSize: 28 }}
               aria-hidden="true"
             />
             <Box>
-              <Typography
-                variant="h6"
-                component="h3"
-              >
+              <Typography variant="h6" component="h3">
                 {forum.name}
               </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 {forum.description}
               </Typography>
             </Box>
           </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              flexShrink: 0,
-            }}
-          >
-            <Chip
-              icon={<TopicOutlined />}
-              label={
-                `${forum.threads} threads`
-              }
-              size="small"
-              variant="outlined"
-            />
-            <Chip
-              icon={
-                <ChatBubbleOutlineOutlined />
-              }
-              label={
-                `${forum.posts} posts`
-              }
-              size="small"
-              variant="outlined"
-            />
-          </Box>
+          <ForumCardStats forum={forum} />
         </CardContent>
       </CardActionArea>
     </Card>

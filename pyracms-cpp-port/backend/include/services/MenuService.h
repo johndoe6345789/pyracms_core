@@ -38,7 +38,9 @@ public:
     void createMenuGroup(const DbClientPtr &db, int tenantId,
                          const std::string &name, BoolCallback cb);
 
-    void deleteMenuGroup(const DbClientPtr &db, int id, BoolCallback cb);
+    // scopeTenant: 0 = any tenant, else the row must belong to it.
+    void deleteMenuGroup(const DbClientPtr &db, int id, int scopeTenant,
+                         BoolCallback cb);
 
     void listMenuItems(const DbClientPtr &db, int groupId,
                        ItemListCallback cb);
@@ -51,13 +53,14 @@ public:
                         int groupId,
                         int position,
                         const std::string &permissions,
-                        BoolCallback cb);
+                        int scopeTenant, BoolCallback cb);
 
     void updateMenuItem(const DbClientPtr &db, int id,
                         const Json::Value &updates,
-                        BoolCallback cb);
+                        int scopeTenant, BoolCallback cb);
 
-    void deleteMenuItem(const DbClientPtr &db, int id, BoolCallback cb);
+    void deleteMenuItem(const DbClientPtr &db, int id, int scopeTenant,
+                        BoolCallback cb);
 
 private:
     MenuGroupDto rowToGroupDto(const drogon::orm::Row &row);

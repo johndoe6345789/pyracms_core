@@ -1,0 +1,34 @@
+import {
+  DashboardOutlined, SettingsOutlined,
+  AddCircleOutlineOutlined, ShieldOutlined,
+} from '@mui/icons-material'
+import MenuLink from './MenuLink'
+
+/** Site-scoped menu links (Admin, Settings). */
+export function siteMenuItems(slug: string, close: () => void) {
+  return [
+    <MenuLink key="admin" href={`/site/${slug}/admin`} label="Admin"
+      testId="admin-link" onClick={close}
+      icon={<DashboardOutlined fontSize="small" />} />,
+    <MenuLink key="settings" href={`/site/${slug}/admin/settings`}
+      label="Settings" testId="settings-link" onClick={close}
+      icon={<SettingsOutlined fontSize="small" />} />,
+  ]
+}
+
+/** Portal menu links (Create a site, Super admin for super admins). */
+export function portalMenuItems(isSuper: boolean, close: () => void) {
+  const items = [
+    <MenuLink key="create" href="/create-site" label="Create a site"
+      testId="create-site-link" onClick={close}
+      icon={<AddCircleOutlineOutlined fontSize="small" />} />,
+  ]
+  if (isSuper) {
+    items.push(
+      <MenuLink key="super" href="/super-admin" label="Super admin"
+        testId="super-admin-link" onClick={close}
+        icon={<ShieldOutlined fontSize="small" />} />,
+    )
+  }
+  return items
+}

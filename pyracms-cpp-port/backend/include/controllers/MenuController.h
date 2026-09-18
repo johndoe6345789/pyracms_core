@@ -9,12 +9,12 @@ class MenuController : public drogon::HttpController<MenuController> {
 public:
     METHOD_LIST_BEGIN
     ADD_METHOD_TO(MenuController::listGroups, "/api/menu-groups", drogon::Get);
-    ADD_METHOD_TO(MenuController::createGroup, "/api/menu-groups", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(MenuController::deleteGroup, "/api/menu-groups/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(MenuController::createGroup, "/api/menu-groups", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(MenuController::deleteGroup, "/api/menu-groups/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
     ADD_METHOD_TO(MenuController::listItems, "/api/menu-groups/{id}/items", drogon::Get);
-    ADD_METHOD_TO(MenuController::createItem, "/api/menu-groups/{id}/items", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(MenuController::updateItem, "/api/menus/{id}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(MenuController::deleteItem, "/api/menus/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(MenuController::createItem, "/api/menu-groups/{id}/items", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(MenuController::updateItem, "/api/menus/{id}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(MenuController::deleteItem, "/api/menus/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
     METHOD_LIST_END
 
     void listGroups(const drogon::HttpRequestPtr &req,

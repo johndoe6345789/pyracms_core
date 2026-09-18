@@ -77,10 +77,12 @@ curl -s -X POST "$API/api/forum/categories" \
   -H "Content-Type: application/json" -H "$AUTH" \
   -d "{\"name\":\"Development\",\"tenantId\":$TENANT_ID}" > /dev/null 2>&1
 
-# Get category IDs from the list endpoint
+# JSON keys come back alphabetically, so "id" directly precedes "name".
+idByName() { echo "$1" | grep -o "\"id\":[0-9]*,\"name\":\"$2\"" | head -1 | sed 's/"id":\([0-9]*\),.*/\1/'; }
+
 CATS=$(curl -s "$API/api/forum/categories?tenant_id=$TENANT_ID")
-CAT1=$(echo "$CATS" | sed -n 's/.*\[{"id":\([0-9]*\).*/\1/p')
-CAT2=$(echo "$CATS" | sed -n 's/.*},{"id":\([0-9]*\).*/\1/p')
+CAT1=$(idByName "$CATS" "General Discussion")
+CAT2=$(idByName "$CATS" "Development")
 echo "    categories: $CAT1, $CAT2"
 
 # Create forums
@@ -91,13 +93,10 @@ curl -s -X POST "$API/api/forum/forums" -H "Content-Type: application/json" -H "
 curl -s -X POST "$API/api/forum/forums" -H "Content-Type: application/json" -H "$AUTH" \
   -d "{\"name\":\"Backend Development\",\"description\":\"APIs and databases.\",\"categoryId\":${CAT2:-2}}" > /dev/null 2>&1
 
-# Get forum IDs from categories (they include forums array)
 CATS_FULL=$(curl -s "$API/api/forum/categories?tenant_id=$TENANT_ID")
-# Extract first 3 forum IDs using grep
-FORUM_IDS=$(echo "$CATS_FULL" | grep -o '"id":[0-9]*' | sed 's/"id"://' | tail -3)
-FORUM1=$(echo "$FORUM_IDS" | sed -n '1p')
-FORUM2=$(echo "$FORUM_IDS" | sed -n '2p')
-FORUM3=$(echo "$FORUM_IDS" | sed -n '3p')
+FORUM1=$(idByName "$CATS_FULL" "Introductions")
+FORUM2=$(idByName "$CATS_FULL" "Frontend Development")
+FORUM3=$(idByName "$CATS_FULL" "Backend Development")
 echo "    forums: $FORUM1, $FORUM2, $FORUM3"
 
 # Create threads
@@ -152,11 +151,11 @@ curl -s -X POST "$API/api/menu-groups" -H "Content-Type: application/json" -H "$
 MG=$(curl -s "$API/api/menu-groups?tenant_id=$TENANT_ID" | grep -o '"id":[0-9]*' | head -1 | sed 's/"id"://')
 if [ -n "$MG" ]; then
   for item in \
-    '{"name":"Home","route":"/","position":0}' \
-    '{"name":"Articles","route":"/articles","position":1}' \
-    '{"name":"Forum","route":"/forum","position":2}' \
-    '{"name":"Gallery","route":"/gallery","position":3}' \
-    '{"name":"Code","route":"/snippets","position":4}'; do
+    '{"name":"Home","routePath":"/","type":"route","position":0}' \
+    '{"name":"Articles","routePath":"/articles","type":"route","position":1}' \
+    '{"name":"Forum","routePath":"/forum","type":"route","position":2}' \
+    '{"name":"Gallery","routePath":"/gallery","type":"route","position":3}' \
+    '{"name":"Code","routePath":"/snippets","type":"route","position":4}'; do
     curl -s -X POST "$API/api/menu-groups/$MG/items" -H "Content-Type: application/json" -H "$AUTH" \
       -d "$item" > /dev/null 2>&1
   done

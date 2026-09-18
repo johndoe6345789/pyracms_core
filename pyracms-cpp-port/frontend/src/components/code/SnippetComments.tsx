@@ -2,40 +2,42 @@
 
 import { useState } from 'react'
 import {
-  Typography, Paper, TextField, Button, Divider,
+  Alert, Typography, Paper, TextField, Button, Divider,
 } from '@mui/material'
 import { SendOutlined } from '@mui/icons-material'
-import api from '@/lib/api'
+import { useSnippetComments } from '@/hooks/useSnippetComments'
+import { CommentItem } from './CommentItem'
 
 export function SnippetComments({ id }: { id: string }) {
   const [text, setText] = useState('')
+  const { comments, loading, error, post } = useSnippetComments(id)
 
-  const post = () => {
-    api.post('/api/comments', {
-      contentType: 'snippet',
-      contentId: Number(id),
-      content: text,
-    })
-      .then(() => setText(''))
-      .catch(() => {})
+  const submit = () => {
+    const body = text.trim()
+    if (!body) return
+    post(body).then((ok) => ok && setText(''))
   }
 
   return (
     <>
       <Divider sx={{ my: 4 }} />
       <Typography variant="h5" gutterBottom>
-        Comments
+        Comments ({comments.length})
       </Typography>
-      <Paper
-        variant="outlined"
-        sx={{ p: 2, borderColor: 'divider' }}
-        data-testid="comment-section"
-      >
+      {error && <Alert severity="error" sx={{ mb: 2 }}
+        data-testid="comment-error">{error}</Alert>}
+      <div data-testid="comment-list">
+        {!loading && comments.length === 0 && (
+          <Typography color="text.secondary" data-testid="no-comments">
+            No comments yet.
+          </Typography>
+        )}
+        {comments.map((c) => <CommentItem key={c.id} c={c} />)}
+      </div>
+      <Paper variant="outlined" sx={{ p: 2, mt: 2, borderColor: 'divider' }}
+        data-testid="comment-section">
         <TextField
-          fullWidth
-          multiline
-          minRows={2}
-          maxRows={6}
+          fullWidth multiline minRows={2} maxRows={6}
           placeholder="Write a comment..."
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -43,13 +45,11 @@ export function SnippetComments({ id }: { id: string }) {
           data-testid="comment-input"
         />
         <Button
-          variant="contained"
-          size="small"
-          endIcon={<SendOutlined />}
-          disabled={!text}
+          variant="contained" size="small" endIcon={<SendOutlined />}
+          disabled={!text.trim()}
           data-testid="post-comment-btn"
           aria-label="Post comment"
-          onClick={post}
+          onClick={submit}
         >
           Post Comment
         </Button>

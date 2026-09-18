@@ -6,87 +6,42 @@ import { useDispatch } from 'react-redux'
 import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
 import { setToken } from '@/lib/session'
+import { validateRegisterForm } from '@/hooks/registerValidation'
+import { apiErrorMessage } from '@/lib/apiError'
 import type { RegisterRequest } from '@/types'
 
-/** Minimal valid e-mail pattern used for registration validation. */
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+export { validateRegisterForm } from '@/hooks/registerValidation'
 
-/**
- * Validates a {@link RegisterRequest} and returns a human-readable
- * error string, or an empty string when the data is valid.
- *
- * Rules:
- * - `username`  — required, non-blank
- * - `email`     — required, must look like an e-mail address
- * - `password`  — required, minimum 8 characters
- *
- * @param data - The registration form values to validate.
- * @returns A validation error message, or `''` if valid.
- */
-export function validateRegisterForm(data: RegisterRequest): string {
-  if (!data.username.trim()) {
-    return 'Username is required'
-  }
-  if (!data.email.trim()) {
-    return 'Email is required'
-  }
-  if (!EMAIL_RE.test(data.email)) {
-    return 'Invalid email address'
-  }
-  if (!data.password) {
-    return 'Password is required'
-  }
-  if (data.password.length < 8) {
-    return 'Password must be at least 8 characters'
-  }
-  if (
-    data.confirmPassword !== undefined &&
-    data.password !== data.confirmPassword
-  ) {
-    return 'Passwords do not match'
-  }
-  return ''
+const EMPTY: RegisterRequest = {
+  username: '', email: '', password: '', confirmPassword: '',
+  firstName: '', lastName: '',
 }
 
 /**
- * Manages registration form state, field updates, client-side
- * validation, server submission, and post-registration navigation.
+ * Registration form state, validation, submission and navigation.
  *
- * @param redirectTo - Path to navigate to on successful registration.
- *   Defaults to `'/'`.
+ * @param redirectTo - Path to navigate to on success (default `'/'`).
  * @param tenant - Site slug to create the account on (accounts are
  *   scoped per site). Omit for a platform account.
  */
 export function useRegister(redirectTo = '/', tenant?: string) {
   const router = useRouter()
   const dispatch = useDispatch()
-  const [formData, setFormData] = useState<RegisterRequest>({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-  })
+  const [formData, setFormData] = useState<RegisterRequest>(EMPTY)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const updateField = (
-    field: keyof RegisterRequest,
-    value: string,
-  ) => {
+  const updateField = (field: keyof RegisterRequest, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     const validationError = validateRegisterForm(formData)
     if (validationError) {
       setError(validationError)
       return
     }
-
     setError('')
     setLoading(true)
 
@@ -101,12 +56,8 @@ export function useRegister(redirectTo = '/', tenant?: string) {
     }
 
     try {
-      const response = await api.post(
-        '/api/auth/register',
-        payload,
-      )
+      const response = await api.post('/api/auth/register', payload)
       const { token, user } = response.data
-
       if (token) {
         setToken(tenant ?? null, token)
         dispatch(setCredentials({ user, token }))
@@ -115,16 +66,7 @@ export function useRegister(redirectTo = '/', tenant?: string) {
         setError(response.data.error || 'Registration failed')
       }
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as {
-          response: { data?: { error?: string } }
-        }
-        setError(
-          axiosErr.response?.data?.error || 'Registration failed',
-        )
-      } else {
-        setError('Unable to connect to server')
-      }
+      setError(apiErrorMessage(err, 'Registration failed'))
     } finally {
       setLoading(false)
     }

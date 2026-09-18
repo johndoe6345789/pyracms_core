@@ -81,6 +81,8 @@ const MOCK_ARTICLES_LIST = {
   total: 2,
 }
 
+// Shapes mirror the C++ API: forum/thread rows use name, authorUsername,
+// viewCount, totalThreads and totalPosts; posts use username, likes.
 const MOCK_CATEGORY = {
   id: 1,
   name: 'General',
@@ -89,40 +91,59 @@ const MOCK_CATEGORY = {
       id: 1,
       name: 'General Discussion',
       description: 'Talk about anything.',
-      threads: 5,
-      posts: 20,
+      categoryId: 1,
+      totalThreads: 5,
+      totalPosts: 20,
     },
   ],
+}
+
+const MOCK_THREAD_ROW = {
+  id: 1,
+  name: 'Welcome Thread',
+  description: 'First thread here.',
+  forumId: 1,
+  userId: 1,
+  authorUsername: 'admin',
+  pinned: false,
+  locked: false,
+  totalPosts: 3,
+  viewCount: 15,
+  createdAt: '2024-01-01T00:00:00Z',
+  lastPostAt: '2024-01-01T10:00:00Z',
 }
 
 const MOCK_FORUM = {
   id: 1,
   name: 'General Discussion',
   description: 'Talk about anything.',
+  categoryId: 1,
+  totalThreads: 1,
+  totalPosts: 3,
+  threads: [MOCK_THREAD_ROW],
 }
-
-const MOCK_THREAD = {
-  id: 1,
-  title: 'Welcome Thread',
-  description: 'First thread here.',
-  author: 'admin',
-  pinned: false,
-  replies: 3,
-  views: 15,
-  lastPostDate: '2024-01-01',
-}
-
-const MOCK_THREADS = [MOCK_THREAD]
 
 const MOCK_POSTS = [
   {
     id: 1,
-    author: 'admin',
+    title: '',
+    threadId: 1,
+    userId: 1,
+    username: 'admin',
     content: 'First post content.',
     createdAt: '2024-01-01T10:00:00Z',
-    votes: 2,
+    likes: 2,
+    dislikes: 0,
   },
 ]
+
+const MOCK_THREAD = {
+  ...MOCK_THREAD_ROW,
+  forumName: 'General Discussion',
+  posts: MOCK_POSTS,
+}
+
+const MOCK_THREADS = [MOCK_THREAD_ROW]
 
 const MOCK_ALBUMS = [
   {

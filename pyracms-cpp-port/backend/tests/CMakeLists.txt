@@ -17,9 +17,47 @@ endif()
 # Auto-generated test sources — run `python generate_cmake.py` to update
 set(TEST_SOURCES
 
+    test_admin_filter.cpp
+
     test_auth_service.cpp
 
+    test_auth_tenant_claim.cpp
+
+    test_forum_flow_db_1.cpp
+
+    test_forum_flow_db_2.cpp
+
+    test_forum_flow_db_3.cpp
+
+    test_forum_scope_db_1.cpp
+
+    test_forum_scope_db_2.cpp
+
+    test_jwt_filter_1.cpp
+
+    test_jwt_filter_2.cpp
+
+    test_menu_tenant_db_1.cpp
+
+    test_menu_tenant_db_2.cpp
+
+    test_role_rules.cpp
+
+    test_services_crud_db_1.cpp
+
+    test_services_crud_db_2.cpp
+
+    test_snippet_scope_db_1.cpp
+
+    test_snippet_scope_db_2.cpp
+
+    test_tenant_rules.cpp
+
     test_tenant_service.cpp
+
+    test_user_scope_db_1.cpp
+
+    test_user_scope_db_2.cpp
 
     test_user_service.cpp
 

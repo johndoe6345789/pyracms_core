@@ -1,11 +1,9 @@
 'use client'
 
-import {
-  Button, Typography, Box, Alert,
-} from '@mui/material'
-import Link from 'next/link'
+import { Button, Typography, Alert } from '@mui/material'
 import { useRegister } from '@/hooks/useRegister'
 import RegisterFields from './RegisterFields'
+import RegisterFooter from './RegisterFooter'
 import AuthScopeNotice from './AuthScopeNotice'
 
 interface Props {
@@ -75,23 +73,7 @@ export default function RegisterForm({ redirectTo, tenant }: Props) {
         >
           {loading ? 'Registering...' : 'Register'}
         </Button>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2">
-            Already have an account?{' '}
-            <Link
-              href={
-                tenant
-                  ? `/auth/login?tenant=${encodeURIComponent(tenant)}`
-                  : '/auth/login'
-              }
-              data-testid="login-link"
-              aria-label="Go to login page"
-              style={{ color: '#1976d2' }}
-            >
-              Login
-            </Link>
-          </Typography>
-        </Box>
+        <RegisterFooter tenant={tenant} />
       </form>
     </>
   )

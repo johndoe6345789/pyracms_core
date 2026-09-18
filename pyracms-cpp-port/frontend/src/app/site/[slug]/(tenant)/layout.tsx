@@ -1,15 +1,11 @@
 'use client'
 
 import { Box, Container } from '@mui/material'
-import TenantAppBar
-  from '@/components/layout/TenantAppBar'
-import TenantDrawer
-  from '@/components/layout/TenantDrawer'
-import TenantBreadcrumbs
-  from '@/components/common/TenantBreadcrumbs'
-import {
-  useTenantNav,
-} from '@/hooks/useTenantNav'
+import TenantAppBar from '@/components/layout/TenantAppBar'
+import TenantDrawer from '@/components/layout/TenantDrawer'
+import SkipLink from '@/components/layout/SkipLink'
+import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
+import { useTenantNav } from '@/hooks/useTenantNav'
 
 export default function TenantSiteLayout({
   children,
@@ -22,68 +18,8 @@ export default function TenantSiteLayout({
   } = useTenantNav()
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: 'background.default',
-      }}
-    >
-      <a
-        href="#main-content"
-        className="skip-to-content"
-        data-testid="skip-to-content"
-        style={{
-          position: 'absolute',
-          left: '-9999px',
-          top: 'auto',
-          width: '1px',
-          height: '1px',
-          overflow: 'hidden',
-          zIndex: 9999,
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.position
-            = 'fixed'
-          e.currentTarget.style.left
-            = '16px'
-          e.currentTarget.style.top
-            = '16px'
-          e.currentTarget.style.width
-            = 'auto'
-          e.currentTarget.style.height
-            = 'auto'
-          e.currentTarget.style.overflow
-            = 'visible'
-          e.currentTarget.style.background
-            = '#fff'
-          e.currentTarget.style.padding
-            = '8px 16px'
-          e.currentTarget.style.border
-            = '2px solid #1976d2'
-          e.currentTarget.style.borderRadius
-            = '4px'
-          e.currentTarget.style.color
-            = '#1976d2'
-          e.currentTarget.style.fontWeight
-            = '700'
-          e.currentTarget.style.textDecoration
-            = 'none'
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.position
-            = 'absolute'
-          e.currentTarget.style.left
-            = '-9999px'
-          e.currentTarget.style.width
-            = '1px'
-          e.currentTarget.style.height
-            = '1px'
-          e.currentTarget.style.overflow
-            = 'hidden'
-        }}
-      >
-        Skip to main content
-      </a>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <SkipLink />
       <TenantAppBar
         slug={slug}
         siteName={siteName}

@@ -40,10 +40,12 @@ public:
 
     void listSnippets(const DbClientPtr &db, int tenantId,
                       const std::string &language, int authorId,
-                      int limit, int offset,
+                      int viewerId, int limit, int offset,
                       std::function<void(const std::vector<CodeSnippetDto> &, int total)> cb);
 
+    // scopeTenant 0 = any site. Private snippets: author (viewer) only.
     void getSnippet(const DbClientPtr &db, int snippetId,
+                    int scopeTenant, int viewerId,
                     std::function<void(const std::optional<CodeSnippetDto> &)> cb);
 
     void createSnippet(const DbClientPtr &db, int tenantId, int authorId,
