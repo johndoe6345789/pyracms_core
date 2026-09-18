@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QtQml/qqml.h>
 #include <QtQml/qqmlregistration.h>
 
 #include "services/AuthService.h"

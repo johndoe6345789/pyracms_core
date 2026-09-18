@@ -13,12 +13,12 @@ void MainViewModel::wireSettings()
             [this]() { m_api->setTenant(m_settings->tenantSlug()); });
     connect(m_settings, &SettingsManager::installDirChanged, this,
             [this]() { m_paths->setDataDir(m_settings->installDir()); });
-    for (auto sig :
-         {&SettingsManager::osNameChanged, &SettingsManager::archNameChanged,
-          &SettingsManager::pythonPathChanged,
-          &SettingsManager::preferPipChanged}) {
-        connect(m_settings, sig, this, &MainViewModel::applyPlatformSettings);
-    }
+    auto* self = this;
+    const auto apply = [self]() { self->applyPlatformSettings(); };
+    connect(m_settings, &SettingsBase::osNameChanged, this, apply);
+    connect(m_settings, &SettingsBase::archNameChanged, this, apply);
+    connect(m_settings, &SettingsManager::pythonPathChanged, this, apply);
+    connect(m_settings, &SettingsManager::preferPipChanged, this, apply);
 }
 
 void MainViewModel::wireAuth()
