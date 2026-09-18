@@ -2,6 +2,28 @@
 
 namespace pyracms {
 
+namespace {
+const char *kThreadCols =
+    "t.id, t.name, t.description, t.forum_id, "
+    "COALESCE(t.view_count, 0) AS view_count, "
+    "COALESCE(t.total_posts, 0) AS total_posts, "
+    "t.created_at, COALESCE(t.user_id, 0) AS user_id, "
+    "COALESCE(u.username, (SELECT u2.username FROM forum_posts p2 "
+    "JOIN users u2 ON u2.id = p2.user_id WHERE p2.thread_id = t.id "
+    "ORDER BY p2.created_at ASC LIMIT 1), '') AS username, "
+    "COALESCE((SELECT MAX(p3.created_at) FROM forum_posts p3 "
+    "WHERE p3.thread_id = t.id), t.created_at) AS last_post_at, "
+    "t.is_pinned, t.is_locked, "
+    "COALESCE((SELECT f.name FROM forums f WHERE f.id = t.forum_id), '') "
+    "AS forum_name ";
+const char *kThreadFrom =
+    "FROM forum_threads t LEFT JOIN users u ON u.id = t.user_id ";
+// $1 = acting user id: owner of the row, or moderator (role >= 2).
+const char *kOwnerOrMod =
+    "(user_id = $1::int OR EXISTS "
+    "(SELECT 1 FROM users mu WHERE mu.id = $1::int AND mu.role >= 2))";
+} // namespace
+
 ForumCategoryDto ForumService::rowToCategoryDto(const drogon::orm::Row &row) {
     ForumCategoryDto dto;
     dto.id = row["id"].as<int>();
@@ -26,9 +48,15 @@ ForumThreadDto ForumService::rowToThreadDto(const drogon::orm::Row &row) {
     dto.name = row["name"].as<std::string>();
     dto.description = row["description"].isNull() ? "" : row["description"].as<std::string>();
     dto.forumId = row["forum_id"].as<int>();
-    dto.viewCount = row["view_count"].isNull() ? 0 : row["view_count"].as<int>();
-    dto.totalPosts = row["total_posts"].isNull() ? 0 : row["total_posts"].as<int>();
+    dto.viewCount = row["view_count"].as<int>();
+    dto.totalPosts = row["total_posts"].as<int>();
     dto.createdAt = row["created_at"].as<std::string>();
+    dto.userId = row["user_id"].as<int>();
+    dto.authorUsername = row["username"].as<std::string>();
+    dto.lastPostAt = row["last_post_at"].as<std::string>();
+    dto.forumName = row["forum_name"].as<std::string>();
+    dto.pinned = row["is_pinned"].as<bool>();
+    dto.locked = row["is_locked"].as<bool>();
     return dto;
 }
 
@@ -38,7 +66,7 @@ ForumPostDto ForumService::rowToPostDto(const drogon::orm::Row &row) {
     dto.title = row["title"].isNull() ? "" : row["title"].as<std::string>();
     dto.content = row["content"].as<std::string>();
     dto.createdAt = row["created_at"].as<std::string>();
-    dto.userId = row["user_id"].as<int>();
+    dto.userId = row["user_id"].isNull() ? 0 : row["user_id"].as<int>();
     dto.username = row["username"].isNull() ? "" : row["username"].as<std::string>();
     dto.threadId = row["thread_id"].as<int>();
     return dto;
@@ -138,14 +166,17 @@ void ForumService::deleteCategory(const DbClientPtr &db, int id,
 // --- Forums ---
 
 void ForumService::getForum(
-    const DbClientPtr &db, int forumId,
+    const DbClientPtr &db, int forumId, int tenantId,
     std::function<void(const std::optional<ForumWithThreadsDto> &)> cb) {
 
+    // Scoped to the tenant when tenantId != 0
     db->execSqlAsync(
-        "SELECT id, name, description, category_id, "
-        "COALESCE(total_threads, 0) AS total_threads, "
-        "COALESCE(total_posts, 0) AS total_posts "
-        "FROM forums WHERE id = $1",
+        "SELECT f.id, f.name, f.description, f.category_id, "
+        "COALESCE(f.total_threads, 0) AS total_threads, "
+        "COALESCE(f.total_posts, 0) AS total_posts "
+        "FROM forums f WHERE f.id = $1 AND ($2::int = 0 OR EXISTS "
+        "(SELECT 1 FROM forum_categories c WHERE c.id = f.category_id "
+        "AND c.tenant_id = $2::int))",
         [this, db, forumId, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(std::nullopt);
@@ -156,25 +187,12 @@ void ForumService::getForum(
             dto.forum = rowToForumDto(result[0]);
 
             db->execSqlAsync(
-                "SELECT t.id, t.name, t.description, t.forum_id, "
-                "COALESCE(t.view_count, 0) AS view_count, "
-                "COALESCE(t.total_posts, 0) AS total_posts, "
-                "t.created_at "
-                "FROM forum_threads t WHERE t.forum_id = $1 "
-                "ORDER BY t.created_at DESC",
-                [dto, cb](const drogon::orm::Result &threadResult) mutable {
+                std::string("SELECT ") + kThreadCols + kThreadFrom +
+                    "WHERE t.forum_id = $1 "
+                    "ORDER BY t.is_pinned DESC, last_post_at DESC",
+                [this, dto, cb](const drogon::orm::Result &threadResult) mutable {
                     for (const auto &row : threadResult) {
-                        ForumThreadDto thread;
-                        thread.id = row["id"].as<int>();
-                        thread.name = row["name"].as<std::string>();
-                        thread.description = row["description"].isNull()
-                                                 ? ""
-                                                 : row["description"].as<std::string>();
-                        thread.forumId = row["forum_id"].as<int>();
-                        thread.viewCount = row["view_count"].as<int>();
-                        thread.totalPosts = row["total_posts"].as<int>();
-                        thread.createdAt = row["created_at"].as<std::string>();
-                        dto.threads.push_back(thread);
+                        dto.threads.push_back(rowToThreadDto(row));
                     }
                     cb(dto);
                 },
@@ -186,7 +204,7 @@ void ForumService::getForum(
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt);
         },
-        forumId);
+        forumId, tenantId);
 }
 
 void ForumService::createForum(const DbClientPtr &db, int categoryId,
@@ -236,54 +254,50 @@ void ForumService::deleteForum(const DbClientPtr &db, int id,
 // --- Threads ---
 
 void ForumService::getThread(
-    const DbClientPtr &db, int threadId,
+    const DbClientPtr &db, int threadId, int tenantId,
     std::function<void(const std::optional<ForumThreadWithPostsDto> &)> cb) {
 
-    // Increment view count
+    // Fetch thread (scoped to the tenant when tenantId != 0)
     db->execSqlAsync(
-        "UPDATE forum_threads SET view_count = COALESCE(view_count, 0) + 1 "
-        "WHERE id = $1",
-        [](const drogon::orm::Result &) {},
-        [](const drogon::orm::DrogonDbException &) {},
-        threadId);
-
-    // Fetch thread
-    db->execSqlAsync(
-        "SELECT id, name, description, forum_id, "
-        "COALESCE(view_count, 0) AS view_count, "
-        "COALESCE(total_posts, 0) AS total_posts, "
-        "created_at "
-        "FROM forum_threads WHERE id = $1",
+        std::string("SELECT ") + kThreadCols + kThreadFrom +
+            "WHERE t.id = $1 AND ($2::int = 0 OR EXISTS "
+            "(SELECT 1 FROM forums tf JOIN forum_categories tc "
+            "ON tc.id = tf.category_id WHERE tf.id = t.forum_id "
+            "AND tc.tenant_id = $2::int))",
         [this, db, threadId, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(std::nullopt);
                 return;
             }
 
+            // Increment view count only for a visible thread
+            db->execSqlAsync(
+                "UPDATE forum_threads "
+                "SET view_count = COALESCE(view_count, 0) + 1 "
+                "WHERE id = $1",
+                [](const drogon::orm::Result &) {},
+                [](const drogon::orm::DrogonDbException &) {},
+                threadId);
+
             ForumThreadWithPostsDto dto;
             dto.thread = rowToThreadDto(result[0]);
 
             db->execSqlAsync(
                 "SELECT p.id, p.title, p.content, p.created_at, "
-                "p.user_id, u.username, p.thread_id "
+                "p.user_id, u.username, p.thread_id, "
+                "(SELECT COUNT(*) FROM forum_post_votes v "
+                "WHERE v.post_id = p.id AND v.is_like)::int AS likes, "
+                "(SELECT COUNT(*) FROM forum_post_votes v "
+                "WHERE v.post_id = p.id AND NOT v.is_like)::int AS dislikes "
                 "FROM forum_posts p "
                 "LEFT JOIN users u ON u.id = p.user_id "
                 "WHERE p.thread_id = $1 "
-                "ORDER BY p.created_at ASC",
-                [dto, cb](const drogon::orm::Result &postResult) mutable {
+                "ORDER BY p.created_at ASC, p.id ASC",
+                [this, dto, cb](const drogon::orm::Result &postResult) mutable {
                     for (const auto &row : postResult) {
-                        ForumPostDto post;
-                        post.id = row["id"].as<int>();
-                        post.title = row["title"].isNull()
-                                         ? ""
-                                         : row["title"].as<std::string>();
-                        post.content = row["content"].as<std::string>();
-                        post.createdAt = row["created_at"].as<std::string>();
-                        post.userId = row["user_id"].as<int>();
-                        post.username = row["username"].isNull()
-                                            ? ""
-                                            : row["username"].as<std::string>();
-                        post.threadId = row["thread_id"].as<int>();
+                        auto post = rowToPostDto(row);
+                        post.likes = row["likes"].as<int>();
+                        post.dislikes = row["dislikes"].as<int>();
                         dto.posts.push_back(post);
                     }
                     cb(dto);
@@ -296,20 +310,27 @@ void ForumService::getThread(
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt);
         },
-        threadId);
+        threadId, tenantId);
 }
 
 void ForumService::createThread(const DbClientPtr &db, int forumId,
                                  const std::string &title,
                                  const std::string &description,
                                  const std::string &content,
-                                 int userId,
-                                 BoolCallback cb) {
+                                 int userId, int tenantId,
+                                 IdCallback cb) {
     db->execSqlAsync(
-        "INSERT INTO forum_threads (name, description, forum_id, view_count, "
-        "total_posts, created_at) "
-        "VALUES ($1, $2, $3, 0, 1, NOW()) RETURNING id",
+        "INSERT INTO forum_threads (name, description, forum_id, user_id, "
+        "view_count, total_posts, created_at) "
+        "SELECT $1::text, $2::text, f.id, $4::int, 0, 1, NOW() "
+        "FROM forums f WHERE f.id = $3::int AND ($5::int = 0 OR EXISTS "
+        "(SELECT 1 FROM forum_categories c WHERE c.id = f.category_id "
+        "AND c.tenant_id = $5::int)) RETURNING id",
         [db, title, content, userId, cb](const drogon::orm::Result &result) {
+            if (result.empty()) {
+                cb(0, "Forum not found");
+                return;
+            }
             int threadId = result[0]["id"].as<int>();
 
             // Create the first post
@@ -322,58 +343,97 @@ void ForumService::createThread(const DbClientPtr &db, int forumId,
                         "UPDATE forums SET total_threads = COALESCE(total_threads, 0) + 1, "
                         "total_posts = COALESCE(total_posts, 0) + 1 "
                         "WHERE id = (SELECT forum_id FROM forum_threads WHERE id = $1)",
-                        [cb](const drogon::orm::Result &) {
-                            cb(true, "");
+                        [threadId, cb](const drogon::orm::Result &) {
+                            cb(threadId, "");
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(false, e.base().what());
+                            cb(0, e.base().what());
                         },
                         threadId);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(0, e.base().what());
                 },
                 title, content, threadId, userId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(0, e.base().what());
         },
-        title, description, forumId);
+        title, description, forumId, userId, tenantId);
 }
 
-void ForumService::updateThread(const DbClientPtr &db, int id,
+void ForumService::updateThread(const DbClientPtr &db, int id, int userId,
                                  const std::string &title,
                                  const std::string &description,
                                  BoolCallback cb) {
     db->execSqlAsync(
-        "UPDATE forum_threads SET name = $1, description = $2 WHERE id = $3",
-        [cb](const drogon::orm::Result &) {
+        std::string("UPDATE forum_threads SET name = $2, description = $3 "
+                    "WHERE id = $4 AND ") + kOwnerOrMod,
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Thread not found or not permitted");
+                return;
+            }
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, e.base().what());
         },
-        title, description, id);
+        userId, title, description, id);
 }
 
-void ForumService::deleteThread(const DbClientPtr &db, int id,
-                                 BoolCallback cb) {
-    // Update forum counts before deleting
+void ForumService::setThreadFlags(const DbClientPtr &db, int id, int userId,
+                                   bool pinned, bool locked,
+                                   BoolCallback cb) {
     db->execSqlAsync(
-        "UPDATE forums SET "
-        "total_threads = GREATEST(COALESCE(total_threads, 0) - 1, 0), "
-        "total_posts = GREATEST(COALESCE(total_posts, 0) - "
-        "(SELECT COUNT(*) FROM forum_posts WHERE thread_id = $1), 0) "
-        "WHERE id = (SELECT forum_id FROM forum_threads WHERE id = $1)",
-        [db, id, cb](const drogon::orm::Result &) {
-            // Delete posts first, then thread
+        "UPDATE forum_threads SET is_pinned = $2, is_locked = $3 "
+        "WHERE id = $4 AND EXISTS "
+        "(SELECT 1 FROM users mu WHERE mu.id = $1::int AND mu.role >= 2)",
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Thread not found or not permitted");
+                return;
+            }
+            cb(true, "");
+        },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, e.base().what());
+        },
+        userId, pinned, locked, id);
+}
+
+void ForumService::deleteThread(const DbClientPtr &db, int id, int userId,
+                                 BoolCallback cb) {
+    // Permission check first
+    db->execSqlAsync(
+        std::string("SELECT id FROM forum_threads WHERE id = $2 AND ") +
+            kOwnerOrMod,
+        [db, id, cb](const drogon::orm::Result &check) {
+            if (check.empty()) {
+                cb(false, "Thread not found or not permitted");
+                return;
+            }
+            // Update forum counts before deleting
             db->execSqlAsync(
-                "DELETE FROM forum_posts WHERE thread_id = $1",
+                "UPDATE forums SET "
+                "total_threads = GREATEST(COALESCE(total_threads, 0) - 1, 0), "
+                "total_posts = GREATEST(COALESCE(total_posts, 0) - "
+                "(SELECT COUNT(*) FROM forum_posts WHERE thread_id = $1), 0) "
+                "WHERE id = (SELECT forum_id FROM forum_threads WHERE id = $1)",
                 [db, id, cb](const drogon::orm::Result &) {
+                    // Delete posts first, then thread
                     db->execSqlAsync(
-                        "DELETE FROM forum_threads WHERE id = $1",
-                        [cb](const drogon::orm::Result &) {
-                            cb(true, "");
+                        "DELETE FROM forum_posts WHERE thread_id = $1",
+                        [db, id, cb](const drogon::orm::Result &) {
+                            db->execSqlAsync(
+                                "DELETE FROM forum_threads WHERE id = $1",
+                                [cb](const drogon::orm::Result &) {
+                                    cb(true, "");
+                                },
+                                [cb](const drogon::orm::DrogonDbException &e) {
+                                    cb(false, e.base().what());
+                                },
+                                id);
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
                             cb(false, e.base().what());
@@ -388,7 +448,7 @@ void ForumService::deleteThread(const DbClientPtr &db, int id,
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, e.base().what());
         },
-        id);
+        userId, id);
 }
 
 // --- Posts ---
@@ -397,35 +457,43 @@ void ForumService::createPost(const DbClientPtr &db, int threadId,
                                const std::string &title,
                                const std::string &content,
                                int userId,
-                               BoolCallback cb) {
+                               IdCallback cb) {
+    // Refuses locked or missing threads (no row inserted).
     db->execSqlAsync(
         "INSERT INTO forum_posts (title, content, thread_id, user_id, "
-        "created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id",
-        [db, threadId, cb](const drogon::orm::Result &) {
+        "created_at) SELECT $1::text, $2::text, t.id, $4::int, NOW() "
+        "FROM forum_threads t WHERE t.id = $3::int AND NOT t.is_locked "
+        "RETURNING id",
+        [db, threadId, cb](const drogon::orm::Result &inserted) {
+            if (inserted.empty()) {
+                cb(0, "Thread is locked or not found");
+                return;
+            }
+            int postId = inserted[0]["id"].as<int>();
             // Update thread post count
             db->execSqlAsync(
                 "UPDATE forum_threads SET total_posts = COALESCE(total_posts, 0) + 1 "
                 "WHERE id = $1",
-                [db, threadId, cb](const drogon::orm::Result &) {
+                [db, threadId, postId, cb](const drogon::orm::Result &) {
                     // Update forum post count
                     db->execSqlAsync(
                         "UPDATE forums SET total_posts = COALESCE(total_posts, 0) + 1 "
                         "WHERE id = (SELECT forum_id FROM forum_threads WHERE id = $1)",
-                        [cb](const drogon::orm::Result &) {
-                            cb(true, "");
+                        [postId, cb](const drogon::orm::Result &) {
+                            cb(postId, "");
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(false, e.base().what());
+                            cb(0, e.base().what());
                         },
                         threadId);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(0, e.base().what());
                 },
                 threadId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(0, e.base().what());
         },
         title, content, threadId, userId);
 }
@@ -452,29 +520,35 @@ void ForumService::getPost(
         postId);
 }
 
-void ForumService::updatePost(const DbClientPtr &db, int postId,
+void ForumService::updatePost(const DbClientPtr &db, int postId, int userId,
                                const std::string &title,
                                const std::string &content,
                                BoolCallback cb) {
     db->execSqlAsync(
-        "UPDATE forum_posts SET title = $1, content = $2 WHERE id = $3",
-        [cb](const drogon::orm::Result &) {
+        std::string("UPDATE forum_posts SET title = $2, content = $3 "
+                    "WHERE id = $4 AND ") + kOwnerOrMod,
+        [cb](const drogon::orm::Result &result) {
+            if (result.affectedRows() == 0) {
+                cb(false, "Post not found or not permitted");
+                return;
+            }
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, e.base().what());
         },
-        title, content, postId);
+        userId, title, content, postId);
 }
 
-void ForumService::deletePost(const DbClientPtr &db, int postId,
+void ForumService::deletePost(const DbClientPtr &db, int postId, int userId,
                                BoolCallback cb) {
-    // Get thread_id before deleting
+    // Get thread_id before deleting (also checks permission)
     db->execSqlAsync(
-        "SELECT thread_id FROM forum_posts WHERE id = $1",
+        std::string("SELECT thread_id FROM forum_posts WHERE id = $2 AND ") +
+            kOwnerOrMod,
         [db, postId, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
-                cb(false, "Post not found");
+                cb(false, "Post not found or not permitted");
                 return;
             }
             int threadId = result[0]["thread_id"].as<int>();
@@ -514,7 +588,7 @@ void ForumService::deletePost(const DbClientPtr &db, int postId,
         [cb](const drogon::orm::DrogonDbException &) {
             cb(false, "Post not found");
         },
-        postId);
+        userId, postId);
 }
 
 // --- Voting ---

@@ -11,6 +11,7 @@ import Link from 'next/link'
 
 interface CreateThreadFormProps {
   slug: string
+  cancelHref?: string
   title: string
   setTitle: (v: string) => void
   description: string
@@ -24,6 +25,7 @@ interface CreateThreadFormProps {
 
 export function CreateThreadForm({
   slug,
+  cancelHref,
   title,
   setTitle,
   description,
@@ -120,7 +122,7 @@ export function CreateThreadForm({
         <Button
           variant="outlined"
           component={Link}
-          href={`/site/${slug}/forum`}
+          href={cancelHref ?? `/site/${slug}/forum`}
           data-testid={
             'create-thread-cancel'
           }

@@ -142,9 +142,14 @@ void ForumController::getForum(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
     int id) {
 
+    int tenantId = 0;
+    auto tenantParam = req->getParameter("tenant_id");
+    if (!tenantParam.empty()) {
+        try { tenantId = std::stoi(tenantParam); } catch (...) {}
+    }
     auto db = drogon::app().getDbClient();
     forumService_.getForum(
-        db, id,
+        db, id, tenantId,
         [callback](const std::optional<ForumWithThreadsDto> &forumData) {
             if (!forumData) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -172,6 +177,11 @@ void ForumController::getForum(
                 threadJson["viewCount"] = t.viewCount;
                 threadJson["totalPosts"] = t.totalPosts;
                 threadJson["createdAt"] = t.createdAt;
+                threadJson["userId"] = t.userId;
+                threadJson["authorUsername"] = t.authorUsername;
+                threadJson["lastPostAt"] = t.lastPostAt;
+                threadJson["pinned"] = t.pinned;
+                threadJson["locked"] = t.locked;
                 threadsJson.append(threadJson);
             }
             result["threads"] = threadsJson;
@@ -280,9 +290,14 @@ void ForumController::getThread(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
     int id) {
 
+    int tenantId = 0;
+    auto tenantParam = req->getParameter("tenant_id");
+    if (!tenantParam.empty()) {
+        try { tenantId = std::stoi(tenantParam); } catch (...) {}
+    }
     auto db = drogon::app().getDbClient();
     forumService_.getThread(
-        db, id,
+        db, id, tenantId,
         [callback](const std::optional<ForumThreadWithPostsDto> &threadData) {
             if (!threadData) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -300,6 +315,12 @@ void ForumController::getThread(
             result["viewCount"] = threadData->thread.viewCount;
             result["totalPosts"] = threadData->thread.totalPosts;
             result["createdAt"] = threadData->thread.createdAt;
+            result["userId"] = threadData->thread.userId;
+            result["authorUsername"] = threadData->thread.authorUsername;
+            result["lastPostAt"] = threadData->thread.lastPostAt;
+            result["forumName"] = threadData->thread.forumName;
+            result["pinned"] = threadData->thread.pinned;
+            result["locked"] = threadData->thread.locked;
 
             Json::Value postsJson(Json::arrayValue);
             for (const auto &p : threadData->posts) {
@@ -311,6 +332,8 @@ void ForumController::getThread(
                 postJson["userId"] = p.userId;
                 postJson["username"] = p.username;
                 postJson["threadId"] = p.threadId;
+                postJson["likes"] = p.likes;
+                postJson["dislikes"] = p.dislikes;
                 postsJson.append(postJson);
             }
             result["posts"] = postsJson;
@@ -338,13 +361,23 @@ void ForumController::createThread(
                            ? (*json)["description"].asString()
                            : "";
     auto content = (*json)["content"].asString();
+    int tenantId = (*json).isMember("tenantId")
+                       ? (*json)["tenantId"].asInt()
+                       : 0;
+    if (title.empty() || content.empty()) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "title and content must not be empty";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
 
     forumService_.createThread(
-        db, forumId, title, description, content, userId,
-        [callback](bool success, const std::string &error) {
-            if (!success) {
+        db, forumId, title, description, content, userId, tenantId,
+        [callback](int newId, const std::string &error) {
+            if (newId <= 0) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
                 resp->setStatusCode(drogon::k400BadRequest);
@@ -353,6 +386,7 @@ void ForumController::createThread(
             }
             Json::Value result;
             result["success"] = true;
+            result["id"] = newId;
             callback(drogon::HttpResponse::newHttpJsonResponse(result));
         });
 }
@@ -375,10 +409,11 @@ void ForumController::updateThread(
     auto description = (*json).isMember("description")
                            ? (*json)["description"].asString()
                            : "";
+    int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
 
     forumService_.updateThread(
-        db, id, title, description,
+        db, id, userId, title, description,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -398,14 +433,50 @@ void ForumController::deleteThread(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
     int id) {
 
+    int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
     forumService_.deleteThread(
-        db, id,
+        db, id, userId,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
                 resp->setStatusCode(drogon::k400BadRequest);
+                callback(resp);
+                return;
+            }
+            Json::Value result;
+            result["success"] = true;
+            callback(drogon::HttpResponse::newHttpJsonResponse(result));
+        });
+}
+
+void ForumController::setThreadFlags(
+    const drogon::HttpRequestPtr &req,
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    int id) {
+
+    auto json = req->getJsonObject();
+    if (!json || !(*json).isMember("pinned") || !(*json).isMember("locked")) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "pinned and locked are required";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+
+    bool pinned = (*json)["pinned"].asBool();
+    bool locked = (*json)["locked"].asBool();
+    int userId = req->attributes()->get<int>("userId");
+    auto db = drogon::app().getDbClient();
+
+    forumService_.setThreadFlags(
+        db, id, userId, pinned, locked,
+        [callback](bool success, const std::string &error) {
+            if (!success) {
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                (*resp->jsonObject())["error"] = error;
+                resp->setStatusCode(drogon::k403Forbidden);
                 callback(resp);
                 return;
             }
@@ -433,13 +504,20 @@ void ForumController::createPost(
     int threadId = (*json)["threadId"].asInt();
     auto title = (*json).isMember("title") ? (*json)["title"].asString() : "";
     auto content = (*json)["content"].asString();
+    if (content.empty()) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "content must not be empty";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
 
     forumService_.createPost(
         db, threadId, title, content, userId,
-        [callback](bool success, const std::string &error) {
-            if (!success) {
+        [callback](int newId, const std::string &error) {
+            if (newId <= 0) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
                 resp->setStatusCode(drogon::k400BadRequest);
@@ -448,6 +526,7 @@ void ForumController::createPost(
             }
             Json::Value result;
             result["success"] = true;
+            result["id"] = newId;
             callback(drogon::HttpResponse::newHttpJsonResponse(result));
         });
 }
@@ -497,10 +576,11 @@ void ForumController::updatePost(
 
     auto title = (*json).isMember("title") ? (*json)["title"].asString() : "";
     auto content = (*json)["content"].asString();
+    int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
 
     forumService_.updatePost(
-        db, id, title, content,
+        db, id, userId, title, content,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -520,9 +600,10 @@ void ForumController::deletePost(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
     int id) {
 
+    int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
     forumService_.deletePost(
-        db, id,
+        db, id, userId,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});

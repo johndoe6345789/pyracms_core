@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { formatForumDate } from '@/lib/forumDate'
 
 export interface ThreadSummary {
   id: string
@@ -11,6 +12,7 @@ export interface ThreadSummary {
   views: number
   lastPostDate: string
   pinned: boolean
+  locked: boolean
 }
 
 export interface ForumInfo {
@@ -18,32 +20,54 @@ export interface ForumInfo {
   description: string
 }
 
-export function useThreadList(forumId: string) {
+interface RawThread {
+  id: number
+  name?: string
+  authorUsername?: string
+  totalPosts?: number
+  viewCount?: number
+  lastPostAt?: string
+  createdAt?: string
+  pinned?: boolean
+  locked?: boolean
+}
+
+export function useThreadList(forumId: string, tenantId: number | null) {
   const [forum, setForum] = useState<ForumInfo>({ name: '', description: '' })
   const [threads, setThreads] = useState<ThreadSummary[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!forumId) return
+    if (!forumId || !tenantId) return
     setLoading(true)
-    api.get(`/api/forum/forums/${forumId}`)
+    setError('')
+    api.get(`/api/forum/forums/${forumId}?tenant_id=${tenantId}`)
       .then(res => {
         const data = res.data
-        setForum({ name: data.name || '', description: data.description || '' })
-        const mapped: ThreadSummary[] = (data.threads || []).map((t: Record<string, unknown>) => ({
+        setForum({
+          name: data.name || '',
+          description: data.description || '',
+        })
+        const raw: RawThread[] = data.threads || []
+        setThreads(raw.map(t => ({
           id: String(t.id),
-          title: t.title || '',
+          title: t.name || '(untitled)',
           author: t.authorUsername || 'Unknown',
-          replies: Math.max(0, (Number(t.postCount) || 0) - 1),
+          replies: Math.max(0, (t.totalPosts || 0) - 1),
           views: t.viewCount || 0,
-          lastPostDate: typeof t.lastPostAt === 'string' ? (t.lastPostAt as string).replace('T', ' ').substring(0, 16) : '',
-          pinned: t.pinned || false,
-        }))
-        setThreads(mapped)
+          lastPostDate: formatForumDate(t.lastPostAt || t.createdAt),
+          pinned: Boolean(t.pinned),
+          locked: Boolean(t.locked),
+        })))
       })
-      .catch(() => {})
+      .catch(err => setError(
+        err?.response?.status === 404
+          ? 'This forum does not exist.'
+          : 'Could not load threads. Please try again.',
+      ))
       .finally(() => setLoading(false))
-  }, [forumId])
+  }, [forumId, tenantId])
 
-  return { forum, threads, loading }
+  return { forum, threads, loading, error }
 }

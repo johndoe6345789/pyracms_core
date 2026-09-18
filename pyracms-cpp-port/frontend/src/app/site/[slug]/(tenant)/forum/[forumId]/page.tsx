@@ -1,42 +1,52 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
-} from '@mui/material'
+import { Container, Typography, Box, Button } from '@mui/material'
 import { AddOutlined } from '@mui/icons-material'
 import Link from 'next/link'
+import { useThreadList } from '@/hooks/useThreadList'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useForumUser } from '@/hooks/useForumUser'
+import { ThreadTable } from '@/components/forum/ThreadTable'
+import { ForumBreadcrumbs } from '@/components/forum/ForumBreadcrumbs'
 import {
-  useThreadList,
-} from '@/hooks/useThreadList'
-import {
-  BackButton,
-} from '@/components/common/BackButton'
-import {
-  ThreadTable,
-} from '@/components/forum/ThreadTable'
+  ForumLoading, ForumError, ForumEmpty,
+} from '@/components/forum/ForumStatus'
 
 export default function ThreadListPage() {
   const params = useParams()
   const slug = params.slug as string
   const forumId = params.forumId as string
-  const { forum, threads } = useThreadList(forumId)
+  const { tenantId, loading: tenantLoading } = useTenantId(slug)
+  const { isAuthenticated } = useForumUser()
+  const { forum, threads, loading, error } = useThreadList(forumId, tenantId)
+  const busy = tenantLoading || loading
+  const base = `/site/${slug}/forum`
+
+  let body
+  if (busy) {
+    body = <ForumLoading />
+  } else if (error || !tenantId) {
+    body = <ForumError message={error || 'Site not found.'} />
+  } else if (threads.length === 0) {
+    body = (
+      <ForumEmpty
+        title="No threads yet"
+        hint="Be the first to start a discussion."
+      />
+    )
+  } else {
+    body = <ThreadTable threads={threads} slug={slug} />
+  }
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: 6 }}
-      data-testid="thread-list-page"
-    >
-      <Box sx={{ mb: 2 }}>
-        <BackButton
-          href={`/site/${slug}/forum`}
-          label="Back to Forums"
-        />
-      </Box>
+    <Container maxWidth="lg" sx={{ py: 6 }} data-testid="thread-list-page">
+      <ForumBreadcrumbs
+        crumbs={[
+          { label: 'Forum', href: base },
+          { label: forum.name || 'Threads' },
+        ]}
+      />
       <Box
         sx={{
           display: 'flex',
@@ -48,17 +58,10 @@ export default function ThreadListPage() {
         }}
       >
         <Box>
-          <Typography
-            variant="h3"
-            component="h1"
-            gutterBottom
-          >
+          <Typography variant="h3" component="h1" gutterBottom>
             {forum.name}
           </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-          >
+          <Typography variant="body1" color="text.secondary">
             {forum.description}
           </Typography>
         </Box>
@@ -67,19 +70,16 @@ export default function ThreadListPage() {
           startIcon={<AddOutlined />}
           component={Link}
           href={
-            `/site/${slug}/forum`
-            + `/thread/create`
-            + `?forumId=${forumId}`
+            isAuthenticated
+              ? `${base}/thread/create?forumId=${forumId}`
+              : '/auth/login'
           }
           data-testid="new-thread-button"
         >
-          New Thread
+          {isAuthenticated ? 'New Thread' : 'Sign in to post'}
         </Button>
       </Box>
-      <ThreadTable
-        threads={threads}
-        slug={slug}
-      />
+      {body}
     </Container>
   )
 }

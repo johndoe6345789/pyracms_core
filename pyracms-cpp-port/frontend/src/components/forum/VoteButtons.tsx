@@ -14,10 +14,11 @@ interface VoteButtonsProps {
   likes: number
   dislikes: number
   onVote?: (isLike: boolean) => void
+  disabled?: boolean
 }
 
 export function VoteButtons(
-  { likes, dislikes, onVote }:
+  { likes, dislikes, onVote, disabled }:
   VoteButtonsProps,
 ) {
   return (
@@ -39,6 +40,7 @@ export function VoteButtons(
         <IconButton
           size="small"
           color="primary"
+          disabled={disabled ?? false}
           onClick={() => onVote?.(true)}
           aria-label="Like"
           data-testid="vote-like-button"
@@ -65,6 +67,7 @@ export function VoteButtons(
         <IconButton
           size="small"
           color="default"
+          disabled={disabled ?? false}
           onClick={
             () => onVote?.(false)
           }

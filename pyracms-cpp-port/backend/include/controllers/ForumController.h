@@ -25,6 +25,7 @@ public:
     ADD_METHOD_TO(ForumController::createThread, "/api/forum/threads", drogon::Post, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(ForumController::updateThread, "/api/forum/threads/{id}", drogon::Put, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(ForumController::deleteThread, "/api/forum/threads/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ForumController::setThreadFlags, "/api/forum/threads/{id}/flags", drogon::Put, "pyracms::JwtAuthFilter");
 
     // Posts
     ADD_METHOD_TO(ForumController::createPost, "/api/forum/posts", drogon::Post, "pyracms::JwtAuthFilter");
@@ -80,6 +81,10 @@ public:
     void deleteThread(const drogon::HttpRequestPtr &req,
                       std::function<void(const drogon::HttpResponsePtr &)> &&callback,
                       int id);
+
+    void setThreadFlags(const drogon::HttpRequestPtr &req,
+                        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+                        int id);
 
     // Posts
     void createPost(const drogon::HttpRequestPtr &req,

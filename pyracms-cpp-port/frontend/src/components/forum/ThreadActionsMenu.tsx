@@ -17,7 +17,7 @@ interface ThreadActionsMenuProps {
   isLocked: boolean
   onPin: () => void
   onLock: () => void
-  onMove: () => void
+  onMove?: (() => void) | undefined
   onDelete: () => void
 }
 
@@ -49,16 +49,18 @@ export function ThreadActionsMenu({
           {isLocked ? 'Unlock' : 'Lock'} Thread
         </ListItemText>
       </MenuItem>
-      <MenuItem onClick={onMove}
-        data-testid="thread-action-move">
-        <ListItemIcon>
-          <DriveFileMoveOutlined
-            fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>
-          Move Thread
-        </ListItemText>
-      </MenuItem>
+      {onMove && (
+        <MenuItem onClick={onMove}
+          data-testid="thread-action-move">
+          <ListItemIcon>
+            <DriveFileMoveOutlined
+              fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            Move Thread
+          </ListItemText>
+        </MenuItem>
+      )}
       <Divider />
       <MenuItem onClick={onDelete}
         sx={{ color: 'error.main' }}

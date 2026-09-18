@@ -4,7 +4,11 @@ import { useState } from 'react'
 import api from '@/lib/api'
 import { useRouter } from 'next/navigation'
 
-export function useCreateThread(forumId: string) {
+export function useCreateThread(
+  forumId: string,
+  slug: string,
+  tenantId: number | null,
+) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [content, setContent] = useState('')
@@ -13,6 +17,10 @@ export function useCreateThread(forumId: string) {
   const router = useRouter()
 
   const handleSubmit = () => {
+    if (!forumId) {
+      setError('Choose a forum first.')
+      return
+    }
     if (!title.trim() || !content.trim()) {
       setError('Title and content are required')
       return
@@ -21,18 +29,31 @@ export function useCreateThread(forumId: string) {
     setError('')
     api.post('/api/forum/threads', {
       title: title.trim(),
+      description: description.trim(),
       content: content.trim(),
       forumId: Number(forumId),
+      tenantId: tenantId ?? 0,
     })
       .then(res => {
-        const threadId = res.data.id
-        router.push(`../thread/${threadId}`)
+        const id = res.data?.id
+        router.push(
+          id
+            ? `/site/${slug}/forum/thread/${id}`
+            : `/site/${slug}/forum/${forumId}`,
+        )
       })
       .catch(err => {
-        setError(err.response?.data?.message || 'Failed to create thread')
+        setError(
+          err.response?.data?.error
+          || err.response?.data?.message
+          || 'Failed to create thread',
+        )
+        setLoading(false)
       })
-      .finally(() => setLoading(false))
   }
 
-  return { title, setTitle, description, setDescription, content, setContent, loading, error, handleSubmit }
+  return {
+    title, setTitle, description, setDescription,
+    content, setContent, loading, error, handleSubmit,
+  }
 }

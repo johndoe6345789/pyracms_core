@@ -13,7 +13,9 @@ import {
   Chip,
   Pagination,
 } from '@mui/material'
+import { useState } from 'react'
 import {
+  LockOutlined,
   PersonOutlined,
   VisibilityOutlined,
   ChatBubbleOutlineOutlined,
@@ -23,6 +25,8 @@ import type {
   ThreadSummary,
 } from '@/hooks/useThreadList'
 
+const PAGE_SIZE = 20
+
 interface ThreadTableProps {
   threads: ThreadSummary[]
   slug: string
@@ -31,6 +35,12 @@ interface ThreadTableProps {
 export function ThreadTable(
   { threads, slug }: ThreadTableProps,
 ) {
+  const [page, setPage] = useState(1)
+  const pages = Math.max(1, Math.ceil(threads.length / PAGE_SIZE))
+  const current = Math.min(page, pages)
+  const visible = threads.slice(
+    (current - 1) * PAGE_SIZE, current * PAGE_SIZE,
+  )
   return (
     <>
       <TableContainer
@@ -71,7 +81,7 @@ export function ThreadTable(
             </TableRow>
           </TableHead>
           <TableBody>
-            {threads.map((thread) => (
+            {visible.map((thread) => (
               <ThreadRow
                 key={thread.id}
                 thread={thread}
@@ -81,7 +91,7 @@ export function ThreadTable(
           </TableBody>
         </Table>
       </TableContainer>
-      <Box
+      {pages > 1 && <Box
         sx={{
           display: 'flex',
           justifyContent: 'center',
@@ -89,12 +99,14 @@ export function ThreadTable(
         }}
       >
         <Pagination
-          count={5}
+          count={pages}
+          page={current}
+          onChange={(_, v) => setPage(v)}
           color="primary"
           aria-label="Thread pagination"
           data-testid="thread-pagination"
         />
-      </Box>
+      </Box>}
     </>
   )
 }
@@ -135,6 +147,14 @@ function ThreadRow(
               label="Pinned"
               size="small"
               color="primary"
+            />
+          )}
+          {thread.locked && (
+            <Chip
+              icon={<LockOutlined />}
+              label="Locked"
+              size="small"
+              variant="outlined"
             />
           )}
         </Box>

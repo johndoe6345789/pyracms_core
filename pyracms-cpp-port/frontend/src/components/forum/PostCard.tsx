@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import {
-  Paper, Typography, TextField,
+  Paper, TextField, Box,
   Button, Dialog, DialogTitle,
   DialogActions,
 } from '@mui/material'
 import { VoteButtons } from './VoteButtons'
+import { QuoteButton } from './QuoteButton'
+import { PostBody } from './PostBody'
 import { PostCardHeader } from
   './PostCardHeader'
 import type { Post } from '@/hooks/useThread'
@@ -18,10 +20,13 @@ interface PostCardProps {
     id: string, c: string
   ) => Promise<void>
   onDelete?: (id: string) => Promise<void>
+  onQuote?: (author: string, content: string) => void
+  canVote?: boolean
 }
 
 export function PostCard({
-  post, onVote, onEdit, onDelete,
+  post, onVote, onEdit, onDelete, onQuote,
+  canVote = true,
 }: PostCardProps) {
   const [editing, setEditing] = useState(false)
   const [editContent, setEditContent] =
@@ -61,14 +66,23 @@ export function PostCard({
           sx={{ mb: 2 }}
           data-testid="post-edit-input" />
       ) : (
-        <Typography variant="body1" sx={{
-          mb: 2, whiteSpace: 'pre-line',
-          lineHeight: 1.8,
-        }}>{post.content}</Typography>
+        <PostBody content={post.content} />
       )}
-      <VoteButtons likes={post.likes}
-        dislikes={post.dislikes}
-        onVote={l => onVote?.(post.id, l)} />
+      <Box sx={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <VoteButtons likes={post.likes}
+          dislikes={post.dislikes}
+          disabled={!canVote}
+          onVote={l => onVote?.(post.id, l)} />
+        {onQuote && (
+          <QuoteButton author={post.author}
+            content={post.content}
+            onQuote={() => onQuote(
+              post.author, post.content)} />
+        )}
+      </Box>
       <Dialog open={confirmDel}
         onClose={() => setConfirmDel(false)}
         data-testid="post-delete-dialog">
