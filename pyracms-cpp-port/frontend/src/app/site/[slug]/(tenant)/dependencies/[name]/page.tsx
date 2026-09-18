@@ -17,15 +17,20 @@ export default function DependencyDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const name = params.name as string
-  const { detail, tabIndex, setTabIndex } = useGameDepDetail(PLACEHOLDER_DEP_DETAIL)
+  const { detail, tabIndex, setTabIndex } =
+    useGameDepDetail(PLACEHOLDER_DEP_DETAIL)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Breadcrumbs separator={<NavigateNextOutlined fontSize="small" />} sx={{ mb: 3 }}>
-        <Link href={`/site/${slug}/dependencies`} style={{ color: 'inherit', textDecoration: 'none' }}>
+      <Breadcrumbs sx={{ mb: 3 }}
+        separator={<NavigateNextOutlined fontSize="small" />}>
+        <Link href={`/site/${slug}/dependencies`}
+          style={{ color: 'inherit', textDecoration: 'none' }}>
           Dependencies
         </Link>
-        <Typography color="text.primary">{detail.displayName}</Typography>
+        <Typography color="text.primary">
+          {detail.displayName}
+        </Typography>
       </Breadcrumbs>
 
       <GameDepDetail
@@ -41,7 +46,8 @@ export default function DependencyDetailPage() {
           <BinaryMatrix binaries={detail.binaries} />
         </TabPanel>
         <TabPanel value={tabIndex} index={2}>
-          <DependencyList dependencies={detail.dependencies} slug={slug} />
+          <DependencyList dependencies={detail.dependencies}
+            slug={slug} />
         </TabPanel>
         <TabPanel value={tabIndex} index={3}>
           <ScreenshotGrid screenshots={detail.screenshots} />

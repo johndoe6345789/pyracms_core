@@ -41,29 +41,24 @@ export function useGalleryPicture(pictureId: string) {
       .finally(() => setLoading(false))
   }, [pictureId])
 
-  const handleLike = () => {
-    api.post(`/api/gallery/pictures/${pictureId}/vote`, { like: true })
+  const vote = (like: boolean, key: 'likes' | 'dislikes') =>
+    api.post(`/api/gallery/pictures/${pictureId}/vote`, { like })
       .then(() => {
-        setPicture(prev => prev ? { ...prev, likes: prev.likes + 1 } : prev)
+        setPicture(prev => prev ? { ...prev, [key]: prev[key] + 1 } : prev)
       })
       .catch(() => {})
-  }
 
-  const handleDislike = () => {
-    api.post(`/api/gallery/pictures/${pictureId}/vote`, { like: false })
-      .then(() => {
-        setPicture(prev => prev ? { ...prev, dislikes: prev.dislikes + 1 } : prev)
-      })
-      .catch(() => {})
-  }
+  const handleLike = () => vote(true, 'likes')
+  const handleDislike = () => vote(false, 'dislikes')
 
-  const handleSetCover = () => {
-    return api.put(`/api/gallery/pictures/${pictureId}/default`)
-  }
+  const handleSetCover = () =>
+    api.put(`/api/gallery/pictures/${pictureId}/default`)
 
-  const handleDelete = () => {
-    return api.delete(`/api/gallery/pictures/${pictureId}`)
-  }
+  const handleDelete = () =>
+    api.delete(`/api/gallery/pictures/${pictureId}`)
 
-  return { picture, loading, handleLike, handleDislike, handleSetCover, handleDelete }
+  return {
+    picture, loading, handleLike, handleDislike,
+    handleSetCover, handleDelete,
+  }
 }

@@ -26,6 +26,7 @@ GdResult gdOk(int status = 200);
 // Postgres error text -> 409 (duplicate) or 400.
 GdResult gdDbError(const std::string &what);
 bool gdValidType(const std::string &type);
+GdResult gdBadType();
 
 // Resolve a page the caller may change; 404 / 403 through `fail`.
 void gdWithPage(const GdCtx &c, const std::string &type,

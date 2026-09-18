@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Box,
-  List,
-  Pagination,
-  Paper,
-  Typography,
-} from '@mui/material'
+import { Box, List, Pagination, Paper, Typography } from '@mui/material'
 import AnimatedList from '@/components/common/AnimatedList'
 import {
   SEARCH_ITEMS_PER_PAGE,

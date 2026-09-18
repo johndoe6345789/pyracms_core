@@ -1,49 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  Box, Card, CardContent,
-  Typography, Tooltip,
-} from '@mui/material'
-import {
-  StarOutlined, ForumOutlined,
-  ArticleOutlined, CodeOutlined,
-  RocketLaunchOutlined, BugReportOutlined,
-  CalendarMonthOutlined, ThumbUpOutlined,
-  EmojiEventsOutlined, WhatshotOutlined,
-} from '@mui/icons-material'
+import { Box } from '@mui/material'
 import api from '@/lib/api'
-import AnimatedList from
-  '@/components/common/AnimatedList'
+import AnimatedList from '@/components/common/AnimatedList'
+import { AchievementCard } from './AchievementCard'
+import type { Achievement } from './achievementIcons'
 
-interface Achievement {
-  id: number; name: string
-  displayName: string; description: string
-  icon: string; earned: boolean; earnedAt: string
-}
-const ico: Record<string, React.ReactNode> = {
-  star: <StarOutlined />,
-  forum: <ForumOutlined />,
-  article: <ArticleOutlined />,
-  code: <CodeOutlined />,
-  rocket: <RocketLaunchOutlined />,
-  bug: <BugReportOutlined />,
-  calendar: <CalendarMonthOutlined />,
-  thumbup: <ThumbUpOutlined />,
-  hundred: <WhatshotOutlined />,
-  default: <EmojiEventsOutlined />,
-}
-
-export function AchievementGrid({
-  userId,
-}: { userId: number }) {
-  const [items, setItems] =
-    useState<Achievement[]>([])
+export function AchievementGrid({ userId }: { userId: number }) {
+  const [items, setItems] = useState<Achievement[]>([])
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(
-          `/api/users/${userId}/achievements`)
+        const res = await api.get(`/api/users/${userId}/achievements`)
         setItems(res.data || [])
       } catch { /* ignore */ }
     })()
@@ -51,47 +20,10 @@ export function AchievementGrid({
   return (
     <Box data-testid="achievement-grid" sx={{
       display: 'grid', gap: 2,
-      gridTemplateColumns:
-        'repeat(auto-fill, minmax(200px, 1fr))',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
     }}>
       <AnimatedList>
-        {items.map((a) => (
-          <Tooltip key={a.id}
-            title={a.description}>
-            <Card data-testid={
-              `achievement-${a.name}`} sx={{
-              opacity: a.earned ? 1 : 0.4,
-              border: a.earned
-                ? '2px solid' : '1px solid',
-              borderColor: a.earned
-                ? 'primary.main' : 'divider',
-              transition: 'all 0.2s',
-              '&:hover': { transform: a.earned
-                ? 'scale(1.02)' : undefined },
-            }}>
-              <CardContent sx={{
-                textAlign: 'center', py: 3 }}>
-                <Box sx={{ fontSize: 40, mb: 1,
-                  color: a.earned
-                    ? 'primary.main'
-                    : 'text.disabled' }}>
-                  {ico[a.icon] || ico.default}
-                </Box>
-                <Typography variant="subtitle2"
-                  fontWeight={700}>
-                  {a.displayName}
-                </Typography>
-                {a.earned && a.earnedAt && (
-                  <Typography variant="caption"
-                    color="text.secondary">
-                    {new Date(a.earnedAt)
-                      .toLocaleDateString()}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Tooltip>
-        ))}
+        {items.map((a) => <AchievementCard key={a.id} a={a} />)}
       </AnimatedList>
     </Box>
   )

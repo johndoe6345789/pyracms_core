@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { MenuItemData } from './menuItemTypes'
 import PLACEHOLDER_MENU from './placeholderMenu'
+import { moveBefore } from './menuTree'
 
 export default function useMenuHandlers() {
   const [items, setItems] =
@@ -10,33 +11,24 @@ export default function useMenuHandlers() {
 
   const handleEdit = useCallback(
     (id: string, l: string, u: string) => {
-      const rec = (
-        arr: MenuItemData[],
-      ): MenuItemData[] =>
+      const rec = (arr: MenuItemData[]): MenuItemData[] =>
         arr.map((m) => m.id === id
           ? { ...m, label: l, url: u }
-          : {
-            ...m,
-            children: rec(m.children),
-          })
+          : { ...m, children: rec(m.children) })
       setItems(rec)
     }, [])
 
   const handleDelete = useCallback(
     (id: string) => {
-      const rec = (
-        arr: MenuItemData[],
-      ): MenuItemData[] =>
+      const rec = (arr: MenuItemData[]): MenuItemData[] =>
         arr.filter((m) => m.id !== id)
-          .map((m) => ({
-            ...m, children: rec(m.children),
-          }))
+          .map((m) => ({ ...m, children: rec(m.children) }))
       setItems(rec)
     }, [])
 
   const handleMove = useCallback(
-    (dId: string, tId: string) => {
-      console.log('Move', dId, 'to', tId)
+    (dragId: string, targetId: string) => {
+      setItems((prev) => moveBefore(prev, dragId, targetId))
     }, [])
 
   const handleAdd = () => {
@@ -50,9 +42,7 @@ export default function useMenuHandlers() {
   }
 
   return {
-    items, label, url,
-    setLabel, setUrl,
-    handleEdit, handleDelete,
-    handleMove, handleAdd,
+    items, label, url, setLabel, setUrl,
+    handleEdit, handleDelete, handleMove, handleAdd,
   }
 }

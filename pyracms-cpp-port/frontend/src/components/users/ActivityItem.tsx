@@ -1,39 +1,12 @@
 import { Box, Typography, Chip } from '@mui/material'
-import {
-  ForumOutlined, ArticleOutlined,
-  CodeOutlined, ThumbUpOutlined,
-} from '@mui/icons-material'
+import { TYPE_COLORS, getTypeIcon } from './activityIcons'
+
+export { TYPE_COLORS, getTypeIcon }
 
 export interface ActivityEvent {
   id: string; type: string; title: string
   description: string; date: string
   link?: string
-}
-
-export const TYPE_COLORS: Record<string, string> = {
-  post: '#ed6c02', forum_post: '#ed6c02',
-  article: '#1976d2', snippet: '#2e7d32',
-  vote: '#9c27b0',
-}
-
-const ICONS: Record<string, React.ReactNode> = {
-  post: <ForumOutlined sx={{ fontSize: 18 }} />,
-  forum_post: (
-    <ForumOutlined sx={{ fontSize: 18 }} />
-  ),
-  article: (
-    <ArticleOutlined sx={{ fontSize: 18 }} />
-  ),
-  snippet: (
-    <CodeOutlined sx={{ fontSize: 18 }} />
-  ),
-  vote: (
-    <ThumbUpOutlined sx={{ fontSize: 18 }} />
-  ),
-}
-
-export function getTypeIcon(type: string) {
-  return ICONS[type] || ICONS.article
 }
 
 interface ActivityItemProps {

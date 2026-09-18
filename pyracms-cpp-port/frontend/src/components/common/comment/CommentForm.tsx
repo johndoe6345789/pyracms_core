@@ -1,9 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Box, TextField, Button,
-} from '@mui/material'
+import { Box, TextField, Button } from '@mui/material'
 import api from '@/lib/api'
 
 interface CommentFormProps {
@@ -32,12 +30,8 @@ export default function CommentForm({
     if (!text.trim()) return
     setSubmitting(true)
     try {
-      const url =
-        `/api/comments/${contentType}/${contentId}`
-      await api.post(url, {
-        content: text,
-        parent_id: parentId,
-      })
+      const url = `/api/comments/${contentType}/${contentId}`
+      await api.post(url, { content: text, parent_id: parentId })
       setText('')
       onSubmitted()
     } catch { /* ignore */ }
@@ -56,14 +50,9 @@ export default function CommentForm({
         onChange={(e) => setText(e.target.value)}
         data-testid="comment-input"
       />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          gap: 1,
-          mt: 1,
-        }}
-      >
+      <Box sx={{
+        display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1,
+      }}>
         {onCancel && (
           <Button
             size="small"

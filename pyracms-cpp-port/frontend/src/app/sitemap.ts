@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const SITE = () => process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     {
-      url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      url: SITE(),
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
@@ -20,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const articles = await res.json()
       for (const article of articles) {
         entries.push({
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/site/default/articles/${article.name}`,
+          url: `${SITE()}/site/default/articles/${article.name}`,
           lastModified: new Date(article.createdAt),
           changeFrequency: 'weekly',
           priority: 0.8,

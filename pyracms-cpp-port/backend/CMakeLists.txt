@@ -49,11 +49,7 @@ set(LIB_SOURCES
 
     src/controllers/DocsController.cpp
 
-    src/controllers/FileController.cpp
-
     src/controllers/GalleryController.cpp
-
-    src/controllers/GameDepController.cpp
 
     src/controllers/NotificationController.cpp
 
@@ -139,6 +135,14 @@ set(LIB_SOURCES
 
     src/controllers/auth/AuthControllerWithTenant.cpp
 
+    src/controllers/file/FileControllerDownload.cpp
+
+    src/controllers/file/FileControllerHelpers.cpp
+
+    src/controllers/file/FileControllerManage.cpp
+
+    src/controllers/file/FileControllerUpload.cpp
+
     src/controllers/forum/ForumControllerCreateCategory.cpp
 
     src/controllers/forum/ForumControllerCreateForum.cpp
@@ -174,6 +178,20 @@ set(LIB_SOURCES
     src/controllers/forum/ForumControllerUpdateThread.cpp
 
     src/controllers/forum/ForumControllerVotePost.cpp
+
+    src/controllers/gamedep/GameDepAttachControllerDeps.cpp
+
+    src/controllers/gamedep/GameDepAttachControllerMeta.cpp
+
+    src/controllers/gamedep/GameDepControllerPages.cpp
+
+    src/controllers/gamedep/GameDepControllerWrites.cpp
+
+    src/controllers/gamedep/GameDepRevisionControllerBinaries.cpp
+
+    src/controllers/gamedep/GameDepRevisionControllerRevisions.cpp
+
+    src/controllers/gamedep/GdHttp.cpp
 
     src/controllers/menu/MenuControllerCreateGroup.cpp
 
@@ -237,11 +255,7 @@ set(LIB_SOURCES
 
     src/services/EmailService.cpp
 
-    src/services/FileService.cpp
-
     src/services/GalleryService.cpp
-
-    src/services/GameDepService.cpp
 
     src/services/NotificationService.cpp
 
@@ -297,6 +311,10 @@ set(LIB_SOURCES
 
     src/services/article/ArticleServiceVoteArticle.cpp
 
+    src/services/file/FileServiceQueries.cpp
+
+    src/services/file/FileServiceUpload.cpp
+
     src/services/forum/ForumServiceCreateCategory.cpp
 
     src/services/forum/ForumServiceCreateForum.cpp
@@ -340,6 +358,54 @@ set(LIB_SOURCES
     src/services/forum/ForumServiceUpdateThread.cpp
 
     src/services/forum/ForumServiceVotePost.cpp
+
+    src/services/gamedep/GameDepAttachBinary.cpp
+
+    src/services/gamedep/GameDepAttachDependency.cpp
+
+    src/services/gamedep/GameDepAttachPip.cpp
+
+    src/services/gamedep/GameDepAttachShots.cpp
+
+    src/services/gamedep/GameDepAttachTags.cpp
+
+    src/services/gamedep/GameDepAttachVote.cpp
+
+    src/services/gamedep/GameDepServiceCatalog.cpp
+
+    src/services/gamedep/GameDepServiceLookups.cpp
+
+    src/services/gamedep/GameDepServiceReads.cpp
+
+    src/services/gamedep/GameDepWriteCreatePage.cpp
+
+    src/services/gamedep/GameDepWriteCreateRevision.cpp
+
+    src/services/gamedep/GameDepWritePage.cpp
+
+    src/services/gamedep/GameDepWritePublish.cpp
+
+    src/services/gamedep/GameDepWriteRevisions.cpp
+
+    src/services/gamedep/GdAddPip.cpp
+
+    src/services/gamedep/GdFileId.cpp
+
+    src/services/gamedep/GdQuery.cpp
+
+    src/services/gamedep/GdResults.cpp
+
+    src/services/gamedep/GdSqlBinaries.cpp
+
+    src/services/gamedep/GdSqlPage.cpp
+
+    src/services/gamedep/GdSqlParts.cpp
+
+    src/services/gamedep/GdSqlRevisions.cpp
+
+    src/services/gamedep/GdWithPage.cpp
+
+    src/services/gamedep/GdWithRevision.cpp
 
     src/services/menu/MenuServiceCreateMenuGroup.cpp
 

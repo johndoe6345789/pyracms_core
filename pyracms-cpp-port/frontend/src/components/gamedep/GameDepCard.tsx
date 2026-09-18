@@ -1,15 +1,9 @@
 import {
-  Card,
-  CardActionArea,
-  CardContent,
-  Typography,
-  Box,
+  Card, CardActionArea, CardContent, Typography, Box,
 } from '@mui/material'
 import Link from 'next/link'
 import {
-  ThumbUpOutlined,
-  ThumbDownOutlined,
-  VisibilityOutlined,
+  ThumbUpOutlined, ThumbDownOutlined, VisibilityOutlined,
 } from '@mui/icons-material'
 import TagChips from '@/components/common/TagChips'
 import type { GameDepItem } from '@/hooks/useGameDepList'
@@ -39,35 +33,29 @@ export default function GameDepCard({
         },
       }}
     >
-      <CardActionArea component={Link} href={href} sx={{ height: '100%' }}>
+      <CardActionArea component={Link} href={href}
+        sx={{ height: '100%' }}>
         <CardContent sx={{ p: 3 }}>
           <Typography variant="h5" component="h2" gutterBottom>
             {item.displayName}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary"
+            sx={{ mb: 2 }}>
             {item.description}
           </Typography>
           <Box sx={{ mb: 2 }}>
             <TagChips tags={item.tags} />
           </Box>
           <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            color: 'text.secondary',
+            display: 'flex', alignItems: 'center',
+            gap: 2, color: 'text.secondary',
           }}>
-            <StatIcon
-              icon={<ThumbUpOutlined fontSize="small" />}
-              value={item.likes}
-            />
-            <StatIcon
-              icon={<ThumbDownOutlined fontSize="small" />}
-              value={item.dislikes}
-            />
-            <StatIcon
-              icon={<VisibilityOutlined fontSize="small" />}
-              value={item.views}
-            />
+            <Stat icon={<ThumbUpOutlined fontSize="small" />}
+              value={item.likes} />
+            <Stat icon={<ThumbDownOutlined fontSize="small" />}
+              value={item.dislikes} />
+            <Stat icon={<VisibilityOutlined fontSize="small" />}
+              value={item.views} />
           </Box>
         </CardContent>
       </CardActionArea>
@@ -75,7 +63,7 @@ export default function GameDepCard({
   )
 }
 
-function StatIcon({ icon, value }: { icon: React.ReactNode; value: number }) {
+function Stat({ icon, value }: { icon: React.ReactNode; value: number }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       {icon}

@@ -10,7 +10,9 @@ export const metadata: Metadata = {
     default: 'PyraCMS',
     template: '%s | PyraCMS',
   },
-  description: 'A multi-tenant content management system with articles, forums, galleries, and more.',
+  description:
+    'A multi-tenant content management system with articles, '
+    + 'forums, galleries, and more.',
   openGraph: {
     type: 'website',
     siteName: 'PyraCMS',

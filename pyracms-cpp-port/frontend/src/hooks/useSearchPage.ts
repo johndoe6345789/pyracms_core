@@ -2,20 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import api from '@/lib/api'
 import { useTenantId } from '@/hooks/useTenantId'
+import {
+  fetchSearch, SEARCH_ITEMS_PER_PAGE, type SearchResult,
+} from './searchTypes'
 
-export interface SearchResult {
-  type: string
-  id: number
-  title: string
-  snippet: string
-  url: string
-  rank: number
-  createdAt: string
-}
-
-export const SEARCH_ITEMS_PER_PAGE = 10
+export { SEARCH_ITEMS_PER_PAGE }
+export type { SearchResult }
 
 export function useSearchPage() {
   const searchParams = useSearchParams()
@@ -47,17 +40,10 @@ export function useSearchPage() {
     try {
       const tenantId = tenantParam
         || (siteTenantId ? String(siteTenantId) : '1')
-      const params = new URLSearchParams({
-        q,
-        tenant_id: tenantId,
-        type: type === 'all' ? '' : type,
-        limit: String(SEARCH_ITEMS_PER_PAGE),
-        offset: String((pg - 1) * SEARCH_ITEMS_PER_PAGE),
-      })
-      const res = await api.get(`/api/search?${params}`)
-      setResults(res.data.items || [])
-      setTotalCount(res.data.totalCount || 0)
-      setFacets(res.data.facets || {})
+      const data = await fetchSearch(q, tenantId, type, pg)
+      setResults(data.items)
+      setTotalCount(data.totalCount)
+      setFacets(data.facets)
     } catch {
       setResults([])
     }
@@ -88,16 +74,7 @@ export function useSearchPage() {
   }
 
   return {
-    activeType,
-    facets,
-    handleSearch,
-    handleTypeChange,
-    loading,
-    page,
-    query,
-    results,
-    router,
-    setPage,
-    totalCount,
+    activeType, facets, handleSearch, handleTypeChange, loading,
+    page, query, results, router, setPage, totalCount,
   }
 }

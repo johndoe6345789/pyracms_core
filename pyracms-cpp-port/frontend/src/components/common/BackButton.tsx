@@ -11,7 +11,12 @@ interface BackButtonProps {
 
 export function BackButton({ href, label }: BackButtonProps) {
   return (
-    <Button component={Link} href={href} startIcon={<ArrowBackOutlined />} sx={{ color: 'text.secondary' }}>
+    <Button
+      component={Link}
+      href={href}
+      startIcon={<ArrowBackOutlined />}
+      sx={{ color: 'text.secondary' }}
+    >
       {label}
     </Button>
   )

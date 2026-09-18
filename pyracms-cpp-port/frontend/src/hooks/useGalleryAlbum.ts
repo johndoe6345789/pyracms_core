@@ -11,6 +11,17 @@ export interface GalleryPicture {
   rows: number
 }
 
+type Raw = Record<string, unknown>
+
+const mapPicture = (p: Raw, i: number): GalleryPicture => ({
+  id: String(p.id),
+  title: (p.title as string) || `Photo ${i + 1}`,
+  src: (p.url || p.thumbnailUrl
+    || `https://picsum.photos/seed/pic${p.id}/400/300`) as string,
+  cols: i % 5 === 0 ? 2 : 1,
+  rows: i % 7 === 0 ? 2 : 1,
+})
+
 export function useGalleryAlbum(albumId: string) {
   const [albumName, setAlbumName] = useState('')
   const [pictures, setPictures] = useState<GalleryPicture[]>([])
@@ -23,14 +34,7 @@ export function useGalleryAlbum(albumId: string) {
       .then(res => {
         const data = res.data
         setAlbumName(data.displayName || data.name || '')
-        const mapped: GalleryPicture[] = (data.pictures || []).map((p: Record<string, unknown>, i: number) => ({
-          id: String(p.id),
-          title: p.title || `Photo ${i + 1}`,
-          src: p.url || p.thumbnailUrl || `https://picsum.photos/seed/pic${p.id}/400/300`,
-          cols: i % 5 === 0 ? 2 : 1,
-          rows: i % 7 === 0 ? 2 : 1,
-        }))
-        setPictures(mapped)
+        setPictures((data.pictures || []).map(mapPicture))
       })
       .catch(() => {})
       .finally(() => setLoading(false))

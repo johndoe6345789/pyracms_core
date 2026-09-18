@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { IconButton, Menu, MenuItem, ListItemText } from '@mui/material'
+import {
+  IconButton, Menu, MenuItem, ListItemText,
+} from '@mui/material'
 import { LanguageOutlined } from '@mui/icons-material'
 import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from '@/i18n/navigation'
@@ -20,10 +22,17 @@ export default function LocaleSwitcher() {
 
   return (
     <>
-      <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ color: 'text.primary' }}>
+      <IconButton
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{ color: 'text.primary' }}
+      >
         <LanguageOutlined />
       </IconButton>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
         {locales.map((loc) => (
           <MenuItem
             key={loc}

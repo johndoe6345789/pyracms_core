@@ -10,10 +10,8 @@ import CommentHeader from './CommentHeader'
 import EditForm from './EditForm'
 import CommentActions from './CommentActions'
 import CommentChildren from './CommentChildren'
-import DeleteCommentDialog
-  from './DeleteCommentDialog'
-import { useCommentActions }
-  from './useCommentActions'
+import DeleteCommentDialog from './DeleteCommentDialog'
+import { useCommentActions } from './useCommentActions'
 
 interface Props {
   comment: Comment; contentType: string
@@ -26,19 +24,15 @@ export default function CommentItem({
 }: Props) {
   const [replying, setReplying] = useState(false)
   const [exp, setExp] = useState(true)
-  const isAuth = useSelector(
-    (s: RootState) => s.auth.isAuthenticated)
-  const usr = useSelector(
-    (s: RootState) => s.auth.user)
-  const a = useCommentActions(
-    c.id, c.content, onRefresh)
+  const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
+  const usr = useSelector((s: RootState) => s.auth.user)
+  const a = useCommentActions(c.id, c.content, onRefresh)
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
         <Avatar
           {...(c.avatar ? { src: c.avatar } : {})}
-          sx={{ width: 32, height: 32,
-            fontSize: 14 }}>
+          sx={{ width: 32, height: 32, fontSize: 14 }}>
           {c.username[0]?.toUpperCase()}</Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentHeader comment={c} />
@@ -56,24 +50,18 @@ export default function CommentItem({
             isAuthenticated={isAuth}
             isOwner={usr?.id === c.user_id}
             depth={depth}
-            onVote={(v) =>
-              a.vote(v, c.user_vote, isAuth)}
-            onReply={() =>
-              setReplying(!replying)}
+            onVote={(v) => a.vote(v, c.user_vote, isAuth)}
+            onReply={() => setReplying(!replying)}
             onEdit={() => a.setEditing(true)}
-            onDelete={() =>
-              a.setDelOpen(true)} />
+            onDelete={() => a.setDelOpen(true)} />
           {replying && <CommentForm
             contentType={contentType}
             contentId={contentId}
             parentId={c.id}
             placeholder="Write a reply..."
             submitLabel="Reply"
-            onSubmitted={() => {
-              setReplying(false)
-              onRefresh() }}
-            onCancel={() =>
-              setReplying(false)} />}
+            onSubmitted={() => { setReplying(false); onRefresh() }}
+            onCancel={() => setReplying(false)} />}
           <CommentChildren items={c.children}
             expanded={exp}
             onToggle={() => setExp(!exp)}

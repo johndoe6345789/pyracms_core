@@ -2,44 +2,41 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@mui/material'
-import { PersonAddOutlined, PersonRemoveOutlined } from '@mui/icons-material'
+import {
+  PersonAddOutlined, PersonRemoveOutlined,
+} from '@mui/icons-material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
 
-interface FollowButtonProps {
-  userId: number
-}
-
-export function FollowButton({ userId }: FollowButtonProps) {
+export function FollowButton({ userId }: { userId: number }) {
   const [following, setFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
-  const currentUserId = useSelector((state: RootState) => state.auth.user?.id)
+  const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
+  const me = useSelector((s: RootState) => s.auth.user?.id)
 
   useEffect(() => {
-    if (!isAuthenticated || currentUserId === userId) return
+    if (!isAuth || me === userId) return
     // Check if already following (heuristic: check followers list)
-    const checkFollowing = async () => {
+    const check = async () => {
       try {
-        const res = await api.get(`/api/users/${userId}/followers?limit=100`)
-        const followers = res.data?.items || []
-        setFollowing(followers.some((f: { userId: number }) => f.userId === currentUserId))
+        const res = await api.get(
+          `/api/users/${userId}/followers?limit=100`)
+        const list = res.data?.items || []
+        setFollowing(list.some(
+          (f: { userId: number }) => f.userId === me))
       } catch { /* ignore */ }
     }
-    checkFollowing()
-  }, [isAuthenticated, userId, currentUserId])
+    check()
+  }, [isAuth, userId, me])
 
-  if (!isAuthenticated || currentUserId === userId) return null
+  if (!isAuth || me === userId) return null
 
   const handleToggle = async () => {
     setLoading(true)
     try {
-      if (following) {
-        await api.delete(`/api/users/${userId}/follow`)
-      } else {
-        await api.post(`/api/users/${userId}/follow`)
-      }
+      if (following) await api.delete(`/api/users/${userId}/follow`)
+      else await api.post(`/api/users/${userId}/follow`)
       setFollowing(!following)
     } catch { /* ignore */ }
     setLoading(false)
@@ -48,10 +45,9 @@ export function FollowButton({ userId }: FollowButtonProps) {
   return (
     <Button
       variant={following ? 'outlined' : 'contained'}
-      size="small"
-      onClick={handleToggle}
-      disabled={loading}
-      startIcon={following ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
+      size="small" onClick={handleToggle} disabled={loading}
+      startIcon={following
+        ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
     >
       {following ? 'Unfollow' : 'Follow'}
     </Button>

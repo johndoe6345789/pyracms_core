@@ -17,6 +17,7 @@ struct FileDto {
     bool isPicture;
     bool isVideo;
     int downloadCount;
+    std::string sha256;
 };
 
 class FileService {
@@ -33,7 +34,8 @@ public:
                     int64_t size,
                     bool isPicture,
                     bool isVideo,
-                    BoolCallback cb);
+                    BoolCallback cb,
+                    const std::string &sha256 = "");
 
     void getFile(const DbClientPtr &db,
                  const std::string &uuid,

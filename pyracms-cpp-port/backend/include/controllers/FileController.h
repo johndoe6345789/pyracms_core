@@ -40,6 +40,8 @@ private:
     static bool isVideoMimetype(const std::string &mimetype);
     static std::string generateUuid();
     static std::string getUploadDir();
+    static std::string mimeFor(const std::string &filename);
+    static std::string sha256Hex(const std::string &data);
 };
 
 } // namespace pyracms

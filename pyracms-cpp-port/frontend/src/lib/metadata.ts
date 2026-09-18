@@ -3,6 +3,13 @@ import type { Metadata } from 'next'
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
+function articleUrl(
+  kind: 'opengraph' | 'jsonld', slug: string, name: string, tenantId: number,
+) {
+  return `${API_URL}/api/articles/${name}/${kind}`
+    + `?tenant_id=${tenantId}&base_url=${SITE_URL}/site/${slug}`
+}
+
 export async function generateArticleMetadata(
   slug: string,
   name: string,
@@ -10,7 +17,7 @@ export async function generateArticleMetadata(
 ): Promise<Metadata> {
   try {
     const res = await fetch(
-      `${API_URL}/api/articles/${name}/opengraph?tenant_id=${tenantId}&base_url=${SITE_URL}/site/${slug}`,
+      articleUrl('opengraph', slug, name, tenantId),
       { next: { revalidate: 3600 } }
     )
 
@@ -42,7 +49,7 @@ export async function fetchArticleJsonLd(
 ): Promise<Record<string, unknown> | null> {
   try {
     const res = await fetch(
-      `${API_URL}/api/articles/${name}/jsonld?tenant_id=${tenantId}&base_url=${SITE_URL}/site/${slug}`,
+      articleUrl('jsonld', slug, name, tenantId),
       { next: { revalidate: 3600 } }
     )
     if (!res.ok) return null

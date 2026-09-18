@@ -25,4 +25,8 @@ bool gdValidType(const std::string &type) {
     return type == "game" || type == "dep";
 }
 
+GdResult gdBadType() {
+    return gdError(400, "type must be game or dep");
+}
+
 } // namespace pyracms

@@ -10,21 +10,20 @@ export interface Site {
   owner: string
 }
 
+const mapSite = (t: Record<string, unknown>): Site => ({
+  slug: (t.slug || '') as string,
+  name: (t.displayName || t.slug || '') as string,
+  description: (t.description || '') as string,
+  owner: (t.ownerUsername || 'admin') as string,
+})
+
 export function useTenantList() {
   const [sites, setSites] = useState<Site[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     api.get('/api/tenants')
-      .then(res => {
-        const mapped: Site[] = (res.data || []).map((t: Record<string, unknown>) => ({
-          slug: t.slug || '',
-          name: t.displayName || t.slug || '',
-          description: t.description || '',
-          owner: t.ownerUsername || 'admin',
-        }))
-        setSites(mapped)
-      })
+      .then(res => setSites((res.data || []).map(mapSite)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

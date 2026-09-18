@@ -1,77 +1,33 @@
 'use client'
 
 import {
-  IconButton, Menu, MenuItem,
-  ListItemIcon, ListItemText,
+  IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
 } from '@mui/material'
-import {
-  DarkModeOutlined,
-  LightModeOutlined,
-  SettingsBrightnessOutlined,
-} from '@mui/icons-material'
+import { SettingsBrightnessOutlined } from '@mui/icons-material'
 import { useState } from 'react'
-import {
-  useDispatch, useSelector,
-} from 'react-redux'
-import {
-  setColorMode, type ColorMode,
-} from '@/store/slices/uiSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { setColorMode } from '@/store/slices/uiSlice'
 import type { RootState } from '@/store/store'
-
-const modes: {
-  value: ColorMode
-  label: string
-  icon: React.ReactNode
-}[] = [
-  {
-    value: 'light',
-    label: 'Light',
-    icon: <LightModeOutlined />,
-  },
-  {
-    value: 'dark',
-    label: 'Dark',
-    icon: <DarkModeOutlined />,
-  },
-  {
-    value: 'system',
-    label: 'System',
-    icon: <SettingsBrightnessOutlined />,
-  },
-]
+import { modes } from './themeModes'
 
 export default function ThemeToggle() {
   const dispatch = useDispatch()
-  const colorMode = useSelector(
-    (state: RootState) =>
-      state.ui.colorMode,
-  )
-  const [anchorEl, setAnchorEl] =
-    useState<null | HTMLElement>(null)
+  const colorMode = useSelector((s: RootState) => s.ui.colorMode)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const currentMode = modes.find(
-    (m) => m.value === colorMode,
-  )
-  const currentIcon =
-    currentMode?.icon
-    || <SettingsBrightnessOutlined />
+  const currentMode = modes.find((m) => m.value === colorMode)
+  const currentIcon = currentMode?.icon || <SettingsBrightnessOutlined />
 
   return (
     <>
       <IconButton
-        onClick={(e) =>
-          setAnchorEl(e.currentTarget)
-        }
+        onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{ color: 'text.primary' }}
-        aria-label={
-          `Toggle theme, current: ${
-            currentMode?.label || 'System'
-          }`
-        }
+        aria-label={`Toggle theme, current: ${
+          currentMode?.label || 'System'
+        }`}
         aria-haspopup="true"
-        aria-expanded={
-          Boolean(anchorEl)
-        }
+        aria-expanded={Boolean(anchorEl)}
         data-testid="theme-toggle"
       >
         {currentIcon}
@@ -86,25 +42,15 @@ export default function ThemeToggle() {
         {modes.map((mode) => (
           <MenuItem
             key={mode.value}
-            selected={
-              colorMode === mode.value
-            }
+            selected={colorMode === mode.value}
             onClick={() => {
-              dispatch(
-                setColorMode(mode.value),
-              )
+              dispatch(setColorMode(mode.value))
               setAnchorEl(null)
             }}
-            data-testid={
-              `theme-${mode.value}`
-            }
+            data-testid={`theme-${mode.value}`}
           >
-            <ListItemIcon>
-              {mode.icon}
-            </ListItemIcon>
-            <ListItemText>
-              {mode.label}
-            </ListItemText>
+            <ListItemIcon>{mode.icon}</ListItemIcon>
+            <ListItemText>{mode.label}</ListItemText>
           </MenuItem>
         ))}
       </Menu>

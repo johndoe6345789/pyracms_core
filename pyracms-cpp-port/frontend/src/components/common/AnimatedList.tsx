@@ -7,36 +7,21 @@ interface AnimatedListProps {
   staggerDelay?: number
 }
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-}
-
 const item = {
   hidden: { opacity: 0, y: 8 },
   show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
 }
 
-export default function AnimatedList({ children, staggerDelay = 0.05 }: AnimatedListProps) {
-  const containerVariants = {
-    ...container,
-    show: {
-      ...container.show,
-      transition: { staggerChildren: staggerDelay },
-    },
+export default function AnimatedList({
+  children, staggerDelay = 0.05,
+}: AnimatedListProps) {
+  const variants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: staggerDelay } },
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-    >
+    <motion.div variants={variants} initial="hidden" animate="show">
       {children.map((child, index) => (
         <motion.div key={index} variants={item}>
           {child}

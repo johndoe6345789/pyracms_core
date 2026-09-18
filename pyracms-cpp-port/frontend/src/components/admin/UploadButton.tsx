@@ -4,7 +4,7 @@ import { CloudUploadOutlined } from '@mui/icons-material'
 export default function UploadButton({
   onFilesSelected,
 }: {
-  onFilesSelected?: (files: FileList) => void
+  onFilesSelected?: ((files: FileList) => void) | undefined
 }) {
   return (
     <Button

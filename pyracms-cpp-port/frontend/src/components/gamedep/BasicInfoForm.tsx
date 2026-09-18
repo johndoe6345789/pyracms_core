@@ -27,12 +27,18 @@ export default function BasicInfoForm({
   onDeleteTag,
 }: BasicInfoFormProps) {
   return (
-    <Paper variant="outlined" sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
+    <Paper variant="outlined"
+      sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
       <Typography variant="h5" gutterBottom>Basic Info</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <TextField label="Name (slug)" value={nameSlug} disabled fullWidth size="small" />
-        <TextField label="Display Name" value={displayName} onChange={(e) => onDisplayNameChange(e.target.value)} fullWidth size="small" />
-        <TextField label="Description" value={description} onChange={(e) => onDescriptionChange(e.target.value)} fullWidth multiline rows={4} size="small" />
+        <TextField label="Name (slug)" value={nameSlug}
+          disabled fullWidth size="small" />
+        <TextField label="Display Name" value={displayName}
+          onChange={(e) => onDisplayNameChange(e.target.value)}
+          fullWidth size="small" />
+        <TextField label="Description" value={description}
+          onChange={(e) => onDescriptionChange(e.target.value)}
+          fullWidth multiline rows={4} size="small" />
         <TagInput
           tags={tags}
           tagInput={tagInput}

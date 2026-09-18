@@ -7,7 +7,7 @@ interface UploadDropzoneProps {
   onDragOver: (e: React.DragEvent) => void
   onDragLeave: () => void
   onDrop: (e: React.DragEvent) => void
-  onFilesSelected?: (files: FileList) => void
+  onFilesSelected?: ((files: FileList) => void) | undefined
 }
 
 export default function UploadDropzone({

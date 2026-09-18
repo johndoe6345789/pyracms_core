@@ -1,16 +1,6 @@
 import {
-  Paper,
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Switch,
-  IconButton,
+  Paper, Box, Typography, Button, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Switch, IconButton,
 } from '@mui/material'
 import { AddOutlined, DeleteOutlined } from '@mui/icons-material'
 import type { Revision } from '@/hooks/useGameDepDetail'
@@ -21,12 +11,19 @@ interface EditRevisionTableProps {
   onDeleteRevision?: (version: string) => void
 }
 
-export default function EditRevisionTable({ revisions, onCreateRevision, onDeleteRevision }: EditRevisionTableProps) {
+export default function EditRevisionTable({
+  revisions, onCreateRevision, onDeleteRevision,
+}: EditRevisionTableProps) {
   return (
-    <Paper variant="outlined" sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Paper variant="outlined"
+      sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
+      <Box sx={{
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', mb: 2,
+      }}>
         <Typography variant="h5">Revisions</Typography>
-        <Button variant="outlined" startIcon={<AddOutlined />} size="small" onClick={onCreateRevision}>
+        <Button variant="outlined" startIcon={<AddOutlined />}
+          size="small" onClick={onCreateRevision}>
           Create Revision
         </Button>
       </Box>
@@ -44,14 +41,20 @@ export default function EditRevisionTable({ revisions, onCreateRevision, onDelet
             {revisions.map((rev) => (
               <TableRow key={rev.version}>
                 <TableCell>
-                  <Typography variant="body2" fontWeight={600}>{rev.version}</Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {rev.version}
+                  </Typography>
                 </TableCell>
-                <TableCell>{new Date(rev.date).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {new Date(rev.date).toLocaleDateString()}
+                </TableCell>
                 <TableCell>
                   <Switch defaultChecked={rev.published} size="small" />
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton size="small" color="error" onClick={() => onDeleteRevision?.(rev.version)}>
+                  <IconButton size="small" color="error"
+                    aria-label={`Delete ${rev.version}`}
+                    onClick={() => onDeleteRevision?.(rev.version)}>
                     <DeleteOutlined fontSize="small" />
                   </IconButton>
                 </TableCell>
