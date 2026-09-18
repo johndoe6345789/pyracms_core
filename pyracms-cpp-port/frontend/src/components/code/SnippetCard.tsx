@@ -18,6 +18,7 @@ import {
   VisibilityOutlined,
 } from '@mui/icons-material'
 import Link from 'next/link'
+import { langColor as colorFor } from '@/lib/snippets'
 
 interface SnippetCardProps {
   id: string
@@ -31,18 +32,6 @@ interface SnippetCardProps {
   onFork?: () => void
   onShare?: () => void
 }
-
-const LANGUAGE_COLORS:
-  Record<string, string> = {
-    python: '#3572A5',
-    javascript: '#f1e05a',
-    typescript: '#2b7489',
-    cpp: '#f34b7d',
-    rust: '#dea584',
-    go: '#00ADD8',
-    java: '#b07219',
-    ruby: '#701516',
-  }
 
 export function SnippetCard({
   id,
@@ -60,9 +49,7 @@ export function SnippetCard({
     .split('\n')
     .slice(0, 6)
     .join('\n')
-  const langColor =
-    LANGUAGE_COLORS[language]
-    ?? '#6e7681'
+  const langColor = colorFor(language)
 
   const handleShare = () => {
     if (onShare) {
@@ -238,6 +225,7 @@ export function SnippetCard({
         >
           View
         </Button>
+        {onFork && (
         <Tooltip title="Fork snippet">
           <IconButton
             size="small"
@@ -254,6 +242,7 @@ export function SnippetCard({
             />
           </IconButton>
         </Tooltip>
+        )}
         <Tooltip title="Share">
           <IconButton
             size="small"

@@ -1,130 +1,97 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
 import {
-  useParams,
-  useRouter,
-} from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
-  Chip,
-  Divider,
-  Paper,
-  TextField,
-  Avatar,
+  Container, Box, Alert, Typography, CircularProgress,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  DialogContentText, Button,
 } from '@mui/material'
-import {
-  PlayArrowOutlined,
-  ForkRightOutlined,
-  ShareOutlined,
-  SendOutlined,
-} from '@mui/icons-material'
-import {
-  BackButton,
-} from '@/components/common/BackButton'
-import {
-  CodeOutput,
-} from '@/components/code/CodeOutput'
+import { BackButton } from '@/components/common/BackButton'
+import { CodeEditor } from '@/components/code/CodeEditor'
+import { CodeOutput } from '@/components/code/CodeOutput'
+import { SnippetHeader } from '@/components/code/SnippetHeader'
+import { SnippetToolbar } from '@/components/code/SnippetToolbar'
+import { SnippetComments } from '@/components/code/SnippetComments'
+import { SnippetEditorForm } from '@/components/code/SnippetEditorForm'
+import { useSnippet } from '@/hooks/useSnippet'
+import { useSnippetRun } from '@/hooks/useSnippetRun'
+import { useSnippetEditor } from '@/hooks/useSnippetEditor'
 import { useTenantId } from '@/hooks/useTenantId'
+import { isRunnable, type Snippet } from '@/lib/snippets'
 import api from '@/lib/api'
+import type { RootState } from '@/store/store'
 
-interface SnippetDetail {
-  id: string
-  title: string
-  language: string
-  code: string
-  author: string
-  date: string
-  runCount: number
+function EditView({ snippet, tenantId, onDone }: {
+  snippet: Snippet
+  tenantId: number | null
+  onDone: (saved: boolean) => void
+}) {
+  const editor = useSnippetEditor(tenantId, snippet)
+  return (
+    <SnippetEditorForm
+      editor={editor}
+      saveLabel="Save Changes"
+      onSaved={() => onDone(true)}
+      onCancel={() => onDone(false)}
+    />
+  )
 }
 
 export default function ViewSnippetPage() {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string
-  const snippetId = params.id as string
+  const id = params.id as string
+  const base = `/site/${slug}/snippets`
   const { tenantId } = useTenantId(slug)
-  const [snippet, setSnippet] =
-    useState<SnippetDetail | null>(null)
-  const [isRunning, setIsRunning] =
-    useState(false)
-  const [output, setOutput] = useState<{
-    stdout?: string
-    exitCode?: number
-    executionTime?: number
-  } | null>(null)
-  const [commentText, setCommentText] =
-    useState('')
+  const { snippet, loading, notFound, reload } = useSnippet(id)
+  const { running, result, run } = useSnippetRun()
+  const user = useSelector((s: RootState) => s.auth.user)
+  const [editing, setEditing] = useState(false)
+  const [confirmDel, setConfirmDel] = useState(false)
+  const [error, setError] = useState('')
 
-  useEffect(() => {
-    api.get(`/api/snippets/${snippetId}`)
-      .then(res => {
-        const s = res.data
-        setSnippet({
-          id: String(s.id),
-          title: s.title || '',
-          language: s.language || '',
-          code: s.code || '',
-          author:
-            s.authorUsername || 'Unknown',
-          date:
-            s.createdAt?.split('T')[0]
-            || '',
-          runCount: s.runCount || 0,
-        })
-      })
-      .catch(() => {})
-  }, [snippetId])
+  const fail = (m: string) => () => setError(m)
 
-  const handleRun = () => {
-    setIsRunning(true)
-    const url =
-      `/api/snippets/${snippetId}/run`
-    api.post(url)
-      .then(res => {
-        setOutput({
-          stdout:
-            res.data.output
-            || res.data.stdout
-            || '',
-          exitCode:
-            res.data.exitCode ?? 0,
-          executionTime:
-            res.data.executionTime,
-        })
-      })
-      .catch(() => {
-        setOutput({
-          stdout: 'Error running snippet',
-          exitCode: 1,
-        })
-      })
-      .finally(() => setIsRunning(false))
+  const fork = () => {
+    api.post(`/api/snippets/${id}/fork`, { tenant_id: tenantId })
+      .then(res => router.push(`${base}/${res.data.id}`))
+      .catch(fail('Log in to fork this snippet.'))
+  }
+  const remove = () => {
+    setConfirmDel(false)
+    api.delete(`/api/snippets/${id}`)
+      .then(() => router.push(base))
+      .catch(fail('Failed to delete snippet.'))
+  }
+  const doneEditing = (saved: boolean) => {
+    setEditing(false)
+    if (saved) reload()
   }
 
-  const handleFork = () => {
-    const url =
-      `/api/snippets/${snippetId}/fork`
-    api.post(url)
-      .then(res => {
-        const dest =
-          `/site/${slug}/snippets/`
-          + `${res.data.id}`
-        router.push(dest)
-      })
-      .catch(() => {})
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+        <CircularProgress aria-label="Loading snippet" />
+      </Box>
+    )
   }
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(
-      window.location.href,
+  if (notFound || !snippet) {
+    return (
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <BackButton href={base} label="Back to Snippets" />
+        <Typography sx={{ mt: 3 }} data-testid="snippet-not-found">
+          Snippet not found.
+        </Typography>
+      </Container>
     )
   }
 
-  if (!snippet) return null
+  const isOwner = !!user && user.id === snippet.authorId
+  const lines = snippet.code.split('\n').length
+  const height = `${Math.min(600, Math.max(120, lines * 19 + 20))}px`
 
   return (
     <Container
@@ -133,205 +100,82 @@ export default function ViewSnippetPage() {
       data-testid="view-snippet-page"
     >
       <Box sx={{ mb: 2 }}>
-        <BackButton
-          href={
-            `/site/${slug}/snippets`
-          }
-          label="Back to Snippets"
-        />
+        <BackButton href={base} label="Back to Snippets" />
       </Box>
-
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-          flexWrap: 'wrap',
-          gap: 2,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h3"
-            component="h1"
-          >
-            {snippet.title}
-          </Typography>
+      <SnippetHeader s={snippet} />
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}
+          onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+      {editing ? (
+        <EditView
+          snippet={snippet}
+          tenantId={tenantId}
+          onDone={doneEditing}
+        />
+      ) : (
+        <>
+          <Box sx={{ mb: 2 }}>
+            <SnippetToolbar
+              runnable={isRunnable(snippet.language)}
+              running={running}
+              isOwner={isOwner}
+              code={snippet.code}
+              onRun={() => run(id)}
+              onFork={fork}
+              onEdit={() => setEditing(true)}
+              onDelete={() => setConfirmDel(true)}
+            />
+          </Box>
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              mt: 1,
+              border: 1, borderColor: 'divider',
+              borderRadius: 1, overflow: 'hidden', mb: 3,
             }}
+            data-testid="snippet-code-block"
           >
-            <Chip
-              label={snippet.language}
-              size="small"
-              color="primary"
-              variant="outlined"
+            <CodeEditor
+              value={snippet.code}
+              onChange={() => {}}
+              language={snippet.language}
+              readOnly
+              height={height}
             />
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >
-              by {snippet.author}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >
-              {snippet.date}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >
-              {snippet.runCount} runs
-            </Typography>
           </Box>
-        </Box>
-        <Box
-          sx={{ display: 'flex', gap: 1 }}
-        >
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={
-              <PlayArrowOutlined />
-            }
-            onClick={handleRun}
-            disabled={isRunning}
-            data-testid="run-snippet-btn"
-            aria-label="Run snippet"
-          >
-            {isRunning
-              ? 'Running...'
-              : 'Run'}
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={
-              <ForkRightOutlined />
-            }
-            onClick={handleFork}
-            data-testid="fork-snippet-btn"
-            aria-label="Fork snippet"
-          >
-            Fork
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={
-              <ShareOutlined />
-            }
-            onClick={handleShare}
-            data-testid="share-snippet-btn"
-            aria-label="Share snippet"
-          >
-            Share
-          </Button>
-        </Box>
-      </Box>
-
-      <Paper
-        variant="outlined"
-        sx={{
-          borderColor: 'divider',
-          overflow: 'hidden',
-          mb: 3,
-        }}
-        data-testid="snippet-code-block"
-      >
-        <Box
-          component="pre"
-          sx={{
-            m: 0,
-            p: 3,
-            bgcolor: '#1e293b',
-            color: '#e2e8f0',
-            fontFamily:
-              '"Fira Code", '
-              + '"JetBrains Mono", '
-              + 'monospace',
-            fontSize: '0.875rem',
-            lineHeight: 1.7,
-            overflow: 'auto',
-            whiteSpace: 'pre',
-          }}
-        >
-          <code>{snippet.code}</code>
-        </Box>
-      </Paper>
-
-      {(isRunning || output) && (
-        <Box sx={{ mb: 3 }}>
-          <CodeOutput
-            stdout={output?.stdout}
-            exitCode={
-              output?.exitCode
-              ?? undefined
-            }
-            executionTime={
-              output?.executionTime
-              ?? undefined
-            }
-            isLoading={isRunning}
-          />
-        </Box>
+          {(running || result) && (
+            <Box sx={{ mb: 3 }}>
+              <CodeOutput
+                stdout={result?.stdout}
+                stderr={result?.stderr}
+                exitCode={result?.exitCode}
+                executionTime={result?.executionTime}
+                isLoading={running}
+              />
+            </Box>
+          )}
+        </>
       )}
-
-      <Divider sx={{ my: 4 }} />
-
-      <Typography variant="h5" gutterBottom>
-        Comments
-      </Typography>
-
-      <Paper
-        variant="outlined"
-        sx={{
-          p: 2,
-          borderColor: 'divider',
-        }}
-        data-testid="comment-section"
-      >
-        <TextField
-          fullWidth
-          multiline
-          minRows={2}
-          maxRows={6}
-          placeholder="Write a comment..."
-          value={commentText}
-          onChange={(e) =>
-            setCommentText(e.target.value)
-          }
-          sx={{ mb: 1 }}
-          data-testid="comment-input"
-        />
-        <Button
-          variant="contained"
-          size="small"
-          endIcon={<SendOutlined />}
-          disabled={!commentText}
-          data-testid="post-comment-btn"
-          aria-label="Post comment"
-          onClick={() => {
-            api.post('/api/comments', {
-              contentType: 'snippet',
-              contentId:
-                Number(snippetId),
-              content: commentText,
-            })
-              .then(() =>
-                setCommentText(''),
-              )
-              .catch(() => {})
-          }}
-        >
-          Post Comment
-        </Button>
-      </Paper>
+      <SnippetComments id={id} />
+      <Dialog open={confirmDel}
+        onClose={() => setConfirmDel(false)}>
+        <DialogTitle>Delete snippet?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This permanently deletes this snippet.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDel(false)}>
+            Cancel
+          </Button>
+          <Button color="error" onClick={remove}
+            data-testid="confirm-delete-btn">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }

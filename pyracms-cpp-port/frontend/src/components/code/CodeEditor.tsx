@@ -7,15 +7,18 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import Editor from '@monaco-editor/react'
 
 interface CodeEditorProps {
   value: string
   onChange: (value: string) => void
   language: string
-  onLanguageChange: (
+  onLanguageChange?: (
     language: string,
   ) => void
+  readOnly?: boolean
+  height?: string
 }
 
 const LANGUAGES = [
@@ -91,7 +94,14 @@ export function CodeEditor({
   onChange,
   language,
   onLanguageChange,
+  readOnly = false,
+  height = '400px',
 }: CodeEditorProps) {
+  const theme = useTheme()
+  const monacoTheme =
+    theme.palette.mode === 'dark'
+      ? 'vs-dark'
+      : 'light'
   const handleEditorChange = (
     newValue: string | undefined,
   ) => {
@@ -104,7 +114,7 @@ export function CodeEditor({
       const detected =
         detectLanguage(val)
       if (detected) {
-        onLanguageChange(detected)
+        onLanguageChange?.(detected)
       }
     }
   }
@@ -118,6 +128,7 @@ export function CodeEditor({
       }}
       data-testid="code-editor"
     >
+      {onLanguageChange && !readOnly && (
       <FormControl
         size="small"
         sx={{ maxWidth: 200 }}
@@ -147,6 +158,7 @@ export function CodeEditor({
           ))}
         </Select>
       </FormControl>
+      )}
       <Box
         sx={{
           border: 1,
@@ -156,13 +168,15 @@ export function CodeEditor({
         }}
       >
         <Editor
-          height="400px"
+          height={height}
           language={language}
           value={value}
           onChange={
             handleEditorChange
           }
-          theme="vs-dark"
+          loading="Loading editor..."
+
+          theme={monacoTheme}
           options={{
             minimap: {
               enabled: false,
@@ -174,6 +188,7 @@ export function CodeEditor({
               false,
             automaticLayout: true,
             tabSize: 4,
+            readOnly,
           }}
         />
       </Box>

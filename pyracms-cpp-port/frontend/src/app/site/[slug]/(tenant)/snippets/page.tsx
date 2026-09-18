@@ -1,105 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  InputAdornment,
-} from '@mui/material'
-import {
-  AddOutlined,
-  SearchOutlined,
-} from '@mui/icons-material'
 import Link from 'next/link'
 import {
-  SnippetCard,
-} from '@/components/code/SnippetCard'
-import {
-  BackButton,
-} from '@/components/common/BackButton'
+  Container, Typography, Box, Grid, Button, Alert,
+  FormControl, InputLabel, Select, MenuItem, TextField,
+  InputAdornment, Chip, Skeleton,
+} from '@mui/material'
+import { AddOutlined, SearchOutlined } from '@mui/icons-material'
+import { SnippetCard } from '@/components/code/SnippetCard'
+import { BackButton } from '@/components/common/BackButton'
+import { useSnippets } from '@/hooks/useSnippets'
 import { useTenantId } from '@/hooks/useTenantId'
-import api from '@/lib/api'
-
-interface Snippet {
-  id: string
-  title: string
-  language: string
-  code: string
-  author: string
-  date: string
-  runCount: number
-}
 
 export default function SnippetsPage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
-  const [snippets, setSnippets] =
-    useState<Snippet[]>([])
-  const [search, setSearch] = useState('')
-  const [languageFilter, setLanguageFilter] =
-    useState('')
-  const [sortBy, setSortBy] = useState('date')
-
-  useEffect(() => {
-    if (!tenantId) return
-    const url =
-      `/api/snippets?tenant_id=${tenantId}`
-    api.get(url)
-      .then(res => {
-        const items =
-          res.data.items || res.data || []
-        setSnippets(items.map(
-          (s: Record<string, unknown>) => ({
-            id: String(s.id),
-            title: s.title || '',
-            language: s.language || '',
-            code: s.code || '',
-            author:
-              s.authorUsername || 'Unknown',
-            date:
-              typeof s.createdAt === 'string'
-                ? (s.createdAt as string)
-                  .split('T')[0]
-                : '',
-            runCount: s.runCount || 0,
-          }),
-        ))
-      })
-      .catch(() => {})
-  }, [tenantId])
-
-  const filtered = snippets
-    .filter((s) => {
-      const q = search.toLowerCase()
-      const matchesSearch = !search
-        || s.title.toLowerCase().includes(q)
-        || s.code.toLowerCase().includes(q)
-      const matchesLang = !languageFilter
-        || s.language === languageFilter
-      return matchesSearch && matchesLang
-    })
-    .sort((a, b) => {
-      if (sortBy === 'popularity') {
-        return b.runCount - a.runCount
-      }
-      return b.date.localeCompare(a.date)
-    })
-
-  const languages = [
-    ...new Set(
-      snippets.map((s) => s.language),
-    ),
-  ]
+  const s = useSnippets(tenantId)
 
   return (
     <Container
@@ -108,32 +26,20 @@ export default function SnippetsPage() {
       data-testid="snippets-page"
     >
       <Box sx={{ mb: 2 }}>
-        <BackButton
-          href={`/site/${slug}`}
-          label="Back to Site"
-        />
+        <BackButton href={`/site/${slug}`} label="Back to Site" />
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 4,
-        }}
-      >
-        <Typography
-          variant="h3"
-          component="h1"
-        >
+      <Box sx={{
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2,
+      }}>
+        <Typography variant="h3" component="h1">
           Code Snippets
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddOutlined />}
           component={Link}
-          href={
-            `/site/${slug}/snippets/new`
-          }
+          href={`/site/${slug}/snippets/new`}
           data-testid="new-snippet-btn"
           aria-label="Create new snippet"
         >
@@ -141,114 +47,96 @@ export default function SnippetsPage() {
         </Button>
       </Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 2,
-          mb: 4,
-          flexWrap: 'wrap',
-        }}
-      >
+      <Box sx={{
+        display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap',
+      }}>
         <TextField
-          placeholder="Search snippets..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          placeholder="Search title, author or code..."
+          value={s.search}
+          onChange={(e) => s.setSearch(e.target.value)}
           size="small"
-          sx={{
-            flexGrow: 1,
-            minWidth: 200,
-          }}
+          sx={{ flexGrow: 1, minWidth: 200 }}
           data-testid="snippet-search"
           InputProps={{
             startAdornment: (
-              <InputAdornment
-                position="start"
-              >
-                <SearchOutlined
-                  aria-label="Search"
-                />
+              <InputAdornment position="start">
+                <SearchOutlined aria-label="Search" />
               </InputAdornment>
             ),
           }}
         />
-        <FormControl
-          size="small"
-          sx={{ minWidth: 140 }}
-        >
-          <InputLabel>Language</InputLabel>
-          <Select
-            value={languageFilter}
-            label="Language"
-            onChange={(e) =>
-              setLanguageFilter(
-                e.target.value,
-              )
-            }
-            data-testid="language-filter"
-          >
-            <MenuItem value="">
-              All Languages
-            </MenuItem>
-            {languages.map((l) => (
-              <MenuItem key={l} value={l}>
-                {l}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl
-          size="small"
-          sx={{ minWidth: 140 }}
-        >
+        <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Sort By</InputLabel>
           <Select
-            value={sortBy}
+            value={s.sortBy}
             label="Sort By"
-            onChange={(e) =>
-              setSortBy(e.target.value)
-            }
+            onChange={(e) => s.setSortBy(e.target.value)}
             data-testid="sort-select"
           >
-            <MenuItem value="date">
-              Newest
-            </MenuItem>
-            <MenuItem value="popularity">
-              Most Runs
-            </MenuItem>
+            <MenuItem value="date">Newest</MenuItem>
+            <MenuItem value="popularity">Most Runs</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      <Grid container spacing={3}>
-        {filtered.map((snippet) => (
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={4}
-            key={snippet.id}
-          >
-            <SnippetCard
-              {...snippet}
-              siteSlug={slug}
-            />
-          </Grid>
+      <Box
+        sx={{ display: 'flex', gap: 1, mb: 4, flexWrap: 'wrap' }}
+        data-testid="language-filter"
+      >
+        <Chip
+          label="All"
+          color={s.language ? 'default' : 'primary'}
+          onClick={() => s.setLanguage('')}
+        />
+        {s.languages.map((l) => (
+          <Chip
+            key={l}
+            label={l}
+            color={s.language === l ? 'primary' : 'default'}
+            onClick={() =>
+              s.setLanguage(s.language === l ? '' : l)}
+          />
         ))}
+      </Box>
+
+      {s.error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Could not load snippets. Please try again later.
+        </Alert>
+      )}
+
+      <Grid container spacing={3}>
+        {s.loading
+          ? [0, 1, 2].map((i) => (
+            <Grid item xs={12} sm={6} md={4} key={i}>
+              <Skeleton variant="rounded" height={240} />
+            </Grid>
+          ))
+          : s.snippets.map((snippet) => (
+            <Grid item xs={12} sm={6} md={4} key={snippet.id}>
+              <SnippetCard {...snippet} siteSlug={slug} />
+            </Grid>
+          ))}
       </Grid>
-      {filtered.length === 0 && (
-        <Typography
-          color="text.secondary"
-          sx={{
-            textAlign: 'center',
-            py: 4,
-          }}
+      {!s.loading && !s.error && s.snippets.length === 0 && (
+        <Box
+          sx={{ textAlign: 'center', py: 6 }}
           data-testid="no-snippets-msg"
         >
-          No snippets found matching your
-          criteria.
-        </Typography>
+          <Typography color="text.secondary" gutterBottom>
+            {s.total === 0
+              ? 'No snippets yet. Share the first one!'
+              : 'No snippets match your search.'}
+          </Typography>
+          {s.total === 0 && (
+            <Button
+              component={Link}
+              href={`/site/${slug}/snippets/new`}
+            >
+              Create a snippet
+            </Button>
+          )}
+        </Box>
       )}
     </Container>
   )

@@ -42,6 +42,7 @@ void CodeSnippetController::listSnippets(
                 item["authorId"] = s.authorId;
                 item["authorUsername"] = s.authorUsername;
                 item["title"] = s.title;
+                item["code"] = s.code;
                 item["language"] = s.language;
                 item["visibility"] = s.visibility;
                 item["runCount"] = s.runCount;
