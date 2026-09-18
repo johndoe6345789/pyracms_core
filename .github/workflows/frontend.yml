@@ -12,6 +12,13 @@ on:
       - 'pyracms-cpp-port/frontend/**'
       - '.github/workflows/frontend.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

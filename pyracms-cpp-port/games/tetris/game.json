@@ -1,0 +1,19 @@
+{
+  "name": "tetris",
+  "displayName": "Tetris",
+  "description": "Falling blocks with 7-bag randomiser, ghost piece, wall kicks and levels, drawn with pyglet shapes and a Batch.",
+  "version": "1.0.0",
+  "engine": "pyglet",
+  "tags": [
+    "puzzle",
+    "classic",
+    "pyglet"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pyglet==2.1.16"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

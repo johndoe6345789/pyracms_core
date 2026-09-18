@@ -1,8 +1,15 @@
-name: Multi-Architecture Docker Build
+name: Docker Images (multi-arch)
+
+# Builds the backend and frontend images natively per architecture (amd64 on
+# ubuntu-24.04, arm64 on ubuntu-24.04-arm: no QEMU, the C++/Conan build is
+# too slow under emulation), then merges the per-arch digests into one
+# multi-arch manifest on GHCR. arm/v7 is intentionally not built: the Conan
+# dependency set has no reliable armv7 binaries. Pull requests build only.
 
 on:
   push:
     branches: [ master ]
+    tags: [ 'v*' ]
     paths:
       - 'pyracms-cpp-port/backend/**'
       - 'pyracms-cpp-port/frontend/**'
@@ -13,92 +20,130 @@ on:
       - 'pyracms-cpp-port/backend/**'
       - 'pyracms-cpp-port/frontend/**'
       - '.github/workflows/docker-multiarch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: johndoe6345789
 
 jobs:
-  build-backend-multiarch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Build backend for multiple architectures
-        uses: docker/build-push-action@v5
-        with:
-          context: ./pyracms-cpp-port/backend
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          push: false
-          tags: pyracms-backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  build-frontend-multiarch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Build frontend for multiple architectures
-        uses: docker/build-push-action@v5
-        with:
-          context: ./pyracms-cpp-port/frontend
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          push: false
-          tags: pyracms-frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  test-multiarch:
-    needs: [build-backend-multiarch, build-frontend-multiarch]
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.image }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      packages: write
     strategy:
+      fail-fast: false
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        image: [ backend, frontend ]
+        platform: [ linux/amd64, linux/arm64 ]
+        include:
+          - { platform: linux/amd64, runner: ubuntu-24.04, pair: amd64 }
+          - { platform: linux/arm64, runner: ubuntu-24.04-arm, pair: arm64 }
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
         with:
-          platforms: all
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/pyracms-${{ matrix.image }}
 
-      - name: Test backend on ${{ matrix.platform }}
+      - name: Build (push by digest on non-PR)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: pyracms-cpp-port/${{ matrix.image }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: >-
+            type=image,name=${{ env.REGISTRY }}/${{ env.OWNER }}/pyracms-${{ matrix.image }},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' }}
+          cache-from: type=gha,scope=${{ matrix.image }}-${{ matrix.pair }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ matrix.pair }}
+
+      - name: Export digest
+        if: github.event_name != 'pull_request'
         run: |
-          docker buildx build \
-            --platform ${{ matrix.platform }} \
-            --load \
-            -t pyracms-backend:test \
-            ./pyracms-cpp-port/backend
-          echo "✓ Backend built successfully for ${{ matrix.platform }}"
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
 
-      - name: Test frontend on ${{ matrix.platform }}
+      - name: Upload digest
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.image }}-${{ matrix.pair }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: manifest ${{ matrix.image }}
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [ backend, frontend ]
+    env:
+      REPO: ghcr.io/johndoe6345789/pyracms-${{ matrix.image }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.image }}-*
+          merge-multiple: true
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REPO }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Create multi-arch manifest
+        working-directory: /tmp/digests
         run: |
-          docker buildx build \
-            --platform ${{ matrix.platform }} \
-            --load \
-            -t pyracms-frontend:test \
-            ./pyracms-cpp-port/frontend
-          echo "✓ Frontend built successfully for ${{ matrix.platform }}"
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' \
+              <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf "${REPO}@sha256:%s " *)
+
+      - name: Inspect
+        run: docker buildx imagetools inspect ${REPO}:${{ steps.meta.outputs.version }}

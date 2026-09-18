@@ -1,0 +1,19 @@
+{
+  "name": "asteroids",
+  "displayName": "Asteroids",
+  "description": "Vector-style space shooter: rotate, thrust, shoot rocks that split, survive waves.",
+  "version": "1.0.0",
+  "engine": "pygame",
+  "tags": [
+    "arcade",
+    "shooter",
+    "pygame"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pygame==2.6.1"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

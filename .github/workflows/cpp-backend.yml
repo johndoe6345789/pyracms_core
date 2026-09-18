@@ -12,6 +12,13 @@ on:
       - 'pyracms-cpp-port/backend/**'
       - '.github/workflows/cpp-backend.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}

@@ -1,0 +1,19 @@
+{
+  "name": "pong",
+  "displayName": "Pong",
+  "description": "Pong against a CPU paddle (or a friend with --two-player). Hit position steers the ball; first to 7 wins.",
+  "version": "1.0.0",
+  "engine": "pyglet",
+  "tags": [
+    "arcade",
+    "classic",
+    "pyglet"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pyglet==2.1.16"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

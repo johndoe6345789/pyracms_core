@@ -1,0 +1,19 @@
+{
+  "name": "snake",
+  "displayName": "Snake",
+  "description": "Classic Snake with speed ramp, pause and restart. Pure shapes, no assets.",
+  "version": "1.0.0",
+  "engine": "pygame",
+  "tags": [
+    "arcade",
+    "classic",
+    "pygame"
+  ],
+  "entry": "main.py",
+  "moduleType": "python",
+  "pipRequirements": [
+    "pygame==2.6.1"
+  ],
+  "dependencies": [],
+  "pythonVersion": ">=3.9"
+}

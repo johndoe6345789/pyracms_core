@@ -1,0 +1,395 @@
+name: Launcher and Games Build
+
+# Builds the Hypernucleus Qt6/C++ launcher (pyracms-cpp-port/client) and the PyInstaller-packaged Python games
+# (pyracms-cpp-port/games) for Windows / macOS / Linux on x86_64 and arm64, uploads artifacts named
+# hypernucleus-<os>-<arch> and games-<os>-<arch> (os = win|mac|lin, matching the Hypernucleus catalogue's
+# operating_systems names), attaches them to a GitHub Release on version tags, and optionally registers the
+# manifests with the backend GameDep API.
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*.*.*', 'launcher-v*.*.*' ]
+    paths:
+      - 'pyracms-cpp-port/client/**'
+      - 'pyracms-cpp-port/games/**'
+      - 'pyracms-cpp-port/scripts/**'
+      - '.github/workflows/launcher-build.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'pyracms-cpp-port/client/**'
+      - 'pyracms-cpp-port/games/**'
+      - 'pyracms-cpp-port/scripts/**'
+      - '.github/workflows/launcher-build.yml'
+  workflow_dispatch:
+    inputs:
+      qt_source:
+        description: 'Where Qt comes from: aqt (fast, default; falls back to conan automatically) or conan (slow, builds Qt from source)'
+        type: choice
+        options: [ aqt, conan ]
+        default: aqt
+      publish:
+        description: 'Also run the release/publish job (needs a tag or this box)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  CLIENT: pyracms-cpp-port/client
+  # client/conanfile.txt pins qt/6.7.3 for the Conan-from-source path. The aqt path uses the newest Qt that ships
+  # native Windows-ARM64 and Linux-ARM64 binaries (6.8 LTS); find_package(Qt6) in client/CMakeLists.txt accepts any 6.x.
+  QT_VERSION: '6.8.3'
+  QUAZIP_TAG: 'v1.4'
+  CONAN_VERSION: '2.11.0'
+  CONAN_HOME: ${{ github.workspace }}/.conan2
+
+jobs:
+  launcher:
+    name: launcher ${{ matrix.hn_os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    # Experimental entries may fail without blocking the release (see the notes on each entry).
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-2022,    hn_os: win, arch: x86_64, conan_arch: x86_64, qt_host: windows,     qt_arch: win64_msvc2022_64,    msvc: x64,   experimental: false }
+          # Windows ARM64: aqt offers win64_msvc2022_arm64 from Qt 6.8 but support for an ARM64 *host* in aqt /
+          # install-qt-action is recent and unverified here, so this entry is experimental. If the aqt step fails the
+          # job automatically falls back to building Qt with Conan (very slow, may time out).
+          - { runner: windows-11-arm,  hn_os: win, arch: arm64,  conan_arch: armv8,  qt_host: windows,     qt_arch: win64_msvc2022_arm64, msvc: arm64, experimental: true }
+          # macos-13 (Intel) was retired by GitHub in Dec 2025; macos-15-intel is the last x86_64 macOS image.
+          - { runner: macos-15-intel,  hn_os: mac, arch: x86_64, conan_arch: x86_64, qt_host: mac,         qt_arch: clang_64,             experimental: false }
+          - { runner: macos-14,        hn_os: mac, arch: arm64,  conan_arch: armv8,  qt_host: mac,         qt_arch: clang_64,             experimental: false }
+          - { runner: ubuntu-24.04,    hn_os: lin, arch: x86_64, conan_arch: x86_64, qt_host: linux,       qt_arch: linux_gcc_64,         experimental: false }
+          # Linux ARM64: aqt provides linux_gcc_arm64 for Qt >= 6.7 with host linux_arm64.
+          - { runner: ubuntu-24.04-arm, hn_os: lin, arch: arm64, conan_arch: armv8,  qt_host: linux_arm64, qt_arch: linux_gcc_arm64,      experimental: false }
+    env:
+      QT_MODE: aqt
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Linux system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgl1-mesa-dev libxkbcommon-dev libxkbcommon-x11-0 \
+            libegl1 libfontconfig1-dev libfreetype6-dev libdbus-1-3 libxcb-cursor0 libxcb-icccm4 libxcb-image0 \
+            libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libssl-dev
+
+      - name: Set up MSVC developer environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc }}
+
+      - name: Install build tools (Conan 2, Ninja, jinja2)
+        shell: bash
+        run: python -m pip install "conan==${CONAN_VERSION}" ninja jinja2
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CONAN_HOME }}/p
+          key: conan-${{ matrix.runner }}-${{ matrix.arch }}-${{ env.QT_VERSION }}-${{ hashFiles('pyracms-cpp-port/client/conanfile.txt') }}
+          restore-keys: |
+            conan-${{ matrix.runner }}-${{ matrix.arch }}-
+
+      - name: Conan profile
+        shell: bash
+        run: |
+          conan profile detect --force
+          # Force the requested architecture and C++17 regardless of what detect guessed.
+          sed -i.bak "s/^arch=.*/arch=${{ matrix.conan_arch }}/" "$(conan profile path default)"
+          conan profile show
+
+      - name: Install Qt via aqtinstall
+        id: qt_aqt
+        if: inputs.qt_source != 'conan'
+        continue-on-error: true
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: ${{ matrix.qt_host }}
+          target: desktop
+          arch: ${{ matrix.qt_arch }}
+          modules: qt5compat
+          cache: true
+
+      - name: Decide Qt source
+        shell: bash
+        run: |
+          if [ "${{ inputs.qt_source }}" = "conan" ] || [ "${{ steps.qt_aqt.outcome }}" = "failure" ]; then
+            echo "QT_MODE=conan" >> "$GITHUB_ENV"
+            echo "::warning::Qt from aqt unavailable for ${{ matrix.runner }}; falling back to Conan's qt package (slow)."
+          else
+            echo "QT_MODE=aqt" >> "$GITHUB_ENV"
+          fi
+
+      - name: Regenerate CMakeLists.txt from template
+        shell: bash
+        run: cd "$CLIENT" && python generate_cmake.py
+
+      - name: Conan install (aqt mode - only the non-Qt dependency zlib)
+        if: env.QT_MODE == 'aqt'
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/deps"
+          printf '[requires]\nzlib/1.3.1\n\n[generators]\nCMakeDeps\nCMakeToolchain\n' > "$RUNNER_TEMP/deps/conanfile.txt"
+          conan install "$RUNNER_TEMP/deps/conanfile.txt" -of "$CLIENT/build" --build=missing \
+            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17
+
+      - name: Build QuaZip against the aqt Qt (static)
+        if: env.QT_MODE == 'aqt'
+        shell: bash
+        run: |
+          git clone --depth 1 --branch "$QUAZIP_TAG" https://github.com/stachenov/quazip.git "$RUNNER_TEMP/quazip"
+          cmake -S "$RUNNER_TEMP/quazip" -B "$RUNNER_TEMP/quazip-build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/$CLIENT/build/conan_toolchain.cmake" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR;$GITHUB_WORKSPACE/$CLIENT/build" \
+            -DQUAZIP_QT_MAJOR_VERSION=6 -DBUILD_SHARED_LIBS=OFF -DQUAZIP_BZIP2=OFF -DQUAZIP_ENABLE_TESTS=OFF \
+            -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/quazip-install"
+          cmake --build "$RUNNER_TEMP/quazip-build" --parallel
+          cmake --install "$RUNNER_TEMP/quazip-build"
+
+      - name: Conan install (conan mode - Qt and QuaZip from client/conanfile.txt)
+        if: env.QT_MODE == 'conan'
+        shell: bash
+        run: |
+          conan install "$CLIENT/conanfile.txt" -of "$CLIENT/build" --build=missing \
+            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17 \
+            -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True \
+            --deployer=runtime_deploy --deployer-folder="$GITHUB_WORKSPACE/$CLIENT/build/conan_runtime"
+
+      - name: Configure
+        shell: bash
+        run: |
+          if [ "$QT_MODE" = "aqt" ]; then
+            PREFIX="$QT_ROOT_DIR;$RUNNER_TEMP/quazip-install"
+          else
+            PREFIX="$GITHUB_WORKSPACE/$CLIENT/build"
+          fi
+          # client/CMakeLists.txt also includes build/conan_toolchain.cmake itself; passing it up-front is what the
+          # client Dockerfile does and lets Conan's compiler/arch settings apply before project().
+          cmake -S "$CLIENT" -B "$CLIENT/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/$CLIENT/build/conan_toolchain.cmake" \
+            -DCMAKE_PREFIX_PATH="$PREFIX"
+
+      - name: Build
+        shell: bash
+        run: cmake --build "$CLIENT/build" --parallel
+
+      - name: Test
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ctest --test-dir "$CLIENT/build" --output-on-failure
+
+      - name: Compute version and asset name
+        id: meta
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then V="${GITHUB_REF_NAME#*v}"; else
+            V="$(python -c "import json;print(json.load(open('$CLIENT/cmake_config.json'))['version'])")-dev.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "base=hypernucleus-${{ matrix.hn_os }}-${{ matrix.arch }}" >> "$GITHUB_OUTPUT"
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+
+      - name: Package (Windows - windeployqt + zip)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          B="${{ steps.meta.outputs.base }}"
+          mkdir -p "stage/$B"
+          cp "$CLIENT/build/hypernucleus.exe" "stage/$B/"
+          if [ "$QT_MODE" = "aqt" ]; then
+            windeployqt --release --qmldir "$CLIENT/qml" --compiler-runtime "stage/$B/hypernucleus.exe"
+          else
+            cp -r "$CLIENT/build/conan_runtime/." "stage/$B/" || true   # best effort: Conan runtime DLLs only
+          fi
+          (cd stage && 7z a -tzip "$GITHUB_WORKSPACE/dist/$B.zip" "$B")
+
+      - name: Package (macOS - macdeployqt + zip + dmg)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          B="${{ steps.meta.outputs.base }}"
+          APP="$CLIENT/build/hypernucleus.app"
+          if [ "$QT_MODE" = "aqt" ]; then
+            macdeployqt "$APP" -qmldir="$CLIENT/qml"
+          fi
+          ditto -c -k --keepParent "$APP" "dist/$B.zip"
+          # Unsigned/un-notarised: Gatekeeper will need right-click > Open until signing secrets are wired in.
+          hdiutil create -volname Hypernucleus -srcfolder "$APP" -ov -format UDZO "dist/$B.dmg"
+
+      - name: Package (Linux - AppImage via linuxdeploy, tar.gz fallback)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          B="${{ steps.meta.outputs.base }}"
+          ARCH_UNAME="$(uname -m)"
+          BIN="$CLIENT/build/hypernucleus"
+          if [ "$QT_MODE" = "aqt" ]; then
+            cat > hypernucleus.desktop <<'DESKTOP'
+          [Desktop Entry]
+          Type=Application
+          Name=Hypernucleus
+          Exec=hypernucleus
+          Icon=hypernucleus
+          Categories=Game;
+          DESKTOP
+            # No icon ships with client/ yet; generate a flat placeholder PNG (stdlib only) so linuxdeploy is happy.
+            python - <<'PY'
+          import struct, zlib
+          w = h = 256
+          raw = b"".join(b"\x00" + bytes([40, 90, 200]) * w for _ in range(h))
+          def chunk(t, d): return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xffffffff)
+          open("hypernucleus.png", "wb").write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+          PY
+            BASE=https://github.com/linuxdeploy
+            curl -fsSL -o linuxdeploy "$BASE/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH_UNAME.AppImage"
+            curl -fsSL -o linuxdeploy-plugin-qt-$ARCH_UNAME.AppImage "$BASE/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-$ARCH_UNAME.AppImage"
+            chmod +x linuxdeploy linuxdeploy-plugin-qt-$ARCH_UNAME.AppImage
+            export PATH="$PWD:$PATH" QMAKE="$QT_ROOT_DIR/bin/qmake" QML_SOURCES_PATHS="$GITHUB_WORKSPACE/$CLIENT/qml"
+            export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib:${LD_LIBRARY_PATH:-}" APPIMAGE_EXTRACT_AND_RUN=1 ARCH="$ARCH_UNAME"
+            ./linuxdeploy --appdir AppDir -e "$BIN" -d hypernucleus.desktop -i hypernucleus.png --plugin qt --output appimage
+            mv Hypernucleus*.AppImage "dist/$B.AppImage"
+          fi
+          # tar.gz is always produced: the whole AppDir if we have one, otherwise the binary plus Conan runtime libs.
+          if [ -d AppDir ]; then tar -C AppDir -czf "dist/$B.tar.gz" .; else
+            mkdir -p "stage/$B" && cp "$BIN" "stage/$B/" && cp -r "$CLIENT/build/conan_runtime/." "stage/$B/" 2>/dev/null || true
+            tar -C stage -czf "dist/$B.tar.gz" "$B"
+          fi
+
+      - name: Manifests
+        shell: bash
+        run: |
+          URL="https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}"
+          [[ "$GITHUB_REF" == refs/tags/* ]] || URL=""
+          for f in dist/*; do
+            [[ "$f" == *.manifest.json ]] && continue
+            python pyracms-cpp-port/scripts/make_manifest.py launcher --name hypernucleus --display-name Hypernucleus \
+              --version "${{ steps.meta.outputs.version }}" --file "$f" --os ${{ matrix.hn_os }} --arch ${{ matrix.arch }} \
+              ${URL:+--url "$URL/$(basename "$f")"} --out "$f.manifest.json"
+          done
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hypernucleus-${{ matrix.hn_os }}-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+
+  games:
+    name: games ${{ matrix.hn_os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-2022,     hn_os: win, arch: x86_64, experimental: false }
+          # pygame 2.6.1 publishes no win_arm64 wheel, so pip would compile SDL from source and probably fail.
+          # pyglet-only games should still build; keep the entry, allow failure.
+          - { runner: windows-11-arm,   hn_os: win, arch: arm64,  experimental: true }
+          - { runner: macos-15-intel,   hn_os: mac, arch: x86_64, experimental: false }
+          - { runner: macos-14,         hn_os: mac, arch: arm64,  experimental: false }
+          - { runner: ubuntu-24.04,     hn_os: lin, arch: x86_64, experimental: false }
+          - { runner: ubuntu-24.04-arm, hn_os: lin, arch: arm64,  experimental: false }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: pyracms-cpp-port/games/*/requirements.txt
+
+      - name: Build, test and package every game
+        shell: bash
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/out"; mkdir -p "$OUT"
+          URL="https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}"
+          [[ "$GITHUB_REF" == refs/tags/* ]] || URL=""
+          cd pyracms-cpp-port/games
+          python -m pip install -r requirements-dev.txt
+          for gj in */game.json; do
+            g="${gj%/game.json}"
+            echo "::group::$g"
+            python -m pip install -r "$g/requirements.txt"
+            (cd "$g" && python -m pytest -q)
+            python build_game.py "$g"
+            case "$RUNNER_OS" in
+              Windows) name="$g-${{ matrix.hn_os }}-${{ matrix.arch }}.exe"; cp "$g/dist/$g.exe" "$OUT/$name" ;;
+              macOS)   name="$g-${{ matrix.hn_os }}-${{ matrix.arch }}.zip"; ditto -c -k --keepParent "$g/dist/$g.app" "$OUT/$name" ;;
+              Linux)   name="$g-${{ matrix.hn_os }}-${{ matrix.arch }}"; cp "$g/dist/$g" "$OUT/$name" ;;
+            esac
+            python ../scripts/make_manifest.py game --game-dir "$g" --file "$OUT/$name" \
+              --os ${{ matrix.hn_os }} --arch ${{ matrix.arch }} ${URL:+--url "$URL/$name"} --out "$OUT/$name.manifest.json"
+            echo "::endgroup::"
+          done
+          ls -la "$OUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: games-${{ matrix.hn_os }}-${{ matrix.arch }}
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    name: release and publish
+    needs: [ launcher, games ]
+    if: ${{ !cancelled() && (startsWith(github.ref, 'refs/tags/') || inputs.publish) }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      # Optional. When the secrets are absent the publish step is skipped (forks, or before the backend is wired in).
+      HN_API_URL: ${{ secrets.HN_API_URL }}
+      HN_API_TOKEN: ${{ secrets.HN_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '{hypernucleus,games}-*'
+          path: release
+          merge-multiple: true
+
+      - name: Catalogue and checksums
+        run: |
+          cd release
+          python ../pyracms-cpp-port/scripts/make_manifest.py merge ./*.manifest.json --out catalog.json
+          sha256sum $(ls | grep -v -E 'manifest.json$|catalog.json$|SHA256SUMS') > SHA256SUMS
+          ls -la
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+
+      - name: Publish manifests to the GameDep API
+        if: env.HN_API_URL != '' && env.HN_API_TOKEN != ''
+        run: python pyracms-cpp-port/scripts/publish_manifest.py --files-dir release 'release/*.manifest.json'
