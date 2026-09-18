@@ -107,12 +107,12 @@ services:
     ports:
       - "3199:80"
     volumes:
-      # Absolute host path, not relative: this compose file gets invoked by
-      # DeployButton's backend container (via the shared docker.sock), whose
-      # cwd is /srv/repos/pyracms_core/pyracms-cpp-port -- but the real
-      # docker daemon runs on the host and needs the actual host path for
-      # the bind-mount syscall, not the calling container's view of it.
-      - /home/r/Documents/GitHub/pyracms_core/pyracms-cpp-port/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Defaults to the repo-relative file for local development. The
+      # remote deploy (DeployButton, which calls compose from inside the
+      # backend container via the shared docker.sock) must set NGINX_CONF
+      # to the absolute *host* path, because the docker daemon resolves
+      # bind-mounts on the host, not in the calling container.
+      - ${NGINX_CONF:-./nginx.conf}:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - frontend
       - backend
