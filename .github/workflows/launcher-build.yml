@@ -64,7 +64,7 @@ jobs:
           # Windows ARM64: aqt offers win64_msvc2022_arm64 from Qt 6.8 but support for an ARM64 *host* in aqt /
           # install-qt-action is recent and unverified here, so this entry is experimental. If the aqt step fails the
           # job automatically falls back to building Qt with Conan (very slow, may time out).
-          - { runner: windows-11-arm,  hn_os: win, arch: arm64,  conan_arch: armv8,  qt_host: windows,     qt_arch: win64_msvc2022_arm64, msvc: arm64, experimental: true }
+          - { runner: windows-11-arm,  hn_os: win, arch: arm64,  conan_arch: armv8,  qt_host: windows_arm64, qt_arch: win64_msvc2022_arm64, msvc: arm64, experimental: true }
           # macos-13 (Intel) was retired by GitHub in Dec 2025; macos-15-intel is the last x86_64 macOS image.
           - { runner: macos-15-intel,  hn_os: mac, arch: x86_64, conan_arch: x86_64, qt_host: mac,         qt_arch: clang_64,             experimental: false }
           - { runner: macos-14,        hn_os: mac, arch: arm64,  conan_arch: armv8,  qt_host: mac,         qt_arch: clang_64,             experimental: false }
@@ -126,7 +126,6 @@ jobs:
           host: ${{ matrix.qt_host }}
           target: desktop
           arch: ${{ matrix.qt_arch }}
-          modules: qt5compat
           cache: true
           setup-python: false
 
@@ -151,7 +150,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/deps"
           printf '[requires]\nzlib/1.3.1\n\n[generators]\nCMakeDeps\nCMakeToolchain\n' > "$RUNNER_TEMP/deps/conanfile.txt"
           conan install "$RUNNER_TEMP/deps/conanfile.txt" -of "$CLIENT/build" --build=missing \
-            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17
+            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17 \n            -c tools.cmake.cmaketoolchain:generator=Ninja
 
       - name: Build QuaZip against the aqt Qt (static)
         if: env.QT_MODE == 'aqt'
@@ -171,7 +170,7 @@ jobs:
         shell: bash
         run: |
           conan install "$CLIENT/conanfile.txt" -of "$CLIENT/build" --build=missing \
-            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17 \
+            -s arch=${{ matrix.conan_arch }} -s build_type=Release -s compiler.cppstd=17 \n            -c tools.cmake.cmaketoolchain:generator=Ninja \
             -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True \
             --deployer=runtime_deploy --deployer-folder="$GITHUB_WORKSPACE/$CLIENT/build/conan_runtime"
 

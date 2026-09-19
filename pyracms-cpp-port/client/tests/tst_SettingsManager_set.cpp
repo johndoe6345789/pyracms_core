@@ -29,8 +29,8 @@ TEST_F(SettingsManagerTest, SetOsName) {
 
 TEST_F(SettingsManagerTest, SetArchName) {
     QSignalSpy spy(m_manager, &SettingsManager::archNameChanged);
-    m_manager->setArchName("arm64");
-    EXPECT_EQ(m_manager->archName(), QString("arm64"));
+    m_manager->setArchName("riscv64");
+    EXPECT_EQ(m_manager->archName(), QString("riscv64"));
     EXPECT_EQ(spy.count(), 1);
 }
 
