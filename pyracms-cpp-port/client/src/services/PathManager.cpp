@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QStandardPaths>
 
-
 namespace Hypernucleus {
 
 PathManager::PathManager(QObject* parent) : QObject(parent)
@@ -31,6 +30,9 @@ PathManager::PathManager(const QString& installRoot, const QString& configDir,
 
 QString PathManager::defaultDataDir()
 {
+    // HYPERNUCLEUS_HOME: portable mode and tests override the OS location
+    const QString home = qEnvironmentVariable("HYPERNUCLEUS_HOME");
+    if (!home.trimmed().isEmpty()) return QDir::cleanPath(home);
 #if defined(Q_OS_WIN)
     QString roaming = qEnvironmentVariable("APPDATA");
     if (roaming.isEmpty())

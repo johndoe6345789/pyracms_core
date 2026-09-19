@@ -208,7 +208,7 @@ jobs:
           cd "$CLIENT/build"
           for t in $(sed -n 's/^[0-9]*:qtst_/qtst_/p' Testing/Temporary/LastTestsFailed.log); do
             exe="$(find . -name "$t.exe" | head -1)"; echo "== $t ($exe)"
-            timeout 90 "$exe" -o out.txt,txt -o -,txt > run.log 2>&1; echo "exit=$?"
+            timeout 90 "$exe" -o out.txt,txt -o -,txt > run.log 2>&1 && echo "exit=0" || echo "exit=$?"
             head -c 1500 run.log; grep -hE "^FAIL|Loc:|Actual|Expected|QFATAL|QWARN" out.txt | head -20 || true
           done
 

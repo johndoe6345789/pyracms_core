@@ -19,6 +19,7 @@ struct TestEnv {
         QSettings().clear();
         qputenv("HOME", m_dir.path().toUtf8()); // default data folders
         qputenv("XDG_CONFIG_HOME", m_dir.filePath("cfg").toUtf8());
+        qputenv("HYPERNUCLEUS_HOME", m_dir.filePath("hn").toUtf8());
         qputenv("APPDATA", m_dir.filePath("appdata").toUtf8()); // Windows
         qputenv("XDG_DATA_HOME", m_dir.filePath("data").toUtf8());
     }
