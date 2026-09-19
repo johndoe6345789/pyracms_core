@@ -1,9 +1,7 @@
 export const mockUseCreateSite = jest.fn()
 
 /** Stub for CreateSiteFields (module is the component itself). */
-export const MockFields = () => (
-  <div data-testid="mock-create-site-fields" />
-)
+export const MockFields = () => <div data-testid="mock-create-site-fields" />
 MockFields.displayName = 'MockCreateSiteFields'
 
 /** Default (idle) hook return value. */

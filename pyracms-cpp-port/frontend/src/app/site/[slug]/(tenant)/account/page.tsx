@@ -9,7 +9,8 @@ export default function TenantAccountPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 6 }} data-testid="account-page">
       <AccountSettings
-        loginHref={`/auth/login?tenant=${encodeURIComponent(slug)}`} />
+        loginHref={`/auth/login?tenant=${encodeURIComponent(slug)}`}
+      />
     </Container>
   )
 }

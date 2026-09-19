@@ -1,6 +1,4 @@
-import {
-  FormControl, InputLabel, Select, MenuItem,
-} from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 
 type Act = 'Allow' | 'Deny'
 
@@ -9,10 +7,7 @@ interface Props {
   onChange: (val: Act) => void
 }
 
-export default function AclActionSelect({
-  value,
-  onChange,
-}: Props) {
+export default function AclActionSelect({ value, onChange }: Props) {
   return (
     <FormControl size="small" sx={{ minWidth: 120 }}>
       <InputLabel>Action</InputLabel>

@@ -15,9 +15,7 @@ export interface GameDepFields {
 export const GAMEDEP_SECTION = { game: 'games', dep: 'dependencies' } as const
 
 /** Saves an edited game/dependency, then returns to its page. */
-export function useSaveGameDep(
-  type: GameDepType, slug: string, name: string,
-) {
+export function useSaveGameDep(type: GameDepType, slug: string, name: string) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -28,10 +26,10 @@ export function useSaveGameDep(
     const base = `/api/gamedep/${type}/${encodeURIComponent(name)}`
     const { tags, ...page } = fields
     // Tags live on their own endpoint
-    return api.put(base, page)
+    return api
+      .put(base, page)
       .then(() => api.put(`${base}/tags`, { tags }))
-      .then(() => router.push(
-        `/site/${slug}/${GAMEDEP_SECTION[type]}/${name}`))
+      .then(() => router.push(`/site/${slug}/${GAMEDEP_SECTION[type]}/${name}`))
       .catch((e) => setError(apiErrorMessage(e, 'Could not save changes')))
       .finally(() => setSaving(false))
   }

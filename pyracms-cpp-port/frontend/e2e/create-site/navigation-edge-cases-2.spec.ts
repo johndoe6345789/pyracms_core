@@ -3,8 +3,7 @@ import { loginAsAdmin } from '../support/create-site-helpers-1'
 
 test.describe('Navigation edge cases', () => {
   test(
-    'authenticated form heading reads '
-    + '"Create Your Site"',
+    'authenticated form heading reads ' + '"Create Your Site"',
     async ({ page }) => {
       await loginAsAdmin(page)
       await expect(page).toHaveURL('/create-site')

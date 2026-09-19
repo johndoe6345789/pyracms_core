@@ -15,7 +15,9 @@ function read(key: string): Rec {
 function write(key: string, v: Rec) {
   try {
     localStorage.setItem(key, JSON.stringify(v))
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Per-browser convenience only; not a real install record. */

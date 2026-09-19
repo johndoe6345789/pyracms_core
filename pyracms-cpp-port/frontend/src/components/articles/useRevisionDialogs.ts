@@ -7,7 +7,7 @@ import { apiErrorMessage } from '@/lib/apiError'
 export function useRevisionDialogs(
   articleName?: string,
   tenantId?: number | null,
-  onRevert?: (n: number) => Promise<void>
+  onRevert?: (n: number) => Promise<void>,
 ) {
   const [dlgOpen, setDlgOpen] = useState(false)
   const [content, setContent] = useState('')
@@ -17,15 +17,18 @@ export function useRevisionDialogs(
 
   const handleView = (rev: Revision) => {
     if (!articleName || !tenantId) return
-    const url = `/api/articles/${articleName}`
-      + `/revisions/${rev.number}?tenant_id=${tenantId}`
+    const url =
+      `/api/articles/${articleName}` +
+      `/revisions/${rev.number}?tenant_id=${tenantId}`
     setError('')
-    api.get(url).then((res) => {
-      setContent(sanitizeHtml(res.data.content || ''))
-      setViewRev(rev)
-      setDlgOpen(true)
-    }).catch((e) => setError(
-      apiErrorMessage(e, 'Could not load revision')))
+    api
+      .get(url)
+      .then((res) => {
+        setContent(sanitizeHtml(res.data.content || ''))
+        setViewRev(rev)
+        setDlgOpen(true)
+      })
+      .catch((e) => setError(apiErrorMessage(e, 'Could not load revision')))
   }
 
   const handleRevert = () => {

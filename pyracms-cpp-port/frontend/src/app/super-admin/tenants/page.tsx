@@ -3,8 +3,7 @@
 import { Box, Typography, Button } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import Link from 'next/link'
-import TenantManagementTable
-  from '@/components/super-admin/TenantManagementTable'
+import TenantManagementTable from '@/components/super-admin/TenantManagementTable'
 
 export default function SuperAdminTenantsPage() {
   return (
@@ -17,11 +16,7 @@ export default function SuperAdminTenantsPage() {
           mb: 3,
         }}
       >
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{ fontWeight: 700 }}
-        >
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
           Tenants
         </Typography>
         <Button

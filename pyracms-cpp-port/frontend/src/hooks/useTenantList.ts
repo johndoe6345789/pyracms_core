@@ -22,8 +22,9 @@ export function useTenantList() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/api/tenants')
-      .then(res => setSites((res.data || []).map(mapSite)))
+    api
+      .get('/api/tenants')
+      .then((res) => setSites((res.data || []).map(mapSite)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

@@ -8,14 +8,11 @@ function tagsToInput(tags: string[]) {
   return tags.join(', ')
 }
 
-export function useTagDraft(
-  tags: string[],
-  setTagsInput: (v: string) => void
-) {
+export function useTagDraft(tags: string[], setTagsInput: (v: string) => void) {
   const [draftTag, setDraftTag] = useState('')
   const tagSet = useMemo(
     () => new Set(tags.map((t) => t.toLowerCase())),
-    [tags]
+    [tags],
   )
 
   const addTag = (rawValue = draftTag) => {
@@ -40,9 +37,7 @@ export function useTagDraft(
   }
 
   const removeTag = (tagToRemove: string) => {
-    setTagsInput(
-      tagsToInput(tags.filter((t) => t !== tagToRemove))
-    )
+    setTagsInput(tagsToInput(tags.filter((t) => t !== tagToRemove)))
   }
 
   const handleDraftChange = (value: string) => {
@@ -55,9 +50,7 @@ export function useTagDraft(
     setDraftTag(value)
   }
 
-  const handleKeyDown = (
-    e: { key: string; preventDefault: () => void }
-  ) => {
+  const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       addTag()

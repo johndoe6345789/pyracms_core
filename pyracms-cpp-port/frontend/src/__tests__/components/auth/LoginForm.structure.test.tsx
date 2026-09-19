@@ -1,15 +1,14 @@
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import {
-  renderLoginForm,
-  resetMockState,
-} from '../../helpers/loginFormMock'
+import { renderLoginForm, resetMockState } from '../../helpers/loginFormMock'
 
 jest.mock('next/navigation', () =>
-  require('../../helpers/loginFormMock').navigationModule())
+  require('../../helpers/loginFormMock').navigationModule(),
+)
 jest.mock('@/hooks/useLogin', () =>
-  require('../../helpers/loginFormMock').loginHookModule())
+  require('../../helpers/loginFormMock').loginHookModule(),
+)
 
 beforeEach(() => {
   resetMockState()
@@ -18,23 +17,17 @@ beforeEach(() => {
 describe('LoginForm – structural rendering', () => {
   it('renders the username field', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('username-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('username-input')).toBeInTheDocument()
   })
 
   it('renders the password field', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('password-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('password-input')).toBeInTheDocument()
   })
 
   it('renders the submit button with text "Sign In"', () => {
     renderLoginForm()
-    expect(
-      screen.getByRole('button', { name: /sign in/i }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 
   it('renders the register link', () => {

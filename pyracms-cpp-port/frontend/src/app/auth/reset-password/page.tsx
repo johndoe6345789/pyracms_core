@@ -15,7 +15,9 @@ function Content() {
 export default function ResetPasswordPage() {
   return (
     <AuthPageShell>
-      <Suspense fallback={null}><Content /></Suspense>
+      <Suspense fallback={null}>
+        <Content />
+      </Suspense>
     </AuthPageShell>
   )
 }

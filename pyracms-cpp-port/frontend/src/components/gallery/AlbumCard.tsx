@@ -1,23 +1,14 @@
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  Typography,
-} from '@mui/material'
+import { Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import Link from 'next/link'
 import AlbumCover from './AlbumCover'
-import type {
-  GalleryAlbum,
-} from '@/hooks/useGalleryAlbums'
+import type { GalleryAlbum } from '@/hooks/useGalleryAlbums'
 
 interface AlbumCardProps {
   album: GalleryAlbum
   slug: string
 }
 
-export default function AlbumCard(
-  { album, slug }: AlbumCardProps,
-) {
+export default function AlbumCard({ album, slug }: AlbumCardProps) {
   return (
     <Card
       variant="outlined"
@@ -25,8 +16,7 @@ export default function AlbumCard(
       sx={{
         height: '100%',
         borderColor: 'divider',
-        transition:
-          'all 0.2s ease-in-out',
+        transition: 'all 0.2s ease-in-out',
         '&:hover': {
           borderColor: 'primary.main',
           boxShadow: 3,
@@ -36,27 +26,15 @@ export default function AlbumCard(
     >
       <CardActionArea
         component={Link}
-        href={
-          `/site/${slug}/gallery/`
-          + `${album.id}`
-        }
-        data-testid={
-          `album-link-${album.id}`
-        }
+        href={`/site/${slug}/gallery/` + `${album.id}`}
+        data-testid={`album-link-${album.id}`}
       >
         <AlbumCover src={album.coverImage} name={album.name} />
         <CardContent>
-          <Typography
-            variant="h5"
-            component="h2"
-            gutterBottom
-          >
+          <Typography variant="h5" component="h2" gutterBottom>
             {album.name}
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-          >
+          <Typography variant="body2" color="text.secondary">
             {album.pictureCount} pictures
           </Typography>
         </CardContent>

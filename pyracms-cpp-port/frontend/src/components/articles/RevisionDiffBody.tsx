@@ -1,9 +1,7 @@
 'use client'
 
 import { Paper, Typography } from '@mui/material'
-import ReactDiffViewer, {
-  DiffMethod,
-} from 'react-diff-viewer-continued'
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued'
 import type { DiffRevision } from './RevisionSelect'
 
 interface RevisionDiffBodyProps {
@@ -20,20 +18,18 @@ export function EmptyNote({ text }: { text: string }) {
   )
 }
 
-const title = (r: DiffRevision) =>
-  `${r.label} (${r.author} - ${r.date})`
+const title = (r: DiffRevision) => `${r.label} (${r.author} - ${r.date})`
 
-export function RevisionDiffBody(
-  { left, right, splitView }: RevisionDiffBodyProps
-) {
+export function RevisionDiffBody({
+  left,
+  right,
+  splitView,
+}: RevisionDiffBodyProps) {
   if (!left || !right) {
     return <EmptyNote text="Select two revisions to compare." />
   }
   return (
-    <Paper
-      variant="outlined"
-      sx={{ overflow: 'auto', borderColor: 'divider' }}
-    >
+    <Paper variant="outlined" sx={{ overflow: 'auto', borderColor: 'divider' }}>
       <ReactDiffViewer
         oldValue={left.content}
         newValue={right.content}

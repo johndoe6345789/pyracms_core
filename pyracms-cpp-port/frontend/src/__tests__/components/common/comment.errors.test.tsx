@@ -10,7 +10,10 @@ import api from '@/lib/api'
 jest.mock('@/lib/api', () => ({
   __esModule: true,
   default: {
-    get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(),
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
   },
 }))
 const m = api as unknown as Record<string, jest.Mock>
@@ -21,12 +24,31 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, userId: 1, username: 'bob',
-  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
-  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
-const item = () => renderPlain(
-  <CommentItem comment={c} contentType="a" contentId={2} depth={1}
-    onRefresh={refresh} />, makeUser())
+const c: Comment = {
+  id: 5,
+  userId: 1,
+  username: 'bob',
+  contentType: 'a',
+  contentId: 2,
+  body: 'hello',
+  parentId: null,
+  likes: 0,
+  dislikes: 0,
+  createdAt: 'x',
+  updatedAt: 'x',
+  children: [],
+}
+const item = () =>
+  renderPlain(
+    <CommentItem
+      comment={c}
+      contentType="a"
+      contentId={2}
+      depth={1}
+      onRefresh={refresh}
+    />,
+    makeUser(),
+  )
 const alert = () => screen.findByTestId('comment-action-error')
 
 it('shows a vote failure', async () => {
@@ -43,8 +65,9 @@ it('shows a save failure and none on success', async () => {
   fireEvent.click(screen.getByTestId('comment-save-btn'))
   expect(await alert()).toHaveTextContent('boom')
   fireEvent.click(screen.getByTestId('comment-save-btn'))
-  await waitFor(() => expect(
-    screen.queryByTestId('comment-action-error')).toBeNull())
+  await waitFor(() =>
+    expect(screen.queryByTestId('comment-action-error')).toBeNull(),
+  )
 })
 
 it('shows a delete failure', async () => {
@@ -57,19 +80,20 @@ it('shows a delete failure', async () => {
 
 it('shows a post failure', async () => {
   m.post!.mockRejectedValue(boom)
-  renderPlain(<CommentForm contentType="a" contentId={1}
-    onSubmitted={refresh} />)
-  fireEvent.change(screen.getByTestId('comment-input')
-    .querySelector('textarea')!, { target: { value: 'hi' } })
+  renderPlain(
+    <CommentForm contentType="a" contentId={1} onSubmitted={refresh} />,
+  )
+  fireEvent.change(
+    screen.getByTestId('comment-input').querySelector('textarea')!,
+    { target: { value: 'hi' } },
+  )
   fireEvent.click(screen.getByTestId('comment-submit-btn'))
-  expect(await screen.findByTestId('comment-error'))
-    .toHaveTextContent('boom')
+  expect(await screen.findByTestId('comment-error')).toHaveTextContent('boom')
   expect(refresh).not.toHaveBeenCalled()
 })
 
 it('shows a comments load failure', async () => {
   m.get!.mockRejectedValue(boom)
   renderPlain(<CommentSection contentType="a" contentId={1} />)
-  expect(await screen.findByTestId('comments-error'))
-    .toHaveTextContent('boom')
+  expect(await screen.findByTestId('comments-error')).toHaveTextContent('boom')
 })

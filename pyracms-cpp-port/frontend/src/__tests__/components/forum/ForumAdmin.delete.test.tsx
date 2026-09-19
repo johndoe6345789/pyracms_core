@@ -22,15 +22,19 @@ describe('forum admin UI', () => {
     expect(m.delete).not.toHaveBeenCalled()
     click('delete-category-1')
     click('forum-admin-submit')
-    await waitFor(() => expect(m.delete).toHaveBeenCalledWith(
-      '/api/forum/categories/1?tenant_id=7'))
+    await waitFor(() =>
+      expect(m.delete).toHaveBeenCalledWith(
+        '/api/forum/categories/1?tenant_id=7',
+      ),
+    )
   })
   it('shows API errors', async () => {
     m.delete.mockRejectedValue({ response: { data: { error: 'Not empty' } } })
     render(<Harness />)
     click('delete-category-1')
     click('forum-admin-submit')
-    expect(await screen.findByTestId('forum-admin-error'))
-      .toHaveTextContent('Not empty')
+    expect(await screen.findByTestId('forum-admin-error')).toHaveTextContent(
+      'Not empty',
+    )
   })
 })

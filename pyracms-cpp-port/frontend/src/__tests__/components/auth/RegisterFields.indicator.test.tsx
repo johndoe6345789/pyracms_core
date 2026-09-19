@@ -6,16 +6,12 @@ import { setup } from '../../helpers/registerFieldsSetup'
 describe('RegisterFields – password strength indicator', () => {
   it('does not show strength bar when password is empty', () => {
     setup({ password: '' })
-    expect(
-      screen.queryByTestId('password-strength'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('password-strength')).not.toBeInTheDocument()
   })
 
   it('shows strength bar when password has content', () => {
     setup({ password: 'abc' })
-    expect(
-      screen.getByTestId('password-strength'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('password-strength')).toBeInTheDocument()
   })
 
   it('strength bar has role="status" and aria-live="polite"', () => {
@@ -27,22 +23,23 @@ describe('RegisterFields – password strength indicator', () => {
 
   it('shows "Weak" label for a short password', () => {
     setup({ password: 'abc' })
-    expect(
-      screen.getByTestId('password-strength-label'),
-    ).toHaveTextContent('Weak')
+    expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+      'Weak',
+    )
   })
 
   it('shows "Strong" label for a fully complex password', () => {
     setup({ password: 'Abcdef1!' })
-    expect(
-      screen.getByTestId('password-strength-label'),
-    ).toHaveTextContent('Strong')
+    expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+      'Strong',
+    )
   })
 
   it('aria-label contains strength text', () => {
     setup({ password: 'Abcdef1!' })
-    expect(
-      screen.getByTestId('password-strength'),
-    ).toHaveAttribute('aria-label', 'Password strength: Strong')
+    expect(screen.getByTestId('password-strength')).toHaveAttribute(
+      'aria-label',
+      'Password strength: Strong',
+    )
   })
 })

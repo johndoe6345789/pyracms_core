@@ -5,7 +5,8 @@ import { renderAppBar } from '../../helpers/superAdminAppBar'
 
 // UserBubble needs the Next.js router context; stub it.
 jest.mock('next/navigation', () =>
-  require('../../helpers/routerStub').navigationMock())
+  require('../../helpers/routerStub').navigationMock(),
+)
 
 describe('SuperAdminAppBar', () => {
   describe('menu toggle (isMobile=false)', () => {
@@ -16,24 +17,20 @@ describe('SuperAdminAppBar', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('does not render a button labelled "Open super admin menu"',
-      () => {
-        renderAppBar(false, jest.fn())
-        expect(
-          screen.queryByRole('button', {
-            name: /open super admin menu/i,
-          }),
-        ).not.toBeInTheDocument()
-      },
-    )
+    it('does not render a button labelled "Open super admin menu"', () => {
+      renderAppBar(false, jest.fn())
+      expect(
+        screen.queryByRole('button', {
+          name: /open super admin menu/i,
+        }),
+      ).not.toBeInTheDocument()
+    })
   })
 
   describe('menu toggle (isMobile=true)', () => {
     it('renders the menu toggle button', () => {
       renderAppBar(true, jest.fn())
-      expect(
-        screen.getByTestId('super-admin-menu-toggle'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('super-admin-menu-toggle')).toBeInTheDocument()
     })
 
     it('button has aria-label "Open super admin menu"', () => {
@@ -48,9 +45,7 @@ describe('SuperAdminAppBar', () => {
     it('calls onMenuClick when the toggle is clicked', () => {
       const onMenuClick = jest.fn()
       renderAppBar(true, onMenuClick)
-      fireEvent.click(
-        screen.getByTestId('super-admin-menu-toggle'),
-      )
+      fireEvent.click(screen.getByTestId('super-admin-menu-toggle'))
       expect(onMenuClick).toHaveBeenCalledTimes(1)
     })
 

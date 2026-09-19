@@ -17,8 +17,12 @@ describe('siteOrigin', () => {
     expect(await siteOrigin()).toBe('https://x.test')
   })
   it('falls back to the forwarded host and protocol', async () => {
-    hdr.mockResolvedValue(new Headers({
-      'x-forwarded-host': 'a.test', 'x-forwarded-proto': 'https' }))
+    hdr.mockResolvedValue(
+      new Headers({
+        'x-forwarded-host': 'a.test',
+        'x-forwarded-proto': 'https',
+      }),
+    )
     expect(await siteOrigin()).toBe('https://a.test')
     hdr.mockResolvedValue(new Headers({ host: 'b.test' }))
     expect(await siteOrigin()).toBe('http://b.test')

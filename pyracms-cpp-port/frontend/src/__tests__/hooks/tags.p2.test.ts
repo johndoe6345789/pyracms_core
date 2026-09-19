@@ -4,7 +4,8 @@ import { useTagCloudPage } from '@/hooks/useTagCloudPage'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 jest.mock('next/navigation', () => ({
   useParams: () => ({ slug: 'demo' }),
@@ -26,14 +27,25 @@ describe('tag cloud hooks', () => {
   })
 
   it('useTagCloudPage scales tags by weight', async () => {
-    get.mockImplementation((u: string) => Promise.resolve(
-      u.includes('tenants')
-        ? { data: { id: 8 } }
-        : { data: [{ name: 'big', count: 10 }, { name: 'sm', count: 5 }] }))
+    get.mockImplementation((u: string) =>
+      Promise.resolve(
+        u.includes('tenants')
+          ? { data: { id: 8 } }
+          : {
+              data: [
+                { name: 'big', count: 10 },
+                { name: 'sm', count: 5 },
+              ],
+            },
+      ),
+    )
     const { result } = renderHook(() => useTagCloudPage())
     await waitFor(() => expect(result.current.items).toHaveLength(2))
-    expect(result.current.items[0]).toMatchObject(
-      { fontSize: 20, height: 40, href: '/search?site=demo&q=big' })
+    expect(result.current.items[0]).toMatchObject({
+      fontSize: 20,
+      height: 40,
+      href: '/search?site=demo&q=big',
+    })
     expect(result.current.items[1]!.fontSize).toBe(16.5)
   })
 })

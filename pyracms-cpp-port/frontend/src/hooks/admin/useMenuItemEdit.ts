@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import api from '@/lib/api'
 import { useActionError } from '../useActionError'
-import {
-  MenuItemRow, SetGroups, updateGroupItems,
-} from './menuData'
+import { MenuItemRow, SetGroups, updateGroupItems } from './menuData'
 
 /**
  * Inline edit and delete state for menu items.
@@ -36,12 +34,17 @@ export function useMenuItemEdit(
     setError('')
     api
       .put(`/api/menus/${editRow.id}`, {
-        name, route, position, permissions,
+        name,
+        route,
+        position,
+        permissions,
       })
       .then(() => {
         setMenuGroups((prev) =>
           updateGroupItems(prev, selectedGroup, (items) =>
-            items.map((i) => (i.id === editRow.id ? editRow : i))))
+            items.map((i) => (i.id === editRow.id ? editRow : i)),
+          ),
+        )
         handleCancelEdit()
       })
       .catch(fail('Could not save menu item'))
@@ -54,13 +57,21 @@ export function useMenuItemEdit(
       .then(() => {
         setMenuGroups((prev) =>
           updateGroupItems(prev, selectedGroup, (items) =>
-            items.filter((i) => i.id !== id)))
+            items.filter((i) => i.id !== id),
+          ),
+        )
       })
       .catch(fail('Could not delete menu item'))
   }
 
   return {
-    editingId, editRow, setEditRow, handleCancelEdit,
-    handleStartEdit, handleSaveEdit, handleDelete, editError,
+    editingId,
+    editRow,
+    setEditRow,
+    handleCancelEdit,
+    handleStartEdit,
+    handleSaveEdit,
+    handleDelete,
+    editError,
   }
 }

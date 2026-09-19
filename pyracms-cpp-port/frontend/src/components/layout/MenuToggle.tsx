@@ -49,21 +49,30 @@ export default function MenuToggle({ open, onClick }: Props) {
         },
       }}
     >
-      <Box component="span" sx={{
-        ...bar,
-        top: open ? 19 : 13,
-        transform: open ? 'rotate(45deg)' : 'none',
-      }} />
-      <Box component="span" sx={{
-        ...bar,
-        top: 19,
-        opacity: open ? 0 : 1,
-      }} />
-      <Box component="span" sx={{
-        ...bar,
-        top: open ? 19 : 25,
-        transform: open ? 'rotate(-45deg)' : 'none',
-      }} />
+      <Box
+        component="span"
+        sx={{
+          ...bar,
+          top: open ? 19 : 13,
+          transform: open ? 'rotate(45deg)' : 'none',
+        }}
+      />
+      <Box
+        component="span"
+        sx={{
+          ...bar,
+          top: 19,
+          opacity: open ? 0 : 1,
+        }}
+      />
+      <Box
+        component="span"
+        sx={{
+          ...bar,
+          top: open ? 19 : 25,
+          transform: open ? 'rotate(-45deg)' : 'none',
+        }}
+      />
     </ButtonBase>
   )
 }

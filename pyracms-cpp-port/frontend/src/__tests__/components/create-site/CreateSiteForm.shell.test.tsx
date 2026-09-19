@@ -6,8 +6,7 @@
  */
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import CreateSiteForm
-  from '@/components/create-site/CreateSiteForm'
+import CreateSiteForm from '@/components/create-site/CreateSiteForm'
 import {
   mockUseCreateSite,
   resetCreateSite,
@@ -18,8 +17,10 @@ jest.mock('@/hooks/useCreateSite', () => ({
   useCreateSite: () => mockUseCreateSite(),
 }))
 
-jest.mock('@/components/create-site/CreateSiteFields', () =>
-  require('../../helpers/createSiteForm').MockFields)
+jest.mock(
+  '@/components/create-site/CreateSiteFields',
+  () => require('../../helpers/createSiteForm').MockFields,
+)
 
 describe('CreateSiteForm', () => {
   beforeEach(resetCreateSite)
@@ -39,35 +40,27 @@ describe('CreateSiteForm', () => {
 
   it('does not show an error alert by default', () => {
     render(<CreateSiteForm />)
-    expect(
-      screen.queryByTestId('create-site-error'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('create-site-error')).not.toBeInTheDocument()
   })
 
-  it('shows an error alert when useCreateSite returns an error',
-    () => {
-      withHook({ error: 'Slug already taken' })
-      render(<CreateSiteForm />)
-      const alert = screen.getByTestId('create-site-error')
-      expect(alert).toBeInTheDocument()
-      expect(alert).toHaveTextContent('Slug already taken')
-    },
-  )
+  it('shows an error alert when useCreateSite returns an error', () => {
+    withHook({ error: 'Slug already taken' })
+    render(<CreateSiteForm />)
+    const alert = screen.getByTestId('create-site-error')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent('Slug already taken')
+  })
 
-  it('error alert has role="alert" and aria-live="assertive"',
-    () => {
-      withHook({ error: 'Something went wrong' })
-      render(<CreateSiteForm />)
-      const alert = screen.getByRole('alert')
-      expect(alert).toHaveAttribute('aria-live', 'assertive')
-    },
-  )
+  it('error alert has role="alert" and aria-live="assertive"', () => {
+    withHook({ error: 'Something went wrong' })
+    render(<CreateSiteForm />)
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveAttribute('aria-live', 'assertive')
+  })
 
   it('renders data-testid="create-site-form" on the <form>', () => {
     render(<CreateSiteForm />)
-    expect(
-      screen.getByTestId('create-site-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('create-site-form')).toBeInTheDocument()
   })
 
   it('<form> has aria-label "Create site form"', () => {

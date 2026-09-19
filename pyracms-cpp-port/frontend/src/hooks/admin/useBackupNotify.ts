@@ -10,7 +10,8 @@ export interface SnackbarState {
 }
 
 export type Notify = (
-  message: string, severity?: SnackbarState['severity'],
+  message: string,
+  severity?: SnackbarState['severity'],
 ) => void
 
 const NO_TENANT = 'Site is still loading; try again in a moment.'
@@ -18,15 +19,15 @@ const NO_TENANT = 'Site is still loading; try again in a moment.'
 /** Snackbar state plus a tenant-guarded, error-reporting runner. */
 export function useBackupNotify(tenantId: number | null) {
   const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false, message: '', severity: 'success',
+    open: false,
+    message: '',
+    severity: 'success',
   })
 
   const notify: Notify = (message, severity = 'success') =>
     setSnackbar({ open: true, message, severity })
 
-  const run = async (
-    label: string, task: (id: number) => Promise<void>,
-  ) => {
+  const run = async (label: string, task: (id: number) => Promise<void>) => {
     if (tenantId == null) return notify(NO_TENANT, 'warning')
     try {
       await task(tenantId)

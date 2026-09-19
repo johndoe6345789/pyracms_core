@@ -4,8 +4,7 @@ test.describe('Search — /search', () => {
   // ---- NEW: search results ARIA ----
 
   test(
-    'mocked API: search-results list has '
-    + 'aria-label="Search results"',
+    'mocked API: search-results list has ' + 'aria-label="Search results"',
     async ({ page }) => {
       await page.route('**/api/search*', (route) => {
         if (route.request().url().includes('autocomplete')) {
@@ -37,10 +36,7 @@ test.describe('Search — /search', () => {
 
       const list = page.getByTestId('search-results')
       await expect(list).toBeVisible({ timeout: 8_000 })
-      await expect(list).toHaveAttribute(
-        'aria-label',
-        /search results/i,
-      )
+      await expect(list).toHaveAttribute('aria-label', /search results/i)
     },
   )
 })

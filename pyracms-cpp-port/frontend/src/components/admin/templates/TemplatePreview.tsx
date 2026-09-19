@@ -18,11 +18,7 @@ export default function TemplatePreview({
         borderColor: 'divider',
       }}
     >
-      <Typography
-        variant="subtitle2"
-        color="text.secondary"
-        gutterBottom
-      >
+      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
         Live Preview - {section}
       </Typography>
       <Divider sx={{ mb: 2 }} />

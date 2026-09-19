@@ -8,11 +8,7 @@ interface Props {
   onChange: (color: string) => void
 }
 
-export default function ColorPickerField({
-  label,
-  color,
-  onChange,
-}: Props) {
+export default function ColorPickerField({ label, color, onChange }: Props) {
   const [open, setOpen] = useState(false)
   return (
     <Box sx={{ mb: 2 }}>

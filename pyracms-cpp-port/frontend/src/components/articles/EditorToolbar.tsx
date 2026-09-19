@@ -11,10 +11,7 @@ export interface ToolbarAction {
 
 interface EditorToolbarProps {
   actions: ToolbarAction[]
-  onAction: (
-    prefix: string,
-    suffix: string,
-  ) => void
+  onAction: (prefix: string, suffix: string) => void
   children?: React.ReactNode
 }
 
@@ -46,21 +43,14 @@ export function EditorToolbar({
         }}
       >
         {actions.map((action) => (
-          <Tooltip
-            key={action.label}
-            title={action.label}
-          >
+          <Tooltip key={action.label} title={action.label}>
             <IconButton
               size="small"
-              onClick={() => onAction(
-                action.prefix,
-                action.suffix,
-              )}
+              onClick={() => onAction(action.prefix, action.suffix)}
               aria-label={action.label}
-              data-testid={
-                `toolbar-${action.label.toLowerCase()
-                  .replace(/\s+/g, '-')}`
-              }
+              data-testid={`toolbar-${action.label
+                .toLowerCase()
+                .replace(/\s+/g, '-')}`}
             >
               {action.icon}
             </IconButton>

@@ -16,31 +16,53 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, userId: 1, username: 'bob',
-  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
-  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
+const c: Comment = {
+  id: 5,
+  userId: 1,
+  username: 'bob',
+  contentType: 'a',
+  contentId: 2,
+  body: 'hello',
+  parentId: null,
+  likes: 0,
+  dislikes: 0,
+  createdAt: 'x',
+  updatedAt: 'x',
+  children: [],
+}
 type U = ReturnType<typeof makeUser> | null
-const show = (u: U = makeUser(), depth = 1) => renderWithStore(
-  <CommentItem comment={c} contentType="a" contentId={2} depth={depth}
-    onRefresh={refresh} />, u ?? undefined)
+const show = (u: U = makeUser(), depth = 1) =>
+  renderWithStore(
+    <CommentItem
+      comment={c}
+      contentType="a"
+      contentId={2}
+      depth={depth}
+      onRefresh={refresh}
+    />,
+    u ?? undefined,
+  )
 
 describe('CommentItem editing', () => {
   it('edits and saves', async () => {
     show()
     fireEvent.click(screen.getByTestId('comment-edit-btn'))
-    const box = screen.getByTestId('comment-edit-input')
+    const box = screen
+      .getByTestId('comment-edit-input')
       .querySelector('textarea')!
     fireEvent.change(box, { target: { value: 'new' } })
     fireEvent.click(screen.getByTestId('comment-save-btn'))
-    await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/comments/5', { body: 'new' }))
+    await waitFor(() =>
+      expect(m.put).toHaveBeenCalledWith('/api/comments/5', { body: 'new' }),
+    )
     expect(screen.queryByTestId('comment-save-btn')).toBeNull()
   })
 
   it('cancels editing and refuses blank saves', () => {
     show()
     fireEvent.click(screen.getByTestId('comment-edit-btn'))
-    const box = screen.getByTestId('comment-edit-input')
+    const box = screen
+      .getByTestId('comment-edit-input')
       .querySelector('textarea')!
     fireEvent.change(box, { target: { value: ' ' } })
     fireEvent.click(screen.getByTestId('comment-save-btn'))
@@ -53,7 +75,8 @@ describe('CommentItem editing', () => {
     show()
     fireEvent.click(screen.getByTestId('comment-delete-btn'))
     fireEvent.click(screen.getByTestId('delete-comment-confirm-btn'))
-    await waitFor(() => expect(m.delete).toHaveBeenCalledWith(
-      '/api/comments/5'))
+    await waitFor(() =>
+      expect(m.delete).toHaveBeenCalledWith('/api/comments/5'),
+    )
   })
 })

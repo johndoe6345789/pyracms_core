@@ -34,7 +34,9 @@ describe('useSnippetRun', () => {
   it('stores the run result', async () => {
     mock.post.mockResolvedValue({ data: { output: 'ok', exitCode: 0 } })
     const { result } = renderHook(() => useSnippetRun())
-    await act(async () => { await result.current.run('1') })
+    await act(async () => {
+      await result.current.run('1')
+    })
     expect(mock.post).toHaveBeenCalledWith('/api/snippets/1/run')
     expect(result.current.result?.stdout).toBe('ok')
     expect(result.current.running).toBe(false)
@@ -42,10 +44,14 @@ describe('useSnippetRun', () => {
   it('explains auth and generic failures', async () => {
     const { result } = renderHook(() => useSnippetRun())
     mock.post.mockRejectedValueOnce({ response: { status: 401 } })
-    await act(async () => { await result.current.run('1') })
+    await act(async () => {
+      await result.current.run('1')
+    })
     expect(result.current.result?.stderr).toMatch(/log in/)
     mock.post.mockRejectedValueOnce(new Error('x'))
-    await act(async () => { await result.current.run('1') })
+    await act(async () => {
+      await result.current.run('1')
+    })
     expect(result.current.result?.stderr).toBe('Failed to run snippet.')
   })
 })

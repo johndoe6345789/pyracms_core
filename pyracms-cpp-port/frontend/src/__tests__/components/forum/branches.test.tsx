@@ -1,5 +1,11 @@
-import { render, screen, fireEvent, renderHook, act, waitFor }
-  from '@testing-library/react'
+import {
+  render,
+  screen,
+  fireEvent,
+  renderHook,
+  act,
+  waitFor,
+} from '@testing-library/react'
 import { VoteButtons } from '@/components/forum/VoteButtons'
 import { SearchResults } from '@/components/forum/SearchResults'
 import { PostBody } from '@/components/forum/PostBody'
@@ -8,14 +14,20 @@ import { useForumSearch } from '@/components/forum/useForumSearch'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
 
 const res = {
-  id: '1', threadId: '1', threadTitle: 'T', postContent: 'c', author: 'a',
-  date: '', forumName: 'f',
+  id: '1',
+  threadId: '1',
+  threadTitle: 'T',
+  postContent: 'c',
+  author: 'a',
+  date: '',
+  forumName: 'f',
 }
 
 describe('forum component defaults', () => {
@@ -34,8 +46,7 @@ describe('forum component defaults', () => {
   })
 
   it('SearchResults render without a click handler', () => {
-    render(<SearchResults results={[res, { ...res, id: '2' }]}
-      query="q" />)
+    render(<SearchResults results={[res, { ...res, id: '2' }]} query="q" />)
     expect(screen.getByTestId('search-result-2')).toBeInTheDocument()
   })
 
@@ -55,15 +66,27 @@ describe('forum component defaults', () => {
 
 describe('useForumSearch fallbacks', () => {
   it('fills blanks for sparse rows', async () => {
-    get.mockResolvedValue({ data: { items: [{ id: 1 },
-      { id: 2, snippet: 's', createdAt: '2024-05-06T10:00:00Z' }] } })
+    get.mockResolvedValue({
+      data: {
+        items: [
+          { id: 1 },
+          { id: 2, snippet: 's', createdAt: '2024-05-06T10:00:00Z' },
+        ],
+      },
+    })
     const { result } = renderHook(() => useForumSearch())
     act(() => result.current.search('q', '', ''))
     await waitFor(() => expect(result.current.results).toHaveLength(2))
-    expect(result.current.results[0]).toMatchObject(
-      { threadTitle: '', postContent: '', author: '', forumName: '' })
-    expect(result.current.results[1]).toMatchObject(
-      { postContent: 's', date: '2024-05-06' })
+    expect(result.current.results[0]).toMatchObject({
+      threadTitle: '',
+      postContent: '',
+      author: '',
+      forumName: '',
+    })
+    expect(result.current.results[1]).toMatchObject({
+      postContent: 's',
+      date: '2024-05-06',
+    })
   })
 
   it('accepts a null payload', async () => {

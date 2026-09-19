@@ -69,9 +69,7 @@ function makeStore() {
 }
 
 /** Render LoginForm wrapped in a Redux Provider. */
-export function renderLoginForm(
-  props: { redirectTo?: string } = {},
-) {
+export function renderLoginForm(props: { redirectTo?: string } = {}) {
   return render(
     <Provider store={makeStore()}>
       <LoginForm {...props} />

@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTenantId } from '@/hooks/useTenantId'
 import {
-  fetchSearch, SEARCH_ITEMS_PER_PAGE, type SearchResult,
+  fetchSearch,
+  SEARCH_ITEMS_PER_PAGE,
+  type SearchResult,
 } from './searchTypes'
 
 export { SEARCH_ITEMS_PER_PAGE }
@@ -27,28 +29,27 @@ export function useSearchPage() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const performSearch = useCallback(async (
-    q: string,
-    type: string,
-    pg: number,
-  ) => {
-    if (!q || !tenantId) {
-      setResults([])
-      setTotalCount(0)
-      setFacets({})
-      return
-    }
-    setLoading(true)
-    try {
-      const data = await fetchSearch(q, tenantId, type, pg)
-      setResults(data.items)
-      setTotalCount(data.totalCount)
-      setFacets(data.facets)
-    } catch {
-      setResults([])
-    }
-    setLoading(false)
-  }, [tenantId])
+  const performSearch = useCallback(
+    async (q: string, type: string, pg: number) => {
+      if (!q || !tenantId) {
+        setResults([])
+        setTotalCount(0)
+        setFacets({})
+        return
+      }
+      setLoading(true)
+      try {
+        const data = await fetchSearch(q, tenantId, type, pg)
+        setResults(data.items)
+        setTotalCount(data.totalCount)
+        setFacets(data.facets)
+      } catch {
+        setResults([])
+      }
+      setLoading(false)
+    },
+    [tenantId],
+  )
 
   useEffect(() => {
     if (initialQuery) {
@@ -60,11 +61,13 @@ export function useSearchPage() {
     setQuery(q)
     setPage(1)
     performSearch(q, activeType, 1)
-    router.push(`/search?${new URLSearchParams({
-      ...(siteSlug ? { site: siteSlug } : {}),
-      ...(tenantParam ? { tenant_id: tenantParam } : {}),
-      q,
-    }).toString()}`)
+    router.push(
+      `/search?${new URLSearchParams({
+        ...(siteSlug ? { site: siteSlug } : {}),
+        ...(tenantParam ? { tenant_id: tenantParam } : {}),
+        q,
+      }).toString()}`,
+    )
   }
 
   const handleTypeChange = (type: string) => {
@@ -74,7 +77,17 @@ export function useSearchPage() {
   }
 
   return {
-    activeType, facets, handleSearch, handleTypeChange, loading,
-    page, query, results, router, setPage, tenantId, totalCount,
+    activeType,
+    facets,
+    handleSearch,
+    handleTypeChange,
+    loading,
+    page,
+    query,
+    results,
+    router,
+    setPage,
+    tenantId,
+    totalCount,
   }
 }

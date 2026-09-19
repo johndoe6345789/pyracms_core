@@ -1,6 +1,5 @@
 export type TurboParse =
-  | { ok: true; user: string; pass: string }
-  | { ok: false; error: string }
+  { ok: true; user: string; pass: string } | { ok: false; error: string }
 
 const MAX_LEN = 4096
 
@@ -25,9 +24,14 @@ export function parseTurbologin(raw: string): TurboParse {
       error: 'Clipboard does not contain valid Turbologin JSON.',
     }
   }
-  if (typeof data.user !== 'string' || typeof data.pass !== 'string'
-    || !data.user || !data.pass || data.user.length > 320
-    || data.pass.length > 1024) {
+  if (
+    typeof data.user !== 'string' ||
+    typeof data.pass !== 'string' ||
+    !data.user ||
+    !data.pass ||
+    data.user.length > 320 ||
+    data.pass.length > 1024
+  ) {
     return {
       ok: false,
       error: 'Clipboard JSON is missing required fields (user, pass).',

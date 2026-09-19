@@ -1,11 +1,7 @@
 'use client'
 
-import {
-  TableCell, TableRow, IconButton, Chip,
-} from '@mui/material'
-import {
-  DeleteOutlined, OpenInNewOutlined,
-} from '@mui/icons-material'
+import { TableCell, TableRow, IconButton, Chip } from '@mui/material'
+import { DeleteOutlined, OpenInNewOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import type { TenantRow } from '@/hooks/useSuperAdminTenants'
 
@@ -14,16 +10,11 @@ interface Props {
   onDelete: (id: number) => void
 }
 
-export default function TenantTableRow({
-  tenant: t,
-  onDelete,
-}: Props) {
+export default function TenantTableRow({ tenant: t, onDelete }: Props) {
   return (
     <TableRow data-testid={`tenant-row-${t.slug}`}>
       <TableCell>{t.name}</TableCell>
-      <TableCell sx={{ fontFamily: 'monospace' }}>
-        {t.slug}
-      </TableCell>
+      <TableCell sx={{ fontFamily: 'monospace' }}>{t.slug}</TableCell>
       <TableCell>{t.owner}</TableCell>
       <TableCell>{t.createdAt}</TableCell>
       <TableCell>

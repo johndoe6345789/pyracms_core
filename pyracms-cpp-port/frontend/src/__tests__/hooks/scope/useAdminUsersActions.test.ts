@@ -12,8 +12,9 @@ const setup = async () => {
 
 beforeEach(() => {
   jest.resetAllMocks()
-  m.get.mockResolvedValue({ data: [
-    { id: 1, username: 'u', banned: false, role: 2 }] })
+  m.get.mockResolvedValue({
+    data: [{ id: 1, username: 'u', banned: false, role: 2 }],
+  })
   m.put.mockResolvedValue({})
   m.delete.mockResolvedValue({})
 })
@@ -30,17 +31,20 @@ it('bans and unbans through the ban endpoint', async () => {
   expect(m.put).toHaveBeenCalledWith('/api/users/1/ban', { banned: true })
   act(() => result.current.handleToggleBan(1))
   await waitFor(() => expect(result.current.users[0]!.banned).toBe(false))
-  expect(m.put).toHaveBeenLastCalledWith(
-    '/api/users/1/ban', { banned: false })
+  expect(m.put).toHaveBeenLastCalledWith('/api/users/1/ban', { banned: false })
 })
 
 it('reports a refused ban and keeps the state', async () => {
-  m.put.mockRejectedValueOnce(
-    { response: { data: { error: 'Account has an equal or higher role' } } })
+  m.put.mockRejectedValueOnce({
+    response: { data: { error: 'Account has an equal or higher role' } },
+  })
   const { result } = await setup()
   act(() => result.current.handleToggleBan(1))
-  await waitFor(() => expect(result.current.actionError)
-    .toBe('Account has an equal or higher role'))
+  await waitFor(() =>
+    expect(result.current.actionError).toBe(
+      'Account has an equal or higher role',
+    ),
+  )
   expect(result.current.users[0]!.banned).toBe(false)
   act(() => result.current.handleToggleBan(1))
   await waitFor(() => expect(result.current.actionError).toBe(''))
@@ -52,6 +56,7 @@ it('reports a refused delete and keeps the row', async () => {
   act(() => result.current.handleDeleteClick(result.current.users[0]!))
   act(() => result.current.handleDeleteConfirm())
   await waitFor(() =>
-    expect(result.current.actionError).toBe('Failed to delete user'))
+    expect(result.current.actionError).toBe('Failed to delete user'),
+  )
   expect(result.current.users).toHaveLength(1)
 })

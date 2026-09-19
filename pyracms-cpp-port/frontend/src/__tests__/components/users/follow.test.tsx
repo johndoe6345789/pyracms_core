@@ -1,5 +1,4 @@
-import { screen, fireEvent, waitFor }
-  from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { FollowButton } from '@/components/users/FollowButton'
 import { UserHeader } from '@/components/users/UserHeader'
 import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
@@ -22,7 +21,8 @@ describe('FollowButton', () => {
 
   it('follows then unfollows', async () => {
     m.get!.mockResolvedValue({ data: { items: [] } })
-    m.post!.mockResolvedValue({}); m.delete!.mockResolvedValue({})
+    m.post!.mockResolvedValue({})
+    m.delete!.mockResolvedValue({})
     renderWithStore(<FollowButton userId={2} />, makeUser())
     fireEvent.click(await screen.findByText('Follow'))
     fireEvent.click(await screen.findByText('Unfollow'))
@@ -47,9 +47,17 @@ describe('FollowButton', () => {
 })
 
 describe('UserHeader', () => {
-  const user = { id: 9, username: 'zed', email: '', bio: 'hi',
-    website: 'http://nyc.dev', avatarUrl: '', reputation: 4,
-    postCount: 2, createdAt: '' }
+  const user = {
+    id: 9,
+    username: 'zed',
+    email: '',
+    bio: 'hi',
+    website: 'http://nyc.dev',
+    avatarUrl: '',
+    reputation: 4,
+    postCount: 2,
+    createdAt: '',
+  }
 
   it('shows optional bio and website', () => {
     renderWithStore(<UserHeader user={user} />)

@@ -16,17 +16,13 @@ beforeEach(resetRegisterMocks)
 describe('RegisterForm – error alert', () => {
   it('does not show an error alert by default', () => {
     renderForm()
-    expect(
-      screen.queryByTestId('register-error'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('register-error')).not.toBeInTheDocument()
   })
 
   it('shows error alert when error is non-empty', () => {
     mockState({ error: 'Username already taken' })
     renderForm()
-    expect(
-      screen.getByTestId('register-error'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-error')).toBeInTheDocument()
   })
 
   it('error alert displays the error message text', () => {

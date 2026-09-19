@@ -11,13 +11,13 @@ interface ArticleContentProps {
   renderer: string
 }
 
-export function ArticleContent(
-  { content, renderer }: ArticleContentProps
-) {
+export function ArticleContent({ content, renderer }: ArticleContentProps) {
   // Sanitised in the browser only: DOMPurify cannot run during SSR, and
   // the server must never emit unverified HTML.
   const [html, setHtml] = useState('')
-  useEffect(() => { setHtml(sanitizeHtml(content)) }, [content])
+  useEffect(() => {
+    setHtml(sanitizeHtml(content))
+  }, [content])
   return (
     <Paper
       variant="outlined"

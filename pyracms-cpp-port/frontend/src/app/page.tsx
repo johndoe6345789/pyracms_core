@@ -1,16 +1,11 @@
 'use client'
 
 import { Box } from '@mui/material'
-import PortalShell from
-  '@/components/layout/PortalShell'
-import SiteFooter from
-  '@/components/layout/SiteFooter'
-import HeroSection from
-  '@/components/portal/HeroSection'
-import TenantGrid from
-  '@/components/portal/TenantGrid'
-import { useTenantList } from
-  '@/hooks/useTenantList'
+import PortalShell from '@/components/layout/PortalShell'
+import SiteFooter from '@/components/layout/SiteFooter'
+import HeroSection from '@/components/portal/HeroSection'
+import TenantGrid from '@/components/portal/TenantGrid'
+import { useTenantList } from '@/hooks/useTenantList'
 
 export default function PortalPage() {
   const { sites, loading } = useTenantList()
@@ -27,10 +22,7 @@ export default function PortalPage() {
     >
       <PortalShell />
       <HeroSection />
-      <TenantGrid
-        sites={sites}
-        loading={loading}
-      />
+      <TenantGrid sites={sites} loading={loading} />
       <SiteFooter />
     </Box>
   )

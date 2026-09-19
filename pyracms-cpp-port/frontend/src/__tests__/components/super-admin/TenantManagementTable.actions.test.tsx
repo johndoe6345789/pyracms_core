@@ -3,8 +3,7 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import TenantManagementTable from
-  '@/components/super-admin/TenantManagementTable'
+import TenantManagementTable from '@/components/super-admin/TenantManagementTable'
 import {
   mockHookState,
   resetHook,
@@ -14,11 +13,12 @@ import {
 
 jest.mock('@/hooks/useSuperAdminTenants', () => ({
   useSuperAdminTenants: () =>
-    require('@/__tests__/helpers/tenantTableHelpers')
-      .mockHookState,
+    require('@/__tests__/helpers/tenantTableHelpers').mockHookState,
 }))
-jest.mock('next/link', () =>
-  require('@/__tests__/helpers/tenantTableHelpers').MockLink)
+jest.mock(
+  'next/link',
+  () => require('@/__tests__/helpers/tenantTableHelpers').MockLink,
+)
 
 describe('TenantManagementTable', () => {
   beforeEach(() => resetHook())
@@ -26,12 +26,8 @@ describe('TenantManagementTable', () => {
   it('delete button triggers handleDelete with correct id', () => {
     resetHook({ tenants: [TENANT_A, TENANT_B] })
     render(<TenantManagementTable />)
-    fireEvent.click(
-      screen.getByTestId('delete-tenant-beta'),
-    )
-    expect(mockHookState.handleDelete).toHaveBeenCalledWith(
-      TENANT_B.id,
-    )
+    fireEvent.click(screen.getByTestId('delete-tenant-beta'))
+    expect(mockHookState.handleDelete).toHaveBeenCalledWith(TENANT_B.id)
     expect(mockHookState.handleDelete).toHaveBeenCalledTimes(1)
   })
 
@@ -45,9 +41,7 @@ describe('TenantManagementTable', () => {
   it('renders TenantDeleteDialog when confirmDeleteId !== null', () => {
     resetHook({ tenants: [TENANT_A], confirmDeleteId: 1 })
     render(<TenantManagementTable />)
-    expect(
-      screen.getByTestId('tenant-delete-dialog'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tenant-delete-dialog')).toBeInTheDocument()
   })
 
   it('does not render delete dialog when confirmDeleteId is null', () => {

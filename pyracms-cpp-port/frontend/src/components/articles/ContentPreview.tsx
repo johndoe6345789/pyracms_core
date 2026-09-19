@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  Box,
-  Paper,
-  Typography,
-  Divider,
-} from '@mui/material'
+import { Box, Paper, Typography, Divider } from '@mui/material'
 import { sanitizeHtml } from '@/lib/sanitize'
 
 interface ContentPreviewProps {
@@ -28,13 +23,9 @@ const PREVIEW_STYLES = {
  * Content is sanitized with DOMPurify before
  * being rendered as HTML.
  */
-export function ContentPreview({
-  content,
-  renderer,
-}: ContentPreviewProps) {
+export function ContentPreview({ content, renderer }: ContentPreviewProps) {
   // Sanitized via DOMPurify before rendering
-  const sanitized =
-    sanitizeHtml(content)
+  const sanitized = sanitizeHtml(content)
 
   return (
     <Paper
@@ -45,11 +36,7 @@ export function ContentPreview({
         borderColor: 'divider',
       }}
     >
-      <Typography
-        variant="subtitle2"
-        color="text.secondary"
-        sx={{ mb: 2 }}
-      >
+      <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
         Preview ({renderer})
       </Typography>
       <Divider sx={{ mb: 2 }} />
@@ -62,12 +49,8 @@ export function ContentPreview({
           sx={PREVIEW_STYLES}
         />
       ) : (
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
-          Nothing to preview yet.
-          Start writing in the editor.
+        <Typography variant="body2" color="text.secondary">
+          Nothing to preview yet. Start writing in the editor.
         </Typography>
       )}
     </Paper>

@@ -24,39 +24,33 @@ describe('useLogin – loading and API shape', () => {
     localStorage.clear()
   })
 
-  it('loading is false after a successful request completes',
-    async () => {
-      mockApi.post.mockResolvedValueOnce({
-        data: { token: 'tok123', user: MOCK_USER },
-      })
-      const { result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      expect(result.current.loading).toBe(false)
-    },
-  )
+  it('loading is false after a successful request completes', async () => {
+    mockApi.post.mockResolvedValueOnce({
+      data: { token: 'tok123', user: MOCK_USER },
+    })
+    const { result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    expect(result.current.loading).toBe(false)
+  })
 
-  it('loading is false after a failed request completes',
-    async () => {
-      mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
-      const { result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      expect(result.current.loading).toBe(false)
-    },
-  )
+  it('loading is false after a failed request completes', async () => {
+    mockApi.post.mockRejectedValueOnce(new Error('Network Error'))
+    const { result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    expect(result.current.loading).toBe(false)
+  })
 
-  it('loading is false after a server-side error (no token)',
-    async () => {
-      mockApi.post.mockResolvedValueOnce({
-        data: { error: 'Bad creds' },
-      })
-      const { result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      expect(result.current.loading).toBe(false)
-    },
-  )
+  it('loading is false after a server-side error (no token)', async () => {
+    mockApi.post.mockResolvedValueOnce({
+      data: { error: 'Bad creds' },
+    })
+    const { result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    expect(result.current.loading).toBe(false)
+  })
 
   it('calls POST /api/auth/login with the form data', async () => {
     mockApi.post.mockResolvedValueOnce({
@@ -65,9 +59,9 @@ describe('useLogin – loading and API shape', () => {
     const { result } = renderLogin()
     fillForm(result, 'alice', 'pass123')
     await submitForm(result)
-    expect(mockApi.post).toHaveBeenCalledWith(
-      '/api/auth/login',
-      { username: 'alice', password: 'pass123' },
-    )
+    expect(mockApi.post).toHaveBeenCalledWith('/api/auth/login', {
+      username: 'alice',
+      password: 'pass123',
+    })
   })
 })

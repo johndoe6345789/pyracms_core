@@ -3,9 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 
 /** Only same-origin relative paths are honoured (no open redirect). */
-export function safeRedirect(
-  value: string | null,
-): string | undefined {
+export function safeRedirect(value: string | null): string | undefined {
   if (!value) return undefined
   if (!value.startsWith('/') || value.startsWith('//')) {
     return undefined
@@ -30,8 +28,8 @@ export function useAuthParams(fallbackRedirect?: string) {
   const rawTenant = params.get('tenant') || ''
   const tenant = SLUG.test(rawTenant) ? rawTenant : undefined
   const redirectTo =
-    safeRedirect(params.get('redirect'))
-    ?? fallbackRedirect
-    ?? (tenant ? `/site/${tenant}` : undefined)
+    safeRedirect(params.get('redirect')) ??
+    fallbackRedirect ??
+    (tenant ? `/site/${tenant}` : undefined)
   return { tenant, redirectTo }
 }

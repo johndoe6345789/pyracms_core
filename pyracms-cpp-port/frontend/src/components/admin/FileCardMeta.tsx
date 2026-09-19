@@ -16,11 +16,7 @@ export default function FileCardMeta({ file }: { file: FileItem }) {
           variant="outlined"
         />
       </Box>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         {file.type}
       </Typography>
     </>

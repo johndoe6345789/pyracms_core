@@ -1,10 +1,7 @@
 'use client'
 
 import { Box, IconButton, Typography } from '@mui/material'
-import {
-  ThumbUpOutlined,
-  ThumbDownOutlined,
-} from '@mui/icons-material'
+import { ThumbUpOutlined, ThumbDownOutlined } from '@mui/icons-material'
 
 interface ArticleVoteButtonsProps {
   likes: number
@@ -18,9 +15,11 @@ const itemSx = {
   gap: 0.5,
 }
 
-export function ArticleVoteButtons(
-  { likes, dislikes, onVote }: ArticleVoteButtonsProps
-) {
+export function ArticleVoteButtons({
+  likes,
+  dislikes,
+  onVote,
+}: ArticleVoteButtonsProps) {
   return (
     <Box
       sx={{ display: 'flex', alignItems: 'center', gap: 2 }}

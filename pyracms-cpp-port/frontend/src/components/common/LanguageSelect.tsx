@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import {
-  IconButton, Menu, MenuItem, ListItemText, Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemText,
+  Typography,
 } from '@mui/material'
 import { TranslateOutlined } from '@mui/icons-material'
 import { LANGUAGES } from './languages'
@@ -20,8 +24,7 @@ export default function LanguageSelect() {
   const router = useRouter()
 
   const handleChange = (code: string) => {
-    document.cookie =
-      `${LOCALE_COOKIE}=${code}; path=/; max-age=${YEAR}; samesite=lax`
+    document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=${YEAR}; samesite=lax`
     setAnchorEl(null)
     router.refresh()
   }

@@ -21,7 +21,8 @@ export function useSettingJson<T>(
 
   useEffect(() => {
     if (!tenantId) return
-    api.get(`/api/settings/${key}?tenant_id=${tenantId}`)
+    api
+      .get(`/api/settings/${key}?tenant_id=${tenantId}`)
       .then((r) => {
         const v = parse(String(r.data?.value ?? ''))
         if (v) setValue(v)

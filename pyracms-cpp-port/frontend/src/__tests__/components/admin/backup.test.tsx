@@ -16,19 +16,34 @@ it('ExportButtons triggers both exports', () => {
 it('ImportSection wires click and change', () => {
   const click = jest.fn()
   const change = jest.fn()
-  render(<ImportSection fileInputRef={null} onImportClick={click}
-    onFileChange={change} />)
+  render(
+    <ImportSection
+      fileInputRef={null}
+      onImportClick={click}
+      onFileChange={change}
+    />,
+  )
   fireEvent.click(screen.getByRole('button', { name: /Choose File/ }))
-  fireEvent.change(screen.getByTestId('import-file-input'),
-    { target: { files: [new File(['{}'], 'a.json')] } })
+  fireEvent.change(screen.getByTestId('import-file-input'), {
+    target: { files: [new File(['{}'], 'a.json')] },
+  })
   expect(click).toHaveBeenCalled()
   expect(change).toHaveBeenCalled()
 })
 
 it('FeatureToggleCard toggles', () => {
   const onToggle = jest.fn()
-  render(<FeatureToggleCard onToggle={onToggle} feature={{
-    id: 'forum', name: 'Forum', description: 'd', enabled: true }} />)
+  render(
+    <FeatureToggleCard
+      onToggle={onToggle}
+      feature={{
+        id: 'forum',
+        name: 'Forum',
+        description: 'd',
+        enabled: true,
+      }}
+    />,
+  )
   expect(screen.getByTestId('feature-card-forum')).toHaveTextContent('Forum')
   fireEvent.click(screen.getByRole('checkbox'))
   expect(onToggle).toHaveBeenCalledWith('forum')

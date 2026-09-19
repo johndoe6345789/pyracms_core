@@ -34,14 +34,24 @@ describe('ThreadListPage', () => {
     list = { ...list, error: '' }
     rerender(<ThreadListPage />)
     expect(screen.getByText('No threads yet')).toBeInTheDocument()
-    expect(screen.getByTestId('new-thread-button'))
-      .toHaveAttribute('href', '/site/s/forum/thread/create?forumId=2')
+    expect(screen.getByTestId('new-thread-button')).toHaveAttribute(
+      'href',
+      '/site/s/forum/thread/create?forumId=2',
+    )
   })
   it('lists threads', () => {
-    list.threads = [{
-      id: '1', title: 'Hi', author: 'a', replies: 0, views: 0,
-      lastPostDate: '', pinned: false, locked: false,
-    }]
+    list.threads = [
+      {
+        id: '1',
+        title: 'Hi',
+        author: 'a',
+        replies: 0,
+        views: 0,
+        lastPostDate: '',
+        pinned: false,
+        locked: false,
+      },
+    ]
     render(<ThreadListPage />)
     expect(screen.getByTestId('thread-row-1')).toBeInTheDocument()
   })

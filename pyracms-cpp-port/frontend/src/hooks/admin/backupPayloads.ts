@@ -34,8 +34,12 @@ export function buildMenusPayload(groups: MenuGroup[]) {
     exportedAt: new Date().toISOString(),
     data: groups.map((g) => ({
       name: g.name,
-      items: g.items.map(({ name, route, position, permissions }) =>
-        ({ name, route, position, permissions })),
+      items: g.items.map(({ name, route, position, permissions }) => ({
+        name,
+        route,
+        position,
+        permissions,
+      })),
     })),
   }
 }
@@ -48,8 +52,12 @@ export interface ParsedImport {
 /** Parses and validates an import file. */
 export function parseImport(text: string): ParsedImport {
   const parsed = JSON.parse(text)
-  if (!parsed || typeof parsed !== 'object'
-    || !parsed.exportType || !parsed.data) {
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    !parsed.exportType ||
+    !parsed.data
+  ) {
     throw new Error('Invalid format')
   }
   return parsed
@@ -61,7 +69,8 @@ export async function applySettings(
   tenantId: number,
 ): Promise<number> {
   const entries = Object.entries(
-    (data && typeof data === 'object' ? data : {}) as object)
+    (data && typeof data === 'object' ? data : {}) as object,
+  )
   for (const [key, value] of entries) {
     await putSetting(key, String(value), tenantId)
   }

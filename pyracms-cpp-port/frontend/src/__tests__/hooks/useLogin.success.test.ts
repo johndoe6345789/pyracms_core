@@ -32,26 +32,20 @@ describe('useLogin – successful login', () => {
     localStorage.clear()
   })
 
-  it('successful login stores token in localStorage',
-    async () => {
-      okResponse('tok123')
-      const { result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      expect(localStorage.getItem('token')).toBe('tok123')
-    },
-  )
+  it('successful login stores token in localStorage', async () => {
+    okResponse('tok123')
+    const { result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    expect(localStorage.getItem('token')).toBe('tok123')
+  })
 
-  it('successful login dispatches setCredentials to the store',
-    async () => {
-      okResponse('tok123')
-      const { store, result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      const auth = (
-        store.getState() as { auth: { token: string } }
-      ).auth
-      expect(auth.token).toBe('tok123')
-    },
-  )
+  it('successful login dispatches setCredentials to the store', async () => {
+    okResponse('tok123')
+    const { store, result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    const auth = (store.getState() as { auth: { token: string } }).auth
+    expect(auth.token).toBe('tok123')
+  })
 })

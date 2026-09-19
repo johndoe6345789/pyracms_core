@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import api from '@/lib/api'
 import { useActionError } from '../useActionError'
-import {
-  MenuGroup, MenuItemRow, SetGroups, updateGroupItems,
-} from './menuData'
+import { MenuGroup, MenuItemRow, SetGroups, updateGroupItems } from './menuData'
 
 /**
  * Add-item form state and submit handler.
@@ -33,15 +31,22 @@ export function useMenuAddItem(
     setError('')
     api
       .post(`/api/menu-groups/${currentGroup.id}/items`, {
-        name, route, position, permissions,
+        name,
+        route,
+        position,
+        permissions,
       })
       .then((res) => {
         const item: MenuItemRow = {
-          id: res.data.id, name, route, position, permissions,
+          id: res.data.id,
+          name,
+          route,
+          position,
+          permissions,
         }
         setMenuGroups((prev) =>
-          updateGroupItems(prev, selectedGroup, (items) =>
-            [...items, item]))
+          updateGroupItems(prev, selectedGroup, (items) => [...items, item]),
+        )
         setNewName('')
         setNewRoute('')
         setNewPosition('')
@@ -51,8 +56,15 @@ export function useMenuAddItem(
   }
 
   return {
-    newName, setNewName, newRoute, setNewRoute,
-    newPosition, setNewPosition,
-    newPermissions, setNewPermissions, handleAddItem, addError,
+    newName,
+    setNewName,
+    newRoute,
+    setNewRoute,
+    newPosition,
+    setNewPosition,
+    newPermissions,
+    setNewPermissions,
+    handleAddItem,
+    addError,
   }
 }

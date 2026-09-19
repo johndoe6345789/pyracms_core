@@ -6,7 +6,8 @@ import { errMsg } from './threadTypes'
 
 /** Reply box state, quoting and submission for a thread. */
 export function useThreadReply(
-  threadId: string, refresh: () => Promise<unknown>,
+  threadId: string,
+  refresh: () => Promise<unknown>,
 ) {
   const [replyContent, setReplyContent] = useState('')
   const [replyError, setReplyError] = useState('')
@@ -35,7 +36,12 @@ export function useThreadReply(
   }
 
   return {
-    replyContent, setReplyContent, replyError, setReplyError,
-    submitting, handleSubmitReply, handleQuote,
+    replyContent,
+    setReplyContent,
+    replyError,
+    setReplyError,
+    submitting,
+    handleSubmitReply,
+    handleQuote,
   }
 }

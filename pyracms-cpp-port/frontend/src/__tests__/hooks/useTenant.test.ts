@@ -3,7 +3,8 @@ import { useTenant, titleFromSlug } from '@/hooks/useTenant'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 

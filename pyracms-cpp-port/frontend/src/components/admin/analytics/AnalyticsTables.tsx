@@ -15,9 +15,7 @@ export function ReferrersTable() {
       {TOP_REFERRERS.map((row) => (
         <TableRow key={row.source}>
           <TableCell>{row.source}</TableCell>
-          <TableCell align="right">
-            {row.visits.toLocaleString()}
-          </TableCell>
+          <TableCell align="right">{row.visits.toLocaleString()}</TableCell>
           <TableCell align="right">{row.percentage}%</TableCell>
         </TableRow>
       ))}
@@ -29,10 +27,7 @@ export function SearchesTable() {
   return (
     <Panel
       title="Popular Search Queries"
-      heads={[
-        { label: 'Query' },
-        { label: 'Searches', right: true },
-      ]}
+      heads={[{ label: 'Query' }, { label: 'Searches', right: true }]}
     >
       {POPULAR_SEARCHES.map((row) => (
         <TableRow key={row.query}>

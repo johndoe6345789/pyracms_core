@@ -22,7 +22,7 @@ export function useGameDepEditor(
   initialName: string,
   initialDescription: string,
   initialTags: string[],
-  initialRevisions: Revision[]
+  initialRevisions: Revision[],
 ): EditorState {
   const [displayName, setDisplayName] = useState(initialName)
   const [description, setDescription] = useState(initialDescription)

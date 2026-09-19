@@ -36,8 +36,10 @@ describe('SiteNotFound', () => {
 describe('TenantModuleCards', () => {
   it('shows admin card only for admins', () => {
     const { rerender } = render(<TenantModuleCards slug="d" />)
-    expect(screen.getByTestId('module-games'))
-      .toHaveAttribute('href', '/site/d/games')
+    expect(screen.getByTestId('module-games')).toHaveAttribute(
+      'href',
+      '/site/d/games',
+    )
     expect(screen.queryByTestId('module-admin')).toBeNull()
     rerender(<TenantModuleCards slug="d" canAdmin />)
     expect(screen.getByTestId('module-admin')).toBeInTheDocument()
@@ -46,28 +48,50 @@ describe('TenantModuleCards', () => {
 
 describe('tenant shells', () => {
   it('renders drawer with default subtitle', () => {
-    render(<TenantDrawer slug="d" siteName="Demo" canAdmin={false}
-      open onClose={jest.fn()} />)
+    render(
+      <TenantDrawer
+        slug="d"
+        siteName="Demo"
+        canAdmin={false}
+        open
+        onClose={jest.fn()}
+      />,
+    )
     expect(screen.getByText('Site navigation')).toBeInTheDocument()
   })
 
   it('renders drawer with description', () => {
-    render(<TenantDrawer slug="d" siteName="Demo" description="Hello"
-      canAdmin open onClose={jest.fn()} />)
+    render(
+      <TenantDrawer
+        slug="d"
+        siteName="Demo"
+        description="Hello"
+        canAdmin
+        open
+        onClose={jest.fn()}
+      />,
+    )
     expect(screen.getByText('Hello')).toBeInTheDocument()
   })
 
   it('toggles the app bar menu', () => {
     const onMenu = jest.fn()
-    renderWithStore(<TenantAppBar slug="d" siteName="Demo"
-      drawerOpen={false} onMenuClick={onMenu} />)
-    expect(screen.getByTestId('site-name-link'))
-      .toHaveAttribute('href', '/site/d')
+    renderWithStore(
+      <TenantAppBar
+        slug="d"
+        siteName="Demo"
+        drawerOpen={false}
+        onMenuClick={onMenu}
+      />,
+    )
+    expect(screen.getByTestId('site-name-link')).toHaveAttribute(
+      'href',
+      '/site/d',
+    )
   })
 
   it('portal shell opens the drawer and shows super admin', () => {
-    renderWithStore(<PortalShell />,
-      makeUser({ role: UserRole.SuperAdmin }))
+    renderWithStore(<PortalShell />, makeUser({ role: UserRole.SuperAdmin }))
     fireEvent.click(screen.getByTestId('menu-toggle'))
     expect(screen.getByTestId('portal-drawer')).toBeInTheDocument()
     expect(screen.getByText('Platform owner')).toBeInTheDocument()

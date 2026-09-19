@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { makeStore, getStoreInstance } from '@/store/store'
 import StoreProvider from '@/store/StoreProvider'
-import auth, { setCredentials, setUser, logout }
-  from '@/store/slices/authSlice'
+import auth, { setCredentials, setUser, logout } from '@/store/slices/authSlice'
 import ui, {
-  setColorMode, addFlashMessage, removeFlashMessage, toggleSidebar,
+  setColorMode,
+  addFlashMessage,
+  removeFlashMessage,
+  toggleSidebar,
   setNotificationBellOpen,
 } from '@/store/slices/uiSlice'
 import type { User } from '@/types'
@@ -27,15 +29,19 @@ describe('uiSlice', () => {
     let s = ui(undefined, setColorMode('dark'))
     s = ui(s, toggleSidebar())
     s = ui(s, setNotificationBellOpen(true))
-    expect(s).toMatchObject({ colorMode: 'dark', sidebarCollapsed: true,
-      notificationBellOpen: true })
+    expect(s).toMatchObject({
+      colorMode: 'dark',
+      sidebarCollapsed: true,
+      notificationBellOpen: true,
+    })
   })
 
   it('adds and removes flash messages', () => {
     Object.defineProperty(globalThis.crypto, 'randomUUID', {
-      value: () => 'abc-abc-abc-abc-abc', configurable: true })
-    let s = ui(undefined, addFlashMessage(
-      { message: 'hi', severity: 'info' }))
+      value: () => 'abc-abc-abc-abc-abc',
+      configurable: true,
+    })
+    let s = ui(undefined, addFlashMessage({ message: 'hi', severity: 'info' }))
     expect(s.flashMessages[0]).toMatchObject({ id: 'abc-abc-abc-abc-abc' })
     s = ui(s, removeFlashMessage('abc-abc-abc-abc-abc'))
     expect(s.flashMessages).toEqual([])
@@ -49,7 +55,11 @@ describe('store', () => {
   })
 
   it('StoreProvider renders children once rehydrated', async () => {
-    render(<StoreProvider><p>inside</p></StoreProvider>)
+    render(
+      <StoreProvider>
+        <p>inside</p>
+      </StoreProvider>,
+    )
     expect(await screen.findByText('inside')).toBeInTheDocument()
   })
 })

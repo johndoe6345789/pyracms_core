@@ -31,7 +31,7 @@ drogon::HttpResponsePtr blobResponse(const BlobPayload &p,
             resp->addHeader("Content-Disposition",
                             "attachment; filename=\"" + name + "\"");
     }
-    resp->addHeader("Content-Type", servedMime(file.mimetype));
+    resp->setContentTypeString(servedMime(file.mimetype));
     return resp;
 }
 

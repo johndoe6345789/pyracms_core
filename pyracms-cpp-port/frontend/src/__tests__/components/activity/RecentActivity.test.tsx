@@ -6,15 +6,24 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 
 beforeEach(() => jest.resetAllMocks())
 
-const row = (id: number, link: string) => ({ id, type: 'article',
-  actor: 'ann', title: `T${id}`, link, createdAt: '2026-01-01T00:00:00Z' })
+const row = (id: number, link: string) => ({
+  id,
+  type: 'article',
+  actor: 'ann',
+  title: `T${id}`,
+  link,
+  createdAt: '2026-01-01T00:00:00Z',
+})
 
 it('lists activity with links and drops unsafe ones', async () => {
-  m.get.mockResolvedValue({ data: [row(1, '/site/s/articles/a'),
-    row(2, 'javascript:alert(1)')] })
+  m.get.mockResolvedValue({
+    data: [row(1, '/site/s/articles/a'), row(2, 'javascript:alert(1)')],
+  })
   render(<RecentActivity tenantId={4} limit={5} />)
-  expect(await screen.findByRole('link', { name: 'T1' }))
-    .toHaveAttribute('href', '/site/s/articles/a')
+  expect(await screen.findByRole('link', { name: 'T1' })).toHaveAttribute(
+    'href',
+    '/site/s/articles/a',
+  )
   expect(screen.queryByRole('link', { name: 'T2' })).toBeNull()
   expect(screen.getByText('T2')).toBeInTheDocument()
   expect(m.get).toHaveBeenCalledWith('/api/activity?tenant_id=4&limit=5')

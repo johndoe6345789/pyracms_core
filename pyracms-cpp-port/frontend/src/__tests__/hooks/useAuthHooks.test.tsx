@@ -14,7 +14,8 @@ jest.mock('next/navigation', () => ({
   usePathname: () => path,
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 
@@ -30,24 +31,34 @@ describe('safeRedirect', () => {
 describe('useAuthParams', () => {
   it('derives tenant and redirect', () => {
     search = new URLSearchParams('tenant=demo')
-    expect(renderHook(() => useAuthParams()).result.current)
-      .toEqual({ tenant: 'demo', redirectTo: '/site/demo' })
+    expect(renderHook(() => useAuthParams()).result.current).toEqual({
+      tenant: 'demo',
+      redirectTo: '/site/demo',
+    })
     search = new URLSearchParams('tenant=demo&redirect=/x')
-    expect(renderHook(() => useAuthParams()).result.current.redirectTo)
-      .toBe('/x')
+    expect(renderHook(() => useAuthParams()).result.current.redirectTo).toBe(
+      '/x',
+    )
     search = new URLSearchParams('')
-    expect(renderHook(() => useAuthParams('/f')).result.current)
-      .toEqual({ tenant: undefined, redirectTo: '/f' })
+    expect(renderHook(() => useAuthParams('/f')).result.current).toEqual({
+      tenant: undefined,
+      redirectTo: '/f',
+    })
   })
 })
 
 describe('useAuthHydration', () => {
-  beforeEach(() => { localStorage.clear(); get.mockReset(); path = '/' })
+  beforeEach(() => {
+    localStorage.clear()
+    get.mockReset()
+    path = '/'
+  })
 
   const run = () => {
     const { store } = makeStore()
-    const wrapper = ({ children }: { children: React.ReactNode }) =>
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <Provider store={store}>{children}</Provider>
+    )
     renderHook(() => useAuthHydration(), { wrapper })
     return store
   }
@@ -63,7 +74,8 @@ describe('useAuthHydration', () => {
     get.mockResolvedValue({ data: { id: 1, username: 'a' } })
     const store = run()
     await waitFor(() =>
-      expect(store.getState().auth.isAuthenticated).toBe(true))
+      expect(store.getState().auth.isAuthenticated).toBe(true),
+    )
   })
 
   it('clears an invalid token', async () => {

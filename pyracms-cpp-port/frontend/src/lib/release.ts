@@ -1,5 +1,8 @@
 import type {
-  LauncherAsset, LauncherRelease, ReleaseArch, ReleaseOs,
+  LauncherAsset,
+  LauncherRelease,
+  ReleaseArch,
+  ReleaseOs,
 } from './releaseTypes'
 
 export * from './releaseTypes'
@@ -8,12 +11,18 @@ const NAME = /^hypernucleus-(win|mac|lin)-(x86_64|arm64)(\.[\w.]+)?$/i
 const TAG = /^(launcher-)?v\d/i
 
 interface RawAsset {
-  name?: unknown; size?: unknown; digest?: unknown
+  name?: unknown
+  size?: unknown
+  digest?: unknown
   browser_download_url?: unknown
 }
 interface RawRelease {
-  tag_name?: unknown; name?: unknown; html_url?: unknown
-  published_at?: unknown; draft?: unknown; prerelease?: unknown
+  tag_name?: unknown
+  name?: unknown
+  html_url?: unknown
+  published_at?: unknown
+  draft?: unknown
+  prerelease?: unknown
   assets?: unknown
 }
 
@@ -39,9 +48,11 @@ export function pickRelease(list: unknown): LauncherRelease | null {
   if (!Array.isArray(list)) return null
   const rels = (list as RawRelease[])
     .filter((r) => r && !r.draft && TAG.test(str(r.tag_name)))
-    .sort((a, b) =>
-      Number(!!a.prerelease) - Number(!!b.prerelease)
-      || str(b.published_at).localeCompare(str(a.published_at)))
+    .sort(
+      (a, b) =>
+        Number(!!a.prerelease) - Number(!!b.prerelease) ||
+        str(b.published_at).localeCompare(str(a.published_at)),
+    )
   const r = rels[0]
   if (!r) return null
   const raw = Array.isArray(r.assets) ? (r.assets as RawAsset[]) : []
@@ -65,9 +76,14 @@ export function formatSize(bytes: number): string {
 
 /** Best asset for the visitor: exact match, else same OS. */
 export function pickAsset(
-  assets: LauncherAsset[], os: ReleaseOs | null, arch: ReleaseArch,
+  assets: LauncherAsset[],
+  os: ReleaseOs | null,
+  arch: ReleaseArch,
 ): LauncherAsset | null {
   if (!os) return null
-  return assets.find((a) => a.os === os && a.arch === arch)
-    ?? assets.find((a) => a.os === os) ?? null
+  return (
+    assets.find((a) => a.os === os && a.arch === arch) ??
+    assets.find((a) => a.os === os) ??
+    null
+  )
 }

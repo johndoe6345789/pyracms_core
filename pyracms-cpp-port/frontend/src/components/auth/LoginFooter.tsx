@@ -2,13 +2,17 @@ import { Box, Typography } from '@mui/material'
 import Link from 'next/link'
 
 const linkStyle = {
-  color: '#667eea', textDecoration: 'none', fontWeight: 600,
+  color: '#667eea',
+  textDecoration: 'none',
+  fontWeight: 600,
 } as const
 
 /** "Don't have an account?" prompt below the login form. */
-export default function LoginFooter(
-  { tenant }: { tenant?: string | undefined },
-) {
+export default function LoginFooter({
+  tenant,
+}: {
+  tenant?: string | undefined
+}) {
   const href = tenant
     ? `/auth/register?tenant=${encodeURIComponent(tenant)}`
     : '/auth/register'

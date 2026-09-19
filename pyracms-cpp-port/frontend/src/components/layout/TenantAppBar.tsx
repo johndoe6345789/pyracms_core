@@ -12,7 +12,10 @@ interface TenantAppBarProps {
 
 /** Top bar for a site: the shared bar with that site's module links. */
 export default function TenantAppBar({
-  slug, siteName, drawerOpen, onMenuClick,
+  slug,
+  siteName,
+  drawerOpen,
+  onMenuClick,
 }: TenantAppBarProps) {
   return (
     <AppTopBar

@@ -2,16 +2,13 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import SuperAdminSettingsPage
-  from '@/app/super-admin/settings/page'
+import SuperAdminSettingsPage from '@/app/super-admin/settings/page'
 
 describe('/super-admin/settings page', () => {
   beforeEach(() => render(<SuperAdminSettingsPage />))
 
   it('renders the page wrapper', () => {
-    expect(
-      screen.getByTestId('super-admin-settings-page'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('super-admin-settings-page')).toBeInTheDocument()
   })
 
   it('renders the "Platform Settings" h1 heading', () => {
@@ -36,8 +33,7 @@ describe('/super-admin/settings page', () => {
   it('settings icon is aria-hidden', () => {
     // The TuneOutlined svg should carry aria-hidden="true"
     // so it does not pollute the accessible name tree.
-    const icons = document
-      .querySelectorAll('[aria-hidden="true"]')
+    const icons = document.querySelectorAll('[aria-hidden="true"]')
     expect(icons.length).toBeGreaterThan(0)
   })
 })

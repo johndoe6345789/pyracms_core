@@ -16,14 +16,16 @@ export default function DownloadContent() {
         Get Hypernucleus
       </Typography>
       <Typography sx={{ mb: 3 }} color="text.secondary">
-        Hypernucleus is the Qt 6 desktop launcher that installs and starts
-        games from PyraCMS sites. Builds come from GitHub Releases.
+        Hypernucleus is the Qt 6 desktop launcher that installs and starts games
+        from PyraCMS sites. Builds come from GitHub Releases.
       </Typography>
       <Box sx={{ mb: 4 }}>
         <DownloadHero state={state} platform={platform} />
       </Box>
       {state.status === 'ready' && state.release.assets.length > 0 && (
-        <Box sx={{ mb: 4 }}><PlatformTable release={state.release} /></Box>
+        <Box sx={{ mb: 4 }}>
+          <PlatformTable release={state.release} />
+        </Box>
       )}
       <InstallNotes />
     </Container>

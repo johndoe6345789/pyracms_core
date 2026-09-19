@@ -1,8 +1,13 @@
 'use client'
 
 import {
-  Paper, List, ListItemButton, ListItemText, ListItemIcon,
-  Typography, Badge,
+  Paper,
+  List,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  Typography,
+  Badge,
 } from '@mui/material'
 import { SelectAllOutlined } from '@mui/icons-material'
 import { TYPE_CONFIG } from './facetConfig'
@@ -15,7 +20,10 @@ interface FacetSidebarProps {
 }
 
 export default function FacetSidebar({
-  facets, activeType, onTypeChange, totalCount,
+  facets,
+  activeType,
+  onTypeChange,
+  totalCount,
 }: FacetSidebarProps) {
   return (
     <Paper variant="outlined" sx={{ p: 1 }}>
@@ -43,9 +51,7 @@ export default function FacetSidebar({
               onClick={() => onTypeChange(type)}
               disabled={count === 0}
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                {config.icon}
-              </ListItemIcon>
+              <ListItemIcon sx={{ minWidth: 36 }}>{config.icon}</ListItemIcon>
               <ListItemText primary={config.label} />
               <Badge badgeContent={count} color="default" max={999} />
             </ListItemButton>

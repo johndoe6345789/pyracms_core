@@ -8,7 +8,14 @@ export class FakeWs {
   onclose: (() => void) | null = () => {}
   onerror: () => void = () => {}
   onmessage: (e: { data: string }) => void = () => {}
-  constructor(public url: string) { FakeWs.all.push(this) }
-  send(d: string) { this.sent.push(d) }
-  close() { this.closed = true; this.onclose?.() }
+  constructor(public url: string) {
+    FakeWs.all.push(this)
+  }
+  send(d: string) {
+    this.sent.push(d)
+  }
+  close() {
+    this.closed = true
+    this.onclose?.()
+  }
 }

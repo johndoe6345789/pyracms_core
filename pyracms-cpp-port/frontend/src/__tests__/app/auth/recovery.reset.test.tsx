@@ -28,8 +28,10 @@ describe('ResetPasswordForm', () => {
     type('reset-confirm', 'longenough1')
     submit()
     expect(await screen.findByTestId('reset-done')).toBeInTheDocument()
-    expect(m.post).toHaveBeenCalledWith('/api/auth/reset-password',
-      { token: 'tok', password: 'longenough1' })
+    expect(m.post).toHaveBeenCalledWith('/api/auth/reset-password', {
+      token: 'tok',
+      password: 'longenough1',
+    })
   })
   it('needs a token and reports invalid ones', async () => {
     const { unmount } = render(<ResetPasswordForm token="" />)
@@ -43,8 +45,9 @@ describe('ResetPasswordForm', () => {
     type('reset-password', 'longenough1')
     type('reset-confirm', 'longenough1')
     submit()
-    expect(await screen.findByTestId('reset-error'))
-      .toHaveTextContent('Invalid or expired')
+    expect(await screen.findByTestId('reset-error')).toHaveTextContent(
+      'Invalid or expired',
+    )
   })
 })
 
@@ -54,14 +57,16 @@ describe('VerifyEmailStatus', () => {
     render(<VerifyEmailStatus token="t" />)
     expect(screen.getByTestId('verify-pending')).toBeInTheDocument()
     expect(await screen.findByTestId('verify-ok')).toBeInTheDocument()
-    expect(m.post).toHaveBeenCalledWith(
-      '/api/auth/verify-email', { token: 't' })
+    expect(m.post).toHaveBeenCalledWith('/api/auth/verify-email', {
+      token: 't',
+    })
   })
   it('reports failure and a missing token', async () => {
     m.post.mockRejectedValue({ response: { data: { error: 'Expired' } } })
     const { unmount } = render(<VerifyEmailStatus token="t" />)
-    await waitFor(() => expect(screen.getByTestId('verify-error'))
-      .toHaveTextContent('Expired'))
+    await waitFor(() =>
+      expect(screen.getByTestId('verify-error')).toHaveTextContent('Expired'),
+    )
     unmount()
     render(<VerifyEmailStatus token="" />)
     expect(screen.getByTestId('verify-error')).toHaveTextContent('missing')

@@ -18,7 +18,9 @@ describe('ResetPasswordForm tenant', () => {
     type('reset-password', 'longenough1')
     type('reset-confirm', 'longenough1')
     fireEvent.submit(screen.getByTestId('reset-form'))
-    expect(await screen.findByTestId('reset-login-link'))
-      .toHaveAttribute('href', '/auth/login?tenant=acme')
+    expect(await screen.findByTestId('reset-login-link')).toHaveAttribute(
+      'href',
+      '/auth/login?tenant=acme',
+    )
   })
 })

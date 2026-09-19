@@ -2,11 +2,7 @@ import { Typography, Box, Button } from '@mui/material'
 import { AddOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 
-export default function ArticleListHeader({
-  slug,
-}: {
-  slug: string
-}) {
+export default function ArticleListHeader({ slug }: { slug: string }) {
   return (
     <section aria-label="Article list header">
       <Box
@@ -24,8 +20,7 @@ export default function ArticleListHeader({
             Articles
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Browse articles, tutorials, and blog posts published
-            on this site.
+            Browse articles, tutorials, and blog posts published on this site.
           </Typography>
         </Box>
         <Button

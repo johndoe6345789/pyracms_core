@@ -7,32 +7,24 @@ describe('SuperAdminQuickCard', () => {
   describe('card root', () => {
     it('applies the testId prop as data-testid', () => {
       renderCard()
-      expect(
-        screen.getByTestId('quick-tenants'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-tenants')).toBeInTheDocument()
     })
 
     it('uses a different testId when provided', () => {
       renderCard({ testId: 'quick-users' })
-      expect(
-        screen.getByTestId('quick-users'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-users')).toBeInTheDocument()
     })
   })
 
   describe('label', () => {
     it('renders the label text', () => {
       renderCard()
-      expect(
-        screen.getByText('Manage Tenants'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('Manage Tenants')).toBeInTheDocument()
     })
 
     it('renders a different label when provided', () => {
       renderCard({ label: 'Global Users' })
-      expect(
-        screen.getByText('Global Users'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('Global Users')).toBeInTheDocument()
     })
   })
 
@@ -54,9 +46,7 @@ describe('SuperAdminQuickCard', () => {
   describe('icon container', () => {
     it('icon wrapper has aria-hidden="true"', () => {
       const { container } = renderCard()
-      const iconWrapper = container.querySelector(
-        '[aria-hidden="true"]',
-      )
+      const iconWrapper = container.querySelector('[aria-hidden="true"]')
       expect(iconWrapper).toBeInTheDocument()
     })
   })

@@ -11,20 +11,30 @@ import { useGameDepEditor } from '@/hooks/useGameDepEditor'
 import { useSaveGameDep } from '@/hooks/useSaveGameDep'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
 
-interface Props { slug: string; name: string; detail: GameDepDetailData }
+interface Props {
+  slug: string
+  name: string
+  detail: GameDepDetailData
+}
 
 /** Edit form pre-filled from the loaded dependency. */
 export default function DepEditor({ slug, name, detail }: Props) {
   const { saving, error, save } = useSaveGameDep('dep', slug, name)
   const editor = useGameDepEditor(
-    detail.displayName, detail.description, detail.tags, detail.revisions,
+    detail.displayName,
+    detail.description,
+    detail.tags,
+    detail.revisions,
   )
   const detailHref = `/site/${slug}/dependencies/${name}`
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
-      <EditCrumbs slug={slug} detailHref={detailHref}
-        displayName={editor.displayName} />
+      <EditCrumbs
+        slug={slug}
+        detailHref={detailHref}
+        displayName={editor.displayName}
+      />
       <Typography variant="h3" component="h1" gutterBottom>
         Edit Dependency
       </Typography>
@@ -54,12 +64,17 @@ export default function DepEditor({ slug, name, detail }: Props) {
           {error}
         </Alert>
       )}
-      <EditActions cancelHref={detailHref} saving={saving}
-        onSave={() => save({
-          displayName: editor.displayName,
-          description: editor.description,
-          tags: editor.tags,
-        })} />
+      <EditActions
+        cancelHref={detailHref}
+        saving={saving}
+        onSave={() =>
+          save({
+            displayName: editor.displayName,
+            description: editor.description,
+            tags: editor.tags,
+          })
+        }
+      />
     </Container>
   )
 }

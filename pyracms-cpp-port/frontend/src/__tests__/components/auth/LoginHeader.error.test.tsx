@@ -6,9 +6,7 @@ describe('LoginHeader', () => {
   describe('error alert - absent when error is empty string', () => {
     it('does not render the error alert', () => {
       render(<LoginHeader error="" />)
-      expect(
-        screen.queryByTestId('login-error'),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('login-error')).not.toBeInTheDocument()
     })
 
     it('does not render the error banner element', () => {
@@ -16,9 +14,7 @@ describe('LoginHeader', () => {
       // Only the error Alert carries data-testid="login-error".
       // MUI Alert renders role="alert" on ALL severity levels,
       // so we target by testid rather than role.
-      expect(
-        screen.queryByTestId('login-error'),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('login-error')).not.toBeInTheDocument()
     })
   })
 
@@ -27,9 +23,7 @@ describe('LoginHeader', () => {
 
     it('renders the error alert with the correct message', () => {
       render(<LoginHeader error={ERROR_MSG} />)
-      expect(
-        screen.getByTestId('login-error'),
-      ).toHaveTextContent(ERROR_MSG)
+      expect(screen.getByTestId('login-error')).toHaveTextContent(ERROR_MSG)
     })
 
     it('has role="alert"', () => {
@@ -48,17 +42,13 @@ describe('LoginHeader', () => {
 
     it('has data-testid="login-error"', () => {
       render(<LoginHeader error={ERROR_MSG} />)
-      expect(
-        screen.getByTestId('login-error'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('login-error')).toBeInTheDocument()
     })
 
     it('different messages are displayed verbatim', () => {
       const msg = 'Account locked \u2013 too many attempts'
       render(<LoginHeader error={msg} />)
-      expect(
-        screen.getByTestId('login-error'),
-      ).toHaveTextContent(msg)
+      expect(screen.getByTestId('login-error')).toHaveTextContent(msg)
     })
   })
 })

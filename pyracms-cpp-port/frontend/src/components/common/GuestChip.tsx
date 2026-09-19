@@ -12,8 +12,8 @@ interface Props {
 /** "Sign in" chip shown when there is no session for this scope. */
 export default function GuestChip({ slug, pathname, otherSite }: Props) {
   const href = slug
-    ? `/auth/login?tenant=${encodeURIComponent(slug)}`
-      + `&redirect=${encodeURIComponent(pathname || `/site/${slug}`)}`
+    ? `/auth/login?tenant=${encodeURIComponent(slug)}` +
+      `&redirect=${encodeURIComponent(pathname || `/site/${slug}`)}`
     : '/auth/login'
   return (
     <Chip

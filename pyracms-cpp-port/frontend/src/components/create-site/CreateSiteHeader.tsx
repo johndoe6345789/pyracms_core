@@ -27,15 +27,8 @@ export default function CreateSiteHeader() {
       >
         Back to Portal
       </Button>
-      <WebOutlined
-        sx={{ fontSize: 48, mb: 1 }}
-        aria-hidden="true"
-      />
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{ fontWeight: 700 }}
-      >
+      <WebOutlined sx={{ fontSize: 48, mb: 1 }} aria-hidden="true" />
+      <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
         New Site
       </Typography>
     </Box>

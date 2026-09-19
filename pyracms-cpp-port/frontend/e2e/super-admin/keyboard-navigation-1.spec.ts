@@ -9,13 +9,10 @@ test.describe('Keyboard navigation', () => {
   })
 
   test(
-    'all sidebar nav items are reachable and activatable '
-    + 'via keyboard',
+    'all sidebar nav items are reachable and activatable ' + 'via keyboard',
     async ({ page }) => {
       // Focus the sidebar nav list region
-      const navList = page.getByTestId(
-        'super-admin-nav-list',
-      )
+      const navList = page.getByTestId('super-admin-nav-list')
       await navList.focus()
 
       const navTestIds = [
@@ -34,43 +31,24 @@ test.describe('Keyboard navigation', () => {
     },
   )
 
-  test(
-    'Enter key on Tenants nav activates the link',
-    async ({ page }) => {
-      const tenantsNav = page.getByTestId(
-        'super-admin-nav-tenants',
-      )
-      await tenantsNav.focus()
-      await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(
-        /\/super-admin\/tenants/,
-      )
-    },
-  )
+  test('Enter key on Tenants nav activates the link', async ({ page }) => {
+    const tenantsNav = page.getByTestId('super-admin-nav-tenants')
+    await tenantsNav.focus()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/super-admin\/tenants/)
+  })
 
-  test(
-    'Enter key on Users nav activates the link',
-    async ({ page }) => {
-      const usersNav = page.getByTestId(
-        'super-admin-nav-users',
-      )
-      await usersNav.focus()
-      await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(/\/super-admin\/users/)
-    },
-  )
+  test('Enter key on Users nav activates the link', async ({ page }) => {
+    const usersNav = page.getByTestId('super-admin-nav-users')
+    await usersNav.focus()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/super-admin\/users/)
+  })
 
-  test(
-    'Enter key on Settings nav activates the link',
-    async ({ page }) => {
-      const settingsNav = page.getByTestId(
-        'super-admin-nav-settings',
-      )
-      await settingsNav.focus()
-      await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(
-        /\/super-admin\/settings/,
-      )
-    },
-  )
+  test('Enter key on Settings nav activates the link', async ({ page }) => {
+    const settingsNav = page.getByTestId('super-admin-nav-settings')
+    await settingsNav.focus()
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/\/super-admin\/settings/)
+  })
 })

@@ -1,6 +1,4 @@
-import {
-  Typography, Box, Button, Card, CardContent,
-} from '@mui/material'
+import { Typography, Box, Button, Card, CardContent } from '@mui/material'
 import type { ThemeConfig } from './themeConfig'
 
 interface Props {
@@ -8,13 +6,13 @@ interface Props {
   card: Record<string, unknown>
 }
 
-export default function ThemePreviewSecondary({
-  theme, card,
-}: Props) {
+export default function ThemePreviewSecondary({ theme, card }: Props) {
   const r = `${theme.borderRadius}px`
   const f = theme.fontFamily
   const outline = (color: string) => ({
-    borderColor: color, color, borderRadius: r,
+    borderColor: color,
+    color,
+    borderRadius: r,
   })
   return (
     <Card sx={card}>

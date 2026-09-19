@@ -15,13 +15,18 @@ import { ErrorAlert } from '../ErrorAlert'
 import { useCommentActions } from './useCommentActions'
 
 interface Props {
-  comment: Comment; contentType: string
-  contentId: number; depth: number
+  comment: Comment
+  contentType: string
+  contentId: number
+  depth: number
   onRefresh: () => void
 }
 export default function CommentItem({
-  comment: c, contentType, contentId,
-  depth, onRefresh,
+  comment: c,
+  contentType,
+  contentId,
+  depth,
+  onRefresh,
 }: Props) {
   const [replying, setReplying] = useState(false)
   const [exp, setExp] = useState(true)
@@ -31,49 +36,68 @@ export default function CommentItem({
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
-        <Avatar
-          sx={{ width: 32, height: 32, fontSize: 14 }}>
-          {c.username[0]?.toUpperCase()}</Avatar>
+        <Avatar sx={{ width: 32, height: 32, fontSize: 14 }}>
+          {c.username[0]?.toUpperCase()}
+        </Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentHeader comment={c} />
           <ErrorAlert error={a.error} testId="comment-action-error" />
-          {a.editing
-            ? <EditForm editText={a.editTxt}
-                setEditText={a.setEditTxt}
-                onSave={a.saveEdit}
-                submitting={a.saving}
-                onCancel={a.cancelEdit} />
-            : <Typography variant="body2"
-                sx={{ mb: 0.5,
-                  whiteSpace: 'pre-wrap' }}>
-                {c.body}</Typography>}
-          <CommentActions comment={c}
+          {a.editing ? (
+            <EditForm
+              editText={a.editTxt}
+              setEditText={a.setEditTxt}
+              onSave={a.saveEdit}
+              submitting={a.saving}
+              onCancel={a.cancelEdit}
+            />
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{ mb: 0.5, whiteSpace: 'pre-wrap' }}
+            >
+              {c.body}
+            </Typography>
+          )}
+          <CommentActions
+            comment={c}
             isAuthenticated={isAuth}
             isOwner={usr?.id === c.userId}
             depth={depth}
             onVote={(v) => a.vote(v, isAuth)}
             onReply={() => setReplying(!replying)}
             onEdit={() => a.setEditing(true)}
-            onDelete={() => a.setDelOpen(true)} />
-          {replying && <CommentForm
-            contentType={contentType}
-            contentId={contentId}
-            parentId={c.id}
-            placeholder="Write a reply..."
-            submitLabel="Reply"
-            onSubmitted={() => { setReplying(false); onRefresh() }}
-            onCancel={() => setReplying(false)} />}
-          <CommentChildren items={c.children}
+            onDelete={() => a.setDelOpen(true)}
+          />
+          {replying && (
+            <CommentForm
+              contentType={contentType}
+              contentId={contentId}
+              parentId={c.id}
+              placeholder="Write a reply..."
+              submitLabel="Reply"
+              onSubmitted={() => {
+                setReplying(false)
+                onRefresh()
+              }}
+              onCancel={() => setReplying(false)}
+            />
+          )}
+          <CommentChildren
+            items={c.children}
             expanded={exp}
             onToggle={() => setExp(!exp)}
             contentType={contentType}
             contentId={contentId}
             depth={depth}
-            onRefresh={onRefresh} />
+            onRefresh={onRefresh}
+          />
         </Box>
       </Box>
-      <DeleteCommentDialog open={a.delOpen}
+      <DeleteCommentDialog
+        open={a.delOpen}
         onClose={() => a.setDelOpen(false)}
-        onConfirm={a.del} />
-    </Box>)
+        onConfirm={a.del}
+      />
+    </Box>
+  )
 }

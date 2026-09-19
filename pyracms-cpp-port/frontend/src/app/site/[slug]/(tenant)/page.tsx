@@ -21,7 +21,9 @@ export default function SiteHomePage() {
     <Container maxWidth="lg" sx={{ py: 6 }}>
       <Box sx={{ mb: 6 }}>
         <Typography
-          variant="h2" component="h1" gutterBottom
+          variant="h2"
+          component="h1"
+          gutterBottom
           sx={{ color: 'text.primary' }}
         >
           {siteName}

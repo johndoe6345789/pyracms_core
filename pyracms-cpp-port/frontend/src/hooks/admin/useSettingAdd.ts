@@ -28,8 +28,7 @@ export function useSettingAdd(
     setError('')
     putSetting(key, value, tenantId)
       .then((res) => {
-        const fallback =
-          Math.max(...settings.map((s) => s.id), 0) + 1
+        const fallback = Math.max(...settings.map((s) => s.id), 0) + 1
         const id = res.data?.id || fallback
         setSettings((prev) => [...prev, { id, key, value }])
         setNewKey('')
@@ -38,6 +37,5 @@ export function useSettingAdd(
       .catch(fail('Could not add setting'))
   }
 
-  return { newKey, setNewKey, newValue, setNewValue, handleAdd,
-    addError }
+  return { newKey, setNewKey, newValue, setNewValue, handleAdd, addError }
 }

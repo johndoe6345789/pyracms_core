@@ -19,7 +19,11 @@ export default function ViewThreadPage() {
   const { thread } = t
 
   if (tenantLoading || t.loading) {
-    return <Container sx={{ py: 6 }}><ForumLoading /></Container>
+    return (
+      <Container sx={{ py: 6 }}>
+        <ForumLoading />
+      </Container>
+    )
   }
   if (t.error || !tenantId) {
     return (

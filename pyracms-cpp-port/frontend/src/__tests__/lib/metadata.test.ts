@@ -18,15 +18,21 @@ const ok = (body: unknown) => ({ ok: true, json: async () => body })
 
 describe('generateArticleMetadata', () => {
   it('maps open graph fields for the slug tenant', async () => {
-    fetchMock.mockResolvedValue(ok({
-      'og:title': 'T', 'og:description': 'D', 'og:url': 'http://u',
-      'article:published_time': 'P', 'article:author': 'A',
-    }))
+    fetchMock.mockResolvedValue(
+      ok({
+        'og:title': 'T',
+        'og:description': 'D',
+        'og:url': 'http://u',
+        'article:published_time': 'P',
+        'article:author': 'A',
+      }),
+    )
     const m = await generateArticleMetadata('s', 'n')
     expect(tenantIdOf).toHaveBeenCalledWith('s')
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'http://api/api/articles/n/opengraph?tenant_id=2'
-      + '&base_url=https%3A%2F%2Fsite.test%2Fsite%2Fs')
+      'http://api/api/articles/n/opengraph?tenant_id=2' +
+        '&base_url=https%3A%2F%2Fsite.test%2Fsite%2Fs',
+    )
     expect(m.title).toBe('T')
     expect(m.openGraph).toMatchObject({ url: 'http://u', authors: ['A'] })
   })

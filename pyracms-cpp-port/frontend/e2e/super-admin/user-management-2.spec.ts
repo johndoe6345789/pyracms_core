@@ -11,67 +11,48 @@ test.describe('User management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'role select contains all five role options',
-    async ({ page }) => {
-      await waitForUsersLoaded(page)
+  test('role select contains all five role options', async ({ page }) => {
+    await waitForUsersLoaded(page)
 
-      const roleSelects = page.locator(
-        '[data-testid^="role-select-"]',
-      )
-      if ((await roleSelects.count()) === 0) {
-        test.skip()
-        return
-      }
+    const roleSelects = page.locator('[data-testid^="role-select-"]')
+    if ((await roleSelects.count()) === 0) {
+      test.skip()
+      return
+    }
 
-      // Open the first select
-      await roleSelects.first().click()
+    // Open the first select
+    await roleSelects.first().click()
 
-      const options = page.getByRole('option')
-      await expect(
-        options.filter({ hasText: 'Guest' }),
-      ).toBeVisible()
-      await expect(
-        options.filter({ hasText: 'User' }),
-      ).toBeVisible()
-      await expect(
-        options.filter({ hasText: 'Moderator' }),
-      ).toBeVisible()
-      await expect(
-        options.filter({ hasText: 'Site Admin' }),
-      ).toBeVisible()
-      await expect(
-        options.filter({ hasText: 'Super Admin' }),
-      ).toBeVisible()
+    const options = page.getByRole('option')
+    await expect(options.filter({ hasText: 'Guest' })).toBeVisible()
+    await expect(options.filter({ hasText: 'User' })).toBeVisible()
+    await expect(options.filter({ hasText: 'Moderator' })).toBeVisible()
+    await expect(options.filter({ hasText: 'Site Admin' })).toBeVisible()
+    await expect(options.filter({ hasText: 'Super Admin' })).toBeVisible()
 
-      // Close the menu without making a change
-      await page.keyboard.press('Escape')
-    },
-  )
+    // Close the menu without making a change
+    await page.keyboard.press('Escape')
+  })
 
   // Ban / Unban toggle
 
-  test(
-    'banned user row shows "Banned" status chip',
-    async ({ page }) => {
-      await page.route('**/api/users', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_USERS),
-        }),
-      )
+  test('banned user row shows "Banned" status chip', async ({ page }) => {
+    await page.route('**/api/users', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_USERS),
+      }),
+    )
 
-      await page.goto('/super-admin/users')
-      await page
-        .getByTestId('super-admin-users-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForUsersLoaded(page)
+    await page.goto('/super-admin/users')
+    await page
+      .getByTestId('super-admin-users-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForUsersLoaded(page)
 
-      const bannedRow =
-        page.getByTestId('user-row-banned1')
-      await expect(bannedRow).toBeVisible()
-      await expect(bannedRow).toContainText('Banned')
-    },
-  )
+    const bannedRow = page.getByTestId('user-row-banned1')
+    await expect(bannedRow).toBeVisible()
+    await expect(bannedRow).toContainText('Banned')
+  })
 })

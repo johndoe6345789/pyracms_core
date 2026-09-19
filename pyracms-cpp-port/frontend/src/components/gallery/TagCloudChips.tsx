@@ -3,9 +3,11 @@ import { Box, Chip } from '@mui/material'
 import { LocalOfferOutlined } from '@mui/icons-material'
 import type { TagCloudViewItem } from '@/hooks/useTagCloudPage'
 
-export default function TagCloudChips(
-  { items }: { items: TagCloudViewItem[] },
-) {
+export default function TagCloudChips({
+  items,
+}: {
+  items: TagCloudViewItem[]
+}) {
   return (
     <Box
       sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}

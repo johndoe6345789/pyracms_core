@@ -17,7 +17,9 @@ const submitSx = {
 } as const
 
 const linkStyle = {
-  color: '#667eea', textDecoration: 'none', fontSize: '0.875rem',
+  color: '#667eea',
+  textDecoration: 'none',
+  fontSize: '0.875rem',
 } as const
 
 /** Forgot-password link, submit button and Turbologin button. */
@@ -26,9 +28,11 @@ export default function LoginActions({ loading, onTurbo, tenant }: Props) {
     <>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
         <Link
-          href={tenant
-            ? `/auth/forgot-password?tenant=${encodeURIComponent(tenant)}`
-            : '/auth/forgot-password'}
+          href={
+            tenant
+              ? `/auth/forgot-password?tenant=${encodeURIComponent(tenant)}`
+              : '/auth/forgot-password'
+          }
           data-testid="forgot-password-link"
           aria-label="Forgot your password?"
           style={linkStyle}
@@ -37,8 +41,11 @@ export default function LoginActions({ loading, onTurbo, tenant }: Props) {
         </Link>
       </Box>
       <Button
-        fullWidth variant="contained" type="submit"
-        disabled={loading} size="large"
+        fullWidth
+        variant="contained"
+        type="submit"
+        disabled={loading}
+        size="large"
         data-testid="login-submit"
         aria-label={loading ? 'Signing in' : 'Sign in'}
         sx={submitSx}
@@ -46,8 +53,11 @@ export default function LoginActions({ loading, onTurbo, tenant }: Props) {
         {loading ? 'Signing in...' : 'Sign In'}
       </Button>
       <Button
-        fullWidth variant="outlined" type="button"
-        disabled={loading} size="large"
+        fullWidth
+        variant="outlined"
+        type="button"
+        disabled={loading}
+        size="large"
         data-testid="turbo-login-button"
         onClick={onTurbo}
         sx={{ mb: 2 }}

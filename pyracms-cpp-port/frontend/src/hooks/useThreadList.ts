@@ -42,30 +42,35 @@ export function useThreadList(forumId: string, tenantId: number | null) {
     if (!forumId || !tenantId) return
     setLoading(true)
     setError('')
-    api.get(`/api/forum/forums/${forumId}?tenant_id=${tenantId}`)
-      .then(res => {
+    api
+      .get(`/api/forum/forums/${forumId}?tenant_id=${tenantId}`)
+      .then((res) => {
         const data = res.data
         setForum({
           name: data.name || '',
           description: data.description || '',
         })
         const raw: RawThread[] = data.threads || []
-        setThreads(raw.map(t => ({
-          id: String(t.id),
-          title: t.name || '(untitled)',
-          author: t.authorUsername || 'Unknown',
-          replies: Math.max(0, (t.totalPosts || 0) - 1),
-          views: t.viewCount || 0,
-          lastPostDate: formatForumDate(t.lastPostAt || t.createdAt),
-          pinned: Boolean(t.pinned),
-          locked: Boolean(t.locked),
-        })))
+        setThreads(
+          raw.map((t) => ({
+            id: String(t.id),
+            title: t.name || '(untitled)',
+            author: t.authorUsername || 'Unknown',
+            replies: Math.max(0, (t.totalPosts || 0) - 1),
+            views: t.viewCount || 0,
+            lastPostDate: formatForumDate(t.lastPostAt || t.createdAt),
+            pinned: Boolean(t.pinned),
+            locked: Boolean(t.locked),
+          })),
+        )
       })
-      .catch(err => setError(
-        err?.response?.status === 404
-          ? 'This forum does not exist.'
-          : 'Could not load threads. Please try again.',
-      ))
+      .catch((err) =>
+        setError(
+          err?.response?.status === 404
+            ? 'This forum does not exist.'
+            : 'Could not load threads. Please try again.',
+        ),
+      )
       .finally(() => setLoading(false))
   }, [forumId, tenantId])
 

@@ -23,11 +23,7 @@ export function EditorPreviewPane({
       }}
       elevation={0}
     >
-      <Typography
-        variant="subtitle2"
-        color="text.secondary"
-        gutterBottom
-      >
+      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
         {label}
       </Typography>
       <Divider sx={{ mb: 2 }} />

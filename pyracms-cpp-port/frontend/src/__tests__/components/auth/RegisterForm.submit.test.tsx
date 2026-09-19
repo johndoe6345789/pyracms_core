@@ -16,17 +16,15 @@ beforeEach(resetRegisterMocks)
 describe('RegisterForm – submit button', () => {
   it('shows "Register" text when not loading', () => {
     renderForm()
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toHaveTextContent('Register')
+    expect(screen.getByTestId('register-submit')).toHaveTextContent('Register')
   })
 
   it('shows "Registering..." text when loading', () => {
     mockState({ loading: true })
     renderForm()
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toHaveTextContent('Registering...')
+    expect(screen.getByTestId('register-submit')).toHaveTextContent(
+      'Registering...',
+    )
   })
 
   it('is enabled when not loading', () => {
@@ -42,16 +40,18 @@ describe('RegisterForm – submit button', () => {
 
   it('has aria-label "Register" when not loading', () => {
     renderForm()
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toHaveAttribute('aria-label', 'Register')
+    expect(screen.getByTestId('register-submit')).toHaveAttribute(
+      'aria-label',
+      'Register',
+    )
   })
 
   it('has aria-label "Registering" when loading', () => {
     mockState({ loading: true })
     renderForm()
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toHaveAttribute('aria-label', 'Registering')
+    expect(screen.getByTestId('register-submit')).toHaveAttribute(
+      'aria-label',
+      'Registering',
+    )
   })
 })

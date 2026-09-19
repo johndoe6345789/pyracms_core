@@ -22,11 +22,15 @@ export function ForumError({ message }: { message: string }) {
   )
 }
 
-export function ForumEmpty(
-  { title, hint, children }: {
-    title: string; hint?: string; children?: React.ReactNode
-  },
-) {
+export function ForumEmpty({
+  title,
+  hint,
+  children,
+}: {
+  title: string
+  hint?: string
+  children?: React.ReactNode
+}) {
   return (
     <Box
       sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}

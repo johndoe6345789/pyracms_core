@@ -40,9 +40,7 @@ describe('useRegister', () => {
     const { result } = renderRegister()
     fill(result, { password: 'abc', confirmPassword: 'abc' })
     await submit(result)
-    expect(result.current.error).toBe(
-      'Password must be at least 8 characters',
-    )
+    expect(result.current.error).toBe('Password must be at least 8 characters')
     expect(mockApi.post).not.toHaveBeenCalled()
   })
 

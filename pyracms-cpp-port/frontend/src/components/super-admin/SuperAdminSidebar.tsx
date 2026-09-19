@@ -11,17 +11,8 @@ interface Props {
   onClose: () => void
 }
 
-export default function SuperAdminSidebar({
-  isMobile,
-  open,
-  onClose,
-}: Props) {
-  const nav = (
-    <SuperAdminNav
-      width={DRAWER_WIDTH}
-      onNavClick={onClose}
-    />
-  )
+export default function SuperAdminSidebar({ isMobile, open, onClose }: Props) {
+  const nav = <SuperAdminNav width={DRAWER_WIDTH} onNavClick={onClose} />
 
   if (isMobile) {
     return (
@@ -37,10 +28,7 @@ export default function SuperAdminSidebar({
   }
 
   return (
-    <Box
-      component="aside"
-      data-testid="super-admin-sidebar"
-    >
+    <Box component="aside" data-testid="super-admin-sidebar">
       <Drawer
         variant="permanent"
         sx={{

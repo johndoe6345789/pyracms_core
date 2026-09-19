@@ -46,7 +46,7 @@ export function buildRevisionSummary(
 export function matchRenderer(name: string) {
   const lower = name.toLowerCase()
   return (
-    RENDERERS.find((r) => r.toLowerCase() === lower)
-    ?? lower.charAt(0).toUpperCase() + lower.slice(1)
+    RENDERERS.find((r) => r.toLowerCase() === lower) ??
+    lower.charAt(0).toUpperCase() + lower.slice(1)
   )
 }

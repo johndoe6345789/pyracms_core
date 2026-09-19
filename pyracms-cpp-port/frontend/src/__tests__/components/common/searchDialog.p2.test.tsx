@@ -5,8 +5,13 @@ const push = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
 }))
-let hook = { open: true, setOpen: jest.fn(), q: 'hello',
-  setQ: jest.fn(), res: [] as unknown[] }
+let hook = {
+  open: true,
+  setOpen: jest.fn(),
+  q: 'hello',
+  setQ: jest.fn(),
+  res: [] as unknown[],
+}
 jest.mock('@/components/common/search/useGlobalSearch', () => ({
   useGlobalSearch: () => hook,
 }))
@@ -21,8 +26,10 @@ describe('GlobalSearch', () => {
     render(<GlobalSearch />)
     fireEvent.click(screen.getByTestId('global-search-trigger'))
     expect(hook.setOpen).toHaveBeenCalledWith(true)
-    fireEvent.keyDown(screen.getByTestId('search-dialog-input')
-      .querySelector('input')!, { key: 'Enter' })
+    fireEvent.keyDown(
+      screen.getByTestId('search-dialog-input').querySelector('input')!,
+      { key: 'Enter' },
+    )
     expect(push).toHaveBeenCalledWith('/search?q=hello')
   })
 

@@ -17,7 +17,9 @@ export default function GameEditCrumbs({ slug, name, displayName }: Props) {
       separator={<NavigateNextOutlined fontSize="small" />}
       sx={{ mb: 3 }}
     >
-      <Link href={`/site/${slug}/games`} style={linkStyle}>Games</Link>
+      <Link href={`/site/${slug}/games`} style={linkStyle}>
+        Games
+      </Link>
       <Link href={`/site/${slug}/games/${name}`} style={linkStyle}>
         {displayName}
       </Link>

@@ -22,14 +22,21 @@ const ready = { status: 'ready', release: pickRelease(RAW_RELEASES) }
 describe('download pages', () => {
   it('portal /download has chrome, ribbon and footer', () => {
     mockState.mockReturnValue(ready)
-    render(<Provider store={makeStore().store}><DownloadPage /></Provider>)
+    render(
+      <Provider store={makeStore().store}>
+        <DownloadPage />
+      </Provider>,
+    )
     expect(screen.getByTestId('download-page')).toBeInTheDocument()
-    expect(screen.getByTestId('dl-primary'))
-      .toHaveTextContent('for Linux (x86_64)')
+    expect(screen.getByTestId('dl-primary')).toHaveTextContent(
+      'for Linux (x86_64)',
+    )
     expect(screen.getByTestId('fork-ribbon')).toBeInTheDocument()
     expect(screen.getByTestId('site-footer')).toBeInTheDocument()
     expect(screen.getByTestId('get-launcher')).toHaveAttribute(
-      'href', '/download')
+      'href',
+      '/download',
+    )
   })
 
   it('site page renders just the content', () => {

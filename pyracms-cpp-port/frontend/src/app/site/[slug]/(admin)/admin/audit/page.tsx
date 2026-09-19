@@ -2,8 +2,15 @@
 
 import { useParams } from 'next/navigation'
 import {
-  Container, Typography, Table, TableHead, TableRow, TableCell,
-  TableBody, Paper, TableContainer,
+  Container,
+  Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  TableContainer,
 } from '@mui/material'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useAuditLog } from '@/hooks/admin/useAuditLog'
@@ -23,18 +30,19 @@ export default function AuditLogPage() {
       </Typography>
       <ErrorAlert error={error} testId="audit-error" />
       {!loading && !error && rows.length === 0 && (
-        <Typography color="text.secondary">
-          No audit entries yet.
-        </Typography>
+        <Typography color="text.secondary">No audit entries yet.</Typography>
       )}
       {rows.length > 0 && (
         <TableContainer component={Paper} variant="outlined">
           <Table size="small">
-            <TableHead><TableRow>
-              <TableCell>When</TableCell><TableCell>Actor</TableCell>
-              <TableCell>Action</TableCell>
-              <TableCell>Target</TableCell>
-            </TableRow></TableHead>
+            <TableHead>
+              <TableRow>
+                <TableCell>When</TableCell>
+                <TableCell>Actor</TableCell>
+                <TableCell>Action</TableCell>
+                <TableCell>Target</TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
               {rows.map((r) => (
                 <TableRow key={r.id} data-testid={`audit-row-${r.id}`}>

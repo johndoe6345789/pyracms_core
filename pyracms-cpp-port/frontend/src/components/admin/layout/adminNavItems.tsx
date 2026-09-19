@@ -1,11 +1,18 @@
 import type { ReactNode } from 'react'
 import {
-  DashboardOutlined, PeopleOutlined,
-  SettingsOutlined, ToggleOnOutlined,
-  MenuBookOutlined, SecurityOutlined,
-  FolderOutlined, BackupOutlined,
-  BarChartOutlined, PaletteOutlined,
-  CodeOutlined, WebhookOutlined, HistoryOutlined,
+  DashboardOutlined,
+  PeopleOutlined,
+  SettingsOutlined,
+  ToggleOnOutlined,
+  MenuBookOutlined,
+  SecurityOutlined,
+  FolderOutlined,
+  BackupOutlined,
+  BarChartOutlined,
+  PaletteOutlined,
+  CodeOutlined,
+  WebhookOutlined,
+  HistoryOutlined,
 } from '@mui/icons-material'
 
 export interface AdminNavItem {
@@ -33,9 +40,7 @@ const ITEMS: [string, ReactNode, string][] = [
 ]
 /* eslint-enable react/jsx-key */
 
-export function buildAdminNavItems(
-  slug: string,
-): AdminNavItem[] {
+export function buildAdminNavItems(slug: string): AdminNavItem[] {
   return ITEMS.map(([label, icon, sub]) => ({
     label,
     icon,

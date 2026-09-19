@@ -7,8 +7,9 @@ describe('PasswordStrengthBar', () => {
     const { rerender } = render(<PasswordStrengthBar password="" />)
     expect(screen.queryByTestId('password-strength')).toBeNull()
     rerender(<PasswordStrengthBar password="Abcdef12" />)
-    expect(screen.getByTestId('password-strength-label'))
-      .toHaveTextContent('Strong')
+    expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+      'Strong',
+    )
   })
 })
 

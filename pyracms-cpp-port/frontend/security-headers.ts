@@ -3,7 +3,11 @@
 type Header = { key: string; value: string }
 
 function origin(url: string | undefined): string {
-  try { return url ? new URL(url).origin : '' } catch { return '' }
+  try {
+    return url ? new URL(url).origin : ''
+  } catch {
+    return ''
+  }
 }
 
 export function buildCsp(apiUrl?: string, dev = false): string {
@@ -18,7 +22,7 @@ export function buildCsp(apiUrl?: string, dev = false): string {
   const scriptSrc = `'self' 'unsafe-inline' ${cdn} ${cfScript}`
   const connectSrc = `'self' ${api} ${ws} ${cdn} ${cfConnect} ${gh}`
   const d = [
-    ["default-src", "'self'"],
+    ['default-src', "'self'"],
     // Next.js emits inline bootstrap scripts; nonces would need middleware
     ['script-src', `${scriptSrc}${dev ? " 'unsafe-eval'" : ''}`],
     ['style-src', `'self' 'unsafe-inline' ${cdn} https://fonts.googleapis.com`],
@@ -47,8 +51,9 @@ export function securityHeaders(
     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
     {
       key: 'Permissions-Policy',
-      value: 'camera=(), microphone=(), geolocation=(), payment=(), '
-        + 'usb=(), clipboard-read=(self), clipboard-write=(self)',
+      value:
+        'camera=(), microphone=(), geolocation=(), payment=(), ' +
+        'usb=(), clipboard-read=(self), clipboard-write=(self)',
     },
     {
       key: 'Strict-Transport-Security',

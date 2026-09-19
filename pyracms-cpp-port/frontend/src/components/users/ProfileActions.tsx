@@ -1,8 +1,4 @@
-import {
-  Box,
-  IconButton,
-  Tooltip,
-} from '@mui/material'
+import { Box, IconButton, Tooltip } from '@mui/material'
 import { GitHub, Twitter } from '@mui/icons-material'
 import { safeHref } from '@/lib/safeUrl'
 
@@ -11,10 +7,7 @@ interface ProfileActionsProps {
   twitterUrl?: string
 }
 
-export function ProfileActions({
-  githubUrl,
-  twitterUrl,
-}: ProfileActionsProps) {
+export function ProfileActions({ githubUrl, twitterUrl }: ProfileActionsProps) {
   if (!githubUrl && !twitterUrl) return null
 
   return (

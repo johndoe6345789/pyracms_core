@@ -13,9 +13,9 @@ describe('validateRegisterForm', () => {
   })
 
   it('returns error when username is blank', () => {
-    expect(
-      validateRegisterForm({ ...VALID_FORM, username: '' }),
-    ).toBe('Username is required')
+    expect(validateRegisterForm({ ...VALID_FORM, username: '' })).toBe(
+      'Username is required',
+    )
   })
 
   it('returns error when username is whitespace only', () => {
@@ -28,9 +28,9 @@ describe('validateRegisterForm', () => {
   })
 
   it('returns error when email is blank', () => {
-    expect(
-      validateRegisterForm({ ...VALID_FORM, email: '' }),
-    ).toBe('Email is required')
+    expect(validateRegisterForm({ ...VALID_FORM, email: '' })).toBe(
+      'Email is required',
+    )
   })
 
   it('returns error when email has no @ symbol', () => {
@@ -43,8 +43,8 @@ describe('validateRegisterForm', () => {
   })
 
   it('returns error when email has no domain part', () => {
-    expect(
-      validateRegisterForm({ ...VALID_FORM, email: 'a@b' }),
-    ).toBe('Invalid email address')
+    expect(validateRegisterForm({ ...VALID_FORM, email: 'a@b' })).toBe(
+      'Invalid email address',
+    )
   })
 })

@@ -1,19 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Box, useMediaQuery, useTheme }
-  from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import { getUserRole, UserRole } from '@/types'
-import SuperAdminSidebar
-  from '@/components/super-admin/SuperAdminSidebar'
-import SuperAdminAppBar
-  from '@/components/super-admin/SuperAdminAppBar'
-import SuperAdminGuard
-  from '@/components/super-admin/SuperAdminGuard'
-import SuperAdminBreadcrumbs
-  from '@/components/super-admin/SuperAdminBreadcrumbs'
+import SuperAdminSidebar from '@/components/super-admin/SuperAdminSidebar'
+import SuperAdminAppBar from '@/components/super-admin/SuperAdminAppBar'
+import SuperAdminGuard from '@/components/super-admin/SuperAdminGuard'
+import SuperAdminBreadcrumbs from '@/components/super-admin/SuperAdminBreadcrumbs'
 
 export default function SuperAdminLayout({
   children,
@@ -29,10 +24,11 @@ export default function SuperAdminLayout({
     (state: RootState) => state.auth,
   )
 
-  useEffect(() => { setHydrated(true) }, [])
+  useEffect(() => {
+    setHydrated(true)
+  }, [])
 
-  const allowed = isAuthenticated
-    && getUserRole(user) >= UserRole.SuperAdmin
+  const allowed = isAuthenticated && getUserRole(user) >= UserRole.SuperAdmin
 
   return (
     <SuperAdminGuard hydrated={hydrated} allowed={allowed}>

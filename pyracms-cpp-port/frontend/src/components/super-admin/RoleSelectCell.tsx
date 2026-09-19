@@ -17,18 +17,12 @@ interface Props {
   onChange: (role: UserRole) => void
 }
 
-export default function RoleSelectCell({
-  username,
-  role,
-  onChange,
-}: Props) {
+export default function RoleSelectCell({ username, role, onChange }: Props) {
   return (
     <Select
       value={role}
       size="small"
-      onChange={(e) =>
-        onChange(Number(e.target.value) as UserRole)
-      }
+      onChange={(e) => onChange(Number(e.target.value) as UserRole)}
       inputProps={{
         'aria-label': `Role for ${username}`,
       }}

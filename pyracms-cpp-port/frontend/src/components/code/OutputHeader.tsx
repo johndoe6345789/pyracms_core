@@ -2,7 +2,9 @@
 
 import { Box, Chip, Typography } from '@mui/material'
 import {
-  CheckCircleOutlined, ErrorOutlined, TimerOutlined,
+  CheckCircleOutlined,
+  ErrorOutlined,
+  TimerOutlined,
 } from '@mui/icons-material'
 
 interface Props {
@@ -19,39 +21,75 @@ export function OutputHeader({ exitCode, executionTime }: Props) {
   const failed = exitCode != null && !ok
   let bg = '#f8fafc'
   let color = '#64748b'
-  if (ok) { bg = '#f0fdf4'; color = '#166534' }
-  if (failed) { bg = '#fef2f2'; color = '#991b1b' }
+  if (ok) {
+    bg = '#f0fdf4'
+    color = '#166534'
+  }
+  if (failed) {
+    bg = '#fef2f2'
+    color = '#991b1b'
+  }
   return (
-    <Box sx={{
-      display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1,
-      bgcolor: bg, borderBottom: 1, borderColor: 'divider',
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        px: 2,
+        py: 1,
+        bgcolor: bg,
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
       {ok && (
-        <CheckCircleOutlined sx={{ fontSize: 16, color: '#16a34a' }}
-          aria-label="Success" />
+        <CheckCircleOutlined
+          sx={{ fontSize: 16, color: '#16a34a' }}
+          aria-label="Success"
+        />
       )}
       {failed && (
-        <ErrorOutlined sx={{ fontSize: 16, color: '#dc2626' }}
-          aria-label="Error" />
+        <ErrorOutlined
+          sx={{ fontSize: 16, color: '#dc2626' }}
+          aria-label="Error"
+        />
       )}
-      <Typography variant="caption" sx={{
-        fontWeight: 600, textTransform: 'uppercase',
-        letterSpacing: '0.05em', color,
-      }}>
+      <Typography
+        variant="caption"
+        sx={{
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          color,
+        }}
+      >
         Output
       </Typography>
       {exitCode != null && (
-        <Chip label={`Exit: ${exitCode}`} size="small" sx={{
-          height: 20, fontSize: '0.7rem', color,
-          bgcolor: ok ? '#dcfce7' : '#fee2e2',
-        }} />
+        <Chip
+          label={`Exit: ${exitCode}`}
+          size="small"
+          sx={{
+            height: 20,
+            fontSize: '0.7rem',
+            color,
+            bgcolor: ok ? '#dcfce7' : '#fee2e2',
+          }}
+        />
       )}
       {executionTime != null && (
-        <Box sx={{
-          display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto',
-        }}>
-          <TimerOutlined sx={{ fontSize: 14, color: '#64748b' }}
-            aria-label="Execution time" />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            ml: 'auto',
+          }}
+        >
+          <TimerOutlined
+            sx={{ fontSize: 14, color: '#64748b' }}
+            aria-label="Execution time"
+          />
           <Typography variant="caption" color="text.secondary">
             {formatTime(executionTime)}
           </Typography>

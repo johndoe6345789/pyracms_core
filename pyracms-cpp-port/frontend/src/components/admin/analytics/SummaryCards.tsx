@@ -6,26 +6,36 @@ import api from '@/lib/api'
 
 /** "totalViews" -> "Total views". */
 export function humanize(key: string): string {
-  const s = key.replace(/([A-Z])/g, ' $1').toLowerCase().trim()
+  const s = key
+    .replace(/([A-Z])/g, ' $1')
+    .toLowerCase()
+    .trim()
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 /** Numeric fields of GET /api/analytics/summary as stat tiles. */
-export default function SummaryCards(
-  { tenantId }: { tenantId: number | null },
-) {
+export default function SummaryCards({
+  tenantId,
+}: {
+  tenantId: number | null
+}) {
   const [stats, setStats] = useState<[string, number][]>([])
   useEffect(() => {
     if (!tenantId) return
-    api.get(`/api/analytics/summary?tenant_id=${tenantId}`)
-      .then((r) => setStats(Object.entries(r.data ?? {}).filter(
-        (e): e is [string, number] => typeof e[1] === 'number')))
+    api
+      .get(`/api/analytics/summary?tenant_id=${tenantId}`)
+      .then((r) =>
+        setStats(
+          Object.entries(r.data ?? {}).filter(
+            (e): e is [string, number] => typeof e[1] === 'number',
+          ),
+        ),
+      )
       .catch(() => {})
   }, [tenantId])
   if (stats.length === 0) return null
   return (
-    <Grid container spacing={2} sx={{ mb: 3 }}
-      data-testid="analytics-summary">
+    <Grid container spacing={2} sx={{ mb: 3 }} data-testid="analytics-summary">
       {stats.map(([k, v]) => (
         <Grid item xs={6} md={3} key={k}>
           <Paper variant="outlined" sx={{ p: 2 }}>

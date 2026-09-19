@@ -1,5 +1,11 @@
 import {
-  render, screen, fireEvent, waitFor, within, renderHook, act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+  renderHook,
+  act,
 } from '@testing-library/react'
 import GalleryPage from '@/app/site/[slug]/(tenant)/gallery/page'
 import { useCreateAlbum } from '@/hooks/useCreateAlbum'
@@ -9,14 +15,15 @@ import { routeGet } from '../helpers/scopeMocks'
 let signedIn = true
 jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../helpers/scopeMocks').navMock)
-jest.mock('@/hooks/useTenantId',
-  () => require('../helpers/scopeMocks').tenantMock)
+jest.mock(
+  '@/hooks/useTenantId',
+  () => require('../helpers/scopeMocks').tenantMock,
+)
 jest.mock('@/hooks/useSiteSession', () => ({
   useSiteSession: () => signedIn,
 }))
 
-const box = (id: string) =>
-  within(screen.getByTestId(id)).getByRole('textbox')
+const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -36,12 +43,15 @@ it('creates an album and refreshes the list', async () => {
   render(<GalleryPage />)
   fireEvent.click(await screen.findByTestId('create-album-btn'))
   fireEvent.change(box('album-name-input'), { target: { value: ' Trip ' } })
-  fireEvent.change(box('album-description-input'),
-    { target: { value: 'Fun' } })
+  fireEvent.change(box('album-description-input'), { target: { value: 'Fun' } })
   fireEvent.click(screen.getByTestId('submit-album-btn'))
-  await waitFor(() => expect(m.post).toHaveBeenCalledWith(
-    '/api/gallery/albums',
-    { displayName: 'Trip', description: 'Fun', tenantId: 1 }))
+  await waitFor(() =>
+    expect(m.post).toHaveBeenCalledWith('/api/gallery/albums', {
+      displayName: 'Trip',
+      description: 'Fun',
+      tenantId: 1,
+    }),
+  )
   await waitFor(() => expect(m.get).toHaveBeenCalledTimes(2))
 })
 

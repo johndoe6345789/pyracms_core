@@ -11,22 +11,12 @@ test.describe('Tenant management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'breadcrumb current item reads "Tenants"',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('breadcrumb-current'),
-      ).toHaveText('Tenants')
-    },
-  )
+  test('breadcrumb current item reads "Tenants"', async ({ page }) => {
+    await expect(page.getByTestId('breadcrumb-current')).toHaveText('Tenants')
+  })
 
-  test(
-    'breadcrumb link navigates back to /super-admin',
-    async ({ page }) => {
-      await page
-        .getByTestId('breadcrumb-link-super-admin')
-        .click()
-      await expect(page).toHaveURL(/\/super-admin$/)
-    },
-  )
+  test('breadcrumb link navigates back to /super-admin', async ({ page }) => {
+    await page.getByTestId('breadcrumb-link-super-admin').click()
+    await expect(page).toHaveURL(/\/super-admin$/)
+  })
 })

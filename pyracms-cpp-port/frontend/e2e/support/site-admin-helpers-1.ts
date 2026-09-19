@@ -13,17 +13,12 @@ import { MOCK_FILES, MOCK_MENUS, MOCK_MENU_GROUPS } from './site-admin-data-2'
 /** Log in via the /auth/login form and wait for redirect. */
 export async function loginAsAdmin(page: Page): Promise<void> {
   await page.goto('/auth/login')
-  await page
-    .getByTestId('username-input')
-    .fill(ADMIN_USER.username)
-  await page
-    .getByTestId('password-input')
-    .fill(ADMIN_USER.password)
+  await page.getByTestId('username-input').fill(ADMIN_USER.username)
+  await page.getByTestId('password-input').fill(ADMIN_USER.password)
   await page.getByTestId('login-submit').click()
-  await page.waitForURL(
-    (url) => !url.pathname.startsWith('/auth/login'),
-    { timeout: 10_000 },
-  )
+  await page.waitForURL((url) => !url.pathname.startsWith('/auth/login'), {
+    timeout: 10_000,
+  })
 }
 
 /**
@@ -43,9 +38,7 @@ export async function mockApiRoutes(page: Page): Promise<void> {
   await page.route('**/api/features**', (route) =>
     route.fulfill({ json: MOCK_FEATURES }),
   )
-  await page.route('**/api/acl**', (route) =>
-    route.fulfill({ json: MOCK_ACL }),
-  )
+  await page.route('**/api/acl**', (route) => route.fulfill({ json: MOCK_ACL }))
   await page.route('**/api/menus**', (route) =>
     route.fulfill({ json: MOCK_MENUS }),
   )
@@ -55,9 +48,7 @@ export async function mockApiRoutes(page: Page): Promise<void> {
   await page.route('**/api/files**', (route) =>
     route.fulfill({ json: MOCK_FILES }),
   )
-  await page.route('**/api/articles**', (route) =>
-    route.fulfill({ json: [] }),
-  )
+  await page.route('**/api/articles**', (route) => route.fulfill({ json: [] }))
   await page.route('**/api/auth/register**', (route) =>
     route.fulfill({
       status: 200,
@@ -67,10 +58,7 @@ export async function mockApiRoutes(page: Page): Promise<void> {
 }
 
 /** Navigate to a site-admin path and wait for the layout. */
-export async function goToAdmin(
-  page: Page,
-  path: string = '',
-): Promise<void> {
+export async function goToAdmin(page: Page, path: string = ''): Promise<void> {
   await page.goto(`${BASE}${path}`)
   // The admin toolbar is always rendered by the layout
   await page

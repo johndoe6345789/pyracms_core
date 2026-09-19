@@ -5,11 +5,9 @@ import { Container, Button, Divider } from '@mui/material'
 import Link from 'next/link'
 import { ArrowBackOutlined } from '@mui/icons-material'
 import PictureViewer from '@/components/gallery/PictureViewer'
-import ManagedPictureFooter
-  from '@/components/gallery/ManagedPictureFooter'
+import ManagedPictureFooter from '@/components/gallery/ManagedPictureFooter'
 import PictureInfo from '@/components/gallery/PictureInfo'
-import GalleryBreadcrumbs
-  from '@/components/gallery/GalleryBreadcrumbs'
+import GalleryBreadcrumbs from '@/components/gallery/GalleryBreadcrumbs'
 import { useGalleryPicture } from '@/hooks/useGalleryPicture'
 import CommentSection from '@/components/common/CommentSection'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
@@ -22,20 +20,15 @@ export default function PictureViewPage() {
   const router = useRouter()
   const slug = params.slug as string
   const pictureId = params.pictureId as string
-  const {
-    picture, handleLike, handleDislike, handleSetCover, refresh,
-  } = useGalleryPicture(pictureId)
+  const { picture, handleLike, handleDislike, handleSetCover, refresh } =
+    useGalleryPicture(pictureId)
   const { error, guard } = useGuardedAction()
 
   if (!picture) return null
 
   const albumUrl = `/site/${slug}/gallery/${picture.albumId}`
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: 6 }}
-      data-testid="picture-view-page"
-    >
+    <Container maxWidth="lg" sx={{ py: 6 }} data-testid="picture-view-page">
       <GalleryBreadcrumbs
         slug={slug}
         label="Picture breadcrumb"
@@ -66,14 +59,18 @@ export default function PictureViewPage() {
       />
       <ErrorAlert error={error} testId="picture-error" />
       <Divider sx={{ mb: 3 }} />
-      <ManagedPictureFooter slug={slug} pictureId={pictureId}
-        picture={picture} onLike={() => guard(handleLike, VOTE_ERR)}
+      <ManagedPictureFooter
+        slug={slug}
+        pictureId={pictureId}
+        picture={picture}
+        onLike={() => guard(handleLike, VOTE_ERR)}
         onDislike={() => guard(handleDislike, VOTE_ERR)}
         onSetCover={() => guard(handleSetCover, 'Failed to set cover')}
-        onChanged={refresh} onDeleted={() => router.push(albumUrl)} />
+        onChanged={refresh}
+        onDeleted={() => router.push(albumUrl)}
+      />
       {Number.isInteger(Number(pictureId)) && (
-        <CommentSection contentType="picture"
-          contentId={Number(pictureId)} />
+        <CommentSection contentType="picture" contentId={Number(pictureId)} />
       )}
     </Container>
   )

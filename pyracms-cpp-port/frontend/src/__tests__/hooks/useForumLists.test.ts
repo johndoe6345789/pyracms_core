@@ -18,16 +18,25 @@ describe('useForumCategories', () => {
     expect(mock.get).not.toHaveBeenCalled()
   })
   it('maps categories and forums', async () => {
-    mock.get.mockResolvedValue({ data: [{
-      id: 1, name: 'Gen',
-      forums: [{ id: 2, name: 'Chat', totalThreads: 3 }],
-    }, { id: 9, name: 'Empty' }] })
+    mock.get.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          name: 'Gen',
+          forums: [{ id: 2, name: 'Chat', totalThreads: 3 }],
+        },
+        { id: 9, name: 'Empty' },
+      ],
+    })
     const { result } = renderHook(() => useForumCategories(7))
     await waitFor(() => expect(result.current.loading).toBe(false))
-    expect(mock.get).toHaveBeenCalledWith(
-      '/api/forum/categories?tenant_id=7')
+    expect(mock.get).toHaveBeenCalledWith('/api/forum/categories?tenant_id=7')
     expect(result.current.categories[0]!.forums[0]).toEqual({
-      id: '2', name: 'Chat', description: '', threads: 3, posts: 0,
+      id: '2',
+      name: 'Chat',
+      description: '',
+      threads: 3,
+      posts: 0,
     })
     expect(result.current.categories[1]!.forums).toEqual([])
   })
@@ -48,20 +57,30 @@ describe('useThreadList', () => {
     expect(mock.get).not.toHaveBeenCalled()
   })
   it('maps threads', async () => {
-    mock.get.mockResolvedValue({ data: {
-      name: 'F', description: 'D',
-      threads: [{ id: 5, totalPosts: 4, lastPostAt: '2024-01-01T10:00:00' },
-        { id: 6, totalPosts: 0, pinned: true, locked: true }],
-    } })
+    mock.get.mockResolvedValue({
+      data: {
+        name: 'F',
+        description: 'D',
+        threads: [
+          { id: 5, totalPosts: 4, lastPostAt: '2024-01-01T10:00:00' },
+          { id: 6, totalPosts: 0, pinned: true, locked: true },
+        ],
+      },
+    })
     const { result } = renderHook(() => useThreadList('2', 1))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.forum).toEqual({ name: 'F', description: 'D' })
     expect(result.current.threads[0]).toMatchObject({
-      id: '5', title: '(untitled)', author: 'Unknown', replies: 3,
+      id: '5',
+      title: '(untitled)',
+      author: 'Unknown',
+      replies: 3,
       lastPostDate: '2024-01-01 10:00',
     })
     expect(result.current.threads[1]).toMatchObject({
-      replies: 0, pinned: true, locked: true,
+      replies: 0,
+      pinned: true,
+      locked: true,
     })
   })
   it('distinguishes 404 from other errors', async () => {

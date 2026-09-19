@@ -10,12 +10,15 @@ interface Props {
 export default function VersionSelect({ versions, value, onChange }: Props) {
   return (
     <Select
-      size="small" value={value}
+      size="small"
+      value={value}
       onChange={(e) => onChange(String(e.target.value))}
       inputProps={{ 'aria-label': 'Version' }}
     >
       {versions.map((r) => (
-        <MenuItem key={r.version} value={r.version}>v{r.version}</MenuItem>
+        <MenuItem key={r.version} value={r.version}>
+          v{r.version}
+        </MenuItem>
       ))}
     </Select>
   )

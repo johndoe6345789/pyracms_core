@@ -12,41 +12,23 @@ test.describe('Admin Templates', () => {
     await goToAdmin(page, '/templates')
   })
 
-  test(
-    'page loads and toolbar is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-toolbar'),
-      ).toBeVisible()
-    },
-  )
+  test('page loads and toolbar is visible', async ({ page }) => {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible()
+  })
 
-  test(
-    'page has "Template Editor" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /template editor/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('page has "Template Editor" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /template editor/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    '"Template Section" select is present',
-    async ({ page }) => {
-      await expect(
-        page.getByLabel('Template Section'),
-      ).toBeVisible()
-    },
-  )
+  test('"Template Section" select is present', async ({ page }) => {
+    await expect(page.getByLabel('Template Section')).toBeVisible()
+  })
 
-  test(
-    '"Template Section" select defaults to "Header"',
-    async ({ page }) => {
-      await expect(
-        page.getByLabel('Template Section'),
-      ).toContainText('Header')
-    },
-  )
+  test('"Template Section" select defaults to "Header"', async ({ page }) => {
+    await expect(page.getByLabel('Template Section')).toContainText('Header')
+  })
 })

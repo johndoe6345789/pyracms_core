@@ -32,30 +32,59 @@ it('imports settings by PUTting each one', async () => {
   const { result } = renderHook(() => useBackupRestore(7))
   act(() => result.current.handleFileChange(change(undefined)))
   expect(result.current.snackbar.open).toBe(false)
-  act(() => result.current.handleFileChange(change([file({
-    exportType: 'settings', data: { a: '1', b: '2' } })])))
-  await waitFor(() => expect(result.current.snackbar.message)
-    .toMatch(/Imported 2 settings/))
-  expect(put).toHaveBeenCalledWith('/api/settings/a?tenant_id=7',
-    expect.objectContaining({ name: 'a', value: '1' }))
+  act(() =>
+    result.current.handleFileChange(
+      change([
+        file({
+          exportType: 'settings',
+          data: { a: '1', b: '2' },
+        }),
+      ]),
+    ),
+  )
+  await waitFor(() =>
+    expect(result.current.snackbar.message).toMatch(/Imported 2 settings/),
+  )
+  expect(put).toHaveBeenCalledWith(
+    '/api/settings/a?tenant_id=7',
+    expect.objectContaining({ name: 'a', value: '1' }),
+  )
 })
 
 it('reports failed writes, menus and invalid files', async () => {
   put.mockRejectedValue({ response: { data: { error: 'denied' } } })
   const { result } = renderHook(() => useBackupRestore(7))
-  act(() => result.current.handleFileChange(change([file({
-    exportType: 'settings', data: { a: '1' } })])))
-  await waitFor(() => expect(result.current.snackbar.severity)
-    .toBe('error'))
-  act(() => result.current.handleFileChange(change([file({
-    exportType: 'menus', data: [] })])))
-  await waitFor(() => expect(result.current.snackbar.message)
-    .toMatch(/not available yet/))
+  act(() =>
+    result.current.handleFileChange(
+      change([
+        file({
+          exportType: 'settings',
+          data: { a: '1' },
+        }),
+      ]),
+    ),
+  )
+  await waitFor(() => expect(result.current.snackbar.severity).toBe('error'))
+  act(() =>
+    result.current.handleFileChange(
+      change([
+        file({
+          exportType: 'menus',
+          data: [],
+        }),
+      ]),
+    ),
+  )
+  await waitFor(() =>
+    expect(result.current.snackbar.message).toMatch(/not available yet/),
+  )
   expect(put).toHaveBeenCalledTimes(1)
-  act(() => result.current.handleFileChange(change([
-    new File(['{nope'], 'b.json')])))
-  await waitFor(() => expect(result.current.snackbar.message)
-    .toMatch(/Invalid JSON/))
+  act(() =>
+    result.current.handleFileChange(change([new File(['{nope'], 'b.json')])),
+  )
+  await waitFor(() =>
+    expect(result.current.snackbar.message).toMatch(/Invalid JSON/),
+  )
 })
 
 it('rejects malformed exports', () => {

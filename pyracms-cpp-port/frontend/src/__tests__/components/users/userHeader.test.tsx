@@ -3,13 +3,20 @@ import { UserHeader, type UserProfile } from '@/components/users/UserHeader'
 
 jest.mock('@/components/users/FollowButton', () => ({
   FollowButton: (p: { userId: number }) => (
-    <button data-testid="follow">f{p.userId}</button>),
+    <button data-testid="follow">f{p.userId}</button>
+  ),
 }))
 
 const user: UserProfile = {
-  id: 4, username: 'zed', email: '', bio: 'about zed',
-  website: 'http://z.dev', avatarUrl: '', reputation: 1500,
-  postCount: 12, createdAt: '2024-03-05T10:00:00',
+  id: 4,
+  username: 'zed',
+  email: '',
+  bio: 'about zed',
+  website: 'http://z.dev',
+  avatarUrl: '',
+  reputation: 1500,
+  postCount: 12,
+  createdAt: '2024-03-05T10:00:00',
 }
 
 describe('UserHeader', () => {

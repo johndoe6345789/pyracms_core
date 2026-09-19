@@ -1,16 +1,12 @@
 'use client'
 
 import { Typography, Box } from '@mui/material'
-import {
-  useAdminSettings,
-} from '@/hooks/useAdminSettings'
+import { useAdminSettings } from '@/hooks/useAdminSettings'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
-import AddSettingForm from
-  '@/components/admin/AddSettingForm'
+import AddSettingForm from '@/components/admin/AddSettingForm'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import SettingsTable from
-  '@/components/admin/SettingsTable'
+import SettingsTable from '@/components/admin/SettingsTable'
 
 export default function AdminSettingsPage() {
   const params = useParams()
@@ -35,19 +31,11 @@ export default function AdminSettingsPage() {
 
   return (
     <Box data-testid="admin-settings-page">
-      <Typography
-        variant="h3"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="h3" sx={{ mb: 1 }}>
         Settings
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
-        Manage key-value configuration
-        settings.
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Manage key-value configuration settings.
       </Typography>
       <ErrorAlert error={error} testId="settings-error" />
       <AddSettingForm

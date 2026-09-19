@@ -11,32 +11,23 @@ test.describe('Tenant management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'tenant filter input narrows visible rows',
-    async ({ page }) => {
-      await waitForTenantsLoaded(page)
+  test('tenant filter input narrows visible rows', async ({ page }) => {
+    await waitForTenantsLoaded(page)
 
-      const rows = page.locator(
-        '[data-testid^="tenant-row-"]',
-      )
-      const count = await rows.count()
-      if (count === 0) {
-        test.skip()
-        return
-      }
+    const rows = page.locator('[data-testid^="tenant-row-"]')
+    const count = await rows.count()
+    if (count === 0) {
+      test.skip()
+      return
+    }
 
-      // Type a string that matches nothing
-      const filterInput = page.getByTestId(
-        'tenant-filter-input',
-      )
-      await filterInput.fill('__nonexistent_tenant__')
-      await expect(
-        page.getByText('No tenants found.'),
-      ).toBeVisible()
+    // Type a string that matches nothing
+    const filterInput = page.getByTestId('tenant-filter-input')
+    await filterInput.fill('__nonexistent_tenant__')
+    await expect(page.getByText('No tenants found.')).toBeVisible()
 
-      // Clear filter — rows come back
-      await filterInput.clear()
-      await expect(rows.first()).toBeVisible()
-    },
-  )
+    // Clear filter — rows come back
+    await filterInput.clear()
+    await expect(rows.first()).toBeVisible()
+  })
 })

@@ -1,6 +1,8 @@
 import { formatForumDate } from '@/lib/forumDate'
 import {
-  mapReactions, type RawReaction, type Reaction,
+  mapReactions,
+  type RawReaction,
+  type Reaction,
 } from '@/components/forum/reactionData'
 
 export interface Post {
@@ -37,8 +39,13 @@ export interface RawPost {
 }
 
 export const EMPTY_THREAD: ThreadInfo = {
-  title: '', description: '', forumId: '', forumName: '',
-  pinned: false, locked: false, views: 0,
+  title: '',
+  description: '',
+  forumId: '',
+  forumName: '',
+  pinned: false,
+  locked: false,
+  views: 0,
 }
 
 export function errMsg(err: unknown, fallback: string): string {
@@ -59,7 +66,9 @@ export function mapThread(d: Record<string, unknown>): ThreadInfo {
 }
 
 export function mapPosts(
-  raw: RawPost[], userId: number | null, isModerator: boolean,
+  raw: RawPost[],
+  userId: number | null,
+  isModerator: boolean,
 ): Post[] {
   return raw.map((p) => ({
     id: String(p.id),

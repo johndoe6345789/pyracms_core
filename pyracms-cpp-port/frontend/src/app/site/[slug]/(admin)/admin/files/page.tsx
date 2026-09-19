@@ -1,18 +1,13 @@
 'use client'
 
 import { Typography, Box } from '@mui/material'
-import {
-  useFileManager,
-} from '@/hooks/useFileManager'
+import { useFileManager } from '@/hooks/useFileManager'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
-import UploadDropzone from
-  '@/components/admin/UploadDropzone'
-import FileGrid from
-  '@/components/admin/FileGrid'
+import UploadDropzone from '@/components/admin/UploadDropzone'
+import FileGrid from '@/components/admin/FileGrid'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import ConfirmDialog from
-  '@/components/admin/ConfirmDialog'
+import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 export default function AdminFilesPage() {
   const params = useParams()
@@ -35,19 +30,11 @@ export default function AdminFilesPage() {
 
   return (
     <Box data-testid="admin-files-page">
-      <Typography
-        variant="h3"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="h3" sx={{ mb: 1 }}>
         File Manager
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
-        Upload and manage files across
-        the platform.
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Upload and manage files across the platform.
       </Typography>
       <ErrorAlert error={error} testId="files-error" />
       <UploadDropzone
@@ -57,10 +44,7 @@ export default function AdminFilesPage() {
         onDrop={handleDrop}
         onFilesSelected={uploadFiles}
       />
-      <FileGrid
-        files={files}
-        onDelete={handleDeleteClick}
-      />
+      <FileGrid files={files} onDelete={handleDeleteClick} />
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Delete File"

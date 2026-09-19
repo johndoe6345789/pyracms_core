@@ -8,7 +8,10 @@ interface Props {
 }
 
 export default function EditUserFields({
-  fullName, email, onFullName, onEmail,
+  fullName,
+  email,
+  onFullName,
+  onEmail,
 }: Props) {
   return (
     <>

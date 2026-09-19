@@ -1,6 +1,9 @@
 import type { ReleaseArch, ReleaseOs } from './releaseTypes'
 
-export interface Platform { os: ReleaseOs | null; arch: ReleaseArch }
+export interface Platform {
+  os: ReleaseOs | null
+  arch: ReleaseArch
+}
 
 interface UaData {
   platform?: string
@@ -24,13 +27,17 @@ export function appleGpu(): boolean | null {
     const ext = gl?.getExtension('WEBGL_debug_renderer_info')
     if (!gl || !ext) return null
     return /Apple (M\d|GPU)/i.test(
-      String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)))
-  } catch { return null }
+      String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)),
+    )
+  } catch {
+    return null
+  }
 }
 
 /** Synchronous best guess from the user agent alone. */
-export function detectPlatform(nav: Nav | undefined = globalThis.navigator):
-  Platform {
+export function detectPlatform(
+  nav: Nav | undefined = globalThis.navigator,
+): Platform {
   const ua = nav?.userAgent ?? ''
   const os = osOf(ua, nav?.userAgentData?.platform)
   const arm = /aarch64|arm64|\barm\b/i.test(ua)
@@ -41,15 +48,19 @@ export function detectPlatform(nav: Nav | undefined = globalThis.navigator):
 
 /** Refines the guess with client hints and (on macOS) the GPU name. */
 export async function refinePlatform(
-  base: Platform, nav: Nav | undefined = globalThis.navigator,
+  base: Platform,
+  nav: Nav | undefined = globalThis.navigator,
 ): Promise<Platform> {
   try {
-    const hint = await nav?.userAgentData?.getHighEntropyValues?.(
-      ['architecture'])
+    const hint = await nav?.userAgentData?.getHighEntropyValues?.([
+      'architecture',
+    ])
     const a = hint?.architecture
     if (a === 'arm') return { ...base, arch: 'arm64' }
     if (a === 'x86') return { ...base, arch: 'x86_64' }
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
   const apple = base.os === 'mac' ? appleGpu() : null
   if (apple === null) return base
   return { ...base, arch: apple ? 'arm64' : 'x86_64' }

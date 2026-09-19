@@ -17,13 +17,11 @@ interface ArticleTagChipsProps {
   searchSlug?: string
 }
 
-export function ArticleTagChips(
-  {
-    tags,
-    color = 'default',
-    searchSlug,
-  }: ArticleTagChipsProps
-) {
+export function ArticleTagChips({
+  tags,
+  color = 'default',
+  searchSlug,
+}: ArticleTagChipsProps) {
   return (
     <Box
       sx={{
@@ -47,9 +45,7 @@ export function ArticleTagChips(
           variant="outlined"
           color={color}
           role="listitem"
-          data-testid={
-            `tag-chip-${tag}`
-          }
+          data-testid={`tag-chip-${tag}`}
         />
       ))}
     </Box>

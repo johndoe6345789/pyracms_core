@@ -27,13 +27,18 @@ export default function LibrarySidebar(p: Props) {
       sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
     >
       <SidebarFilters
-        search={p.search} onSearch={p.onSearch}
-        filter={p.filter} onFilter={p.onFilter}
+        search={p.search}
+        onSearch={p.onSearch}
+        filter={p.filter}
+        onFilter={p.onFilter}
       />
       <SidebarTags tags={p.tags} tag={p.tag} onTag={p.onTag} />
       <SidebarList
-        games={p.games} selected={p.selected} onSelect={p.onSelect}
-        installed={p.installed} favs={p.favs}
+        games={p.games}
+        selected={p.selected}
+        onSelect={p.onSelect}
+        installed={p.installed}
+        favs={p.favs}
       />
     </Box>
   )

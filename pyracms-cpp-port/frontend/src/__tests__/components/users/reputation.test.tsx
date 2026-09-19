@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { ReputationBadge } from '@/components/users/ReputationBadge'
 import {
-  getLevel, getNextLevel, getProgress,
+  getLevel,
+  getNextLevel,
+  getProgress,
 } from '@/components/users/reputationLevels'
 
 describe('reputationLevels', () => {
@@ -30,14 +32,15 @@ describe('ReputationBadge', () => {
     render(<ReputationBadge points={1500} />)
     expect(screen.getByText('Expert')).toBeInTheDocument()
     expect(screen.getByText('1,500')).toBeInTheDocument()
-    expect(screen.getByRole('progressbar'))
-      .toHaveAttribute('aria-valuenow', '33')
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '33',
+    )
   })
 
   it('tooltip names the next level', async () => {
     render(<ReputationBadge points={10} />)
-    expect(screen.getByLabelText(/40 points until Member/))
-      .toBeInTheDocument()
+    expect(screen.getByLabelText(/40 points until Member/)).toBeInTheDocument()
   })
 
   it('tooltip says max level for the top rank', () => {

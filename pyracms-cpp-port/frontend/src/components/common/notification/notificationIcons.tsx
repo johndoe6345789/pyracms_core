@@ -1,12 +1,18 @@
 import {
-  ReplyOutlined, ThumbUpOutlined, CommentOutlined,
-  InfoOutlined, GavelOutlined,
+  ReplyOutlined,
+  ThumbUpOutlined,
+  CommentOutlined,
+  InfoOutlined,
+  GavelOutlined,
 } from '@mui/icons-material'
 
 export interface Notification {
-  id: number; type: string
-  title: string; message: string
-  link: string | null; is_read: boolean
+  id: number
+  type: string
+  title: string
+  message: string
+  link: string | null
+  is_read: boolean
   created_at: string
 }
 

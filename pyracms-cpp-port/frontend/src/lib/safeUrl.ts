@@ -35,6 +35,7 @@ export function safeSrc(url: unknown): string | undefined {
   if (ok) return ok
   if (typeof url !== 'string') return undefined
   const t = url.trim()
-  return /^data:image\/(png|jpe?g|gif|webp|avif);base64,[a-z0-9+/=]+$/i
-    .test(t) ? t : undefined
+  return /^data:image\/(png|jpe?g|gif|webp|avif);base64,[a-z0-9+/=]+$/i.test(t)
+    ? t
+    : undefined
 }

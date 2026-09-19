@@ -1,7 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import {
-  MonacoEditorComponent,
-} from '@/components/articles/MonacoEditor'
+import { MonacoEditorComponent } from '@/components/articles/MonacoEditor'
 
 jest.mock('@monaco-editor/react', () => ({
   __esModule: true,
@@ -28,8 +26,14 @@ const ed = {
 
 const setup = (language = 'Markdown', value = 'v') => {
   const onChange = jest.fn()
-  render(<MonacoEditorComponent value={value} onChange={onChange}
-    language={language} autoSaveKey="k" />)
+  render(
+    <MonacoEditorComponent
+      value={value}
+      onChange={onChange}
+      language={language}
+      autoSaveKey="k"
+    />,
+  )
   return onChange
 }
 
@@ -44,8 +48,9 @@ it('inserts toolbar text through the editor', () => {
   expect(ed.executeEdits).not.toHaveBeenCalled()
   fireEvent.click(screen.getByTestId('mount'))
   fireEvent.click(screen.getByTestId('toolbar-bold'))
-  expect(ed.executeEdits).toHaveBeenCalledWith('toolbar',
-    [{ range: { s: 1 }, text: '**sel**' }])
+  expect(ed.executeEdits).toHaveBeenCalledWith('toolbar', [
+    { range: { s: 1 }, text: '**sel**' },
+  ])
   ed.getSelection.mockReturnValueOnce(null as never)
   fireEvent.click(screen.getByTestId('toolbar-bold'))
   expect(ed.executeEdits).toHaveBeenCalledTimes(1)

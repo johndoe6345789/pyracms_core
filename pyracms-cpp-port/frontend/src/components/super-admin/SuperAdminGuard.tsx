@@ -41,8 +41,7 @@ export default function SuperAdminGuard({
         data-testid="super-admin-denied"
       >
         <Alert severity="error" sx={{ maxWidth: 480 }}>
-          <strong>Access Denied</strong> — Super Admin
-          privileges required.
+          <strong>Access Denied</strong> — Super Admin privileges required.
         </Alert>
       </Box>
     )

@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
-import {
-  FileItem, formatFileSize, mapFileRecord,
-} from './admin/fileData'
+import { FileItem, formatFileSize, mapFileRecord } from './admin/fileData'
 import { useFileUpload } from './admin/useFileUpload'
 import { useActionError } from './useActionError'
 
@@ -21,8 +19,7 @@ export function useFileManager(tenantId: number | null) {
   const [files, setFiles] = useState<FileItem[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedFile, setSelectedFile] =
-    useState<FileItem | null>(null)
+  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
   const del = useActionError()
   const upload = useFileUpload(tenantId, setFiles)
 
@@ -60,9 +57,14 @@ export function useFileManager(tenantId: number | null) {
   }
 
   return {
-    files, loading, deleteDialogOpen, selectedFile,
+    files,
+    loading,
+    deleteDialogOpen,
+    selectedFile,
     error: del.error || upload.uploadError,
-    handleDeleteClick, handleDeleteConfirm, handleDeleteCancel,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleDeleteCancel,
     ...upload,
   }
 }

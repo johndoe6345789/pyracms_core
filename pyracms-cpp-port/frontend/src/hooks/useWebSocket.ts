@@ -14,8 +14,12 @@ interface UseWebSocketOptions {
 }
 
 export function useWebSocket({
-  url, onMessage, onConnect, onDisconnect,
-  autoReconnect = true, reconnectInterval = 3000,
+  url,
+  onMessage,
+  onConnect,
+  onDisconnect,
+  autoReconnect = true,
+  reconnectInterval = 3000,
 }: UseWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null)
   const timerRef = useRef<NodeJS.Timeout>(null)
@@ -25,10 +29,17 @@ export function useWebSocket({
     const token = currentToken()
     if (!token) return
     const ws = new WebSocket(buildWsUrl(url, token))
-    ws.onopen = () => { setConnected(true); onConnect?.() }
+    ws.onopen = () => {
+      setConnected(true)
+      onConnect?.()
+    }
     ws.onmessage = (event) => {
       let data: unknown
-      try { data = JSON.parse(event.data) } catch { data = event.data }
+      try {
+        data = JSON.parse(event.data)
+      } catch {
+        data = event.data
+      }
       onMessage?.(data)
     }
     ws.onclose = () => {
@@ -38,10 +49,18 @@ export function useWebSocket({
         timerRef.current = setTimeout(connect, reconnectInterval)
       }
     }
-    ws.onerror = () => { ws.close() }
+    ws.onerror = () => {
+      ws.close()
+    }
     wsRef.current = ws
-  }, [url, onMessage, onConnect, onDisconnect,
-    autoReconnect, reconnectInterval])
+  }, [
+    url,
+    onMessage,
+    onConnect,
+    onDisconnect,
+    autoReconnect,
+    reconnectInterval,
+  ])
 
   useEffect(() => {
     connect()

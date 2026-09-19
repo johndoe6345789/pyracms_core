@@ -15,27 +15,13 @@ test.describe('Admin Files', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'confirm dialog cancel closes it for file delete',
-    async ({ page }) => {
-      await page
-        .getByTestId('delete-file-f1')
-        .click()
-      await page
-        .getByTestId('confirm-cancel-btn')
-        .click()
-      await expect(
-        page.getByTestId('confirm-dialog'),
-      ).not.toBeVisible()
-    },
-  )
+  test('confirm dialog cancel closes it for file delete', async ({ page }) => {
+    await page.getByTestId('delete-file-f1').click()
+    await page.getByTestId('confirm-cancel-btn').click()
+    await expect(page.getByTestId('confirm-dialog')).not.toBeVisible()
+  })
 
-  test(
-    'admin sidebar is present on files page',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-sidebar'),
-      ).toBeVisible()
-    },
-  )
+  test('admin sidebar is present on files page', async ({ page }) => {
+    await expect(page.getByTestId('admin-sidebar')).toBeVisible()
+  })
 })

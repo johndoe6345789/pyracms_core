@@ -9,36 +9,39 @@ import type { Notification } from './NotificationList'
 import { mapNotificationList } from './notificationApi'
 
 export function useNotifications() {
-  const [items, setItems] =
-    useState<Notification[]>([])
+  const [items, setItems] = useState<Notification[]>([])
   const [unread, setUnread] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const isAuth = useSelector(
-    (s: RootState) => s.auth.isAuthenticated)
-  const onWs = useCallback(
-    (data: unknown) => {
-      const m = data as Record<string, unknown>
-      if (m.type !== 'notification') return
-      setUnread((c) => c + 1)
-      setItems((p) => [{
-        id: m.id as number,
-        type: (m.notificationType as string)
-          || 'system',
-        title: (m.title as string) || '',
-        message: (m.message as string) || '',
-        link: m.link as string | null,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      }, ...p].slice(0, 20))
-    }, [])
+  const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
+  const onWs = useCallback((data: unknown) => {
+    const m = data as Record<string, unknown>
+    if (m.type !== 'notification') return
+    setUnread((c) => c + 1)
+    setItems((p) =>
+      [
+        {
+          id: m.id as number,
+          type: (m.notificationType as string) || 'system',
+          title: (m.title as string) || '',
+          message: (m.message as string) || '',
+          link: m.link as string | null,
+          is_read: false,
+          created_at: new Date().toISOString(),
+        },
+        ...p,
+      ].slice(0, 20),
+    )
+  }, [])
   useWebSocket({
-    url: isAuth
-      ? apiOrigin() + '/api/ws/notifications' : '',
-    onMessage: onWs, autoReconnect: isAuth })
+    url: isAuth ? apiOrigin() + '/api/ws/notifications' : '',
+    onMessage: onWs,
+    autoReconnect: isAuth,
+  })
   useEffect(() => {
     if (!isAuth) return
-    api.get('/api/notifications/unread-count')
+    api
+      .get('/api/notifications/unread-count')
       .then((r) => setUnread(r.data.count))
       .catch(() => {})
   }, [isAuth])
@@ -47,15 +50,16 @@ export function useNotifications() {
     try {
       const r = await api.get('/api/notifications?limit=20')
       setItems(mapNotificationList(r.data))
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setLoading(false)
   }
   const markAll = async () => {
     setError('')
     try {
       await api.put('/api/notifications/read-all')
-      setItems((p) => p.map(
-        (n) => ({ ...n, is_read: true })))
+      setItems((p) => p.map((n) => ({ ...n, is_read: true })))
       setUnread(0)
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not mark all read'))
@@ -65,16 +69,20 @@ export function useNotifications() {
     setError('')
     try {
       await api.put(`/api/notifications/${id}/read`)
-      setItems((p) => p.map((n) =>
-        n.id === id
-          ? { ...n, is_read: true } : n))
+      setItems((p) => p.map((n) => (n.id === id ? { ...n, is_read: true } : n)))
       setUnread((c) => Math.max(0, c - 1))
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not mark as read'))
     }
   }
   return {
-    items, unread, loading, isAuth, error,
-    fetchList, markAll, markOne,
+    items,
+    unread,
+    loading,
+    isAuth,
+    error,
+    fetchList,
+    markAll,
+    markOne,
   }
 }

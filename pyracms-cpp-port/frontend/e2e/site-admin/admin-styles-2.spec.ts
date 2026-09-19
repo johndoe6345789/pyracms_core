@@ -12,57 +12,34 @@ test.describe('Admin Styles', () => {
     await goToAdmin(page, '/styles')
   })
 
-  test(
-    '"Font Family" select has multiple options',
-    async ({ page }) => {
-      await page.getByLabel('Font Family').click()
-      await expect(
-        page.getByRole('option', {
-          name: /Roboto/i,
-        }),
-      ).toBeVisible()
-      await expect(
-        page.getByRole('option', {
-          name: /Inter/i,
-        }),
-      ).toBeVisible()
-      await page.keyboard.press('Escape')
-    },
-  )
+  test('"Font Family" select has multiple options', async ({ page }) => {
+    await page.getByLabel('Font Family').click()
+    await expect(
+      page.getByRole('option', {
+        name: /Roboto/i,
+      }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('option', {
+        name: /Inter/i,
+      }),
+    ).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
 
-  test(
-    '"Primary Color" label is present',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Primary Color'),
-      ).toBeVisible()
-    },
-  )
+  test('"Primary Color" label is present', async ({ page }) => {
+    await expect(page.getByText('Primary Color')).toBeVisible()
+  })
 
-  test(
-    '"Secondary Color" label is present',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Secondary Color'),
-      ).toBeVisible()
-    },
-  )
+  test('"Secondary Color" label is present', async ({ page }) => {
+    await expect(page.getByText('Secondary Color')).toBeVisible()
+  })
 
-  test(
-    '"Background Color" label is present',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Background Color'),
-      ).toBeVisible()
-    },
-  )
+  test('"Background Color" label is present', async ({ page }) => {
+    await expect(page.getByText('Background Color')).toBeVisible()
+  })
 
-  test(
-    '"Text Color" label is present',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Text Color'),
-      ).toBeVisible()
-    },
-  )
+  test('"Text Color" label is present', async ({ page }) => {
+    await expect(page.getByText('Text Color')).toBeVisible()
+  })
 })

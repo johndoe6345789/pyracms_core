@@ -12,12 +12,7 @@ test.describe('Admin Styles', () => {
     await goToAdmin(page, '/styles')
   })
 
-  test(
-    'admin sidebar is present on styles page',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-sidebar'),
-      ).toBeVisible()
-    },
-  )
+  test('admin sidebar is present on styles page', async ({ page }) => {
+    await expect(page.getByTestId('admin-sidebar')).toBeVisible()
+  })
 })

@@ -3,24 +3,18 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import TenantTableRow from
-  '@/components/super-admin/TenantTableRow'
-import type { TenantRow } from
-  '@/hooks/useSuperAdminTenants'
-import {
-  TENANT_A,
-  TENANT_B,
-} from '../../helpers/tenantTableHelpers'
+import TenantTableRow from '@/components/super-admin/TenantTableRow'
+import type { TenantRow } from '@/hooks/useSuperAdminTenants'
+import { TENANT_A, TENANT_B } from '../../helpers/tenantTableHelpers'
 
-jest.mock('next/link', () =>
-  require('@/__tests__/helpers/tenantTableHelpers').MockLink)
+jest.mock(
+  'next/link',
+  () => require('@/__tests__/helpers/tenantTableHelpers').MockLink,
+)
 
 describe('TenantTableRow', () => {
   /** Wraps TenantTableRow in the required table context. */
-  function renderRow(
-    tenant: TenantRow,
-    onDelete: jest.Mock = jest.fn(),
-  ) {
+  function renderRow(tenant: TenantRow, onDelete: jest.Mock = jest.fn()) {
     return render(
       <table>
         <tbody>
@@ -34,9 +28,7 @@ describe('TenantTableRow', () => {
     expect(screen.getByText(TENANT_A.name)).toBeInTheDocument()
     expect(screen.getByText(TENANT_A.slug)).toBeInTheDocument()
     expect(screen.getByText(TENANT_A.owner)).toBeInTheDocument()
-    expect(
-      screen.getByText(TENANT_A.createdAt),
-    ).toBeInTheDocument()
+    expect(screen.getByText(TENANT_A.createdAt)).toBeInTheDocument()
   })
 
   it('active chip shows "Active" with success color', () => {
@@ -44,9 +36,7 @@ describe('TenantTableRow', () => {
     const chip = screen.getByText('Active')
     expect(chip).toBeInTheDocument()
     // MUI renders color as a class; check the parent element
-    expect(chip.closest('.MuiChip-root')).toHaveClass(
-      'MuiChip-colorSuccess',
-    )
+    expect(chip.closest('.MuiChip-root')).toHaveClass('MuiChip-colorSuccess')
   })
 
   it('inactive chip shows "Inactive" with default color', () => {
@@ -61,19 +51,14 @@ describe('TenantTableRow', () => {
   it('open icon button has correct aria-label and href', () => {
     renderRow(TENANT_A)
     const btn = screen.getByTestId('open-tenant-alpha')
-    expect(btn).toHaveAttribute(
-      'aria-label',
-      `Open ${TENANT_A.name}`,
-    )
+    expect(btn).toHaveAttribute('aria-label', `Open ${TENANT_A.name}`)
     expect(btn).toHaveAttribute('href', `/site/${TENANT_A.slug}`)
   })
 
   it('delete icon button calls onDelete with tenant id', () => {
     const onDelete = jest.fn()
     renderRow(TENANT_A, onDelete)
-    fireEvent.click(
-      screen.getByTestId('delete-tenant-alpha'),
-    )
+    fireEvent.click(screen.getByTestId('delete-tenant-alpha'))
     expect(onDelete).toHaveBeenCalledWith(TENANT_A.id)
     expect(onDelete).toHaveBeenCalledTimes(1)
   })

@@ -1,8 +1,7 @@
 /** Tests for SuperAdminDashboard: card labels and text. */
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import SuperAdminDashboard from
-  '@/components/super-admin/SuperAdminDashboard'
+import SuperAdminDashboard from '@/components/super-admin/SuperAdminDashboard'
 
 describe('SuperAdminDashboard', () => {
   beforeEach(() => {
@@ -11,27 +10,27 @@ describe('SuperAdminDashboard', () => {
 
   describe('quick-link card labels', () => {
     it('Manage Tenants card shows correct label', () => {
-      expect(
-        screen.getByTestId('quick-tenants'),
-      ).toHaveTextContent('Manage Tenants')
+      expect(screen.getByTestId('quick-tenants')).toHaveTextContent(
+        'Manage Tenants',
+      )
     })
 
     it('Global Users card shows correct label', () => {
-      expect(
-        screen.getByTestId('quick-users'),
-      ).toHaveTextContent('Global Users')
+      expect(screen.getByTestId('quick-users')).toHaveTextContent(
+        'Global Users',
+      )
     })
 
     it('Platform Settings card shows correct label', () => {
-      expect(
-        screen.getByTestId('quick-settings'),
-      ).toHaveTextContent('Platform Settings')
+      expect(screen.getByTestId('quick-settings')).toHaveTextContent(
+        'Platform Settings',
+      )
     })
 
     it('Create New Site card shows correct label', () => {
-      expect(
-        screen.getByTestId('quick-create-site'),
-      ).toHaveTextContent('Create New Site')
+      expect(screen.getByTestId('quick-create-site')).toHaveTextContent(
+        'Create New Site',
+      )
     })
   })
 
@@ -50,17 +49,13 @@ describe('SuperAdminDashboard', () => {
 
     it('Platform Settings shows its description', () => {
       expect(
-        screen.getByText(
-          'Configure global PyraCMS settings',
-        ),
+        screen.getByText('Configure global PyraCMS settings'),
       ).toBeInTheDocument()
     })
 
     it('Create New Site shows its description', () => {
       expect(
-        screen.getByText(
-          'Launch the site creation wizard',
-        ),
+        screen.getByText('Launch the site creation wizard'),
       ).toBeInTheDocument()
     })
   })

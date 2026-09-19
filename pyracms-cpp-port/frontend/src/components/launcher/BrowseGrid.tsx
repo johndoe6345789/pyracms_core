@@ -9,10 +9,14 @@ interface Props {
 
 export default function BrowseGrid({ games, onSelect }: Props) {
   return (
-    <Box data-testid="browse-grid" sx={{
-      display: 'grid', gap: 2,
-      gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
-    }}>
+    <Box
+      data-testid="browse-grid"
+      sx={{
+        display: 'grid',
+        gap: 2,
+        gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
+      }}
+    >
       {games.map((g) => (
         <Card key={g.name} variant="outlined">
           <CardActionArea onClick={() => onSelect(g.name)} sx={{ p: 1 }}>

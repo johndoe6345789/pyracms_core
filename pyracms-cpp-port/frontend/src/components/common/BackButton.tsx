@@ -11,7 +11,9 @@ interface BackButtonProps {
 }
 
 export function BackButton({
-  href, label, 'data-testid': testId,
+  href,
+  label,
+  'data-testid': testId,
 }: BackButtonProps) {
   return (
     <Button

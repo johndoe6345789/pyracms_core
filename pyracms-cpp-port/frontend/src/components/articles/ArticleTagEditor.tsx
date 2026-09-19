@@ -1,16 +1,7 @@
 'use client'
 
-import {
-  AddOutlined,
-  LocalOfferOutlined,
-} from '@mui/icons-material'
-import {
-  Box,
-  Chip,
-  IconButton,
-  InputAdornment,
-  TextField,
-} from '@mui/material'
+import { AddOutlined, LocalOfferOutlined } from '@mui/icons-material'
+import { Box, Chip, IconButton, InputAdornment, TextField } from '@mui/material'
 import { normaliseTag, useTagDraft } from './useTagDraft'
 import { boxSx, listSx } from './tagEditorStyles'
 

@@ -1,5 +1,9 @@
 import {
-  render, screen, fireEvent, waitFor, within,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
 } from '@testing-library/react'
 import AdminAclPage from '@/app/site/[slug]/(admin)/admin/acl/page'
 import AdminSettingsPage from '@/app/site/[slug]/(admin)/admin/settings/page'
@@ -9,11 +13,12 @@ import { routeGet } from '../../helpers/scopeMocks'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-jest.mock('@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock)
+jest.mock(
+  '@/hooks/useTenantId',
+  () => require('../../helpers/scopeMocks').tenantMock,
+)
 
-const box = (id: string) =>
-  within(screen.getByTestId(id)).getByRole('textbox')
+const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -38,8 +43,9 @@ it('settings page edits and adds settings', async () => {
   render(<AdminSettingsPage />)
   await screen.findByText('k')
   fireEvent.click(screen.getByTestId('edit-setting-btn'))
-  const input = within(screen.getAllByTestId('setting-value-input')[1]!)
-    .getByRole('textbox')
+  const input = within(
+    screen.getAllByTestId('setting-value-input')[1]!,
+  ).getByRole('textbox')
   fireEvent.change(input, { target: { value: 'n' } })
   fireEvent.click(screen.getByTestId('save-setting-btn'))
   await screen.findByText('n')

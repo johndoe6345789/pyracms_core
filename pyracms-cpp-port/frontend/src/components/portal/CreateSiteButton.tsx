@@ -11,9 +11,7 @@ export default function CreateSiteButton() {
     (state: RootState) => state.auth.isAuthenticated,
   )
 
-  const href = isAuthenticated
-    ? '/create-site'
-    : '/auth/login/create-site'
+  const href = isAuthenticated ? '/create-site' : '/auth/login/create-site'
 
   return (
     <Box
@@ -31,9 +29,7 @@ export default function CreateSiteButton() {
         href={href}
         data-testid="create-site-button"
         aria-label={
-          isAuthenticated
-            ? 'Create a new site'
-            : 'Sign in to create a new site'
+          isAuthenticated ? 'Create a new site' : 'Sign in to create a new site'
         }
         sx={{
           bgcolor: 'white',

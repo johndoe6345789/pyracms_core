@@ -1,7 +1,11 @@
 'use client'
 
 import {
-  IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material'
 import { SettingsBrightnessOutlined } from '@mui/icons-material'
 import { useState } from 'react'
@@ -23,9 +27,7 @@ export default function ThemeToggle() {
       <IconButton
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{ color: 'text.primary' }}
-        aria-label={`Toggle theme, current: ${
-          currentMode?.label || 'System'
-        }`}
+        aria-label={`Toggle theme, current: ${currentMode?.label || 'System'}`}
         aria-haspopup="true"
         aria-expanded={Boolean(anchorEl)}
         data-testid="theme-toggle"

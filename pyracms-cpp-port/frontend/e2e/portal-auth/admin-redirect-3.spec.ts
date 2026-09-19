@@ -5,8 +5,8 @@ test.describe('Admin redirect — /admin', () => {
   // ---- NEW: mocked /admin behaviour ----
 
   test(
-    'mocked tenants: /admin redirects to '
-    + '/site/<slug>/admin when tenant exists',
+    'mocked tenants: /admin redirects to ' +
+      '/site/<slug>/admin when tenant exists',
     async ({ page }) => {
       await loginAsAdmin(page)
 
@@ -15,9 +15,7 @@ test.describe('Admin redirect — /admin', () => {
         route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify([
-            { slug: 'demo', name: 'Demo Site' },
-          ]),
+          body: JSON.stringify([{ slug: 'demo', name: 'Demo Site' }]),
         }),
       )
 
@@ -25,21 +23,23 @@ test.describe('Admin redirect — /admin', () => {
       await page.waitForLoadState('networkidle')
 
       // Should have navigated to the tenant admin
-      await page.waitForURL(
-        (url) =>
-          url.pathname.includes('/admin') &&
-          url.pathname.includes('/site/demo'),
-        { timeout: 8_000 },
-      ).catch(() => {
-        // Redirect may not happen if session is not
-        // established — acceptable in test env
-      })
+      await page
+        .waitForURL(
+          (url) =>
+            url.pathname.includes('/admin') &&
+            url.pathname.includes('/site/demo'),
+          { timeout: 8_000 },
+        )
+        .catch(() => {
+          // Redirect may not happen if session is not
+          // established — acceptable in test env
+        })
     },
   )
 
   test(
-    'mocked tenants: /admin shows "No tenants found" '
-    + 'when tenant list is empty',
+    'mocked tenants: /admin shows "No tenants found" ' +
+      'when tenant list is empty',
     async ({ page }) => {
       await loginAsAdmin(page)
 
@@ -57,9 +57,9 @@ test.describe('Admin redirect — /admin', () => {
       // Either the no-tenant message or still loading
       // spinner — wait for no-tenant text if on /admin
       if (page.url().includes('/admin')) {
-        await expect(
-          page.getByText(/No tenants found/i),
-        ).toBeVisible({ timeout: 8_000 })
+        await expect(page.getByText(/No tenants found/i)).toBeVisible({
+          timeout: 8_000,
+        })
       }
     },
   )

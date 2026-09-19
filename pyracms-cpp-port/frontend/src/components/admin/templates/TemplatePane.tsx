@@ -4,8 +4,7 @@ import { Box } from '@mui/material'
 import Editor from '@monaco-editor/react'
 import TemplatePreview from './TemplatePreview'
 import type { TemplateSection } from './defaultTemplates'
-import { EDITOR_OPTIONS } from
-  '@/app/site/[slug]/(admin)/admin/templates/templateEditorOptions'
+import { EDITOR_OPTIONS } from '@/app/site/[slug]/(admin)/admin/templates/templateEditorOptions'
 
 interface Props {
   section: TemplateSection
@@ -19,8 +18,12 @@ export default function TemplatePane(p: Props) {
     <Box sx={{ display: 'flex', gap: 2, minHeight: 500 }}>
       <Box
         sx={{
-          flex: 1, minWidth: 0, border: 1, borderColor: 'divider',
-          borderRadius: 1, overflow: 'hidden',
+          flex: 1,
+          minWidth: 0,
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'hidden',
         }}
       >
         <Editor

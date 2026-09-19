@@ -1,10 +1,7 @@
 import { act } from '@testing-library/react'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import {
-  renderLogin,
-  submitForm,
-} from '../helpers/loginHookHelpers'
+import { renderLogin, submitForm } from '../helpers/loginHookHelpers'
 
 const mockPush = jest.fn()
 
@@ -49,26 +46,22 @@ describe('useLogin', () => {
     expect(result.current.formData.password).toBe('')
   })
 
-  it('sets error and does not call API when username is empty',
-    async () => {
-      const { result } = renderLogin()
-      await submitForm(result)
-      expect(result.current.error).toBe('Username is required')
-      expect(mockApi.post).not.toHaveBeenCalled()
-    },
-  )
+  it('sets error and does not call API when username is empty', async () => {
+    const { result } = renderLogin()
+    await submitForm(result)
+    expect(result.current.error).toBe('Username is required')
+    expect(mockApi.post).not.toHaveBeenCalled()
+  })
 
-  it('sets error and does not call API when password is empty',
-    async () => {
-      const { result } = renderLogin()
-      act(() => {
-        result.current.updateField('username', 'alice')
-      })
-      await submitForm(result)
-      expect(result.current.error).toBe('Password is required')
-      expect(mockApi.post).not.toHaveBeenCalled()
-    },
-  )
+  it('sets error and does not call API when password is empty', async () => {
+    const { result } = renderLogin()
+    act(() => {
+      result.current.updateField('username', 'alice')
+    })
+    await submitForm(result)
+    expect(result.current.error).toBe('Password is required')
+    expect(mockApi.post).not.toHaveBeenCalled()
+  })
 
   it('loading stays false after a validation failure', async () => {
     const { result } = renderLogin()

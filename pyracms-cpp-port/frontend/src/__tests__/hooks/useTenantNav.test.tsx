@@ -21,13 +21,16 @@ jest.mock('@/hooks/useTenant', () => ({
 function setup(user?: ReturnType<typeof makeUser>) {
   const { store } = makeStore()
   if (user) store.dispatch(setCredentials({ user, token: 't' }))
-  const wrapper = ({ children }: { children: React.ReactNode }) =>
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
     <Provider store={store}>{children}</Provider>
+  )
   return renderHook(() => useTenantNav(), { wrapper })
 }
 
 describe('useTenantNav', () => {
-  beforeEach(() => { tenant = null })
+  beforeEach(() => {
+    tenant = null
+  })
 
   it('falls back to the slug title and finds the active link', () => {
     const { result } = setup()
@@ -49,8 +52,9 @@ describe('useTenantNav', () => {
 
   it('lets site admins and owners administer', () => {
     tenant = { displayName: 'Demo', ownerId: 9 }
-    expect(setup(makeUser({ role: UserRole.SiteAdmin }))
-      .result.current.canAdmin).toBe(true)
+    expect(
+      setup(makeUser({ role: UserRole.SiteAdmin })).result.current.canAdmin,
+    ).toBe(true)
     expect(setup(makeUser({ id: 9 })).result.current.canAdmin).toBe(true)
     expect(setup(makeUser({ id: 3 })).result.current.canAdmin).toBe(false)
   })

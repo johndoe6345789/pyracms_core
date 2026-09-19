@@ -1,23 +1,24 @@
 'use client'
 
-import {
-  Typography, Box, Button, Snackbar, Alert,
-} from '@mui/material'
+import { Typography, Box, Button, Snackbar, Alert } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import FeatureToggleCard from
-  '@/components/admin/FeatureToggleCard'
+import FeatureToggleCard from '@/components/admin/FeatureToggleCard'
 
 export default function AdminFeaturesPage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
   const {
-    features, snackbarOpen, error, handleToggle,
-    handleSave, handleCloseSnackbar,
+    features,
+    snackbarOpen,
+    error,
+    handleToggle,
+    handleSave,
+    handleCloseSnackbar,
   } = useFeatureToggles(tenantId)
 
   return (
@@ -25,11 +26,7 @@ export default function AdminFeaturesPage() {
       <Typography variant="h3" sx={{ mb: 1 }}>
         Feature Toggles
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Enable or disable features across the platform.
       </Typography>
       <ErrorAlert error={error} testId="features-error" />

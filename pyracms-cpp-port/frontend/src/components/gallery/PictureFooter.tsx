@@ -15,7 +15,13 @@ interface PictureFooterProps {
 }
 
 export default function PictureFooter({
-  likes, dislikes, onLike, onDislike, onSetCover, onEdit, onDelete,
+  likes,
+  dislikes,
+  onLike,
+  onDislike,
+  onSetCover,
+  onEdit,
+  onDelete,
   canManage = true,
 }: PictureFooterProps) {
   return (
@@ -35,8 +41,11 @@ export default function PictureFooter({
         onDislike={onDislike}
       />
       {canManage && (
-        <PictureActions onSetCover={onSetCover} onDelete={onDelete}
-          {...(onEdit ? { onEdit } : {})} />
+        <PictureActions
+          onSetCover={onSetCover}
+          onDelete={onDelete}
+          {...(onEdit ? { onEdit } : {})}
+        />
       )}
     </Box>
   )

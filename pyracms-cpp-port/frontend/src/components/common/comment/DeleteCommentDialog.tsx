@@ -1,8 +1,12 @@
 'use client'
 
 import {
-  Dialog, DialogTitle, DialogContent,
-  DialogActions, Button, Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
 } from '@mui/material'
 
 interface DeleteCommentDialogProps {
@@ -20,16 +24,10 @@ export default function DeleteCommentDialog({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Delete Comment</DialogTitle>
       <DialogContent>
-        <Typography>
-          Are you sure you want to delete
-          this comment?
-        </Typography>
+        <Typography>Are you sure you want to delete this comment?</Typography>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          data-testid="delete-comment-cancel-btn"
-        >
+        <Button onClick={onClose} data-testid="delete-comment-cancel-btn">
           Cancel
         </Button>
         <Button

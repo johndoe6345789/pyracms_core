@@ -1,25 +1,27 @@
-import {
-  ListItem, ListItemAvatar, ListItemText, Avatar,
-} from '@mui/material'
+import { ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material'
 
 export interface FollowUser {
-  userId: number; username: string
-  avatarUrl: string; createdAt: string
+  userId: number
+  username: string
+  avatarUrl: string
+  createdAt: string
 }
 
 export function FollowerRow({ u }: { u: FollowUser }) {
   return (
-    <ListItem component="a" href={`../../users/${u.username}`}
+    <ListItem
+      component="a"
+      href={`../../users/${u.username}`}
       sx={{ textDecoration: 'none', color: 'inherit' }}
-      data-testid={`follower-${u.username}`}>
+      data-testid={`follower-${u.username}`}
+    >
       <ListItemAvatar>
-        <Avatar src={u.avatarUrl}>
-          {u.username[0]?.toUpperCase()}
-        </Avatar>
+        <Avatar src={u.avatarUrl}>{u.username[0]?.toUpperCase()}</Avatar>
       </ListItemAvatar>
-      <ListItemText primary={u.username}
-        secondary={'Since ' + new Date(u.createdAt)
-          .toLocaleDateString()} />
+      <ListItemText
+        primary={u.username}
+        secondary={'Since ' + new Date(u.createdAt).toLocaleDateString()}
+      />
     </ListItem>
   )
 }

@@ -13,8 +13,20 @@ function install() {
 }
 
 const FORBID_ATTR = ['formaction', 'srcdoc']
-const FORBID_TAGS = ['style', 'form', 'input', 'button', 'textarea',
-  'select', 'iframe', 'object', 'embed', 'base', 'meta', 'link']
+const FORBID_TAGS = [
+  'style',
+  'form',
+  'input',
+  'button',
+  'textarea',
+  'select',
+  'iframe',
+  'object',
+  'embed',
+  'base',
+  'meta',
+  'link',
+]
 
 /**
  * Sanitises untrusted HTML for dangerouslySetInnerHTML. Without a DOM

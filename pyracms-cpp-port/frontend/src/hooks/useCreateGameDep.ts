@@ -27,18 +27,26 @@ export function useCreateGameDep(type: GameDepType, slug: string) {
     }
     setSaving(true)
     setError('')
-    return api.post(`/api/gamedep/${type}`, {
-      name: id,
-      displayName: displayName.trim() || id,
-      description: description.trim(),
-    })
+    return api
+      .post(`/api/gamedep/${type}`, {
+        name: id,
+        displayName: displayName.trim() || id,
+        description: description.trim(),
+      })
       .then(() => router.push(`/site/${slug}/${GAMEDEP_SECTION[type]}/${id}`))
       .catch((err) => setError(apiErrorMessage(err, 'Could not create it')))
       .finally(() => setSaving(false))
   }
 
   return {
-    name, setName, displayName, setDisplayName, description,
-    setDescription, saving, error, submit,
+    name,
+    setName,
+    displayName,
+    setDisplayName,
+    description,
+    setDescription,
+    saving,
+    error,
+    submit,
   }
 }

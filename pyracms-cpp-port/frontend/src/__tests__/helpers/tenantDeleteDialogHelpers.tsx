@@ -1,6 +1,5 @@
 import { render } from '@testing-library/react'
-import TenantDeleteDialog from
-  '@/components/super-admin/TenantDeleteDialog'
+import TenantDeleteDialog from '@/components/super-admin/TenantDeleteDialog'
 
 interface RenderOptions {
   open: boolean

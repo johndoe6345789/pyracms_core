@@ -4,8 +4,10 @@ import { Alert, Box, Button, Paper, TextField, Typography } from '@mui/material'
 import { useProfileEdit, type ProfileFields } from '@/hooks/useProfileEdit'
 
 const FIELDS: [keyof ProfileFields, string][] = [
-  ['fullName', 'Full name'], ['email', 'Email'],
-  ['website', 'Website'], ['timezone', 'Timezone'],
+  ['fullName', 'Full name'],
+  ['email', 'Email'],
+  ['website', 'Website'],
+  ['timezone', 'Timezone'],
 ]
 
 export default function ProfileEditForm({ userId }: { userId: number }) {
@@ -27,18 +29,37 @@ export default function ProfileEditForm({ userId }: { userId: number }) {
           </Alert>
         )}
         {FIELDS.map(([key, label]) => (
-          <TextField key={key} fullWidth size="small" margin="dense"
-            label={label} value={s.fields[key]} disabled={s.loading}
+          <TextField
+            key={key}
+            fullWidth
+            size="small"
+            margin="dense"
+            label={label}
+            value={s.fields[key]}
+            disabled={s.loading}
             onChange={(e) => s.set(key, e.target.value)}
-            inputProps={{ 'data-testid': `profile-${key}` }} />
+            inputProps={{ 'data-testid': `profile-${key}` }}
+          />
         ))}
-        <TextField fullWidth size="small" margin="dense" multiline
-          minRows={3} label="About me" value={s.fields.aboutme}
+        <TextField
+          fullWidth
+          size="small"
+          margin="dense"
+          multiline
+          minRows={3}
+          label="About me"
+          value={s.fields.aboutme}
           disabled={s.loading}
           onChange={(e) => s.set('aboutme', e.target.value)}
-          inputProps={{ 'data-testid': 'profile-aboutme' }} />
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}
-          disabled={s.busy || s.loading} data-testid="profile-save">
+          inputProps={{ 'data-testid': 'profile-aboutme' }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ mt: 2 }}
+          disabled={s.busy || s.loading}
+          data-testid="profile-save"
+        >
           {s.busy ? 'Saving...' : 'Save profile'}
         </Button>
       </Box>

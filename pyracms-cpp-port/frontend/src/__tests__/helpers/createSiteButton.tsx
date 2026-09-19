@@ -2,11 +2,8 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
-import CreateSiteButton
-  from '@/components/portal/CreateSiteButton'
-import authReducer, {
-  setCredentials,
-} from '@/store/slices/authSlice'
+import CreateSiteButton from '@/components/portal/CreateSiteButton'
+import authReducer, { setCredentials } from '@/store/slices/authSlice'
 import type { User } from '@/types'
 
 /**
@@ -29,9 +26,7 @@ function makeAuthStore(isAuthenticated = false) {
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z',
     }
-    store.dispatch(
-      setCredentials({ user: fakeUser, token: 'tok' }),
-    )
+    store.dispatch(setCredentials({ user: fakeUser, token: 'tok' }))
   }
 
   return store

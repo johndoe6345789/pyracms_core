@@ -13,15 +13,23 @@ export type LibraryFilter = 'all' | 'installed' | 'favourites'
 type Marks = Record<string, string>
 
 export function filterGames(
-  games: GameDepItem[], search: string, tag: string,
-  filter: LibraryFilter, installed: Marks, favs: Marks,
+  games: GameDepItem[],
+  search: string,
+  tag: string,
+  filter: LibraryFilter,
+  installed: Marks,
+  favs: Marks,
 ): GameDepItem[] {
   const q = search.toLowerCase()
-  const has = (g: GameDepItem) => filter === 'installed'
-    ? !!installed[g.name] : !!favs[g.name]
+  const has = (g: GameDepItem) =>
+    filter === 'installed' ? !!installed[g.name] : !!favs[g.name]
   return games
-    .filter((g) => !q || g.displayName.toLowerCase().includes(q) ||
-      g.description.toLowerCase().includes(q))
+    .filter(
+      (g) =>
+        !q ||
+        g.displayName.toLowerCase().includes(q) ||
+        g.description.toLowerCase().includes(q),
+    )
     .filter((g) => !tag || g.tags.includes(tag))
     .filter((g) => filter === 'all' || has(g))
     .sort((a, b) => a.displayName.localeCompare(b.displayName))
@@ -39,7 +47,8 @@ export function useGameLibrary() {
   useEffect(() => {
     setInstalled(installedStore.get())
     setFavs(favouriteStore.get())
-    api.get('/api/gamedep/game?limit=100')
+    api
+      .get('/api/gamedep/game?limit=100')
       .then((res) => {
         const rows = Array.isArray(res.data) ? res.data : []
         setGames(rows.map(mapListItem))
@@ -50,22 +59,39 @@ export function useGameLibrary() {
 
   const tags = useMemo(
     () => Array.from(new Set(games.flatMap((g) => g.tags))).sort(),
-    [games])
+    [games],
+  )
 
   const visible = useMemo(
     () => filterGames(games, search, tag, filter, installed, favs),
-    [games, search, tag, filter, installed, favs])
+    [games, search, tag, filter, installed, favs],
+  )
 
   const markInstalled = (name: string, version: string) => {
-    installedStore.set(name, version); setInstalled(installedStore.get())
+    installedStore.set(name, version)
+    setInstalled(installedStore.get())
   }
   const unmark = (name: string) => {
-    installedStore.remove(name); setInstalled(installedStore.get())
+    installedStore.remove(name)
+    setInstalled(installedStore.get())
   }
   const toggleFav = (name: string) => setFavs(favouriteStore.toggle(name))
 
   return {
-    games, visible, loading, search, setSearch, filter, setFilter,
-    tag, setTag, tags, installed, favs, markInstalled, unmark, toggleFav,
+    games,
+    visible,
+    loading,
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    tag,
+    setTag,
+    tags,
+    installed,
+    favs,
+    markInstalled,
+    unmark,
+    toggleFav,
   }
 }

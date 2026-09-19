@@ -17,21 +17,33 @@ export function ForumSearchInput(p: Props) {
         placeholder="Search forum posts..."
         value={p.query}
         onChange={(e) => p.onQuery(e.target.value)}
-        size="small" fullWidth
+        size="small"
+        fullWidth
         onKeyDown={(e) => e.key === 'Enter' && p.onSearch()}
         data-testid="forum-search-input"
-        InputProps={{ startAdornment: (
-          <InputAdornment position="start">
-            <SearchOutlined />
-          </InputAdornment>
-        ) }} />
-      <Button variant="outlined" startIcon={<FilterListOutlined />}
-        onClick={p.onToggleFilters} size="small"
-        data-testid="forum-search-filters-btn">
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchOutlined />
+            </InputAdornment>
+          ),
+        }}
+      />
+      <Button
+        variant="outlined"
+        startIcon={<FilterListOutlined />}
+        onClick={p.onToggleFilters}
+        size="small"
+        data-testid="forum-search-filters-btn"
+      >
         Filters
       </Button>
-      <Button variant="contained" onClick={p.onSearch} size="small"
-        data-testid="forum-search-submit">
+      <Button
+        variant="contained"
+        onClick={p.onSearch}
+        size="small"
+        data-testid="forum-search-submit"
+      >
         Search
       </Button>
     </Box>

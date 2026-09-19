@@ -11,9 +11,12 @@ export function useForgotPassword(tenant?: string) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return f.fail('Email is required')
-    return f.run(() => api.post('/api/auth/forgot-password', {
-      email: email.trim(), ...(tenant ? { tenant } : {}),
-    }))
+    return f.run(() =>
+      api.post('/api/auth/forgot-password', {
+        email: email.trim(),
+        ...(tenant ? { tenant } : {}),
+      }),
+    )
   }
   return { email, setEmail, submit, ...f }
 }

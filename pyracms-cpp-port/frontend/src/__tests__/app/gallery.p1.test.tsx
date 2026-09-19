@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import GalleryPage from '@/app/site/[slug]/(tenant)/gallery/page'
 import AlbumPage from '@/app/site/[slug]/(tenant)/gallery/[albumId]/page'
-import PicturePage
-  from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
+import PicturePage from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
 
 const push = jest.fn()
-jest.mock('@/components/common/CommentSection',
-  () => require('../helpers/commentMock').commentSectionMock())
+jest.mock('@/components/common/CommentSection', () =>
+  require('../helpers/commentMock').commentSectionMock(),
+)
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's', albumId: '4', pictureId: '9' }),
@@ -20,20 +20,38 @@ jest.mock('@/hooks/useSiteSession', () => ({
   useSiteSession: () => signedIn,
 }))
 jest.mock('@/hooks/useGalleryAlbums', () => ({
-  useGalleryAlbums: () => ({ albums: [{ id: '1', name: 'A',
-    coverImage: '/c', pictureCount: 2 }] }),
+  useGalleryAlbums: () => ({
+    albums: [{ id: '1', name: 'A', coverImage: '/c', pictureCount: 2 }],
+  }),
 }))
 jest.mock('@/hooks/useGalleryAlbum', () => ({
-  useGalleryAlbum: () => ({ albumName: 'Trip', albumDescription: 'd',
-    ownerId: 1, refresh: jest.fn(), pictures: [
-    { id: '1', title: 'P', src: '/p' }] }),
+  useGalleryAlbum: () => ({
+    albumName: 'Trip',
+    albumDescription: 'd',
+    ownerId: 1,
+    refresh: jest.fn(),
+    pictures: [{ id: '1', title: 'P', src: '/p' }],
+  }),
 }))
-const pic = { title: 'Pic', description: 'd', src: '/s', tags: [],
-  likes: 1, dislikes: 0, isVideo: false, albumId: '4', albumName: 'Trip',
-  ownerId: 1 }
-const h = { picture: pic as unknown, handleLike: jest.fn(),
-  handleDislike: jest.fn(), handleSetCover: jest.fn(),
-  refresh: jest.fn() }
+const pic = {
+  title: 'Pic',
+  description: 'd',
+  src: '/s',
+  tags: [],
+  likes: 1,
+  dislikes: 0,
+  isVideo: false,
+  albumId: '4',
+  albumName: 'Trip',
+  ownerId: 1,
+}
+const h = {
+  picture: pic as unknown,
+  handleLike: jest.fn(),
+  handleDislike: jest.fn(),
+  handleSetCover: jest.fn(),
+  refresh: jest.fn(),
+}
 jest.mock('@/hooks/useGalleryPicture', () => ({
   useGalleryPicture: () => h,
 }))
@@ -63,12 +81,12 @@ describe('gallery pages', () => {
   })
 
   it('shows picture action failures', async () => {
-    h.handleSetCover.mockRejectedValue(
-      { response: { data: { error: 'no cover' } } })
+    h.handleSetCover.mockRejectedValue({
+      response: { data: { error: 'no cover' } },
+    })
     render(<PicturePage />)
     fireEvent.click(screen.getByTestId('set-cover-btn'))
-    expect(await screen.findByRole('alert'))
-      .toHaveTextContent('no cover')
+    expect(await screen.findByRole('alert')).toHaveTextContent('no cover')
   })
 
   it('renders nothing before the picture loads', () => {

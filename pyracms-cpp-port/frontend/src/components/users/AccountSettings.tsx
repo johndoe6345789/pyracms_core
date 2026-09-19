@@ -8,14 +8,19 @@ import ProfileEditForm from './ProfileEditForm'
 import ChangePasswordForm from './ChangePasswordForm'
 
 /** Profile edit + change password for the signed-in user. */
-export default function AccountSettings(
-  { loginHref }: { loginHref: string },
-) {
+export default function AccountSettings({ loginHref }: { loginHref: string }) {
   const { user, isAuthenticated } = useSelector((s: RootState) => s.auth)
   if (!isAuthenticated || !user) {
     return (
-      <Alert severity="info" data-testid="account-signin"
-        action={<Button component={Link} href={loginHref}>Sign in</Button>}>
+      <Alert
+        severity="info"
+        data-testid="account-signin"
+        action={
+          <Button component={Link} href={loginHref}>
+            Sign in
+          </Button>
+        }
+      >
         Sign in to manage your account.
       </Alert>
     )

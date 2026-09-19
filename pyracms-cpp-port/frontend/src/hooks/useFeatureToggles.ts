@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { useActionError } from './useActionError'
 import {
-  Feature, FEATURE_DEFS, featuresFromSettings,
+  Feature,
+  FEATURE_DEFS,
+  featuresFromSettings,
 } from './admin/featureDefs'
 
 export type { Feature }
 
 export function useFeatureToggles(tenantId: number | null) {
   const [features, setFeatures] = useState<Feature[]>(
-    FEATURE_DEFS.map(f => ({ ...f, enabled: false })),
+    FEATURE_DEFS.map((f) => ({ ...f, enabled: false })),
   )
   const [loading, setLoading] = useState(true)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -20,25 +22,29 @@ export function useFeatureToggles(tenantId: number | null) {
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
-    api.get(`/api/settings?tenant_id=${tenantId}`)
-      .then(res => setFeatures(featuresFromSettings(res.data || [])))
+    api
+      .get(`/api/settings?tenant_id=${tenantId}`)
+      .then((res) => setFeatures(featuresFromSettings(res.data || [])))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [tenantId])
 
   const handleToggle = (id: string) => {
-    setFeatures(prev => prev.map(f =>
-      f.id === id ? { ...f, enabled: !f.enabled } : f))
+    setFeatures((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, enabled: !f.enabled } : f)),
+    )
   }
 
   const handleSave = () => {
     if (!tenantId) return
     setError('')
-    const promises = features.map(f =>
-      api.put(
-        `/api/settings/feature_${f.id}?tenant_id=${tenantId}`,
-        { name: `feature_${f.id}`, value: String(f.enabled), tenantId },
-      ))
+    const promises = features.map((f) =>
+      api.put(`/api/settings/feature_${f.id}?tenant_id=${tenantId}`, {
+        name: `feature_${f.id}`,
+        value: String(f.enabled),
+        tenantId,
+      }),
+    )
     Promise.all(promises)
       .then(() => setSnackbarOpen(true))
       .catch(fail('Could not save feature toggles'))
@@ -47,7 +53,12 @@ export function useFeatureToggles(tenantId: number | null) {
   const handleCloseSnackbar = () => setSnackbarOpen(false)
 
   return {
-    features, loading, snackbarOpen, error,
-    handleToggle, handleSave, handleCloseSnackbar,
+    features,
+    loading,
+    snackbarOpen,
+    error,
+    handleToggle,
+    handleSave,
+    handleCloseSnackbar,
   }
 }

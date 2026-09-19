@@ -1,8 +1,14 @@
 'use client'
 
 import {
-  Box, FormControl, InputLabel, Select, MenuItem, TextField,
-  InputAdornment, Chip,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  InputAdornment,
+  Chip,
 } from '@mui/material'
 import { SearchOutlined } from '@mui/icons-material'
 import type { useSnippets } from '@/hooks/useSnippets'
@@ -45,12 +51,18 @@ export function SnippetFilters({ s }: Props) {
         sx={{ display: 'flex', gap: 1, mb: 4, flexWrap: 'wrap' }}
         data-testid="language-filter"
       >
-        <Chip label="All" color={s.language ? 'default' : 'primary'}
-          onClick={() => s.setLanguage('')} />
+        <Chip
+          label="All"
+          color={s.language ? 'default' : 'primary'}
+          onClick={() => s.setLanguage('')}
+        />
         {s.languages.map((l) => (
-          <Chip key={l} label={l}
+          <Chip
+            key={l}
+            label={l}
             color={s.language === l ? 'primary' : 'default'}
-            onClick={() => s.setLanguage(s.language === l ? '' : l)} />
+            onClick={() => s.setLanguage(s.language === l ? '' : l)}
+          />
         ))}
       </Box>
     </>

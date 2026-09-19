@@ -21,9 +21,12 @@ describe('OAuth callback page', () => {
     query = ''
     mockHook.mockReturnValue({ error: 'bad state' })
     render(<Page />)
-    expect(screen.getByTestId('oauth-callback-error'))
-      .toHaveTextContent('bad state')
-    expect(screen.getByText('Back to sign in'))
-      .toHaveAttribute('href', '/auth/login')
+    expect(screen.getByTestId('oauth-callback-error')).toHaveTextContent(
+      'bad state',
+    )
+    expect(screen.getByText('Back to sign in')).toHaveAttribute(
+      'href',
+      '/auth/login',
+    )
   })
 })

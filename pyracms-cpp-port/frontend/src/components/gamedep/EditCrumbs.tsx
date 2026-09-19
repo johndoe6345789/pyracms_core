@@ -11,15 +11,21 @@ interface EditCrumbsProps {
 }
 
 export default function EditCrumbs({
-  slug, detailHref, displayName,
+  slug,
+  detailHref,
+  displayName,
 }: EditCrumbsProps) {
   return (
-    <Breadcrumbs sx={{ mb: 3 }}
-      separator={<NavigateNextOutlined fontSize="small" />}>
+    <Breadcrumbs
+      sx={{ mb: 3 }}
+      separator={<NavigateNextOutlined fontSize="small" />}
+    >
       <Link href={`/site/${slug}/dependencies`} style={linkSx}>
         Dependencies
       </Link>
-      <Link href={detailHref} style={linkSx}>{displayName}</Link>
+      <Link href={detailHref} style={linkSx}>
+        {displayName}
+      </Link>
       <Typography color="text.primary">Edit</Typography>
     </Breadcrumbs>
   )

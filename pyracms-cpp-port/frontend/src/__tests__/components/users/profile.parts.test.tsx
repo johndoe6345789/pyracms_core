@@ -12,10 +12,14 @@ describe('profile parts', () => {
 
   it('ProfileActions renders both links', () => {
     render(<ProfileActions githubUrl="http://g" twitterUrl="http://t" />)
-    expect(screen.getByTestId('github-link'))
-      .toHaveAttribute('href', 'http://g')
-    expect(screen.getByTestId('twitter-link'))
-      .toHaveAttribute('href', 'http://t')
+    expect(screen.getByTestId('github-link')).toHaveAttribute(
+      'href',
+      'http://g',
+    )
+    expect(screen.getByTestId('twitter-link')).toHaveAttribute(
+      'href',
+      'http://t',
+    )
   })
 
   it('ProfileActions renders a single link', () => {
@@ -27,8 +31,10 @@ describe('profile parts', () => {
   it('ProfileInfo shows optional fields', () => {
     render(<ProfileInfo location="Paris" website="http://w" joinDate="X" />)
     expect(screen.getByText('Paris')).toBeInTheDocument()
-    expect(screen.getByTestId('website-link'))
-      .toHaveAttribute('href', 'http://w')
+    expect(screen.getByTestId('website-link')).toHaveAttribute(
+      'href',
+      'http://w',
+    )
     expect(screen.getByText('Joined X')).toBeInTheDocument()
   })
 

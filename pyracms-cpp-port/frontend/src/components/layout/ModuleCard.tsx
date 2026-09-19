@@ -1,13 +1,21 @@
 import {
-  Card, CardContent, CardActionArea, Typography, Box,
+  Card,
+  CardContent,
+  CardActionArea,
+  Typography,
+  Box,
 } from '@mui/material'
 import Link from 'next/link'
 import type { ModuleInfo } from './moduleData'
 
 /** One module tile on the site home page. */
-export default function ModuleCard(
-  { mod, slug }: { mod: ModuleInfo; slug: string },
-) {
+export default function ModuleCard({
+  mod,
+  slug,
+}: {
+  mod: ModuleInfo
+  slug: string
+}) {
   const Icon = mod.icon
   return (
     <Card
@@ -35,8 +43,12 @@ export default function ModuleCard(
           >
             <Box
               sx={{
-                width: 44, height: 44, borderRadius: 2, display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
+                width: 44,
+                height: 44,
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 bgcolor: `${mod.color}14`,
               }}
             >

@@ -5,10 +5,10 @@ import { PageViewChart } from '@/components/admin/charts/PageViewChart'
 import { TopContentChart } from '@/components/admin/charts/TopContentChart'
 import { TrafficPieChart } from '@/components/admin/charts/TrafficPieChart'
 import {
-  ReferrersTable, SearchesTable,
+  ReferrersTable,
+  SearchesTable,
 } from '@/components/admin/analytics/AnalyticsTables'
-import SummaryCards from
-  '@/components/admin/analytics/SummaryCards'
+import SummaryCards from '@/components/admin/analytics/SummaryCards'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 
@@ -21,11 +21,7 @@ export default function AnalyticsPage() {
       <Typography variant="h3" component="h1" gutterBottom>
         Analytics Dashboard
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Overview of site traffic and content performance.
       </Typography>
       <SummaryCards tenantId={tenantId} />

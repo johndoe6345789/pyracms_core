@@ -1,6 +1,8 @@
 import { createTheme, type Theme } from '@mui/material/styles'
 import {
-  FONTS, pickTheme, type ThemeConfig,
+  FONTS,
+  pickTheme,
+  type ThemeConfig,
 } from '@/components/admin/styles/themeConfig'
 
 export const THEME_KEY = 'site_theme'
@@ -14,8 +16,12 @@ const clamp = (n: number, lo: number, hi: number) =>
 export function parseSiteTheme(raw: string): ThemeConfig | null {
   try {
     const t = pickTheme(JSON.parse(raw))
-    const colors = [t.primaryColor, t.secondaryColor,
-      t.backgroundColor, t.textColor]
+    const colors = [
+      t.primaryColor,
+      t.secondaryColor,
+      t.backgroundColor,
+      t.textColor,
+    ]
     if (!colors.every((c) => HEX.test(c))) return null
     if (!FONTS.includes(t.fontFamily)) return null
     return {
@@ -30,17 +36,21 @@ export function parseSiteTheme(raw: string): ThemeConfig | null {
 
 /** Layers a saved site theme over a built-in light or dark theme. */
 export function applySiteTheme(
-  base: Theme, cfg: ThemeConfig, dark: boolean,
+  base: Theme,
+  cfg: ThemeConfig,
+  dark: boolean,
 ): Theme {
   return createTheme(base, {
     palette: {
       primary: { main: cfg.primaryColor },
       secondary: { main: cfg.secondaryColor },
       // Background and text colours are authored for light mode only
-      ...(dark ? {} : {
-        background: { default: cfg.backgroundColor },
-        text: { primary: cfg.textColor },
-      }),
+      ...(dark
+        ? {}
+        : {
+            background: { default: cfg.backgroundColor },
+            text: { primary: cfg.textColor },
+          }),
     },
     typography: { fontFamily: cfg.fontFamily },
     shape: { borderRadius: cfg.borderRadius },

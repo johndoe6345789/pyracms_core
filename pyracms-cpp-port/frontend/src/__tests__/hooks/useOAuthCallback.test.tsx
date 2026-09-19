@@ -8,14 +8,16 @@ const dispatch = jest.fn()
 jest.mock('next/navigation', () => ({ useRouter: () => ({ replace }) }))
 jest.mock('react-redux', () => ({ useDispatch: () => dispatch }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { post: jest.fn() },
+  __esModule: true,
+  default: { post: jest.fn() },
 }))
 const post = api.post as jest.Mock
 
 describe('useOAuthCallback', () => {
   beforeEach(() => {
-    [post, replace, dispatch].forEach((f) => f.mockReset())
-    sessionStorage.clear(); localStorage.clear()
+    ;[post, replace, dispatch].forEach((f) => f.mockReset())
+    sessionStorage.clear()
+    localStorage.clear()
   })
 
   it('exchanges the code, stores the session and redirects', async () => {
@@ -23,8 +25,10 @@ describe('useOAuthCallback', () => {
     post.mockResolvedValue({ data: { token: 'T', user: { id: 1 } } })
     renderHook(() => useOAuthCallback('c', 's'))
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/site/x'))
-    expect(post).toHaveBeenCalledWith('/api/auth/oauth/github/callback',
-      { code: 'c', state: 's' })
+    expect(post).toHaveBeenCalledWith('/api/auth/oauth/github/callback', {
+      code: 'c',
+      state: 's',
+    })
     expect(localStorage.getItem('token')).toBe('T')
     expect(dispatch).toHaveBeenCalled()
   })

@@ -8,47 +8,26 @@ test.describe('Breadcrumbs — per page', () => {
   })
 
   const PAGES: [string, string, string][] = [
-    [
-      '/super-admin',
-      'Super Admin',
-      '',
-    ],
-    [
-      '/super-admin/tenants',
-      'Tenants',
-      'breadcrumb-link-super-admin',
-    ],
-    [
-      '/super-admin/users',
-      'Users',
-      'breadcrumb-link-super-admin',
-    ],
-    [
-      '/super-admin/settings',
-      'Settings',
-      'breadcrumb-link-super-admin',
-    ],
+    ['/super-admin', 'Super Admin', ''],
+    ['/super-admin/tenants', 'Tenants', 'breadcrumb-link-super-admin'],
+    ['/super-admin/users', 'Users', 'breadcrumb-link-super-admin'],
+    ['/super-admin/settings', 'Settings', 'breadcrumb-link-super-admin'],
   ]
 
   for (const [path, currentLabel, linkTestId] of PAGES) {
-    test(
-      `${path} breadcrumb current = "${currentLabel}"`,
-      async ({ page }) => {
-        await page.goto(path)
-        await page
-          .getByTestId('super-admin-breadcrumbs')
-          .waitFor({ state: 'visible', timeout: 10_000 })
+    test(`${path} breadcrumb current = "${currentLabel}"`, async ({ page }) => {
+      await page.goto(path)
+      await page
+        .getByTestId('super-admin-breadcrumbs')
+        .waitFor({ state: 'visible', timeout: 10_000 })
 
-        await expect(
-          page.getByTestId('breadcrumb-current'),
-        ).toHaveText(currentLabel)
+      await expect(page.getByTestId('breadcrumb-current')).toHaveText(
+        currentLabel,
+      )
 
-        if (linkTestId) {
-          await expect(
-            page.getByTestId(linkTestId),
-          ).toBeVisible()
-        }
-      },
-    )
+      if (linkTestId) {
+        await expect(page.getByTestId(linkTestId)).toBeVisible()
+      }
+    })
   }
 })

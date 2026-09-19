@@ -8,14 +8,19 @@ export const OAUTH_PROVIDERS = [
 
 const KEY = 'oauth:pending'
 
-interface Pending { provider: string; redirectTo?: string }
+interface Pending {
+  provider: string
+  redirectTo?: string
+}
 
 /** Remember which provider/redirect the round trip belongs to. */
 export function stashOAuth(provider: string, redirectTo?: string): void {
   try {
     const v: Pending = { provider, ...(redirectTo ? { redirectTo } : {}) }
     sessionStorage.setItem(KEY, JSON.stringify(v))
-  } catch { /* storage blocked: callback reports the failure */ }
+  } catch {
+    /* storage blocked: callback reports the failure */
+  }
 }
 
 export function takeOAuth(): Pending | null {

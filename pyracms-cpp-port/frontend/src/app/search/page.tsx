@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Alert,
-  Box,
-  Container,
-  Grid,
-  Typography,
-} from '@mui/material'
+import { Alert, Box, Container, Grid, Typography } from '@mui/material'
 import SearchAutocomplete from '@/components/common/SearchAutocomplete'
 import PageTransition from '@/components/common/PageTransition'
 import FacetSidebar from '@/components/search/FacetSidebar'

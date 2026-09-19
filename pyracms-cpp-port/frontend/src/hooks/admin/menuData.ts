@@ -15,9 +15,7 @@ export interface MenuGroup {
 }
 
 /** Maps raw API item data to a MenuItemRow. */
-function mapMenuItem(
-  i: Record<string, unknown>,
-): MenuItemRow {
+function mapMenuItem(i: Record<string, unknown>): MenuItemRow {
   return {
     id: i.id as number,
     name: (i.name as string) || '',
@@ -28,12 +26,8 @@ function mapMenuItem(
 }
 
 /** Fetches all menu groups and their items for a tenant. */
-export async function fetchMenuGroups(
-  tenantId: number,
-): Promise<MenuGroup[]> {
-  const res = await api.get(
-    `/api/menu-groups?tenant_id=${tenantId}`,
-  )
+export async function fetchMenuGroups(tenantId: number): Promise<MenuGroup[]> {
+  const res = await api.get(`/api/menu-groups?tenant_id=${tenantId}`)
   const loaded: MenuGroup[] = []
   for (const g of res.data || []) {
     const itemsRes = await api
@@ -55,12 +49,8 @@ export function updateGroupItems(
   updater: (items: MenuItemRow[]) => MenuItemRow[],
 ): MenuGroup[] {
   return groups.map((g) =>
-    g.name === groupName
-      ? { ...g, items: updater(g.items) }
-      : g,
+    g.name === groupName ? { ...g, items: updater(g.items) } : g,
   )
 }
 
-export type SetGroups = React.Dispatch<
-  React.SetStateAction<MenuGroup[]>
->
+export type SetGroups = React.Dispatch<React.SetStateAction<MenuGroup[]>>

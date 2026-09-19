@@ -8,7 +8,9 @@ import ThemeControls from '@/components/admin/styles/ThemeControls'
 import ThemePreview from '@/components/admin/styles/ThemePreview'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import {
-  DEFAULT_THEME, exportTheme, importTheme,
+  DEFAULT_THEME,
+  exportTheme,
+  importTheme,
   type ThemeConfig,
 } from '@/components/admin/styles/themeConfig'
 import { useTenantId } from '@/hooks/useTenantId'
@@ -19,8 +21,13 @@ import { THEME_KEY, parseSiteTheme } from '@/lib/siteTheme'
 export default function StyleEditorPage() {
   const slug = useParams().slug as string
   const { tenantId } = useTenantId(slug)
-  const { value: theme, edit, save, saved, error } = useSettingJson(
-    tenantId, THEME_KEY, parseSiteTheme, DEFAULT_THEME)
+  const {
+    value: theme,
+    edit,
+    save,
+    saved,
+    error,
+  } = useSettingJson(tenantId, THEME_KEY, parseSiteTheme, DEFAULT_THEME)
 
   const update = useCallback(
     (key: keyof ThemeConfig, value: string | number) => {
@@ -37,16 +44,14 @@ export default function StyleEditorPage() {
       <Typography variant="h3" component="h1" gutterBottom>
         Style Editor
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Customize your site theme and appearance.
       </Typography>
       <ErrorAlert error={error} testId="theme-error" />
       {saved && (
-        <Alert severity="success" sx={{ mb: 3 }}>Theme saved.</Alert>
+        <Alert severity="success" sx={{ mb: 3 }}>
+          Theme saved.
+        </Alert>
       )}
       <ThemeActions
         onReset={() => edit(DEFAULT_THEME)}

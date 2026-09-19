@@ -7,10 +7,7 @@ import { parseTurbologin, CLIPBOARD_DENIED } from '@/lib/turbologin'
 type LoginDirect = (user: string, pass: string) => Promise<boolean>
 
 /** Sign in with a Turbologin read from the clipboard. */
-export function useTurboLogin(
-  loginDirect: LoginDirect,
-  redirectTo?: string,
-) {
+export function useTurboLogin(loginDirect: LoginDirect, redirectTo?: string) {
   const router = useRouter()
   const [turboError, setTurboError] = useState<string | null>(null)
 
@@ -29,6 +26,8 @@ export function useTurboLogin(
   }
 
   return {
-    turboError, handleTurboLogin, clearTurboError: () => setTurboError(null),
+    turboError,
+    handleTurboLogin,
+    clearTurboError: () => setTurboError(null),
   }
 }

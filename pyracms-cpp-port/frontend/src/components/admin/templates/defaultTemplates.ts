@@ -1,5 +1,4 @@
-export type TemplateSection =
-  | 'header' | 'footer' | 'sidebar' | 'layout'
+export type TemplateSection = 'header' | 'footer' | 'sidebar' | 'layout'
 
 export type Templates = Record<TemplateSection, string>
 

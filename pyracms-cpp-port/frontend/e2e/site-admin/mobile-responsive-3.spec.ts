@@ -15,23 +15,12 @@ test.describe('Mobile responsive — 375×667', () => {
     await goToAdmin(page)
   })
 
-  test(
-    'clicking a nav item in drawer navigates and closes drawer',
-    async ({ page }) => {
-      await page
-        .getByTestId('admin-menu-toggle')
-        .click()
-      const drawer = page.getByTestId(
-        'admin-drawer-mobile',
-      )
-      await drawer
-        .getByTestId('admin-nav-users')
-        .click()
-      await expect(page).toHaveURL(
-        new RegExp(
-          `/site/${SITE_SLUG}/admin/users`,
-        ),
-      )
-    },
-  )
+  test('clicking a nav item in drawer navigates and closes drawer', async ({
+    page,
+  }) => {
+    await page.getByTestId('admin-menu-toggle').click()
+    const drawer = page.getByTestId('admin-drawer-mobile')
+    await drawer.getByTestId('admin-nav-users').click()
+    await expect(page).toHaveURL(new RegExp(`/site/${SITE_SLUG}/admin/users`))
+  })
 })

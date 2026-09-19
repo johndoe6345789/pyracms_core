@@ -1,9 +1,14 @@
 import api from '@/lib/api'
 
 export const WEBHOOK_EVENTS = [
-  'article.created', 'article.updated', 'article.deleted',
-  'article.published', 'forum.thread.created',
-  'forum.post.created', 'comment.created', 'user.registered',
+  'article.created',
+  'article.updated',
+  'article.deleted',
+  'article.published',
+  'forum.thread.created',
+  'forum.post.created',
+  'comment.created',
+  'user.registered',
 ]
 
 export interface Webhook {
@@ -29,11 +34,13 @@ export interface WebhookDraft {
 }
 
 export const fetchWebhooks = (tenantId: number) =>
-  api.get(`/api/webhooks?tenant_id=${tenantId}`)
+  api
+    .get(`/api/webhooks?tenant_id=${tenantId}`)
     .then((r) => (r.data || []) as Webhook[])
 
 export const fetchDeliveries = (id: number) =>
-  api.get(`/api/webhooks/${id}/deliveries?limit=20`)
+  api
+    .get(`/api/webhooks/${id}/deliveries?limit=20`)
     .then((r) => (r.data || []) as Delivery[])
 
 /** Empty secret is omitted so an edit keeps the stored one. */
@@ -52,5 +59,4 @@ export const createWebhook = (tenantId: number, d: WebhookDraft) =>
 export const updateWebhook = (id: number, d: WebhookDraft) =>
   api.put(`/api/webhooks/${id}`, webhookBody(d))
 
-export const deleteWebhook = (id: number) =>
-  api.delete(`/api/webhooks/${id}`)
+export const deleteWebhook = (id: number) => api.delete(`/api/webhooks/${id}`)

@@ -1,14 +1,15 @@
 import { fetchLatestRelease, resetReleaseCache } from '@/lib/releaseFetch'
 import { RAW_RELEASES } from '../helpers/releaseFixture'
 
-const ok = (body: unknown) =>
-  ({ ok: true, json: async () => body }) as Response
+const ok = (body: unknown) => ({ ok: true, json: async () => body }) as Response
 
 describe('fetchLatestRelease', () => {
   const f = jest.fn()
   beforeEach(() => {
-    f.mockReset(); global.fetch = f
-    resetReleaseCache(); window.sessionStorage.clear()
+    f.mockReset()
+    global.fetch = f
+    resetReleaseCache()
+    window.sessionStorage.clear()
   })
 
   it('calls the GitHub API and caches in memory', async () => {
@@ -52,8 +53,11 @@ describe('fetchLatestRelease', () => {
     window.sessionStorage.setItem('pyracms.launcherRelease.v1', '{bad')
     f.mockResolvedValue(ok([]))
     expect(await fetchLatestRelease()).toBeNull()
-    const set = jest.spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => { throw new Error('quota') })
+    const set = jest
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('quota')
+      })
     resetReleaseCache()
     window.sessionStorage.clear()
     f.mockResolvedValue(ok(RAW_RELEASES))

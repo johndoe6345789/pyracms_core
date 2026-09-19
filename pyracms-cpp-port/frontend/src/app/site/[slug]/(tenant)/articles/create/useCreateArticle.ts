@@ -10,10 +10,7 @@ export function slugifyTitle(title: string) {
     .replace(/^-|-$/g, '')
 }
 
-export function useCreateArticle(
-  slug: string,
-  tenantId: number | null,
-) {
+export function useCreateArticle(slug: string, tenantId: number | null) {
   const router = useRouter()
   const editor = useArticleEditor()
   const [saving, setSaving] = useState(false)

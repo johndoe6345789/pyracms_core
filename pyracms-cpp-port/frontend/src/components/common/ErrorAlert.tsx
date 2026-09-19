@@ -10,8 +10,7 @@ interface Props {
 export function ErrorAlert({ error, testId, mb = 2 }: Props) {
   if (!error) return null
   return (
-    <Alert severity="error" role="alert" data-testid={testId}
-      sx={{ mb }}>
+    <Alert severity="error" role="alert" data-testid={testId} sx={{ mb }}>
       {error}
     </Alert>
   )

@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import {
   EditOutlined,
   VerticalSplit,

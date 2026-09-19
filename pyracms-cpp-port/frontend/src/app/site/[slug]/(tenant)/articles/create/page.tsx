@@ -1,32 +1,23 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import {
-  Container, Typography, Box, Button, Alert,
-} from '@mui/material'
+import { Container, Typography, Box, Button, Alert } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { useTenantId } from '@/hooks/useTenantId'
 import { BackButton } from '@/components/common/BackButton'
-import {
-  ArticleEditorForm,
-} from '@/components/articles/ArticleEditorForm'
+import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
 import { useCreateArticle } from './useCreateArticle'
 
 export default function CreateArticlePage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
-  const { editor, saving, error, create } =
-    useCreateArticle(slug, tenantId)
+  const { editor, saving, error, create } = useCreateArticle(slug, tenantId)
   const back = `/site/${slug}/articles`
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{ py: 6 }}
-      data-testid="create-article-page"
-    >
+    <Container maxWidth="md" sx={{ py: 6 }} data-testid="create-article-page">
       <Box sx={{ mb: 4 }}>
         <BackButton
           href={back}

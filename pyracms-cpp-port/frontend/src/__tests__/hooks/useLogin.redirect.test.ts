@@ -32,25 +32,21 @@ describe('useLogin – redirect and error reset', () => {
     localStorage.clear()
   })
 
-  it('successful login navigates to default "/" path',
-    async () => {
-      okResponse('tok123')
-      const { result } = renderLogin()
-      fillForm(result)
-      await submitForm(result)
-      expect(mockPush).toHaveBeenCalledWith('/')
-    },
-  )
+  it('successful login navigates to default "/" path', async () => {
+    okResponse('tok123')
+    const { result } = renderLogin()
+    fillForm(result)
+    await submitForm(result)
+    expect(mockPush).toHaveBeenCalledWith('/')
+  })
 
-  it('successful login navigates to a custom redirectTo path',
-    async () => {
-      okResponse('tok456')
-      const { result } = renderLogin('/dashboard')
-      fillForm(result)
-      await submitForm(result)
-      expect(mockPush).toHaveBeenCalledWith('/dashboard')
-    },
-  )
+  it('successful login navigates to a custom redirectTo path', async () => {
+    okResponse('tok456')
+    const { result } = renderLogin('/dashboard')
+    fillForm(result)
+    await submitForm(result)
+    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+  })
 
   it('successful login clears any previous error', async () => {
     // First trigger a validation error, then supply valid

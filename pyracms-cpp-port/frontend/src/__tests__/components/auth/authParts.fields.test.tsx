@@ -7,8 +7,10 @@ describe('AuthScopeNotice', () => {
   it('names the site and links to the platform page', () => {
     render(<AuthScopeNotice tenant="demo" platformHref="/auth/login" />)
     expect(screen.getByText('demo')).toBeInTheDocument()
-    expect(screen.getByTestId('platform-account-link'))
-      .toHaveAttribute('href', '/auth/login')
+    expect(screen.getByTestId('platform-account-link')).toHaveAttribute(
+      'href',
+      '/auth/login',
+    )
   })
 })
 
@@ -17,8 +19,9 @@ describe('PasswordStrengthBar', () => {
     const { rerender } = render(<PasswordStrengthBar password="" />)
     expect(screen.queryByTestId('password-strength')).toBeNull()
     rerender(<PasswordStrengthBar password="Abcdef12" />)
-    expect(screen.getByTestId('password-strength-label'))
-      .toHaveTextContent('Strong')
+    expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+      'Strong',
+    )
   })
 })
 

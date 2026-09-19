@@ -30,9 +30,7 @@ describe('useRegister', () => {
     act(() => {
       result.current.updateField('email', 'carol@example.com')
     })
-    expect(result.current.formData.email).toBe(
-      'carol@example.com',
-    )
+    expect(result.current.formData.email).toBe('carol@example.com')
   })
 
   it('updateField updates the password field', () => {
@@ -48,9 +46,7 @@ describe('useRegister', () => {
     act(() => {
       result.current.updateField('confirmPassword', 'newpass1')
     })
-    expect(result.current.formData.confirmPassword).toBe(
-      'newpass1',
-    )
+    expect(result.current.formData.confirmPassword).toBe('newpass1')
   })
 
   it('updateField updates firstName', () => {

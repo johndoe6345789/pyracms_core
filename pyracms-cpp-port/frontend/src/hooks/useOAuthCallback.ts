@@ -24,7 +24,8 @@ export function useOAuthCallback(code: string, state: string) {
       setError('Sign-in was cancelled or the link is no longer valid')
       return
     }
-    api.post(`/api/auth/oauth/${pending.provider}/callback`, { code, state })
+    api
+      .post(`/api/auth/oauth/${pending.provider}/callback`, { code, state })
       .then(({ data }) => {
         if (!data?.token) throw new Error('no token')
         // OAuth creates platform accounts, valid on every site

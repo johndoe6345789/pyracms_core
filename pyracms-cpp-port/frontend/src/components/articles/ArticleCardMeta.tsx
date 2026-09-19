@@ -26,30 +26,20 @@ const itemSx = {
   gap: 0.5,
 }
 
-export function ArticleCardMeta(
-  { author, date, views }: ArticleCardMetaProps
-) {
+export function ArticleCardMeta({ author, date, views }: ArticleCardMetaProps) {
   return (
     <Box sx={rowSx}>
       <Box sx={itemSx}>
         <PersonOutlined sx={{ fontSize: 16 }} />
-        <Typography variant="caption">
-          {author}
-        </Typography>
+        <Typography variant="caption">{author}</Typography>
       </Box>
       <Box sx={itemSx}>
-        <CalendarTodayOutlined
-          sx={{ fontSize: 16 }}
-        />
-        <Typography variant="caption">
-          {date}
-        </Typography>
+        <CalendarTodayOutlined sx={{ fontSize: 16 }} />
+        <Typography variant="caption">{date}</Typography>
       </Box>
       <Box sx={itemSx}>
         <VisibilityOutlined sx={{ fontSize: 16 }} />
-        <Typography variant="caption">
-          {views}
-        </Typography>
+        <Typography variant="caption">{views}</Typography>
       </Box>
     </Box>
   )

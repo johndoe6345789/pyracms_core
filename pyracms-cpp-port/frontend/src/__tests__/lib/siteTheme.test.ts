@@ -4,8 +4,12 @@ import { slugFromPath } from '@/lib/siteSlug'
 import { parseTemplates } from '@/components/admin/templates/templateStore'
 import { DEFAULT_THEME } from '@/components/admin/styles/themeConfig'
 
-const saved = { ...DEFAULT_THEME, primaryColor: '#ff0000',
-  fontFamily: 'Georgia, serif', borderRadius: 99 }
+const saved = {
+  ...DEFAULT_THEME,
+  primaryColor: '#ff0000',
+  fontFamily: 'Georgia, serif',
+  borderRadius: 99,
+}
 
 describe('parseSiteTheme', () => {
   it('accepts a valid theme and clamps numbers', () => {
@@ -29,8 +33,9 @@ describe('applySiteTheme', () => {
   })
   it('keeps dark backgrounds', () => {
     const t = applySiteTheme(darkTheme, saved, true)
-    expect(t.palette.background.default)
-      .toBe(darkTheme.palette.background.default)
+    expect(t.palette.background.default).toBe(
+      darkTheme.palette.background.default,
+    )
     expect(t.palette.mode).toBe('dark')
   })
 })

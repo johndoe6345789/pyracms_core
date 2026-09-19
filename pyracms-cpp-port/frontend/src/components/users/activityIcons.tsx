@@ -1,11 +1,15 @@
 import {
-  ForumOutlined, ArticleOutlined,
-  CodeOutlined, ThumbUpOutlined,
+  ForumOutlined,
+  ArticleOutlined,
+  CodeOutlined,
+  ThumbUpOutlined,
 } from '@mui/icons-material'
 
 export const TYPE_COLORS: Record<string, string> = {
-  post: '#ed6c02', forum_post: '#ed6c02',
-  article: '#1976d2', snippet: '#2e7d32',
+  post: '#ed6c02',
+  forum_post: '#ed6c02',
+  article: '#1976d2',
+  snippet: '#2e7d32',
   vote: '#9c27b0',
 }
 

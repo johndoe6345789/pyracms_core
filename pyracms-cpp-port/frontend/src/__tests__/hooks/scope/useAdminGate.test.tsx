@@ -17,8 +17,9 @@ const setup = (signedIn = false) => {
   if (signedIn) {
     store.dispatch(setCredentials({ user: makeUser(), token: 't' }))
   }
-  const wrapper = ({ children }: { children: React.ReactNode }) =>
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
     <Provider store={store}>{children}</Provider>
+  )
   return renderHook(() => useAdminGate(), { wrapper })
 }
 
@@ -31,8 +32,7 @@ afterEach(() => jest.useRealTimers())
 
 it('denies guests immediately', () => {
   const { result } = setup()
-  expect(result.current).toEqual(
-    { slug: 's', allowed: false, checking: false })
+  expect(result.current).toEqual({ slug: 's', allowed: false, checking: false })
 })
 
 it('waits while the site record loads', () => {
@@ -44,7 +44,9 @@ it('waits for a stored session, then gives up', () => {
   token = 'stored'
   const { result } = setup()
   expect(result.current.checking).toBe(true)
-  act(() => { jest.advanceTimersByTime(RESTORE_TIMEOUT_MS) })
+  act(() => {
+    jest.advanceTimersByTime(RESTORE_TIMEOUT_MS)
+  })
   expect(result.current.checking).toBe(false)
   expect(result.current.allowed).toBe(false)
 })

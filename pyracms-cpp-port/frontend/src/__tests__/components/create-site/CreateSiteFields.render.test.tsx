@@ -16,38 +16,37 @@ describe('CreateSiteFields', () => {
 
   it('renders the URL Slug input', () => {
     renderFields()
-    expect(
-      screen.getByTestId('site-slug-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('site-slug-input')).toBeInTheDocument()
   })
 
   it('renders the Description input', () => {
     renderFields()
-    expect(
-      screen.getByTestId('site-description-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('site-description-input')).toBeInTheDocument()
   })
 
   // ── aria-label attributes ─────────────────────────────────
 
   it('site name input has aria-label "Site name"', () => {
     renderFields()
-    expect(
-      screen.getByTestId('site-name-input'),
-    ).toHaveAttribute('aria-label', 'Site name')
+    expect(screen.getByTestId('site-name-input')).toHaveAttribute(
+      'aria-label',
+      'Site name',
+    )
   })
 
   it('slug input has aria-label "URL slug"', () => {
     renderFields()
-    expect(
-      screen.getByTestId('site-slug-input'),
-    ).toHaveAttribute('aria-label', 'URL slug')
+    expect(screen.getByTestId('site-slug-input')).toHaveAttribute(
+      'aria-label',
+      'URL slug',
+    )
   })
 
   it('description input has aria-label "Site description"', () => {
     renderFields()
-    expect(
-      screen.getByTestId('site-description-input'),
-    ).toHaveAttribute('aria-label', 'Site description')
+    expect(screen.getByTestId('site-description-input')).toHaveAttribute(
+      'aria-label',
+      'Site description',
+    )
   })
 })

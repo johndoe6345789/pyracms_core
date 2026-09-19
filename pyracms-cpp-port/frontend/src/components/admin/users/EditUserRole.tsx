@@ -23,16 +23,14 @@ export default function EditUserRole({ actorRole, value, onChange }: Props) {
         label="Role"
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        disabled={roles.length === 0 || value >= actorRole &&
-          actorRole < UserRole.SuperAdmin}
+        disabled={
+          roles.length === 0 ||
+          (value >= actorRole && actorRole < UserRole.SuperAdmin)
+        }
         data-testid="edit-role-select"
       >
         {options.map((r) => (
-          <MenuItem
-            key={r}
-            value={r}
-            disabled={!roles.includes(r)}
-          >
+          <MenuItem key={r} value={r} disabled={!roles.includes(r)}>
             {USER_ROLE_LABELS[r as UserRole]}
           </MenuItem>
         ))}

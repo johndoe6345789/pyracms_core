@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from '@mui/material'
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 
 export interface DiffRevision {
   id: string

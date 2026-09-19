@@ -16,8 +16,9 @@ interface Props {
 /** Green run button that explains why it is disabled. */
 export function RunButton(p: Props) {
   return (
-    <Tooltip title={p.runnable ? '' :
-      'Running is not supported for this language'}>
+    <Tooltip
+      title={p.runnable ? '' : 'Running is not supported for this language'}
+    >
       <span>
         <Button
           variant="contained"

@@ -25,7 +25,9 @@ beforeEach(() => {
 
 it('moves the thread and refreshes', async () => {
   const { result } = await setup()
-  await act(async () => { await result.current.handleMoveThread('7') })
+  await act(async () => {
+    await result.current.handleMoveThread('7')
+  })
   expect(mock.put).toHaveBeenCalledWith('/api/forum/threads/10/move', {
     forumId: 7,
   })
@@ -35,6 +37,8 @@ it('moves the thread and refreshes', async () => {
 it('reports a failed move', async () => {
   const { result } = await setup()
   mock.put.mockRejectedValueOnce(new Error('x'))
-  await act(async () => { await result.current.handleMoveThread('7') })
+  await act(async () => {
+    await result.current.handleMoveThread('7')
+  })
   expect(result.current.replyError).toMatch(/move/)
 })

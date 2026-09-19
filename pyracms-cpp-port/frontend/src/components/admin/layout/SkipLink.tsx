@@ -1,19 +1,27 @@
 import type { FocusEvent } from 'react'
 
 const HIDDEN = {
-  position: 'absolute', left: '-9999px',
-  width: '1px', height: '1px',
+  position: 'absolute',
+  left: '-9999px',
+  width: '1px',
+  height: '1px',
   overflow: 'hidden',
 }
 
 const SHOWN = {
-  position: 'fixed', left: '16px', top: '16px',
-  width: 'auto', height: 'auto',
-  overflow: 'visible', background: '#fff',
+  position: 'fixed',
+  left: '16px',
+  top: '16px',
+  width: 'auto',
+  height: 'auto',
+  overflow: 'visible',
+  background: '#fff',
   padding: '8px 16px',
   border: '2px solid #1976d2',
-  borderRadius: '4px', color: '#1976d2',
-  fontWeight: '700', textDecoration: 'none',
+  borderRadius: '4px',
+  color: '#1976d2',
+  fontWeight: '700',
+  textDecoration: 'none',
 }
 
 function apply(

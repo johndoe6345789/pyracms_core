@@ -10,8 +10,7 @@ export default function AdminForbidden({ slug }: { slug: string }) {
     >
       <Alert severity="warning" sx={{ mb: 3 }}>
         <AlertTitle>Administrator access required</AlertTitle>
-        Sign in with an administrator account for this site to
-        manage it.
+        Sign in with an administrator account for this site to manage it.
       </Alert>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button

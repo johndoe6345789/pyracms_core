@@ -1,9 +1,5 @@
-import {
-  AppBar, Toolbar, Typography, IconButton,
-} from '@mui/material'
-import {
-  MenuOutlined, AdminPanelSettingsOutlined,
-} from '@mui/icons-material'
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material'
+import { MenuOutlined, AdminPanelSettingsOutlined } from '@mui/icons-material'
 import AdminTopBarActions from './AdminTopBarActions'
 
 interface Props {
@@ -12,11 +8,7 @@ interface Props {
   onMenu: () => void
 }
 
-export default function AdminTopBar({
-  slug,
-  isMobile,
-  onMenu,
-}: Props) {
+export default function AdminTopBar({ slug, isMobile, onMenu }: Props) {
   return (
     <AppBar
       position="sticky"

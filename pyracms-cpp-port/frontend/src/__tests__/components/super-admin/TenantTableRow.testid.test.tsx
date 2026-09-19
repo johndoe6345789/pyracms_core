@@ -3,23 +3,18 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import TenantTableRow from
-  '@/components/super-admin/TenantTableRow'
-import type { TenantRow } from
-  '@/hooks/useSuperAdminTenants'
-import {
-  TENANT_A,
-} from '../../helpers/tenantTableHelpers'
+import TenantTableRow from '@/components/super-admin/TenantTableRow'
+import type { TenantRow } from '@/hooks/useSuperAdminTenants'
+import { TENANT_A } from '../../helpers/tenantTableHelpers'
 
-jest.mock('next/link', () =>
-  require('@/__tests__/helpers/tenantTableHelpers').MockLink)
+jest.mock(
+  'next/link',
+  () => require('@/__tests__/helpers/tenantTableHelpers').MockLink,
+)
 
 describe('TenantTableRow', () => {
   /** Wraps TenantTableRow in the required table context. */
-  function renderRow(
-    tenant: TenantRow,
-    onDelete: jest.Mock = jest.fn(),
-  ) {
+  function renderRow(tenant: TenantRow, onDelete: jest.Mock = jest.fn()) {
     return render(
       <table>
         <tbody>
@@ -42,8 +37,6 @@ describe('TenantTableRow', () => {
       name: 'Different Name',
     }
     renderRow(custom)
-    expect(
-      screen.getByTestId('tenant-row-custom-slug'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('tenant-row-custom-slug')).toBeInTheDocument()
   })
 })

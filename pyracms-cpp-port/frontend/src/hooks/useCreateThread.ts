@@ -31,14 +31,15 @@ export function useCreateThread(
     }
     setLoading(true)
     setError('')
-    api.post('/api/forum/threads', {
-      title: title.trim(),
-      description: description.trim(),
-      content: content.trim(),
-      forumId: Number(forumId),
-      tenantId,
-    })
-      .then(res => {
+    api
+      .post('/api/forum/threads', {
+        title: title.trim(),
+        description: description.trim(),
+        content: content.trim(),
+        forumId: Number(forumId),
+        tenantId,
+      })
+      .then((res) => {
         const id = res.data?.id
         router.push(
           id
@@ -46,18 +47,25 @@ export function useCreateThread(
             : `/site/${slug}/forum/${forumId}`,
         )
       })
-      .catch(err => {
+      .catch((err) => {
         setError(
-          err.response?.data?.error
-          || err.response?.data?.message
-          || 'Failed to create thread',
+          err.response?.data?.error ||
+            err.response?.data?.message ||
+            'Failed to create thread',
         )
         setLoading(false)
       })
   }
 
   return {
-    title, setTitle, description, setDescription,
-    content, setContent, loading, error, handleSubmit,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    content,
+    setContent,
+    loading,
+    error,
+    handleSubmit,
   }
 }

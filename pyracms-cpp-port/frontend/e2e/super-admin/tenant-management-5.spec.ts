@@ -12,14 +12,11 @@ test.describe('Tenant management', () => {
   })
 
   test(
-    'cancel in delete dialog closes it without '
-    + 'removing row',
+    'cancel in delete dialog closes it without ' + 'removing row',
     async ({ page }) => {
       await waitForTenantsLoaded(page)
 
-      const deleteButtons = page.locator(
-        '[data-testid^="delete-tenant-"]',
-      )
+      const deleteButtons = page.locator('[data-testid^="delete-tenant-"]')
       const count = await deleteButtons.count()
 
       if (count === 0) {
@@ -28,26 +25,17 @@ test.describe('Tenant management', () => {
       }
 
       // Capture the slug of the first row before dialog
-      const firstRow = page
-        .locator('[data-testid^="tenant-row-"]')
-        .first()
-      const testId =
-        (await firstRow.getAttribute('data-testid')) ?? ''
+      const firstRow = page.locator('[data-testid^="tenant-row-"]').first()
+      const testId = (await firstRow.getAttribute('data-testid')) ?? ''
       const slug = testId.replace('tenant-row-', '')
 
       await deleteButtons.first().click()
-      await page
-        .getByTestId('cancel-delete-tenant')
-        .click()
+      await page.getByTestId('cancel-delete-tenant').click()
 
       // Dialog should be gone
-      await expect(
-        page.getByTestId('tenant-delete-dialog'),
-      ).not.toBeVisible()
+      await expect(page.getByTestId('tenant-delete-dialog')).not.toBeVisible()
       // Row should still exist
-      await expect(
-        page.getByTestId(`tenant-row-${slug}`),
-      ).toBeVisible()
+      await expect(page.getByTestId(`tenant-row-${slug}`)).toBeVisible()
     },
   )
 })

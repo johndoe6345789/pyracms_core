@@ -8,11 +8,7 @@ export default function TagCloudPage() {
   const { items, loading } = useTagCloudPage()
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{ py: 6 }}
-      data-testid="tag-cloud-page"
-    >
+    <Container maxWidth="md" sx={{ py: 6 }} data-testid="tag-cloud-page">
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom>
           Tags
@@ -37,9 +33,7 @@ export default function TagCloudPage() {
             Loading tags...
           </Typography>
         ) : items.length === 0 ? (
-          <Typography color="text.secondary">
-            No tags yet.
-          </Typography>
+          <Typography color="text.secondary">No tags yet.</Typography>
         ) : (
           <TagCloudChips items={items} />
         )}

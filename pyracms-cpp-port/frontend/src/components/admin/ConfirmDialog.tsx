@@ -29,36 +29,21 @@ export default function ConfirmDialog({
       open={open}
       onClose={onCancel}
       data-testid="confirm-dialog"
-      aria-labelledby={
-        'confirm-dialog-title'
-      }
+      aria-labelledby={'confirm-dialog-title'}
     >
-      <DialogTitle
-        id="confirm-dialog-title"
-      >
-        {title}
-      </DialogTitle>
+      <DialogTitle id="confirm-dialog-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          {message}
-        </DialogContentText>
+        <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onCancel}
-          data-testid={
-            'confirm-cancel-btn'
-          }
-        >
+        <Button onClick={onCancel} data-testid={'confirm-cancel-btn'}>
           Cancel
         </Button>
         <Button
           onClick={onConfirm}
           color="error"
           variant="contained"
-          data-testid={
-            'confirm-submit-btn'
-          }
+          data-testid={'confirm-submit-btn'}
         >
           {confirmLabel}
         </Button>

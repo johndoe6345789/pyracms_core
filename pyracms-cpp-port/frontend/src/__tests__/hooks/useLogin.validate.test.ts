@@ -1,8 +1,5 @@
 import { validateLoginForm } from '@/hooks/useLogin'
-import {
-  VALID_FORM,
-  renderLogin,
-} from '../helpers/loginHookHelpers'
+import { VALID_FORM, renderLogin } from '../helpers/loginHookHelpers'
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -14,21 +11,21 @@ describe('validateLoginForm', () => {
   })
 
   it('returns error when username is blank', () => {
-    expect(
-      validateLoginForm({ username: '  ', password: 'x' }),
-    ).toBe('Username is required')
+    expect(validateLoginForm({ username: '  ', password: 'x' })).toBe(
+      'Username is required',
+    )
   })
 
   it('returns error when username is empty string', () => {
-    expect(
-      validateLoginForm({ username: '', password: 'x' }),
-    ).toBe('Username is required')
+    expect(validateLoginForm({ username: '', password: 'x' })).toBe(
+      'Username is required',
+    )
   })
 
   it('returns error when password is empty', () => {
-    expect(
-      validateLoginForm({ username: 'alice', password: '' }),
-    ).toBe('Password is required')
+    expect(validateLoginForm({ username: 'alice', password: '' })).toBe(
+      'Password is required',
+    )
   })
 })
 

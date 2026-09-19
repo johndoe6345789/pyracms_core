@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import {
-  useRevisions, mapRevisions, mapDiffRevisions,
+  useRevisions,
+  mapRevisions,
+  mapDiffRevisions,
 } from '@/hooks/useRevisions'
 import { m } from '../../helpers/scopeApi'
 
@@ -10,13 +12,22 @@ beforeEach(() => jest.resetAllMocks())
 
 it('maps revisions', () => {
   const r = mapRevisions([
-    { revisionNumber: 2, authorUsername: 'a', summary: 's',
-      createdAt: '2024-01-02 03:04:05+00' },
-    { id: 3, userId: 5 }, { id: 4, userId: 0 },
+    {
+      revisionNumber: 2,
+      authorUsername: 'a',
+      summary: 's',
+      createdAt: '2024-01-02 03:04:05+00',
+    },
+    { id: 3, userId: 5 },
+    { id: 4, userId: 0 },
   ])
   expect(r[0]!.author).toBe('a')
-  expect(r[1]).toMatchObject(
-    { number: 3, author: 'User #5', date: '', summary: '' })
+  expect(r[1]).toMatchObject({
+    number: 3,
+    author: 'User #5',
+    date: '',
+    summary: '',
+  })
   expect(r[2]!.author).toBe('Deleted user')
 })
 
@@ -47,7 +58,6 @@ it('maps diff revisions oldest first with their content', () => {
     { revisionNumber: 3, content: 4 },
   ])
   expect(d.map((x) => x.id)).toEqual(['3', '5', '9'])
-  expect(d[1]).toMatchObject(
-    { label: 'Revision #1', content: 'old' })
+  expect(d[1]).toMatchObject({ label: 'Revision #1', content: 'old' })
   expect(d[0]!.content).toBe('')
 })

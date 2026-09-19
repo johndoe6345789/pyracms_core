@@ -5,8 +5,7 @@ test.describe('Register — /auth/register', () => {
   // ---- NEW: Enter key submits register form ----
 
   test(
-    'pressing Enter in the last field submits the '
-    + 'register form',
+    'pressing Enter in the last field submits the ' + 'register form',
     async ({ page }) => {
       await page.goto('/auth/register')
 
@@ -30,27 +29,27 @@ test.describe('Register — /auth/register', () => {
       })
 
       // Press Enter from the last field
-      await page
-        .getByTestId('register-lastname-input')
-        .press('Enter')
+      await page.getByTestId('register-lastname-input').press('Enter')
 
       // Should either navigate away or show no crash
-      await page.waitForLoadState('networkidle', {
-        timeout: 6_000,
-      }).catch(() => {/* acceptable timeout */})
+      await page
+        .waitForLoadState('networkidle', {
+          timeout: 6_000,
+        })
+        .catch(() => {
+          /* acceptable timeout */
+        })
     },
   )
 
   // ---- NEW: ARIA on register form fields ----
 
-  test(
-    'register form has aria-label="Registration form"',
-    async ({ page }) => {
-      await page.goto('/auth/register')
+  test('register form has aria-label="Registration form"', async ({ page }) => {
+    await page.goto('/auth/register')
 
-      await expect(
-        page.getByTestId('register-form'),
-      ).toHaveAttribute('aria-label', /registration form/i)
-    },
-  )
+    await expect(page.getByTestId('register-form')).toHaveAttribute(
+      'aria-label',
+      /registration form/i,
+    )
+  })
 })

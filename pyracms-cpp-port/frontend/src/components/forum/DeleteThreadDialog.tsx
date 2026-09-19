@@ -21,25 +21,16 @@ export function DeleteThreadDialog({
   onConfirm,
 }: DeleteThreadDialogProps) {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      data-testid="delete-thread-dialog"
-    >
+    <Dialog open={open} onClose={onClose} data-testid="delete-thread-dialog">
       <DialogTitle>Delete Thread</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this
-          thread? This action cannot be undone.
-          All posts within this thread will also
-          be permanently deleted.
+          Are you sure you want to delete this thread? This action cannot be
+          undone. All posts within this thread will also be permanently deleted.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          data-testid="delete-thread-cancel"
-        >
+        <Button onClick={onClose} data-testid="delete-thread-cancel">
           Cancel
         </Button>
         <Button

@@ -17,8 +17,14 @@ interface QuickReplyFormProps {
 }
 
 export function QuickReplyForm({
-  value, onChange, onSubmit, onTyping, submitting = false,
-  error, locked = false, isAuthenticated = true,
+  value,
+  onChange,
+  onSubmit,
+  onTyping,
+  submitting = false,
+  error,
+  locked = false,
+  isAuthenticated = true,
 }: QuickReplyFormProps) {
   const notice = replyNotice(locked, isAuthenticated)
   return (
@@ -34,41 +40,42 @@ export function QuickReplyForm({
         <Alert severity="info" data-testid="reply-disabled-notice">
           {notice}
         </Alert>
-      ) : (<>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}
-            data-testid="reply-error">
-            {error}
-          </Alert>
-        )}
-        <MentionTextField
-          fullWidth
-          multiline
-          minRows={3}
-          maxRows={8}
-          placeholder="Write your reply..."
-          value={value}
-          onValue={(v) => {
-            onChange(v)
-            onTyping?.()
-          }}
-          sx={{ mb: 2 }}
-          inputProps={{
-            'aria-label': 'Reply content',
-            'data-testid': 'quick-reply-input',
-          }}
-        />
-        <Button
-          variant="contained"
-          endIcon={<SendOutlined />}
-          onClick={onSubmit}
-          disabled={!value.trim() || submitting}
-          aria-label="Submit reply"
-          data-testid="quick-reply-submit"
-        >
-          {submitting ? 'Posting...' : 'Submit Reply'}
-        </Button>
-      </>)}
+      ) : (
+        <>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }} data-testid="reply-error">
+              {error}
+            </Alert>
+          )}
+          <MentionTextField
+            fullWidth
+            multiline
+            minRows={3}
+            maxRows={8}
+            placeholder="Write your reply..."
+            value={value}
+            onValue={(v) => {
+              onChange(v)
+              onTyping?.()
+            }}
+            sx={{ mb: 2 }}
+            inputProps={{
+              'aria-label': 'Reply content',
+              'data-testid': 'quick-reply-input',
+            }}
+          />
+          <Button
+            variant="contained"
+            endIcon={<SendOutlined />}
+            onClick={onSubmit}
+            disabled={!value.trim() || submitting}
+            aria-label="Submit reply"
+            data-testid="quick-reply-submit"
+          >
+            {submitting ? 'Posting...' : 'Submit Reply'}
+          </Button>
+        </>
+      )}
     </Paper>
   )
 }

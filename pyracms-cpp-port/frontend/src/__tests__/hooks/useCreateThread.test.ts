@@ -43,10 +43,15 @@ it('creates a thread and navigates to it', async () => {
   const { result } = renderHook(() => useCreateThread('2', 's', 1))
   fill(result)
   act(() => result.current.handleSubmit())
-  await waitFor(() => expect(push).toHaveBeenCalledWith(
-    '/site/s/forum/thread/8'))
+  await waitFor(() =>
+    expect(push).toHaveBeenCalledWith('/site/s/forum/thread/8'),
+  )
   expect(mock.post).toHaveBeenCalledWith('/api/forum/threads', {
-    title: 'T', description: 'd', content: 'c', forumId: 2, tenantId: 1,
+    title: 'T',
+    description: 'd',
+    content: 'c',
+    forumId: 2,
+    tenantId: 1,
   })
 })
 
@@ -75,6 +80,7 @@ it('shows server errors', async () => {
   mock.post.mockRejectedValueOnce({ response: {} })
   act(() => result.current.handleSubmit())
   await waitFor(() =>
-    expect(result.current.error).toBe('Failed to create thread'))
+    expect(result.current.error).toBe('Failed to create thread'),
+  )
   expect(result.current.loading).toBe(false)
 })

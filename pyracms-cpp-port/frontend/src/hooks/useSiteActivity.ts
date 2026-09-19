@@ -19,7 +19,8 @@ export function useSiteActivity(tenantId: number | null, limit = 10) {
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     if (!tenantId) return
-    api.get(`/api/activity?tenant_id=${tenantId}&limit=${limit}`)
+    api
+      .get(`/api/activity?tenant_id=${tenantId}&limit=${limit}`)
       .then((r) => setItems(Array.isArray(r.data) ? r.data : []))
       .catch(() => setFailed(true))
       .finally(() => setLoading(false))

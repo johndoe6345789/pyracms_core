@@ -7,13 +7,15 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 beforeEach(() => jest.resetAllMocks())
 
 it('loads, toggles, saves', async () => {
-  m.get.mockResolvedValue({ data: [
-    { name: 'feature_forum', value: 'true' }, { name: 'other' }, {}] })
+  m.get.mockResolvedValue({
+    data: [{ name: 'feature_forum', value: 'true' }, { name: 'other' }, {}],
+  })
   m.put.mockResolvedValue({})
   const { result } = renderHook(() => useFeatureToggles(1))
   await waitFor(() => expect(result.current.loading).toBe(false))
-  expect(result.current.features.find(f => f.id === 'forum')!.enabled)
-    .toBe(true)
+  expect(result.current.features.find((f) => f.id === 'forum')!.enabled).toBe(
+    true,
+  )
   act(() => result.current.handleToggle('articles'))
   act(() => result.current.handleSave())
   await waitFor(() => expect(result.current.snackbarOpen).toBe(true))

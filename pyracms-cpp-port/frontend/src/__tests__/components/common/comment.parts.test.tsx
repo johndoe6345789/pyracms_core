@@ -4,10 +4,20 @@ import CommentActions from '@/components/common/comment/CommentActions'
 import CommentHeader from '@/components/common/comment/CommentHeader'
 import { timeAgo, type Comment } from '@/components/common/comment/types'
 
-const c: Comment = { id: 1, userId: 1, username: 'bob',
-  contentType: 'a', contentId: 1, body: 'hi', parentId: null,
-  likes: 3, dislikes: 1, createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z', children: [] }
+const c: Comment = {
+  id: 1,
+  userId: 1,
+  username: 'bob',
+  contentType: 'a',
+  contentId: 1,
+  body: 'hi',
+  parentId: null,
+  likes: 3,
+  dislikes: 1,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  children: [],
+}
 
 describe('timeAgo', () => {
   const ago = (ms: number) => timeAgo(new Date(Date.now() - ms).toISOString())
@@ -30,9 +40,16 @@ describe('CommentHeader', () => {
 })
 
 describe('CommentActions', () => {
-  const p = { comment: c, isAuthenticated: true, isOwner: true, depth: 0,
-    onVote: jest.fn(), onReply: jest.fn(), onEdit: jest.fn(),
-    onDelete: jest.fn() }
+  const p = {
+    comment: c,
+    isAuthenticated: true,
+    isOwner: true,
+    depth: 0,
+    onVote: jest.fn(),
+    onReply: jest.fn(),
+    onEdit: jest.fn(),
+    onDelete: jest.fn(),
+  }
 
   it('fires every action for an owner', () => {
     render(<CommentActions {...p} />)
@@ -48,8 +65,14 @@ describe('CommentActions', () => {
   })
 
   it('hides reply/owner controls for guests and deep replies', () => {
-    render(<CommentActions {...p} isAuthenticated={false}
-      isOwner={false} comment={c} />)
+    render(
+      <CommentActions
+        {...p}
+        isAuthenticated={false}
+        isOwner={false}
+        comment={c}
+      />,
+    )
     expect(screen.queryByTestId('comment-reply-btn')).toBeNull()
     expect(screen.queryByTestId('comment-edit-btn')).toBeNull()
     expect(screen.getByTestId('comment-upvote-btn')).toBeDisabled()
@@ -64,7 +87,10 @@ describe('CommentActions', () => {
 describe('buildTree', () => {
   it('nests by parentId and roots orphans', () => {
     const t = buildTree([
-      c, { ...c, id: 2, parentId: 1 }, { ...c, id: 3, parentId: 99 }])
+      c,
+      { ...c, id: 2, parentId: 1 },
+      { ...c, id: 3, parentId: 99 },
+    ])
     expect(t.map((n) => n.id)).toEqual([1, 3])
     expect(t[0]!.children.map((n) => n.id)).toEqual([2])
   })

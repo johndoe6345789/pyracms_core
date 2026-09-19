@@ -14,7 +14,11 @@ interface CodeOutputProps {
 }
 
 export function CodeOutput({
-  stdout, stderr, exitCode, executionTime, isLoading,
+  stdout,
+  stderr,
+  exitCode,
+  executionTime,
+  isLoading,
 }: CodeOutputProps) {
   if (isLoading) return <OutputLoading />
   if (!(stdout || stderr) && exitCode === undefined) return null
@@ -22,8 +26,10 @@ export function CodeOutput({
   return (
     <Box
       sx={{
-        borderRadius: 1, overflow: 'hidden',
-        border: 1, borderColor: 'divider',
+        borderRadius: 1,
+        overflow: 'hidden',
+        border: 1,
+        borderColor: 'divider',
       }}
       data-testid="code-output"
       role="region"
@@ -31,9 +37,7 @@ export function CodeOutput({
     >
       <OutputHeader exitCode={exitCode} executionTime={executionTime} />
       {stdout && <OutputPane text={stdout} testId="code-output-stdout" />}
-      {stderr && (
-        <OutputPane text={stderr} testId="code-output-stderr" error />
-      )}
+      {stderr && <OutputPane text={stderr} testId="code-output-stderr" error />}
     </Box>
   )
 }

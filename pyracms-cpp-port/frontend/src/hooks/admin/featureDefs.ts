@@ -53,7 +53,7 @@ export function featuresFromSettings(
       on[s.name.replace('feature_', '')] = String(s.value)
     }
   }
-  return FEATURE_DEFS.map(f => ({
+  return FEATURE_DEFS.map((f) => ({
     ...f,
     enabled: on[f.id] === 'true',
   }))

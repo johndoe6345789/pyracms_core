@@ -31,9 +31,7 @@ describe('LoginHeader', () => {
   describe('info alert', () => {
     it('is always rendered regardless of error state', () => {
       render(<LoginHeader error="" />)
-      expect(
-        screen.getByTestId('login-info'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('login-info')).toBeInTheDocument()
     })
 
     it('contains the test credentials', () => {
@@ -45,9 +43,7 @@ describe('LoginHeader', () => {
 
     it('is still rendered when an error is present', () => {
       render(<LoginHeader error="Bad credentials" />)
-      expect(
-        screen.getByTestId('login-info'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('login-info')).toBeInTheDocument()
     })
   })
 })

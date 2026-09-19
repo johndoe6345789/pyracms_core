@@ -15,59 +15,31 @@ test.describe('Admin ACL', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'page loads — admin-acl-page container visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-acl-page'),
-      ).toBeVisible()
-    },
-  )
+  test('page loads — admin-acl-page container visible', async ({ page }) => {
+    await expect(page.getByTestId('admin-acl-page')).toBeVisible()
+  })
 
-  test(
-    'page has "ACL Editor" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /acl editor/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('page has "ACL Editor" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /acl editor/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    'add-acl-rule form is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('add-acl-rule-form'),
-      ).toBeVisible()
-    },
-  )
+  test('add-acl-rule form is rendered', async ({ page }) => {
+    await expect(page.getByTestId('add-acl-rule-form')).toBeVisible()
+  })
 
-  test(
-    'ACL action select is present',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-action-select'),
-      ).toBeVisible()
-    },
-  )
+  test('ACL action select is present', async ({ page }) => {
+    await expect(page.getByTestId('acl-action-select')).toBeVisible()
+  })
 
-  test(
-    'ACL principal input is present',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-principal-input'),
-      ).toBeVisible()
-    },
-  )
+  test('ACL principal input is present', async ({ page }) => {
+    await expect(page.getByTestId('acl-principal-input')).toBeVisible()
+  })
 
-  test(
-    'ACL permission input is present',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-permission-input'),
-      ).toBeVisible()
-    },
-  )
+  test('ACL permission input is present', async ({ page }) => {
+    await expect(page.getByTestId('acl-permission-input')).toBeVisible()
+  })
 })

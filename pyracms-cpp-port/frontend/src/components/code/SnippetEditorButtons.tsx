@@ -19,10 +19,15 @@ interface Props {
 export function SnippetEditorButtons(p: Props) {
   return (
     <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-      <RunButton label="Save & Run" runningLabel="Running..."
-        testId="run-btn" running={p.running}
+      <RunButton
+        label="Save & Run"
+        runningLabel="Running..."
+        testId="run-btn"
+        running={p.running}
         disabled={!p.hasCode || p.saving}
-        runnable={p.canRun} onClick={p.onRun} />
+        runnable={p.canRun}
+        onClick={p.onRun}
+      />
       <Button
         variant="contained"
         startIcon={<SaveOutlined />}
@@ -33,8 +38,7 @@ export function SnippetEditorButtons(p: Props) {
       >
         {p.saving ? 'Saving...' : p.saveLabel}
       </Button>
-      <Button variant="outlined" onClick={p.onCancel}
-        data-testid="cancel-btn">
+      <Button variant="outlined" onClick={p.onCancel} data-testid="cancel-btn">
         Cancel
       </Button>
     </Box>

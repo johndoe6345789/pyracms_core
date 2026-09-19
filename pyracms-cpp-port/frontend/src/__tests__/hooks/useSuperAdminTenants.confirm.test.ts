@@ -3,8 +3,7 @@ import '@testing-library/jest-dom'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_TENANTS } from
-  '../helpers/superAdminTenantsFixtures'
+import { RAW_TENANTS } from '../helpers/superAdminTenantsFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -30,9 +29,13 @@ describe('useSuperAdminTenants — confirmDelete (success)', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.tenants).toHaveLength(2)
 
-    act(() => { result.current.handleDelete(1) })
+    act(() => {
+      result.current.handleDelete(1)
+    })
 
-    await act(async () => { result.current.confirmDelete() })
+    await act(async () => {
+      result.current.confirmDelete()
+    })
 
     await waitFor(() => {
       expect(result.current.confirmDeleteId).toBeNull()
@@ -52,7 +55,9 @@ describe('useSuperAdminTenants — confirmDelete (no-op)', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.confirmDeleteId).toBeNull()
 
-    act(() => { result.current.confirmDelete() })
+    act(() => {
+      result.current.confirmDelete()
+    })
 
     expect(mockApi.delete).not.toHaveBeenCalled()
     expect(result.current.tenants).toHaveLength(2)

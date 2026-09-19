@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  Card, CardContent, Typography,
-  Box, Button,
-} from '@mui/material'
+import { Card, CardContent, Typography, Box, Button } from '@mui/material'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
@@ -25,23 +22,13 @@ export default function SuperAdminQuickCard({
   return (
     <Card variant="outlined" data-testid={testId}>
       <CardContent>
-        <Box
-          sx={{ color: 'warning.main', mb: 1 }}
-          aria-hidden="true"
-        >
+        <Box sx={{ color: 'warning.main', mb: 1 }} aria-hidden="true">
           {icon}
         </Box>
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 600, mb: 0.5 }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
           {label}
         </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 2 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {description}
         </Typography>
         <Button

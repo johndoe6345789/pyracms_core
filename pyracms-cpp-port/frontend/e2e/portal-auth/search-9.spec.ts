@@ -2,8 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Search — /search', () => {
   test(
-    'mocked API: clicking page 2 in pagination triggers '
-    + 'a new search',
+    'mocked API: clicking page 2 in pagination triggers ' + 'a new search',
     async ({ page }) => {
       const requests: string[] = []
 

@@ -1,16 +1,16 @@
 import {
-  Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, TextField,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from '@mui/material'
 import type { useMenuEditor } from '@/hooks/useMenuEditor'
 
 type Editor = ReturnType<typeof useMenuEditor>
 
-export default function CreateGroupDialog({
-  editor,
-}: {
-  editor: Editor
-}) {
+export default function CreateGroupDialog({ editor }: { editor: Editor }) {
   return (
     <Dialog
       open={editor.groupDialogOpen}
@@ -18,17 +18,13 @@ export default function CreateGroupDialog({
       data-testid="create-group-dialog"
       aria-labelledby="create-group-title"
     >
-      <DialogTitle id="create-group-title">
-        Create Menu Group
-      </DialogTitle>
+      <DialogTitle id="create-group-title">Create Menu Group</DialogTitle>
       <DialogContent>
         <TextField
           label="Group Name"
           fullWidth
           value={editor.newGroupName}
-          onChange={(e) =>
-            editor.setNewGroupName(e.target.value)
-          }
+          onChange={(e) => editor.setNewGroupName(e.target.value)}
           sx={{ mt: 1 }}
           autoFocus
           onKeyDown={(e) => {

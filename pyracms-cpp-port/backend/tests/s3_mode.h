@@ -34,10 +34,10 @@ inline const std::string kPng =
 // "bucket/key" the fake store holds for an uploaded file.
 inline std::string s3Key(const std::string &uuid, bool thumb = false) {
     auto r = testDb()->execSqlSync(
-        "SELECT COALESCE(tenant_id, 0) AS t, storage FROM files "
+        "SELECT COALESCE(tenant_id, 0) AS t FROM files "
         "WHERE uuid = $1", uuid);
-    return "pyracms-test/tenants/" + std::to_string(r[0]["t"].as<int>()) +
-           (thumb ? "/thumbnails/" : "/") + uuid;
+    return "pyracms-test/tenant-" + std::to_string(r[0]["t"].as<int>()) +
+           (thumb ? "-thumb-" : "-") + uuid;
 }
 
 inline std::string storageOf(const std::string &uuid) {

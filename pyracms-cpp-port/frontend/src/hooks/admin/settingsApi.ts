@@ -29,7 +29,5 @@ export const putSetting = (
   tenantId: number | null,
 ) => api.put(settingUrl(key, tenantId), { name: key, value, tenantId })
 
-export const deleteSetting = (
-  key: string,
-  tenantId: number | null,
-) => api.delete(settingUrl(key, tenantId), { data: { tenantId } })
+export const deleteSetting = (key: string, tenantId: number | null) =>
+  api.delete(settingUrl(key, tenantId), { data: { tenantId } })

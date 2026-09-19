@@ -1,26 +1,16 @@
 'use client'
 
-import {
-  AppBar, Toolbar, Typography,
-  Box, IconButton,
-} from '@mui/material'
-import {
-  MenuOutlined, ShieldOutlined,
-} from '@mui/icons-material'
-import ThemeToggle
-  from '@/components/common/ThemeToggle'
-import UserBubble
-  from '@/components/common/UserBubble'
+import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material'
+import { MenuOutlined, ShieldOutlined } from '@mui/icons-material'
+import ThemeToggle from '@/components/common/ThemeToggle'
+import UserBubble from '@/components/common/UserBubble'
 
 interface Props {
   isMobile: boolean
   onMenuClick: () => void
 }
 
-export default function SuperAdminAppBar({
-  isMobile,
-  onMenuClick,
-}: Props) {
+export default function SuperAdminAppBar({ isMobile, onMenuClick }: Props) {
   return (
     <AppBar
       position="sticky"

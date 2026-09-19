@@ -8,15 +8,12 @@ test.describe('Navigation', () => {
     await goToSuperAdmin(page)
   })
 
-  test(
-    'settings page shows Platform Settings heading',
-    async ({ page }) => {
-      await page.goto('/super-admin/settings')
-      await expect(
-        page.getByRole('heading', {
-          name: 'Platform Settings',
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('settings page shows Platform Settings heading', async ({ page }) => {
+    await page.goto('/super-admin/settings')
+    await expect(
+      page.getByRole('heading', {
+        name: 'Platform Settings',
+      }),
+    ).toBeVisible()
+  })
 })

@@ -17,5 +17,7 @@ export const baseQuery = fetchBaseQuery({
 export const tagTypes = ['User', 'Tenant', 'Me'] as const
 
 export type ApiBuilder = EndpointBuilder<
-  typeof baseQuery, (typeof tagTypes)[number], 'api'
+  typeof baseQuery,
+  (typeof tagTypes)[number],
+  'api'
 >

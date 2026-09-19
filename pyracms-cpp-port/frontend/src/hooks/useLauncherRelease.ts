@@ -3,9 +3,7 @@
 import { useEffect, useState } from 'react'
 import { fetchLatestRelease } from '@/lib/releaseFetch'
 import type { LauncherRelease } from '@/lib/release'
-import {
-  detectPlatform, refinePlatform, type Platform,
-} from '@/lib/platform'
+import { detectPlatform, refinePlatform, type Platform } from '@/lib/platform'
 
 export type ReleaseState =
   | { status: 'loading' }
@@ -18,10 +16,14 @@ export function useLauncherRelease(): ReleaseState {
   useEffect(() => {
     let live = true
     fetchLatestRelease().then((release) => {
-      if (live) setState(release
-        ? { status: 'ready', release } : { status: 'fallback' })
+      if (live)
+        setState(
+          release ? { status: 'ready', release } : { status: 'fallback' },
+        )
     })
-    return () => { live = false }
+    return () => {
+      live = false
+    }
   }, [])
   return state
 }
@@ -33,8 +35,12 @@ export function usePlatform(): Platform {
     let live = true
     const base = detectPlatform()
     setP(base)
-    refinePlatform(base).then((r) => { if (live) setP(r) })
-    return () => { live = false }
+    refinePlatform(base).then((r) => {
+      if (live) setP(r)
+    })
+    return () => {
+      live = false
+    }
   }, [])
   return p
 }

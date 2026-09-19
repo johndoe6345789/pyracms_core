@@ -1,6 +1,4 @@
-import {
-  DEFAULT_TEMPLATES, type Templates,
-} from './defaultTemplates'
+import { DEFAULT_TEMPLATES, type Templates } from './defaultTemplates'
 
 export const TEMPLATES_KEY = 'site_templates'
 

@@ -16,13 +16,16 @@ describe('UserRole enum', () => {
   it('SuperAdmin has numeric value 4', () => {
     expect(UserRole.SuperAdmin).toBe(4)
   })
-  it('values are strictly ordered '
-    + 'Guest < User < Moderator < SiteAdmin < SuperAdmin', () => {
-    expect(UserRole.Guest).toBeLessThan(UserRole.User)
-    expect(UserRole.User).toBeLessThan(UserRole.Moderator)
-    expect(UserRole.Moderator).toBeLessThan(UserRole.SiteAdmin)
-    expect(UserRole.SiteAdmin).toBeLessThan(UserRole.SuperAdmin)
-  })
+  it(
+    'values are strictly ordered ' +
+      'Guest < User < Moderator < SiteAdmin < SuperAdmin',
+    () => {
+      expect(UserRole.Guest).toBeLessThan(UserRole.User)
+      expect(UserRole.User).toBeLessThan(UserRole.Moderator)
+      expect(UserRole.Moderator).toBeLessThan(UserRole.SiteAdmin)
+      expect(UserRole.SiteAdmin).toBeLessThan(UserRole.SuperAdmin)
+    },
+  )
 })
 
 describe('USER_ROLE_LABELS', () => {

@@ -1,22 +1,23 @@
-import { render, screen, fireEvent, act, waitFor }
-  from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { useRef } from 'react'
-import { MentionAutocomplete }
-  from '@/components/common/MentionAutocomplete'
+import { MentionAutocomplete } from '@/components/common/MentionAutocomplete'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
 
 function Host({ onSelect }: { onSelect: (u: string) => void }) {
   const ref = useRef<HTMLTextAreaElement>(null)
-  return (<>
-    <textarea data-testid="ta" ref={ref} />
-    <MentionAutocomplete inputRef={ref} onSelect={onSelect} />
-  </>)
+  return (
+    <>
+      <textarea data-testid="ta" ref={ref} />
+      <MentionAutocomplete inputRef={ref} onSelect={onSelect} />
+    </>
+  )
 }
 
 const type = (v: string) => {
@@ -33,7 +34,9 @@ describe('MentionAutocomplete', () => {
     const onSelect = jest.fn()
     render(<Host onSelect={onSelect} />)
     type('hi @al')
-    await act(async () => { jest.advanceTimersByTime(250) })
+    await act(async () => {
+      jest.advanceTimersByTime(250)
+    })
     jest.useRealTimers()
     fireEvent.click(await screen.findByTestId('mention-item-1'))
     expect(onSelect).toHaveBeenCalledWith('alice')
@@ -49,7 +52,8 @@ describe('MentionAutocomplete', () => {
   })
 
   it('clears on errors and non-array payloads', async () => {
-    get.mockRejectedValueOnce(new Error('x'))
+    get
+      .mockRejectedValueOnce(new Error('x'))
       .mockResolvedValueOnce({ data: {} })
     render(<Host onSelect={jest.fn()} />)
     type('@a')
@@ -65,7 +69,8 @@ describe('MentionAutocomplete', () => {
     type('@b')
     await screen.findByTestId('mention-item-2')
     type('done')
-    await waitFor(() => expect(screen.queryByTestId('mention-item-2'))
-      .toBeNull())
+    await waitFor(() =>
+      expect(screen.queryByTestId('mention-item-2')).toBeNull(),
+    )
   })
 })

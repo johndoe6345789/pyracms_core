@@ -37,19 +37,24 @@ export function useUserEdit(setUsers: SetUsers) {
     setEditError('')
     const { role, ...profile } = fields
     const body = role === editUser.role ? profile : fields
-    api.put(`/api/users/${id}`, body)
+    api
+      .put(`/api/users/${id}`, body)
       .then(() => {
-        setUsers((prev) => prev.map((u) =>
-          u.id === id ? { ...u, ...fields } : u))
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id ? { ...u, ...fields } : u)),
+        )
         setEditUser(null)
       })
-      .catch((err) => setEditError(
-        apiError(err, 'Failed to update user')))
+      .catch((err) => setEditError(apiError(err, 'Failed to update user')))
       .finally(() => setSaving(false))
   }
 
   return {
-    editUser, saving, editError,
-    handleEditClick, handleEditClose, handleEditSave,
+    editUser,
+    saving,
+    editError,
+    handleEditClick,
+    handleEditClose,
+    handleEditSave,
   }
 }

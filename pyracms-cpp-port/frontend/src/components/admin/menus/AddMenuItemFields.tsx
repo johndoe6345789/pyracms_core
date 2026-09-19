@@ -1,15 +1,15 @@
 import {
-  TextField, FormControl, InputLabel, Select, MenuItem,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import type { useMenuEditor } from '@/hooks/useMenuEditor'
 
 type Editor = ReturnType<typeof useMenuEditor>
 
-export default function AddMenuItemFields({
-  editor,
-}: {
-  editor: Editor
-}) {
+export default function AddMenuItemFields({ editor }: { editor: Editor }) {
   return (
     <>
       <TextField
@@ -42,14 +42,11 @@ export default function AddMenuItemFields({
         <Select
           value={editor.newPermissions}
           label="Permissions"
-          onChange={(e) =>
-            editor.setNewPermissions(e.target.value)}
+          onChange={(e) => editor.setNewPermissions(e.target.value)}
           data-testid="menu-permissions-select"
         >
           <MenuItem value="public">public</MenuItem>
-          <MenuItem value="authenticated">
-            authenticated
-          </MenuItem>
+          <MenuItem value="authenticated">authenticated</MenuItem>
           <MenuItem value="admin">admin</MenuItem>
         </Select>
       </FormControl>

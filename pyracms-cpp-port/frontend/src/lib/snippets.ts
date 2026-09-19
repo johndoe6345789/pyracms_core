@@ -18,13 +18,9 @@ export interface RunResult {
   executionTime?: number
 }
 
-const RUNNABLE = [
-  'python', 'javascript', 'cpp', 'rust', 'go',
-  'java', 'ruby',
-]
+const RUNNABLE = ['python', 'javascript', 'cpp', 'rust', 'go', 'java', 'ruby']
 
-export const isRunnable = (language: string) =>
-  RUNNABLE.includes(language)
+export const isRunnable = (language: string) => RUNNABLE.includes(language)
 
 const LANGUAGE_COLORS: Record<string, string> = {
   python: '#3572A5',
@@ -40,9 +36,7 @@ const LANGUAGE_COLORS: Record<string, string> = {
 export const langColor = (language: string) =>
   LANGUAGE_COLORS[language] ?? '#6e7681'
 
-export function mapSnippet(
-  s: Record<string, unknown>,
-): Snippet {
+export function mapSnippet(s: Record<string, unknown>): Snippet {
   const created = String(s.createdAt ?? '')
   return {
     id: String(s.id),
@@ -58,9 +52,7 @@ export function mapSnippet(
   }
 }
 
-export function mapRunResult(
-  d: Record<string, unknown>,
-): RunResult {
+export function mapRunResult(d: Record<string, unknown>): RunResult {
   const code = Number(d.exitCode ?? 0)
   const out = String(d.output ?? d.stdout ?? '')
   const err = String(d.stderr ?? '')
@@ -71,7 +63,6 @@ export function mapRunResult(
     stdout: code === 0 ? out : '',
     stderr: code === 0 ? err : err || out,
     exitCode: code,
-    ...(time != null
-      ? { executionTime: Number(time) } : {}),
+    ...(time != null ? { executionTime: Number(time) } : {}),
   }
 }

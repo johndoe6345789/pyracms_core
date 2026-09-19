@@ -12,11 +12,8 @@ import { makeMockFormEvent } from './mockFormEvent'
  */
 export function makeWrapper() {
   const { store } = makeStore()
-  const Wrapper = ({
-    children,
-  }: {
-    children: React.ReactNode
-  }) => React.createElement(Provider, { store, children })
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(Provider, { store, children })
   return { store, Wrapper }
 }
 

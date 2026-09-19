@@ -5,8 +5,10 @@ namespace pyracms {
 void SearchService::search(const DbClientPtr &db, int tenantId,
                            const std::string &query, const std::string &type,
                            int limit, int offset, SearchResultsCb cb) {
+    // Forum posts are never indexed in Elasticsearch: always use Postgres.
+    bool forumOnly = type == "forum_post" || type == "post";
     // GCOVR_EXCL_START (Elasticsearch/Redis glue: needs a live cluster)
-    if (useElasticsearch()) {
+    if (useElasticsearch() && !forumOnly) {
         esSearch(tenantId, query, type, limit, offset, cb);
         return;
     }

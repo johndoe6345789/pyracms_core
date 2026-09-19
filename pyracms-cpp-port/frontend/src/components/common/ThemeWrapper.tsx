@@ -32,8 +32,7 @@ export default function ThemeWrapper({
   }, [])
 
   const theme = useMemo(() => {
-    const dark = colorMode === 'system'
-      ? systemDark : colorMode === 'dark'
+    const dark = colorMode === 'system' ? systemDark : colorMode === 'dark'
     const base = dark ? darkTheme : lightTheme
     return site ? applySiteTheme(base, site, dark) : base
   }, [colorMode, systemDark, site])
@@ -41,9 +40,7 @@ export default function ThemeWrapper({
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AnimatePresence mode="wait">
-        {children}
-      </AnimatePresence>
+      <AnimatePresence mode="wait">{children}</AnimatePresence>
     </ThemeProvider>
   )
 }

@@ -36,8 +36,10 @@ describe('AccountSettings', () => {
     type('pw-confirm', 'newpass123')
     submit()
     expect(await screen.findByTestId('password-done')).toBeInTheDocument()
-    expect(m.put).toHaveBeenCalledWith('/api/users/4/password',
-      { currentPassword: 'old-pass', newPassword: 'newpass123' })
+    expect(m.put).toHaveBeenCalledWith('/api/users/4/password', {
+      currentPassword: 'old-pass',
+      newPassword: 'newpass123',
+    })
     expect(replaceToken).toHaveBeenCalledWith(null, 'fresh')
     expect(store.getState().auth.token).toBe('fresh')
   })
@@ -51,7 +53,8 @@ describe('AccountSettings', () => {
     type('pw-new', 'newpass123')
     type('pw-confirm', 'newpass123')
     fireEvent.submit(screen.getByTestId('password-form'))
-    expect(await screen.findByTestId('password-error'))
-      .toHaveTextContent('incorrect')
+    expect(await screen.findByTestId('password-error')).toHaveTextContent(
+      'incorrect',
+    )
   })
 })

@@ -15,20 +15,27 @@ const site = { slug: 'demo', name: 'Demo', description: 'D', owner: 'bob' }
 describe('portal components', () => {
   it('renders a tenant card link', () => {
     render(<TenantCard site={site as never} />)
-    expect(screen.getByText('Demo').closest('a'))
-      .toHaveAttribute('href', '/site/demo')
+    expect(screen.getByText('Demo').closest('a')).toHaveAttribute(
+      'href',
+      '/site/demo',
+    )
     expect(screen.getByText('bob')).toBeInTheDocument()
   })
 
   it('renders skeletons while loading', () => {
     const { container } = render(<TenantGrid sites={[]} loading />)
-    expect(container.querySelectorAll('.MuiSkeleton-root').length)
-      .toBeGreaterThan(5)
+    expect(
+      container.querySelectorAll('.MuiSkeleton-root').length,
+    ).toBeGreaterThan(5)
   })
 
   it('renders site cards when loaded', () => {
-    render(<TenantGrid loading={false}
-      sites={[site, { ...site, slug: 'b', name: 'Bee' }] as never} />)
+    render(
+      <TenantGrid
+        loading={false}
+        sites={[site, { ...site, slug: 'b', name: 'Bee' }] as never}
+      />,
+    )
     expect(screen.getByText('Bee')).toBeInTheDocument()
   })
 

@@ -5,10 +5,18 @@ type Handlers = {
   fulfilled: (v: never) => unknown
   rejected: (e: unknown) => unknown
 }
-const req = () => (api.interceptors.request as unknown as {
-  handlers: Handlers[] }).handlers[0]!
-const res = () => (api.interceptors.response as unknown as {
-  handlers: Handlers[] }).handlers[0]!
+const req = () =>
+  (
+    api.interceptors.request as unknown as {
+      handlers: Handlers[]
+    }
+  ).handlers[0]!
+const res = () =>
+  (
+    api.interceptors.response as unknown as {
+      handlers: Handlers[]
+    }
+  ).handlers[0]!
 
 const realLocation = window.location
 let assigned = ''
@@ -20,13 +28,16 @@ beforeEach(() => {
     configurable: true,
     value: {
       pathname: '/site/demo/forum',
-      set href(v: string) { assigned = v },
+      set href(v: string) {
+        assigned = v
+      },
     },
   })
 })
 afterAll(() => {
   Object.defineProperty(window, 'location', {
-    configurable: true, value: realLocation,
+    configurable: true,
+    value: realLocation,
   })
 })
 
@@ -34,13 +45,15 @@ describe('api interceptors', () => {
   it('adds the bearer token for the current scope', () => {
     setToken('demo', 'tok')
     const cfg = req().fulfilled({ headers: {} } as never) as {
-      headers: { Authorization?: string } }
+      headers: { Authorization?: string }
+    }
     expect(cfg.headers.Authorization).toBe('Bearer tok')
   })
 
   it('leaves the request alone without a token', () => {
     const cfg = req().fulfilled({ headers: {} } as never) as {
-      headers: { Authorization?: string } }
+      headers: { Authorization?: string }
+    }
     expect(cfg.headers.Authorization).toBeUndefined()
   })
 
@@ -63,7 +76,12 @@ describe('api interceptors', () => {
   it('sends a portal 401 to the platform login', async () => {
     Object.defineProperty(window, 'location', {
       configurable: true,
-      value: { pathname: '/', set href(v: string) { assigned = v } },
+      value: {
+        pathname: '/',
+        set href(v: string) {
+          assigned = v
+        },
+      },
     })
     const err = { response: { status: 401 } }
     await expect(res().rejected(err)).rejects.toBe(err)

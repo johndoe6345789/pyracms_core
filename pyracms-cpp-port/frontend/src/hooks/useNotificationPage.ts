@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useActionError } from '@/hooks/useActionError'
-import type { Notification }
-  from '@/components/common/notification/notificationIcons'
+import type { Notification } from '@/components/common/notification/notificationIcons'
 import {
-  fetchNotifications, markNotificationRead,
-  markAllNotificationsRead, deleteNotification,
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification,
 } from '@/components/common/notification/notificationApi'
 
 /** State and actions for the full notifications page. */
@@ -26,15 +27,17 @@ export function useNotificationPage(enabled: boolean) {
   const markRead = (id: number) => {
     setError('')
     markNotificationRead(id)
-      .then(() => setItems((p) => p.map((n) =>
-        n.id === id ? { ...n, is_read: true } : n)))
+      .then(() =>
+        setItems((p) =>
+          p.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+        ),
+      )
       .catch(fail('Could not mark as read'))
   }
   const markAll = () => {
     setError('')
     markAllNotificationsRead()
-      .then(() => setItems((p) => p.map(
-        (n) => ({ ...n, is_read: true }))))
+      .then(() => setItems((p) => p.map((n) => ({ ...n, is_read: true }))))
       .catch(fail('Could not mark all read'))
   }
   const remove = (id: number) => {

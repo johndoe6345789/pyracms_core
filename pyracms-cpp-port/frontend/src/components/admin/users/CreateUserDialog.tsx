@@ -1,15 +1,15 @@
 import {
-  Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, Alert,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
 } from '@mui/material'
 import type { CreateUserState } from './useCreateUser'
 import CreateUserFields from './CreateUserFields'
 
-export default function CreateUserDialog({
-  s,
-}: {
-  s: CreateUserState
-}) {
+export default function CreateUserDialog({ s }: { s: CreateUserState }) {
   return (
     <Dialog
       open={s.open}
@@ -19,9 +19,7 @@ export default function CreateUserDialog({
       data-testid="create-user-dialog"
       aria-labelledby="create-user-title"
     >
-      <DialogTitle id="create-user-title">
-        Create User
-      </DialogTitle>
+      <DialogTitle id="create-user-title">Create User</DialogTitle>
       <DialogContent
         sx={{
           display: 'flex',
@@ -31,10 +29,7 @@ export default function CreateUserDialog({
         }}
       >
         {s.error && (
-          <Alert
-            severity="error"
-            data-testid="create-user-error"
-          >
+          <Alert severity="error" data-testid="create-user-error">
             {s.error}
           </Alert>
         )}

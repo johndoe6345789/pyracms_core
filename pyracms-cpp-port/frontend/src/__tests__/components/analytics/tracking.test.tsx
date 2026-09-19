@@ -1,19 +1,26 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import PageViewTracker from '@/components/analytics/PageViewTracker'
-import SummaryCards, { humanize }
-  from '@/components/admin/analytics/SummaryCards'
+import SummaryCards, {
+  humanize,
+} from '@/components/admin/analytics/SummaryCards'
 import { m } from '../../helpers/scopeApi'
 
 let path = '/site/s/articles'
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => ({
-  useParams: () => ({ slug: 's' }), usePathname: () => path,
+  useParams: () => ({ slug: 's' }),
+  usePathname: () => path,
 }))
-jest.mock('@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock)
+jest.mock(
+  '@/hooks/useTenantId',
+  () => require('../../helpers/scopeMocks').tenantMock,
+)
 
-const dnt = (v: string | null) => Object.defineProperty(
-  navigator, 'doNotTrack', { value: v, configurable: true })
+const dnt = (v: string | null) =>
+  Object.defineProperty(navigator, 'doNotTrack', {
+    value: v,
+    configurable: true,
+  })
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -24,9 +31,13 @@ beforeEach(() => {
 
 it('posts the path and tenant on load', async () => {
   render(<PageViewTracker />)
-  await waitFor(() => expect(m.post).toHaveBeenCalledWith(
-    '/api/analytics/track',
-    { path: '/site/s/articles', tenant_id: 1, referrer: '' }))
+  await waitFor(() =>
+    expect(m.post).toHaveBeenCalledWith('/api/analytics/track', {
+      path: '/site/s/articles',
+      tenant_id: 1,
+      referrer: '',
+    }),
+  )
 })
 
 it('respects Do Not Track', () => {

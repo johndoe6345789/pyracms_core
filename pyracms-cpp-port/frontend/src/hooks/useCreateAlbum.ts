@@ -8,10 +8,7 @@ import api from '@/lib/api'
  * @param tenantId - The active tenant ID, or null.
  * @param onCreated - Called after the album exists (refresh list).
  */
-export function useCreateAlbum(
-  tenantId: number | null,
-  onCreated: () => void,
-) {
+export function useCreateAlbum(tenantId: number | null, onCreated: () => void) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -24,11 +21,12 @@ export function useCreateAlbum(
     if (!name.trim() || !tenantId) return
     setSaving(true)
     setError('')
-    api.post('/api/gallery/albums', {
-      displayName: name.trim(),
-      description: description.trim(),
-      tenantId,
-    })
+    api
+      .post('/api/gallery/albums', {
+        displayName: name.trim(),
+        description: description.trim(),
+        tenantId,
+      })
       .then(() => {
         setOpen(false)
         setName('')
@@ -40,8 +38,16 @@ export function useCreateAlbum(
   }
 
   return {
-    open, setOpen, close, name, setName,
-    description, setDescription, saving, error, submit,
+    open,
+    setOpen,
+    close,
+    name,
+    setName,
+    description,
+    setDescription,
+    saving,
+    error,
+    submit,
   }
 }
 

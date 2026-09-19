@@ -3,8 +3,7 @@ import '@testing-library/jest-dom'
 import { useSuperAdminUsers } from '@/hooks/useSuperAdminUsers'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_USERS } from
-  '../helpers/superAdminUsersFixtures'
+import { RAW_USERS } from '../helpers/superAdminUsersFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -27,7 +26,9 @@ describe('useSuperAdminUsers — toggleBan', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => { result.current.toggleBan(9999) })
+    act(() => {
+      result.current.toggleBan(9999)
+    })
 
     expect(mockApi.put).not.toHaveBeenCalled()
   })
@@ -39,7 +40,9 @@ describe('useSuperAdminUsers — toggleBan', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    await act(async () => { result.current.toggleBan(1) })
+    await act(async () => {
+      result.current.toggleBan(1)
+    })
 
     // Give microtasks time to settle
     await act(async () => {})
@@ -55,7 +58,9 @@ describe('useSuperAdminUsers — toggleBan', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    await act(async () => { result.current.toggleBan(1) })
+    await act(async () => {
+      result.current.toggleBan(1)
+    })
 
     await waitFor(() => {
       expect(result.current.users[0]!.isActive).toBe(false)

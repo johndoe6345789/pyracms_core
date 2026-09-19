@@ -5,7 +5,8 @@ import Link from 'next/link'
 
 /** Returns why replying is unavailable, or null when it is allowed. */
 export function replyNotice(
-  locked: boolean, isAuthenticated: boolean,
+  locked: boolean,
+  isAuthenticated: boolean,
 ): ReactNode {
   if (locked) return 'This thread is locked. New replies are disabled.'
   if (!isAuthenticated) {

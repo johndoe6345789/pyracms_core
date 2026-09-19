@@ -11,63 +11,50 @@ test.describe('Tenant management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'pressing Escape closes delete dialog',
-    async ({ page }) => {
-      await page.route('**/api/tenants', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_TENANTS),
-        }),
-      )
+  test('pressing Escape closes delete dialog', async ({ page }) => {
+    await page.route('**/api/tenants', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_TENANTS),
+      }),
+    )
 
-      await page.goto('/super-admin/tenants')
-      await page
-        .getByTestId('super-admin-tenants-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForTenantsLoaded(page)
+    await page.goto('/super-admin/tenants')
+    await page
+      .getByTestId('super-admin-tenants-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForTenantsLoaded(page)
 
-      await page
-        .getByTestId('delete-tenant-alpha')
-        .click()
-      await expect(
-        page.getByTestId('tenant-delete-dialog'),
-      ).toBeVisible()
+    await page.getByTestId('delete-tenant-alpha').click()
+    await expect(page.getByTestId('tenant-delete-dialog')).toBeVisible()
 
-      await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
 
-      await expect(
-        page.getByTestId('tenant-delete-dialog'),
-      ).not.toBeVisible()
-    },
-  )
+    await expect(page.getByTestId('tenant-delete-dialog')).not.toBeVisible()
+  })
 
-  test(
-    'cancel-delete-tenant button is keyboard-focusable',
-    async ({ page }) => {
-      await page.route('**/api/tenants', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_TENANTS),
-        }),
-      )
+  test('cancel-delete-tenant button is keyboard-focusable', async ({
+    page,
+  }) => {
+    await page.route('**/api/tenants', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_TENANTS),
+      }),
+    )
 
-      await page.goto('/super-admin/tenants')
-      await page
-        .getByTestId('super-admin-tenants-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForTenantsLoaded(page)
+    await page.goto('/super-admin/tenants')
+    await page
+      .getByTestId('super-admin-tenants-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForTenantsLoaded(page)
 
-      await page
-        .getByTestId('delete-tenant-alpha')
-        .click()
+    await page.getByTestId('delete-tenant-alpha').click()
 
-      const cancel =
-        page.getByTestId('cancel-delete-tenant')
-      await cancel.focus()
-      await expect(cancel).toBeFocused()
-    },
-  )
+    const cancel = page.getByTestId('cancel-delete-tenant')
+    await cancel.focus()
+    await expect(cancel).toBeFocused()
+  })
 })

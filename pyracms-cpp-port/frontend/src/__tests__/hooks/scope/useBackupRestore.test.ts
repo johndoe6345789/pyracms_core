@@ -14,16 +14,20 @@ beforeEach(() => {
   get.mockReset()
   put.mockReset()
   saved = undefined
-  URL.createObjectURL = jest.fn((b: Blob) => { saved = b; return 'b:x' })
+  URL.createObjectURL = jest.fn((b: Blob) => {
+    saved = b
+    return 'b:x'
+  })
   URL.revokeObjectURL = jest.fn()
   jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation()
 })
 
-const readBlob = (b: Blob) => new Promise<string>((res) => {
-  const r = new FileReader()
-  r.onload = () => res(r.result as string)
-  r.readAsText(b)
-})
+const readBlob = (b: Blob) =>
+  new Promise<string>((res) => {
+    const r = new FileReader()
+    r.onload = () => res(r.result as string)
+    r.readAsText(b)
+  })
 
 it('exports the real tenant settings', async () => {
   get.mockResolvedValue({ data: [{ id: 1, name: 'k', value: 'v' }] })
@@ -36,9 +40,13 @@ it('exports the real tenant settings', async () => {
 })
 
 it('exports menu groups with their items', async () => {
-  get.mockImplementation((u: string) => Promise.resolve({
-    data: u.includes('items') ? [{ id: 2, name: 'Home', route: '/' }]
-      : [{ id: 1, name: 'main' }] }))
+  get.mockImplementation((u: string) =>
+    Promise.resolve({
+      data: u.includes('items')
+        ? [{ id: 2, name: 'Home', route: '/' }]
+        : [{ id: 1, name: 'main' }],
+    }),
+  )
   const { result } = renderHook(() => useBackupRestore(7))
   await act(() => result.current.handleExportMenus())
   const out = JSON.parse(await readBlob(saved as Blob))
@@ -50,8 +58,10 @@ it('does not export or fake success on failure or no tenant', async () => {
   get.mockRejectedValue({ response: { data: { error: 'nope' } } })
   const { result } = renderHook(() => useBackupRestore(7))
   await act(() => result.current.handleExportSettings())
-  expect(result.current.snackbar).toMatchObject(
-    { severity: 'error', message: 'nope' })
+  expect(result.current.snackbar).toMatchObject({
+    severity: 'error',
+    message: 'nope',
+  })
   expect(saved).toBeUndefined()
   const r2 = renderHook(() => useBackupRestore(null))
   await act(() => r2.result.current.handleExportMenus())

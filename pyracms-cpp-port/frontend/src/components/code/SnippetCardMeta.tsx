@@ -18,11 +18,18 @@ export function SnippetCardMeta({ author, date, runCount }: Props) {
       <Typography variant="caption" color="text.secondary">
         {date}
       </Typography>
-      <Box sx={{
-        display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto',
-      }}>
-        <PlayArrowOutlined aria-hidden="true"
-          sx={{ fontSize: 14, color: 'text.secondary' }} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          ml: 'auto',
+        }}
+      >
+        <PlayArrowOutlined
+          aria-hidden="true"
+          sx={{ fontSize: 14, color: 'text.secondary' }}
+        />
         <Typography variant="caption" color="text.secondary">
           {runCount} runs
         </Typography>

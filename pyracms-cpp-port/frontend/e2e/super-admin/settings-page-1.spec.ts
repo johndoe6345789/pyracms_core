@@ -11,32 +11,23 @@ test.describe('Settings page', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'settings page renders with correct heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: 'Platform Settings',
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('settings page renders with correct heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: 'Platform Settings',
+      }),
+    ).toBeVisible()
+  })
+
+  test('settings page shows informational alert', async ({ page }) => {
+    await expect(page.getByRole('alert')).toBeVisible()
+    await expect(page.getByRole('alert')).toContainText(
+      'Global platform settings',
+    )
+  })
 
   test(
-    'settings page shows informational alert',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('alert'),
-      ).toBeVisible()
-      await expect(
-        page.getByRole('alert'),
-      ).toContainText('Global platform settings')
-    },
-  )
-
-  test(
-    'settings page shows TuneOutlined icon '
-    + '(aria-hidden)',
+    'settings page shows TuneOutlined icon ' + '(aria-hidden)',
     async ({ page }) => {
       // The icon is aria-hidden; verify it is in DOM
       // inside the settings page container.
@@ -50,21 +41,11 @@ test.describe('Settings page', () => {
 
   // Breadcrumbs on settings page
 
-  test(
-    'breadcrumbs are visible on settings page',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('super-admin-breadcrumbs'),
-      ).toBeVisible()
-    },
-  )
+  test('breadcrumbs are visible on settings page', async ({ page }) => {
+    await expect(page.getByTestId('super-admin-breadcrumbs')).toBeVisible()
+  })
 
-  test(
-    'breadcrumb current item reads "Settings"',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('breadcrumb-current'),
-      ).toHaveText('Settings')
-    },
-  )
+  test('breadcrumb current item reads "Settings"', async ({ page }) => {
+    await expect(page.getByTestId('breadcrumb-current')).toHaveText('Settings')
+  })
 })

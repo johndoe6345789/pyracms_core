@@ -1,9 +1,16 @@
 import {
-  Box, Button, FormControl, InputLabel, Select, MenuItem,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   ToggleButton,
 } from '@mui/material'
 import {
-  SaveOutlined, RestoreOutlined, VerticalSplit,
+  SaveOutlined,
+  RestoreOutlined,
+  VerticalSplit,
 } from '@mui/icons-material'
 import type { TemplateSection } from './defaultTemplates'
 
@@ -32,9 +39,7 @@ export default function TemplateToolbar(p: Props) {
         <Select
           value={p.section}
           label="Template Section"
-          onChange={(e) =>
-            p.onSection(e.target.value as TemplateSection)
-          }
+          onChange={(e) => p.onSection(e.target.value as TemplateSection)}
         >
           <MenuItem value="header">Header</MenuItem>
           <MenuItem value="footer">Footer</MenuItem>

@@ -1,7 +1,10 @@
 import { UserRole } from '@/types'
 
 const ASSIGNABLE = [
-  UserRole.Guest, UserRole.User, UserRole.Moderator, UserRole.SiteAdmin,
+  UserRole.Guest,
+  UserRole.User,
+  UserRole.Moderator,
+  UserRole.SiteAdmin,
 ]
 
 /**

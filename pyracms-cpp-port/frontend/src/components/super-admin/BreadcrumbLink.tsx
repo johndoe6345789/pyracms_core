@@ -18,17 +18,12 @@ export default function BreadcrumbLink({ crumb }: { crumb: Crumb }) {
         alignItems: 'center',
         gap: 0.5,
       }}
-      data-testid={
-        `breadcrumb-link-${crumb.label
-          .toLowerCase()
-          .replace(/\s+/g, '-')}`
-      }
+      data-testid={`breadcrumb-link-${crumb.label
+        .toLowerCase()
+        .replace(/\s+/g, '-')}`}
     >
       {crumb.href === '/super-admin' && (
-        <ShieldOutlined
-          sx={{ fontSize: 14 }}
-          aria-hidden="true"
-        />
+        <ShieldOutlined sx={{ fontSize: 14 }} aria-hidden="true" />
       )}
       {crumb.label}
     </MuiLink>

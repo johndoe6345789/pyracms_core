@@ -10,10 +10,7 @@ describe('RegisterFields – aria-describedby', () => {
     setup({}, jest.fn(), 'register-error-msg')
     const input = screen.getByTestId('register-username-input')
     const wrapper = input.closest('[aria-describedby]')
-    expect(wrapper).toHaveAttribute(
-      'aria-describedby',
-      'register-error-msg',
-    )
+    expect(wrapper).toHaveAttribute('aria-describedby', 'register-error-msg')
   })
 
   it('has no aria-describedby ancestor on username when errorId absent', () => {

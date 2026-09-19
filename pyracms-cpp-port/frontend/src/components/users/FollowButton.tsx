@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@mui/material'
-import {
-  PersonAddOutlined, PersonRemoveOutlined,
-} from '@mui/icons-material'
+import { PersonAddOutlined, PersonRemoveOutlined } from '@mui/icons-material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
@@ -23,12 +21,12 @@ export function FollowButton({ userId }: { userId: number }) {
     // Check if already following (heuristic: check followers list)
     const check = async () => {
       try {
-        const res = await api.get(
-          `/api/users/${userId}/followers?limit=100`)
+        const res = await api.get(`/api/users/${userId}/followers?limit=100`)
         const list = res.data?.items || []
-        setFollowing(list.some(
-          (f: { userId: number }) => f.userId === me))
-      } catch { /* ignore */ }
+        setFollowing(list.some((f: { userId: number }) => f.userId === me))
+      } catch {
+        /* ignore */
+      }
     }
     check()
   }, [isAuth, userId, me])
@@ -48,15 +46,18 @@ export function FollowButton({ userId }: { userId: number }) {
     setLoading(false)
   }
 
-  return (<>
-    <Button
-      variant={following ? 'outlined' : 'contained'}
-      size="small" onClick={handleToggle} disabled={loading}
-      startIcon={following
-        ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
-    >
-      {following ? 'Unfollow' : 'Follow'}
-    </Button>
-    <ErrorAlert error={error} testId="follow-error" mb={0} />
-  </>)
+  return (
+    <>
+      <Button
+        variant={following ? 'outlined' : 'contained'}
+        size="small"
+        onClick={handleToggle}
+        disabled={loading}
+        startIcon={following ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
+      >
+        {following ? 'Unfollow' : 'Follow'}
+      </Button>
+      <ErrorAlert error={error} testId="follow-error" mb={0} />
+    </>
+  )
 }

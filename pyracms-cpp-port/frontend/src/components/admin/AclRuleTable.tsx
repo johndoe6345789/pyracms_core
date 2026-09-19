@@ -1,6 +1,11 @@
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material'
 import { AclRule } from '@/hooks/useAclEditor'
 import AclRuleRow from './AclRuleRow'
@@ -12,10 +17,7 @@ interface AclRuleTableProps {
 
 const HEADS = ['Action', 'Principal', 'Permission']
 
-export default function AclRuleTable({
-  rules,
-  onDelete,
-}: AclRuleTableProps) {
+export default function AclRuleTable({ rules, onDelete }: AclRuleTableProps) {
   return (
     <TableContainer
       component={Paper}
@@ -27,30 +29,18 @@ export default function AclRuleTable({
         <TableHead>
           <TableRow>
             {HEADS.map((h) => (
-              <TableCell
-                key={h}
-                scope="col"
-                sx={{ fontWeight: 700 }}
-              >
+              <TableCell key={h} scope="col" sx={{ fontWeight: 700 }}>
                 {h}
               </TableCell>
             ))}
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-              align="right"
-            >
+            <TableCell scope="col" sx={{ fontWeight: 700 }} align="right">
               Actions
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rules.map((rule) => (
-            <AclRuleRow
-              key={rule.id}
-              rule={rule}
-              onDelete={onDelete}
-            />
+            <AclRuleRow key={rule.id} rule={rule} onDelete={onDelete} />
           ))}
         </TableBody>
       </Table>

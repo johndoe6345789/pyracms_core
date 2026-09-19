@@ -1,5 +1,10 @@
 import {
-  Box, Button, IconButton, ToggleButton, ToggleButtonGroup, Typography,
+  Box,
+  Button,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from '@mui/material'
 import { AddOutlined, MenuOutlined } from '@mui/icons-material'
 import Link from 'next/link'
@@ -22,30 +27,37 @@ interface Props {
 export default function LibraryHeader(p: Props) {
   return (
     <>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-      {p.mobile && (
-        <IconButton aria-label="Open library" onClick={p.onOpenDrawer}>
-          <MenuOutlined />
-        </IconButton>
-      )}
-      <Typography variant="h5" component="h1" sx={{ flex: 1 }}>
-        Games
-      </Typography>
-      {p.newHref && (
-        <Button component={Link} href={p.newHref} size="small"
-          startIcon={<AddOutlined />} data-testid="new-game-btn">
-          New game
-        </Button>
-      )}
-      <ToggleButtonGroup
-        exclusive size="small" value={p.view}
-        onChange={(_, v) => v && p.onView(v)}
-      >
-        <ToggleButton value="library">Library</ToggleButton>
-        <ToggleButton value="browse">Browse</ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
-    {p.downloadHref && <GetLauncherLink href={p.downloadHref} />}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        {p.mobile && (
+          <IconButton aria-label="Open library" onClick={p.onOpenDrawer}>
+            <MenuOutlined />
+          </IconButton>
+        )}
+        <Typography variant="h5" component="h1" sx={{ flex: 1 }}>
+          Games
+        </Typography>
+        {p.newHref && (
+          <Button
+            component={Link}
+            href={p.newHref}
+            size="small"
+            startIcon={<AddOutlined />}
+            data-testid="new-game-btn"
+          >
+            New game
+          </Button>
+        )}
+        <ToggleButtonGroup
+          exclusive
+          size="small"
+          value={p.view}
+          onChange={(_, v) => v && p.onView(v)}
+        >
+          <ToggleButton value="library">Library</ToggleButton>
+          <ToggleButton value="browse">Browse</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      {p.downloadHref && <GetLauncherLink href={p.downloadHref} />}
     </>
   )
 }

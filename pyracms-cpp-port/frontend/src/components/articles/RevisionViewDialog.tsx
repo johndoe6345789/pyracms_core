@@ -1,9 +1,13 @@
 'use client'
 
 import {
-  Button, Dialog, DialogTitle,
-  DialogContent, DialogActions,
-  Typography, Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Paper,
 } from '@mui/material'
 import type { Revision } from '@/hooks/useRevisions'
 
@@ -24,7 +28,10 @@ interface RevisionViewDialogProps {
  * DOMPurify sanitization of the content prop.
  */
 export function RevisionViewDialog({
-  open, onClose, revision, sanitizedContent,
+  open,
+  onClose,
+  revision,
+  sanitizedContent,
 }: RevisionViewDialogProps) {
   return (
     <Dialog
@@ -36,7 +43,8 @@ export function RevisionViewDialog({
     >
       <DialogTitle id="view-rev-title">
         Revision {revision?.number}
-        {' \u2014 '}{revision?.author}
+        {' \u2014 '}
+        {revision?.author}
       </DialogTitle>
       <DialogContent>
         <Typography
@@ -50,7 +58,8 @@ export function RevisionViewDialog({
         <Paper
           variant="outlined"
           sx={{
-            p: 2, maxHeight: 400,
+            p: 2,
+            maxHeight: 400,
             overflow: 'auto',
           }}
         >
@@ -63,10 +72,7 @@ export function RevisionViewDialog({
         </Paper>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          data-testid="close-revision-dialog"
-        >
+        <Button onClick={onClose} data-testid="close-revision-dialog">
           Close
         </Button>
       </DialogActions>

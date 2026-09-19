@@ -11,25 +11,16 @@ test.describe('Mobile responsive — 375x667', () => {
   })
 
   test(
-    'clicking a nav item in the drawer closes it and '
-    + 'navigates',
+    'clicking a nav item in the drawer closes it and ' + 'navigates',
     async ({ page }) => {
-      await page
-        .getByTestId('super-admin-menu-toggle')
-        .click()
+      await page.getByTestId('super-admin-menu-toggle').click()
 
-      const drawer = page.getByTestId(
-        'super-admin-drawer-mobile',
-      )
+      const drawer = page.getByTestId('super-admin-drawer-mobile')
       await expect(drawer).toBeVisible()
 
-      await drawer
-        .getByTestId('super-admin-nav-tenants')
-        .click()
+      await drawer.getByTestId('super-admin-nav-tenants').click()
 
-      await expect(page).toHaveURL(
-        /\/super-admin\/tenants/,
-      )
+      await expect(page).toHaveURL(/\/super-admin\/tenants/)
       // Drawer should auto-close after nav click
       await expect(
         page.getByTestId('super-admin-drawer-mobile'),
@@ -37,13 +28,8 @@ test.describe('Mobile responsive — 375x667', () => {
     },
   )
 
-  test(
-    'permanent sidebar is NOT visible at mobile width',
-    async ({ page }) => {
-      // On mobile, only the temporary drawer is used
-      await expect(
-        page.getByTestId('super-admin-sidebar'),
-      ).not.toBeVisible()
-    },
-  )
+  test('permanent sidebar is NOT visible at mobile width', async ({ page }) => {
+    // On mobile, only the temporary drawer is used
+    await expect(page.getByTestId('super-admin-sidebar')).not.toBeVisible()
+  })
 })

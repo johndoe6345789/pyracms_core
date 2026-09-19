@@ -1,20 +1,12 @@
 import Link from 'next/link'
 import { Box, Button } from '@mui/material'
 import { ArrowBackOutlined } from '@mui/icons-material'
-import NotificationBell
-  from '@/components/common/NotificationBell'
-import ThemeToggle
-  from '@/components/common/ThemeToggle'
-import LanguageSelect
-  from '@/components/common/LanguageSelect'
-import UserBubble
-  from '@/components/common/UserBubble'
+import NotificationBell from '@/components/common/NotificationBell'
+import ThemeToggle from '@/components/common/ThemeToggle'
+import LanguageSelect from '@/components/common/LanguageSelect'
+import UserBubble from '@/components/common/UserBubble'
 
-export default function AdminTopBarActions({
-  slug,
-}: {
-  slug: string
-}) {
+export default function AdminTopBarActions({ slug }: { slug: string }) {
   return (
     <Box
       sx={{

@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react'
 import { DnsOutlined } from '@mui/icons-material'
-import SuperAdminQuickCard
-  from '@/components/super-admin/SuperAdminQuickCard'
+import SuperAdminQuickCard from '@/components/super-admin/SuperAdminQuickCard'
 
 /** Minimal valid props for SuperAdminQuickCard. */
 export const DEFAULT_PROPS = {
@@ -12,9 +11,7 @@ export const DEFAULT_PROPS = {
   testId: 'quick-tenants',
 }
 
-export function renderCard(
-  overrides: Partial<typeof DEFAULT_PROPS> = {},
-) {
+export function renderCard(overrides: Partial<typeof DEFAULT_PROPS> = {}) {
   const props = { ...DEFAULT_PROPS, ...overrides }
   return render(<SuperAdminQuickCard {...props} />)
 }

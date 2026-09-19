@@ -14,7 +14,8 @@ export function useSuperAdminUsers() {
   const { error, setError, fail } = useActionError()
 
   useEffect(() => {
-    api.get('/api/users')
+    api
+      .get('/api/users')
       .then((res) => setUsers((res.data || []).map(mapUserRow)))
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -22,10 +23,14 @@ export function useSuperAdminUsers() {
 
   const updateRole = (id: number, role: UserRole) => {
     setError('')
-    api.put(`/api/users/${id}`, { role })
+    api
+      .put(`/api/users/${id}`, { role })
       .then(() => {
-        setUsers((prev) => prev.map((u) => u.id === id
-          ? { ...u, role, roleLabel: USER_ROLE_LABELS[role] } : u))
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === id ? { ...u, role, roleLabel: USER_ROLE_LABELS[role] } : u,
+          ),
+        )
       })
       .catch(fail('Could not update role'))
   }
@@ -35,15 +40,16 @@ export function useSuperAdminUsers() {
     if (!target) return
     const isActive = !target.isActive
     // Side effect stays out of the state updater (it may run twice).
-    const set = (active: boolean) => setUsers((prev) => prev.map((u) =>
-      u.id === id ? { ...u, isActive: active } : u))
+    const set = (active: boolean) =>
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, isActive: active } : u)),
+      )
     set(isActive)
     setError('')
-    api.put(`/api/users/${id}/ban`, { banned: !isActive })
-      .catch((e) => {
-        set(!isActive) // roll back when the API refuses
-        fail('Could not update user status')(e)
-      })
+    api.put(`/api/users/${id}/ban`, { banned: !isActive }).catch((e) => {
+      set(!isActive) // roll back when the API refuses
+      fail('Could not update user status')(e)
+    })
   }
 
   return { users, loading, error, updateRole, toggleBan }

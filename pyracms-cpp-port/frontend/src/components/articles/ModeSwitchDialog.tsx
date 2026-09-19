@@ -29,19 +29,14 @@ export function ModeSwitchDialog({
       <DialogContent>
         <DialogContentText>
           Switching from {MODE_INFO[from].label} to{' '}
-          {pending ? MODE_INFO[pending].label : ''}{' '}
-          may cause content formatting to be lost or
-          rendered incorrectly. The content will not be
+          {pending ? MODE_INFO[pending].label : ''} may cause content formatting
+          to be lost or rendered incorrectly. The content will not be
           automatically converted between formats.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>Cancel</Button>
-        <Button
-          onClick={onConfirm}
-          variant="contained"
-          color="warning"
-        >
+        <Button onClick={onConfirm} variant="contained" color="warning">
           Switch Anyway
         </Button>
       </DialogActions>

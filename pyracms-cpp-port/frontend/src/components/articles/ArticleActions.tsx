@@ -1,10 +1,7 @@
 'use client'
 
 import { Box, Button } from '@mui/material'
-import {
-  EditOutlined,
-  HistoryOutlined,
-} from '@mui/icons-material'
+import { EditOutlined, HistoryOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 
 interface ArticleActionsProps {
@@ -13,13 +10,11 @@ interface ArticleActionsProps {
   revisionCount: number
 }
 
-export function ArticleActions(
-  {
-    slug,
-    name,
-    revisionCount,
-  }: ArticleActionsProps
-) {
+export function ArticleActions({
+  slug,
+  name,
+  revisionCount,
+}: ArticleActionsProps) {
   return (
     <Box
       sx={{
@@ -33,10 +28,7 @@ export function ArticleActions(
         variant="outlined"
         startIcon={<EditOutlined />}
         component={Link}
-        href={
-          `/site/${slug}` +
-          `/articles/${name}/edit`
-        }
+        href={`/site/${slug}` + `/articles/${name}/edit`}
         size="small"
         data-testid="edit-article-btn"
         aria-label="Edit article"
@@ -45,21 +37,12 @@ export function ArticleActions(
       </Button>
       <Button
         variant="outlined"
-        startIcon={
-          <HistoryOutlined />
-        }
+        startIcon={<HistoryOutlined />}
         component={Link}
-        href={
-          `/site/${slug}` +
-          `/articles/${name}` +
-          `/revisions`
-        }
+        href={`/site/${slug}` + `/articles/${name}` + `/revisions`}
         size="small"
         data-testid="revisions-btn"
-        aria-label={
-          `View revisions ` +
-          `(${revisionCount})`
-        }
+        aria-label={`View revisions ` + `(${revisionCount})`}
       >
         Revisions ({revisionCount})
       </Button>

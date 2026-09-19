@@ -8,12 +8,19 @@ describe('sidebar parts', () => {
   it('reports filter and search changes', () => {
     const onFilter = jest.fn()
     const onSearch = jest.fn()
-    render(<SidebarFilters search="" onSearch={onSearch} filter="all"
-      onFilter={onFilter} />)
+    render(
+      <SidebarFilters
+        search=""
+        onSearch={onSearch}
+        filter="all"
+        onFilter={onFilter}
+      />,
+    )
     fireEvent.click(screen.getByText('Installed'))
     expect(onFilter).toHaveBeenCalledWith('installed')
-    fireEvent.change(screen.getByLabelText('Search library'),
-      { target: { value: 'q' } })
+    fireEvent.change(screen.getByLabelText('Search library'), {
+      target: { value: 'q' },
+    })
     expect(onSearch).toHaveBeenCalledWith('q')
   })
 
@@ -32,16 +39,30 @@ describe('sidebar parts', () => {
 
   it('lists games with marks', () => {
     const onSelect = jest.fn()
-    render(<SidebarList games={[game]} selected="g" onSelect={onSelect}
-      installed={{ g: '1' }} favs={{ g: '1' }} />)
+    render(
+      <SidebarList
+        games={[game]}
+        selected="g"
+        onSelect={onSelect}
+        installed={{ g: '1' }}
+        favs={{ g: '1' }}
+      />,
+    )
     expect(screen.getByText('Marked installed v1')).toBeInTheDocument()
     fireEvent.click(screen.getByText('Gee'))
     expect(onSelect).toHaveBeenCalledWith('g')
   })
 
   it('shows an empty list message', () => {
-    render(<SidebarList games={[]} selected={null} onSelect={jest.fn()}
-      installed={{}} favs={{}} />)
+    render(
+      <SidebarList
+        games={[]}
+        selected={null}
+        onSelect={jest.fn()}
+        installed={{}}
+        favs={{}}
+      />,
+    )
     expect(screen.getByText('No games match.')).toBeInTheDocument()
   })
 })

@@ -14,9 +14,11 @@ export default function UserMenuHeader({ user }: { user: User | null }) {
       <Chip
         size="small"
         sx={{ mt: 0.75 }}
-        label={user?.tenantSlug
-          ? `Site account · ${user.tenantSlug}`
-          : 'Platform account'}
+        label={
+          user?.tenantSlug
+            ? `Site account · ${user.tenantSlug}`
+            : 'Platform account'
+        }
       />
     </Box>
   )

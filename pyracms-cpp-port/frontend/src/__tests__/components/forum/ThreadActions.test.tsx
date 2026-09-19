@@ -4,16 +4,23 @@ import { ThreadActions } from '@/components/forum/ThreadActions'
 const props = { threadId: '4', isPinned: false, isLocked: false }
 
 it('renders nothing for non-moderators', () => {
-  const { container } = render(
-    <ThreadActions {...props} isModerator={false} />)
+  const { container } = render(<ThreadActions {...props} isModerator={false} />)
   expect(container).toBeEmptyDOMElement()
 })
 
 it('pins, locks and labels reflect state', () => {
   const onPin = jest.fn()
   const onLock = jest.fn()
-  render(<ThreadActions {...props} isPinned isLocked isModerator
-    onPin={onPin} onLock={onLock} />)
+  render(
+    <ThreadActions
+      {...props}
+      isPinned
+      isLocked
+      isModerator
+      onPin={onPin}
+      onLock={onLock}
+    />,
+  )
   fireEvent.click(screen.getByTestId('thread-actions-4'))
   expect(screen.getByText('Unpin Thread')).toBeInTheDocument()
   fireEvent.click(screen.getByTestId('thread-action-pin'))
@@ -38,8 +45,14 @@ it('confirms thread deletion', () => {
 
 it('moves a thread to a chosen forum', () => {
   const onMove = jest.fn()
-  render(<ThreadActions {...props} isModerator onMove={onMove}
-    forums={[{ id: '9', name: 'Nine' }]} />)
+  render(
+    <ThreadActions
+      {...props}
+      isModerator
+      onMove={onMove}
+      forums={[{ id: '9', name: 'Nine' }]}
+    />,
+  )
   fireEvent.click(screen.getByTestId('thread-actions-4'))
   fireEvent.click(screen.getByTestId('thread-action-move'))
   expect(screen.getByTestId('move-thread-confirm')).toBeDisabled()

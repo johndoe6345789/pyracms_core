@@ -12,8 +12,12 @@ it('loads, defaults and votes', async () => {
   m.post.mockResolvedValue({})
   const { result } = renderHook(() => useArticle('n', 1))
   await waitFor(() => expect(result.current.loading).toBe(false))
-  expect(result.current.article).toMatchObject(
-    { title: 'n', author: 'Unknown', renderer: 'html', likes: 0 })
+  expect(result.current.article).toMatchObject({
+    title: 'n',
+    author: 'Unknown',
+    renderer: 'html',
+    likes: 0,
+  })
   act(() => result.current.handleVote(true))
   await waitFor(() => expect(result.current.article!.likes).toBe(1))
   act(() => result.current.handleVote(false))
@@ -21,15 +25,28 @@ it('loads, defaults and votes', async () => {
 })
 
 it('maps full record; ignores errors and missing tenant', async () => {
-  m.get.mockResolvedValue({ data: {
-    displayName: 'D', content: 'c', authorUsername: 'a',
-    createdAt: '2024-01-02 03:04:05+00', rendererName: 'MD',
-    viewCount: 3, likes: 2, dislikes: 1, tags: ['t'], revisionCount: 4,
-  } })
+  m.get.mockResolvedValue({
+    data: {
+      displayName: 'D',
+      content: 'c',
+      authorUsername: 'a',
+      createdAt: '2024-01-02 03:04:05+00',
+      rendererName: 'MD',
+      viewCount: 3,
+      likes: 2,
+      dislikes: 1,
+      tags: ['t'],
+      revisionCount: 4,
+    },
+  })
   const a = renderHook(() => useArticle('n', 1))
   await waitFor(() => expect(a.result.current.article).not.toBeNull())
-  expect(a.result.current.article).toMatchObject(
-    { title: 'D', renderer: 'md', views: 3, tags: ['t'] })
+  expect(a.result.current.article).toMatchObject({
+    title: 'D',
+    renderer: 'md',
+    views: 3,
+    tags: ['t'],
+  })
   m.post.mockRejectedValue(new Error('x'))
   act(() => a.result.current.handleVote(true))
   const b = renderHook(() => useArticle('n', null))

@@ -4,8 +4,7 @@ import { useSuperAdminUsers } from '@/hooks/useSuperAdminUsers'
 import { UserRole } from '@/types'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_USERS } from
-  '../helpers/superAdminUsersFixtures'
+import { RAW_USERS } from '../helpers/superAdminUsersFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -37,10 +36,9 @@ describe('useSuperAdminUsers — updateRole (success)', () => {
       expect(result.current.users[0]!.role).toBe(UserRole.SuperAdmin)
     })
 
-    expect(mockApi.put).toHaveBeenCalledWith(
-      '/api/users/1',
-      { role: UserRole.SuperAdmin },
-    )
+    expect(mockApi.put).toHaveBeenCalledWith('/api/users/1', {
+      role: UserRole.SuperAdmin,
+    })
     expect(result.current.users[0]!.roleLabel).toBe('Platform Owner')
   })
 

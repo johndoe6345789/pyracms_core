@@ -1,5 +1,9 @@
 import {
-  renderHook, act, render, screen, fireEvent,
+  renderHook,
+  act,
+  render,
+  screen,
+  fireEvent,
 } from '@testing-library/react'
 import api from '@/lib/api'
 import { useAlbumUpload } from '@/hooks/useAlbumUpload'
@@ -14,21 +18,29 @@ const m = asMockApi<'post'>(api)
 beforeEach(() => m.post.mockReset())
 
 const files = (...names: string[]) =>
-  names.map((n) => new File(['x'], n, { type: 'image/png' })) as unknown as
-    FileList
+  names.map(
+    (n) => new File(['x'], n, { type: 'image/png' }),
+  ) as unknown as FileList
 
 describe('useAlbumUpload', () => {
   it('uploads each file then attaches it to the album', async () => {
-    m.post.mockResolvedValueOnce({ data: { uuid: 'u1' } })
+    m.post
+      .mockResolvedValueOnce({ data: { uuid: 'u1' } })
       .mockResolvedValueOnce({ data: {} })
     const done = jest.fn()
     const { result } = renderHook(() => useAlbumUpload('4', 9, done))
     await act(() => result.current.upload(files('cat.png')))
-    expect(m.post).toHaveBeenNthCalledWith(1, '/api/files',
-      expect.any(FormData), expect.anything())
-    expect(m.post).toHaveBeenNthCalledWith(2,
+    expect(m.post).toHaveBeenNthCalledWith(
+      1,
+      '/api/files',
+      expect.any(FormData),
+      expect.anything(),
+    )
+    expect(m.post).toHaveBeenNthCalledWith(
+      2,
       '/api/gallery/albums/4/pictures',
-      { displayName: 'cat', fileUuid: 'u1' })
+      { displayName: 'cat', fileUuid: 'u1' },
+    )
     expect(done).toHaveBeenCalled()
     expect(result.current.error).toBe('')
   })
@@ -51,10 +63,12 @@ describe('AlbumHeader upload', () => {
   it('passes chosen files on and can hide the button', () => {
     const onFiles = jest.fn()
     const { rerender } = render(
-      <AlbumHeader albumName="A" count={0} onFiles={onFiles} />)
+      <AlbumHeader albumName="A" count={0} onFiles={onFiles} />,
+    )
     const f = files('a.png')
-    fireEvent.change(screen.getByTestId('upload-file-input'),
-      { target: { files: f } })
+    fireEvent.change(screen.getByTestId('upload-file-input'), {
+      target: { files: f },
+    })
     expect(onFiles).toHaveBeenCalledWith(f)
     rerender(<AlbumHeader albumName="A" count={0} canUpload={false} />)
     expect(screen.queryByTestId('upload-picture-btn')).toBeNull()

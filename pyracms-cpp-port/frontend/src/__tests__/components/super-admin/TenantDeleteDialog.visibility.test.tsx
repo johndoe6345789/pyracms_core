@@ -1,8 +1,7 @@
 /** Tests for TenantDeleteDialog visibility and copy. */
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { renderDialog } from
-  '../../helpers/tenantDeleteDialogHelpers'
+import { renderDialog } from '../../helpers/tenantDeleteDialogHelpers'
 
 describe('TenantDeleteDialog', () => {
   it('dialog is not visible when open=false', () => {
@@ -18,20 +17,14 @@ describe('TenantDeleteDialog', () => {
 
   it('dialog is visible when open=true', () => {
     renderDialog({ open: true })
-    expect(
-      screen.getByRole('dialog'),
-    ).toBeVisible()
+    expect(screen.getByRole('dialog')).toBeVisible()
   })
 
   it('displays warning copy about permanent deletion', () => {
     renderDialog({ open: true })
     expect(
-      screen.getByText(
-        /permanently delete the tenant/i,
-      ),
+      screen.getByText(/permanently delete the tenant/i),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText(/cannot be undone/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument()
   })
 })

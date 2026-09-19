@@ -3,13 +3,15 @@ import Link from 'next/link'
 import { isActive, type NavEntry } from './navTypes'
 
 /** Inline links shown from the `lg` breakpoint up. */
-export default function TopBarLinks(
-  { items, pathname }: { items: NavEntry[]; pathname: string },
-) {
+export default function TopBarLinks({
+  items,
+  pathname,
+}: {
+  items: NavEntry[]
+  pathname: string
+}) {
   return (
-    <Box
-      sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5, flexGrow: 1 }}
-    >
+    <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5, flexGrow: 1 }}>
       {items.map((item) => {
         const active = isActive(pathname, item)
         return (

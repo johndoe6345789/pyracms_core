@@ -20,14 +20,19 @@ interface Props {
 }
 
 /** Header, posts, live typing hint and reply form of a thread. */
-export function ThreadContent(
-  { t, threadId, tenantId = null, onDeleted }: Props,
-) {
+export function ThreadContent({
+  t,
+  threadId,
+  tenantId = null,
+  onDeleted,
+}: Props) {
   const { isAuthenticated, isModerator } = useForumUser()
   const { thread } = t
   const live = useThreadLive({
     threadId: Number(threadId) || 0,
-    onNewPost: () => { t.refresh() },
+    onNewPost: () => {
+      t.refresh()
+    },
   })
   const [page, setPage] = useState(1)
   const onTyping = useTypingSender(live.sendTypingStart)

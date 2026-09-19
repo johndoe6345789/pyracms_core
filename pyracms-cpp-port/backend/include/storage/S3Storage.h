@@ -12,7 +12,8 @@ namespace pyracms {
 
 // Files in an S3-compatible object store (johndoe6345789/object-store
 // dialect: path-style URLs, "Authorization: AWS <access>:<secret>").
-// Objects live at <bucket>/tenants/<tenant>/[thumbnails/]<uuid>. The bucket
+// Objects live at <bucket>/tenant-<site>-[thumb-]<uuid> (the store has flat
+// keys; site 0 = platform). The bucket
 // is created on first use. The endpoint comes from the environment only.
 class S3Storage : public BlobStorage {
   public:

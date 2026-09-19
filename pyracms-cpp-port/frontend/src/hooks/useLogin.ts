@@ -66,7 +66,10 @@ export function useLogin(redirectTo = '/', tenant?: string) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const validationError = validateLoginForm(formData)
-    if (validationError) { setError(validationError); return }
+    if (validationError) {
+      setError(validationError)
+      return
+    }
     const ok = await loginDirect(formData.username.trim(), formData.password)
     if (ok) router.push(redirectTo)
   }

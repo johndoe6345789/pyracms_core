@@ -5,10 +5,17 @@ import { useForumAdmin } from '@/hooks/useForumAdmin'
 
 export const refresh = jest.fn()
 const cat = {
-  id: '1', name: 'Gen',
-  forums: [{
-    id: '2', name: 'Chat', description: 'talk', threads: 0, posts: 0,
-  }],
+  id: '1',
+  name: 'Gen',
+  forums: [
+    {
+      id: '2',
+      name: 'Chat',
+      description: 'talk',
+      threads: 0,
+      posts: 0,
+    },
+  ],
 }
 export function Harness() {
   const admin = useForumAdmin(7, refresh)
@@ -20,5 +27,5 @@ export function Harness() {
   )
 }
 export const click = (id: string) => fireEvent.click(screen.getByTestId(id))
-export const type = (id: string, v: string) => fireEvent.change(
-  screen.getByTestId(id), { target: { value: v } })
+export const type = (id: string, v: string) =>
+  fireEvent.change(screen.getByTestId(id), { target: { value: v } })

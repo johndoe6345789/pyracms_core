@@ -12,56 +12,39 @@ test.describe('Admin Backup', () => {
     await goToAdmin(page, '/backup')
   })
 
-  test(
-    'page loads and toolbar is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-toolbar'),
-      ).toBeVisible()
-    },
-  )
+  test('page loads and toolbar is visible', async ({ page }) => {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible()
+  })
 
-  test(
-    'page has "Backup" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /backup/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('page has "Backup" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /backup/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    'Export section heading is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /^export$/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('Export section heading is visible', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /^export$/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    '"Export Settings" button is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('button', {
-          name: /export settings/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('"Export Settings" button is visible', async ({ page }) => {
+    await expect(
+      page.getByRole('button', {
+        name: /export settings/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    '"Export Menus" button is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('button', {
-          name: /export menus/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('"Export Menus" button is visible', async ({ page }) => {
+    await expect(
+      page.getByRole('button', {
+        name: /export menus/i,
+      }),
+    ).toBeVisible()
+  })
 })

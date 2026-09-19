@@ -16,11 +16,7 @@ export default function NewSnippetPage() {
   const editor = useSnippetEditor(tenantId)
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: 6 }}
-      data-testid="new-snippet-page"
-    >
+    <Container maxWidth="lg" sx={{ py: 6 }} data-testid="new-snippet-page">
       <Box sx={{ mb: 2 }}>
         <BackButton href={base} label="Back to Snippets" />
       </Box>

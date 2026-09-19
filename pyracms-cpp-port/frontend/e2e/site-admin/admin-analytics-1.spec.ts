@@ -12,68 +12,35 @@ test.describe('Admin Analytics', () => {
     await goToAdmin(page, '/analytics')
   })
 
-  test(
-    'page loads and toolbar is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-toolbar'),
-      ).toBeVisible()
-    },
-  )
+  test('page loads and toolbar is visible', async ({ page }) => {
+    await expect(page.getByTestId('admin-toolbar')).toBeVisible()
+  })
 
-  test(
-    'page has "Analytics Dashboard" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /analytics dashboard/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('page has "Analytics Dashboard" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /analytics dashboard/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    '"Top Referrers" section is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Top Referrers'),
-      ).toBeVisible()
-    },
-  )
+  test('"Top Referrers" section is rendered', async ({ page }) => {
+    await expect(page.getByText('Top Referrers')).toBeVisible()
+  })
 
-  test(
-    '"Popular Search Queries" section is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Popular Search Queries'),
-      ).toBeVisible()
-    },
-  )
+  test('"Popular Search Queries" section is rendered', async ({ page }) => {
+    await expect(page.getByText('Popular Search Queries')).toBeVisible()
+  })
 
-  test(
-    'referrer table shows "Google Search" row',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Google Search'),
-      ).toBeVisible()
-    },
-  )
+  test('referrer table shows "Google Search" row', async ({ page }) => {
+    await expect(page.getByText('Google Search')).toBeVisible()
+  })
 
-  test(
-    'referrer table shows "Direct" row',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Direct'),
-      ).toBeVisible()
-    },
-  )
+  test('referrer table shows "Direct" row', async ({ page }) => {
+    await expect(page.getByText('Direct')).toBeVisible()
+  })
 
-  test(
-    'referrer table shows "GitHub" row',
-    async ({ page }) => {
-      await expect(
-        page.getByText('GitHub'),
-      ).toBeVisible()
-    },
-  )
+  test('referrer table shows "GitHub" row', async ({ page }) => {
+    await expect(page.getByText('GitHub')).toBeVisible()
+  })
 })

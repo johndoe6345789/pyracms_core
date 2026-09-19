@@ -25,8 +25,9 @@ export function useAuthHydration() {
     }
 
     let cancelled = false
-    api.get('/api/auth/me')
-      .then(res => {
+    api
+      .get('/api/auth/me')
+      .then((res) => {
         if (!cancelled) {
           dispatch(setCredentials({ user: res.data, token }))
         }
@@ -36,6 +37,8 @@ export function useAuthHydration() {
         clearToken(scope)
         dispatch(logout())
       })
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [dispatch, scope])
 }

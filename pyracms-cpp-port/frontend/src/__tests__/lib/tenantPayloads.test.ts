@@ -44,7 +44,8 @@ it('ACL rules send tenantId', async () => {
 
 it('menu group create sends tenantId', () => {
   const { result } = renderHook(() =>
-    useMenuGroupCreate(6, [], jest.fn(), jest.fn()))
+    useMenuGroupCreate(6, [], jest.fn(), jest.fn()),
+  )
   act(() => result.current.setNewGroupName('Main'))
   act(() => result.current.handleCreateGroup())
   expect(m.post.mock.calls[0][1]).toEqual({ name: 'main', tenantId: 6 })

@@ -10,7 +10,8 @@ interface TenantModuleCardsProps {
 }
 
 export default function TenantModuleCards({
-  slug, canAdmin = false,
+  slug,
+  canAdmin = false,
 }: TenantModuleCardsProps) {
   const modules = canAdmin ? [...MODULES, ADMIN_MODULE] : MODULES
   return (

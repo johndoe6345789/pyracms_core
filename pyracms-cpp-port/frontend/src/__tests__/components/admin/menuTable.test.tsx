@@ -3,16 +3,27 @@ import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
 import MenuItemTable from '@/components/admin/MenuItemTable'
 
 const item = (id: number) => ({
-  id, name: `n${id}`, route: `/r${id}`, position: id, permissions: 'admin',
+  id,
+  name: `n${id}`,
+  route: `/r${id}`,
+  position: id,
+  permissions: 'admin',
 })
 
 it('MenuGroupSelect changes group and creates', () => {
   const onGroupChange = jest.fn()
   const onNewGroup = jest.fn()
-  render(<MenuGroupSelect menuGroups={[
-    { id: 1, name: 'main', items: [] }, { id: 2, name: 'foot', items: [] }]}
-  selectedGroup="main" onGroupChange={onGroupChange}
-  onNewGroup={onNewGroup} />)
+  render(
+    <MenuGroupSelect
+      menuGroups={[
+        { id: 1, name: 'main', items: [] },
+        { id: 2, name: 'foot', items: [] },
+      ]}
+      selectedGroup="main"
+      onGroupChange={onGroupChange}
+      onNewGroup={onNewGroup}
+    />,
+  )
   fireEvent.mouseDown(screen.getByRole('combobox'))
   fireEvent.click(screen.getByRole('option', { name: 'foot' }))
   expect(onGroupChange).toHaveBeenCalled()
@@ -21,9 +32,13 @@ it('MenuGroupSelect changes group and creates', () => {
 })
 
 const props = () => ({
-  editingId: null as number | null, editRow: null as never,
-  onEditRowChange: jest.fn(), onStartEdit: jest.fn(),
-  onSaveEdit: jest.fn(), onCancelEdit: jest.fn(), onDelete: jest.fn(),
+  editingId: null as number | null,
+  editRow: null as never,
+  onEditRowChange: jest.fn(),
+  onStartEdit: jest.fn(),
+  onSaveEdit: jest.fn(),
+  onCancelEdit: jest.fn(),
+  onDelete: jest.fn(),
 })
 
 it('MenuItemTable empty and view rows', () => {
@@ -39,22 +54,30 @@ it('MenuItemTable empty and view rows', () => {
 
 it('MenuItemTable edit row updates fields', () => {
   const p = props()
-  render(<MenuItemTable items={[item(1)]} {...p} editingId={1}
-    editRow={item(1) as never} />)
+  render(
+    <MenuItemTable
+      items={[item(1)]}
+      {...p}
+      editingId={1}
+      editRow={item(1) as never}
+    />,
+  )
   const input = (id: string) =>
     within(screen.getByTestId(id)).getByRole('textbox')
   fireEvent.change(input('name-input'), { target: { value: 'z' } })
   fireEvent.change(input('route-input'), { target: { value: '/z' } })
   fireEvent.change(
     within(screen.getByTestId('position-input')).getByRole('spinbutton'),
-    { target: { value: 'abc' } })
+    { target: { value: 'abc' } },
+  )
   const set = p.onEditRowChange.mock.calls
   expect(set).toHaveLength(3)
   expect(set[0][0](item(1))).toMatchObject({ name: 'z' })
   expect(set[0][0](null)).toBeNull()
   expect(set[2][0](item(1))).toMatchObject({ position: 0 })
   fireEvent.mouseDown(
-    within(screen.getByTestId('perms-select')).getByRole('combobox'))
+    within(screen.getByTestId('perms-select')).getByRole('combobox'),
+  )
   fireEvent.click(screen.getByRole('option', { name: 'public' }))
   expect(p.onEditRowChange).toHaveBeenCalledTimes(4)
   fireEvent.click(screen.getByTestId('save-edit-btn'))
@@ -65,6 +88,7 @@ it('MenuItemTable edit row updates fields', () => {
 
 it('MenuItemTable edit row without editRow uses defaults', () => {
   render(<MenuItemTable items={[item(1)]} {...props()} editingId={1} />)
-  expect(within(screen.getByTestId('name-input')).getByRole('textbox'))
-    .toHaveValue('')
+  expect(
+    within(screen.getByTestId('name-input')).getByRole('textbox'),
+  ).toHaveValue('')
 })

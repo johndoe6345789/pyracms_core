@@ -13,7 +13,11 @@ export interface ProfileFields {
 }
 
 const EMPTY: ProfileFields = {
-  fullName: '', email: '', website: '', aboutme: '', timezone: '',
+  fullName: '',
+  email: '',
+  website: '',
+  aboutme: '',
+  timezone: '',
 }
 
 /** Loads and saves the signed-in user's own profile fields. */
@@ -24,14 +28,17 @@ export function useProfileEdit(userId: number | undefined) {
 
   useEffect(() => {
     if (!userId) return
-    api.get(`/api/users/${userId}`)
-      .then((r) => setFields({
-        fullName: r.data.fullName ?? '',
-        email: r.data.email ?? '',
-        website: r.data.website ?? '',
-        aboutme: r.data.aboutme ?? '',
-        timezone: r.data.timezone ?? '',
-      }))
+    api
+      .get(`/api/users/${userId}`)
+      .then((r) =>
+        setFields({
+          fullName: r.data.fullName ?? '',
+          email: r.data.email ?? '',
+          website: r.data.website ?? '',
+          aboutme: r.data.aboutme ?? '',
+          timezone: r.data.timezone ?? '',
+        }),
+      )
       .catch(() => f.fail('Could not load your profile'))
       .finally(() => setLoading(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps

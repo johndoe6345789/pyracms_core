@@ -8,7 +8,10 @@ interface Props {
 }
 
 export default function EditUserActions({
-  saving, canSave, onClose, onSave,
+  saving,
+  canSave,
+  onClose,
+  onSave,
 }: Props) {
   return (
     <DialogActions>

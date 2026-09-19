@@ -18,16 +18,23 @@ export default function CreateThreadPage() {
   const { tenantId } = useTenantId(slug)
   const { isAuthenticated } = useForumUser()
   const {
-    title, setTitle, description, setDescription,
-    content, setContent, loading, error, handleSubmit,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    content,
+    setContent,
+    loading,
+    error,
+    handleSubmit,
   } = useCreateThread(forumId, slug, tenantId)
 
   let body
   if (!forumId) {
     body = (
       <Alert severity="warning">
-        No forum selected. <Link href={base}>Pick a forum</Link> and use
-        its New Thread button.
+        No forum selected. <Link href={base}>Pick a forum</Link> and use its New
+        Thread button.
       </Alert>
     )
   } else if (!isAuthenticated) {

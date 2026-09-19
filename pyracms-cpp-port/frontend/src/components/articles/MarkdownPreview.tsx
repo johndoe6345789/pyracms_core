@@ -9,9 +9,7 @@ interface MarkdownPreviewProps {
   value: string
 }
 
-export function MarkdownPreview(
-  { value }: MarkdownPreviewProps
-) {
+export function MarkdownPreview({ value }: MarkdownPreviewProps) {
   return (
     <Box sx={MARKDOWN_STYLES} data-testid="markdown-preview">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>

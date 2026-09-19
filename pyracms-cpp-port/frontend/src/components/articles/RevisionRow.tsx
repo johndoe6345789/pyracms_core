@@ -1,11 +1,7 @@
 'use client'
 
-import {
-  TableCell, TableRow, Box, Button,
-} from '@mui/material'
-import {
-  VisibilityOutlined, RestoreOutlined,
-} from '@mui/icons-material'
+import { TableCell, TableRow, Box, Button } from '@mui/material'
+import { VisibilityOutlined, RestoreOutlined } from '@mui/icons-material'
 import type { Revision } from '@/hooks/useRevisions'
 
 interface RevisionRowProps {
@@ -16,7 +12,10 @@ interface RevisionRowProps {
 }
 
 export function RevisionRow({
-  rev, isLatest, onView, onRevert,
+  rev,
+  isLatest,
+  onView,
+  onRevert,
 }: RevisionRowProps) {
   return (
     <TableRow hover>
@@ -25,27 +24,31 @@ export function RevisionRow({
       <TableCell>{rev.date}</TableCell>
       <TableCell>{rev.summary}</TableCell>
       <TableCell align="right">
-        <Box sx={{
-          display: 'flex', gap: 1,
-          justifyContent: 'flex-end',
-        }}>
-          <Button size="small"
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button
+            size="small"
             variant="outlined"
             startIcon={<VisibilityOutlined />}
             onClick={() => onView(rev)}
-            data-testid={
-              `view-rev-${rev.number}`}>
+            data-testid={`view-rev-${rev.number}`}
+          >
             View
           </Button>
           {!isLatest && (
-            <Button size="small"
+            <Button
+              size="small"
               variant="outlined"
               color="warning"
               startIcon={<RestoreOutlined />}
-              onClick={() =>
-                onRevert(rev.number)}
-              data-testid={
-                `revert-${rev.number}`}>
+              onClick={() => onRevert(rev.number)}
+              data-testid={`revert-${rev.number}`}
+            >
               Revert
             </Button>
           )}

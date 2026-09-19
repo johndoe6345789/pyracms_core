@@ -2,12 +2,18 @@ import { render, screen, fireEvent, within } from '@testing-library/react'
 import SettingsTable from '@/components/admin/SettingsTable'
 import UserTable from '@/components/admin/UserTable'
 
-const settings = [{ id: 1, key: 'a', value: 'b' }, { id: 2, key: 'c',
-  value: 'd' }]
+const settings = [
+  { id: 1, key: 'a', value: 'b' },
+  { id: 2, key: 'c', value: 'd' },
+]
 
 const sp = () => ({
-  editValue: 'ev', onEditValueChange: jest.fn(), onStartEdit: jest.fn(),
-  onSaveEdit: jest.fn(), onCancelEdit: jest.fn(), onDelete: jest.fn(),
+  editValue: 'ev',
+  onEditValueChange: jest.fn(),
+  onStartEdit: jest.fn(),
+  onSaveEdit: jest.fn(),
+  onCancelEdit: jest.fn(),
+  onDelete: jest.fn(),
 })
 
 it('SettingsTable view actions', () => {
@@ -22,8 +28,9 @@ it('SettingsTable view actions', () => {
 it('SettingsTable edit actions and keys', () => {
   const p = sp()
   render(<SettingsTable settings={settings} editingId={1} {...p} />)
-  const input = within(screen.getByTestId('setting-value-input'))
-    .getByRole('textbox')
+  const input = within(screen.getByTestId('setting-value-input')).getByRole(
+    'textbox',
+  )
   fireEvent.change(input, { target: { value: 'n' } })
   expect(p.onEditValueChange).toHaveBeenCalledWith('n')
   fireEvent.keyDown(input, { key: 'Enter' })
@@ -38,16 +45,22 @@ it('SettingsTable edit actions and keys', () => {
 })
 
 const user = (id: number, banned: boolean) => ({
-  id, username: `u${id}`, fullName: 'f', email: 'e', created: 'c',
-  banned, role: 1,
+  id,
+  username: `u${id}`,
+  fullName: 'f',
+  email: 'e',
+  created: 'c',
+  banned,
+  role: 1,
 })
 
 it('UserTable renders rows and actions', () => {
   const onToggleBan = jest.fn()
   const onDelete = jest.fn()
   const users = [user(1, false), user(2, true)]
-  render(<UserTable users={users} onToggleBan={onToggleBan}
-    onDelete={onDelete} />)
+  render(
+    <UserTable users={users} onToggleBan={onToggleBan} onDelete={onDelete} />,
+  )
   expect(screen.getByTestId('user-row-1')).toHaveTextContent('Active')
   expect(screen.getByTestId('user-row-2')).toHaveTextContent('Banned')
   fireEvent.click(screen.getByTestId('ban-user-2'))

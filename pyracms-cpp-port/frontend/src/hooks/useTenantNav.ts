@@ -19,14 +19,12 @@ export function useTenantNav() {
   const { tenant, loading } = useTenant(slug)
   const siteName = tenant?.displayName ?? titleFromSlug(slug)
 
-  const { user, isAuthenticated } = useSelector(
-    (s: RootState) => s.auth,
-  )
+  const { user, isAuthenticated } = useSelector((s: RootState) => s.auth)
   const sessionHere = isSessionOnSite(isAuthenticated, user, slug)
-  const canAdmin = sessionHere && (
-    hasMinRole(user, UserRole.SiteAdmin)
-    || (tenant !== null && user?.id === tenant.ownerId)
-  )
+  const canAdmin =
+    sessionHere &&
+    (hasMinRole(user, UserRole.SiteAdmin) ||
+      (tenant !== null && user?.id === tenant.ownerId))
 
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -35,11 +33,19 @@ export function useTenantNav() {
   const toggleDrawer = () => setDrawerOpen((o) => !o)
 
   const activeLink = NAV_ITEMS.find(
-    (item) => pathname === `/site/${slug}/${item.path}`
+    (item) => pathname === `/site/${slug}/${item.path}`,
   )?.path
 
   return {
-    slug, siteName, tenant, loading, canAdmin,
-    drawerOpen, openDrawer, closeDrawer, toggleDrawer, activeLink,
+    slug,
+    siteName,
+    tenant,
+    loading,
+    canAdmin,
+    drawerOpen,
+    openDrawer,
+    closeDrawer,
+    toggleDrawer,
+    activeLink,
   }
 }

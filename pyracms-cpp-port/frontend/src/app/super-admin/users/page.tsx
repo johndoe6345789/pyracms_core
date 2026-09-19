@@ -1,8 +1,7 @@
 'use client'
 
 import { Box, Typography } from '@mui/material'
-import GlobalUsersTable
-  from '@/components/super-admin/GlobalUsersTable'
+import GlobalUsersTable from '@/components/super-admin/GlobalUsersTable'
 
 export default function SuperAdminUsersPage() {
   return (
@@ -15,13 +14,9 @@ export default function SuperAdminUsersPage() {
       >
         Global Users
       </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mb: 3 }}
-      >
-        Manage all platform users and their roles.
-        Role changes take effect immediately.
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        Manage all platform users and their roles. Role changes take effect
+        immediately.
       </Typography>
       <GlobalUsersTable />
     </Box>

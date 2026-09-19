@@ -19,11 +19,7 @@ export default function GalleryPage() {
   const create = useCreateAlbum(tenantId, refresh)
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: 6 }}
-      data-testid="gallery-page"
-    >
+    <Container maxWidth="lg" sx={{ py: 6 }} data-testid="gallery-page">
       <GalleryHeader
         canCreate={signedIn}
         onCreate={() => create.setOpen(true)}

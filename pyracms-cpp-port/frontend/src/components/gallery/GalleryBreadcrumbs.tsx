@@ -14,7 +14,12 @@ interface GalleryBreadcrumbsProps {
 const linkSx = { color: 'inherit', textDecoration: 'none' }
 
 export default function GalleryBreadcrumbs({
-  slug, label, testId, current, albumName, albumUrl,
+  slug,
+  label,
+  testId,
+  current,
+  albumName,
+  albumUrl,
 }: GalleryBreadcrumbsProps) {
   return (
     <Breadcrumbs
@@ -27,7 +32,9 @@ export default function GalleryBreadcrumbs({
         Gallery
       </Link>
       {albumUrl && (
-        <Link href={albumUrl} style={linkSx}>{albumName}</Link>
+        <Link href={albumUrl} style={linkSx}>
+          {albumName}
+        </Link>
       )}
       <Typography color="text.primary">{current}</Typography>
     </Breadcrumbs>

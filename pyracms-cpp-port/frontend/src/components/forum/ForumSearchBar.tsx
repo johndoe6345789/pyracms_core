@@ -16,11 +16,16 @@ interface ForumSearchBarProps {
 export type { ForumSearchResult }
 
 const DEFAULT_FORUMS = [
-  'General Discussion', 'Technology', 'Help & Support', 'Off Topic',
+  'General Discussion',
+  'Technology',
+  'Help & Support',
+  'Off Topic',
 ]
 
 export function ForumSearchBar({
-  forums, tenantId, onResultClick,
+  forums,
+  tenantId,
+  onResultClick,
 }: ForumSearchBarProps) {
   const [query, setQuery] = useState('')
   const [author, setAuthor] = useState('')
@@ -33,18 +38,31 @@ export function ForumSearchBar({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <ForumSearchInput
-        query={query} onQuery={setQuery}
+        query={query}
+        onQuery={setQuery}
         onSearch={() => search(query, author, forum)}
-        onToggleFilters={() => setShowFilters(!showFilters)} />
-      {showFilters && <SearchFilters
-        author={author} onAuthorChange={setAuthor}
-        forum={forum} onForumChange={setForum}
-        dateFrom={dateFrom} onDateFromChange={setDateFrom}
-        dateTo={dateTo} onDateToChange={setDateTo}
-        availableForums={forums ?? DEFAULT_FORUMS} />}
-      {hasSearched && <SearchResults
-        results={results} query={query}
-        onResultClick={onResultClick} />}
+        onToggleFilters={() => setShowFilters(!showFilters)}
+      />
+      {showFilters && (
+        <SearchFilters
+          author={author}
+          onAuthorChange={setAuthor}
+          forum={forum}
+          onForumChange={setForum}
+          dateFrom={dateFrom}
+          onDateFromChange={setDateFrom}
+          dateTo={dateTo}
+          onDateToChange={setDateTo}
+          availableForums={forums ?? DEFAULT_FORUMS}
+        />
+      )}
+      {hasSearched && (
+        <SearchResults
+          results={results}
+          query={query}
+          onResultClick={onResultClick}
+        />
+      )}
     </Box>
   )
 }

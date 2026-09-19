@@ -24,19 +24,13 @@ export function useMenuGroupCreate(
 
   const handleCreateGroup = () => {
     if (!newGroupName.trim() || !tenantId) return
-    const name = newGroupName
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '_')
+    const name = newGroupName.trim().toLowerCase().replace(/\s+/g, '_')
     if (menuGroups.some((g) => g.name === name)) return
     setError('')
     api
       .post('/api/menu-groups', { name, tenantId })
       .then((res) => {
-        setMenuGroups((prev) => [
-          ...prev,
-          { id: res.data.id, name, items: [] },
-        ])
+        setMenuGroups((prev) => [...prev, { id: res.data.id, name, items: [] }])
         onCreated(name)
         setGroupDialogOpen(false)
         setNewGroupName('')
@@ -45,8 +39,11 @@ export function useMenuGroupCreate(
   }
 
   return {
-    groupDialogOpen, newGroupName, setNewGroupName,
-    handleCreateGroup, groupError,
+    groupDialogOpen,
+    newGroupName,
+    setNewGroupName,
+    handleCreateGroup,
+    groupError,
     handleOpenGroupDialog: () => setGroupDialogOpen(true),
     handleCloseGroupDialog: () => setGroupDialogOpen(false),
   }

@@ -19,8 +19,12 @@ export function MentionTextField({ value, onValue, ...rest }: Props) {
   }
   return (
     <>
-      <TextField {...rest} value={value} inputRef={ref}
-        onChange={(e) => onValue(e.target.value)} />
+      <TextField
+        {...rest}
+        value={value}
+        inputRef={ref}
+        onChange={(e) => onValue(e.target.value)}
+      />
       <MentionAutocomplete inputRef={ref} onSelect={pick} />
     </>
   )

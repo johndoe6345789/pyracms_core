@@ -53,8 +53,8 @@ export default function LoginHeader({ error, tenant }: Props) {
           sx={{ mb: 3, borderRadius: 2 }}
           data-testid="login-info"
         >
-          Test credentials:{' '}
-          <strong>admin</strong> / <strong>password123</strong>
+          Test credentials: <strong>admin</strong> /{' '}
+          <strong>password123</strong>
         </Alert>
       )}
     </>

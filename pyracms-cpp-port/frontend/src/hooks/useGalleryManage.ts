@@ -23,7 +23,9 @@ export function useGalleryManage(kind: 'albums' | 'pictures', id: string) {
     }
   }
   return {
-    busy, error, clearError: () => setError(''),
+    busy,
+    error,
+    clearError: () => setError(''),
     update: (displayName: string, description: string, done: () => void) =>
       run(() => api.put(url, { displayName, description }), done),
     remove: (done: () => void) => run(() => api.delete(url), done),

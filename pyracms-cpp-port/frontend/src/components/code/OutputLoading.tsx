@@ -6,8 +6,12 @@ export function OutputLoading() {
   return (
     <Box
       sx={{
-        display: 'flex', alignItems: 'center', gap: 2, p: 3,
-        bgcolor: '#1e293b', borderRadius: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        p: 3,
+        bgcolor: '#1e293b',
+        borderRadius: 1,
       }}
       data-testid="code-output-loading"
       role="status"

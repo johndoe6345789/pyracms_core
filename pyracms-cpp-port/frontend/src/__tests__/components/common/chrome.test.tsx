@@ -9,14 +9,21 @@ jest.mock('next/navigation', () => ({
 }))
 
 describe('TenantBreadcrumbs', () => {
-  beforeEach(() => { path = '/site/s/articles/create'; params = { slug: 's' } })
+  beforeEach(() => {
+    path = '/site/s/articles/create'
+    params = { slug: 's' }
+  })
 
   it('builds crumbs with humanized labels', () => {
     render(<TenantBreadcrumbs />)
-    expect(screen.getByTestId('breadcrumb-Home'))
-      .toHaveAttribute('href', '/site/s')
-    expect(screen.getByTestId('breadcrumb-Articles'))
-      .toHaveAttribute('href', '/site/s/articles')
+    expect(screen.getByTestId('breadcrumb-Home')).toHaveAttribute(
+      'href',
+      '/site/s',
+    )
+    expect(screen.getByTestId('breadcrumb-Articles')).toHaveAttribute(
+      'href',
+      '/site/s/articles',
+    )
     expect(screen.getByText('Create')).toBeInTheDocument()
   })
 

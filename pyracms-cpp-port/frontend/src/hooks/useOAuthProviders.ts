@@ -13,15 +13,18 @@ export function useOAuthProviders() {
 
   useEffect(() => {
     let live = true
-    Promise.allSettled(OAUTH_PROVIDERS.map((p) =>
-      api.get(`/api/auth/oauth/${p.id}/url`)))
-      .then((rs) => {
-        if (!live) return
-        setProviders(OAUTH_PROVIDERS.filter(
-          (_, i) => rs[i]?.status === 'fulfilled'))
-        setLoaded(true)
-      })
-    return () => { live = false }
+    Promise.allSettled(
+      OAUTH_PROVIDERS.map((p) => api.get(`/api/auth/oauth/${p.id}/url`)),
+    ).then((rs) => {
+      if (!live) return
+      setProviders(
+        OAUTH_PROVIDERS.filter((_, i) => rs[i]?.status === 'fulfilled'),
+      )
+      setLoaded(true)
+    })
+    return () => {
+      live = false
+    }
   }, [])
 
   return { providers, loaded }

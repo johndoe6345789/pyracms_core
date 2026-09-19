@@ -1,7 +1,9 @@
 import { IconButton, Tooltip } from '@mui/material'
 import {
-  EditOutlined, CheckOutlined,
-  CloseOutlined, DeleteOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
 } from '@mui/icons-material'
 
 interface EditActionsProps {
@@ -9,9 +11,7 @@ interface EditActionsProps {
   onCancel: () => void
 }
 
-export function SettingEditActions({
-  onSave, onCancel,
-}: EditActionsProps) {
+export function SettingEditActions({ onSave, onCancel }: EditActionsProps) {
   return (
     <>
       <Tooltip title="Save">
@@ -45,9 +45,7 @@ interface ViewActionsProps {
   onDelete: () => void
 }
 
-export function SettingViewActions({
-  onEdit, onDelete,
-}: ViewActionsProps) {
+export function SettingViewActions({ onEdit, onDelete }: ViewActionsProps) {
   return (
     <>
       <Tooltip title="Edit">

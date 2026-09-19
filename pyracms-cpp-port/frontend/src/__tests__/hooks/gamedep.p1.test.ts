@@ -4,10 +4,20 @@ import { useGameDepDetail } from '@/hooks/useGameDepDetail'
 import { DEP_DETAIL } from '../helpers/depDetailFixture'
 
 const mk = (n: string, l: number, v: number, d: string, t: string[]) =>
-  ({ name: n, displayName: n, description: `about ${n}`, tags: t,
-    likes: l, dislikes: 0, views: v, created: d }) as GameDepItem
-const items = [mk('a', 1, 9, '2024-01-01', ['x']),
-  mk('b', 5, 1, '2024-03-01', ['y'])]
+  ({
+    name: n,
+    displayName: n,
+    description: `about ${n}`,
+    tags: t,
+    likes: l,
+    dislikes: 0,
+    views: v,
+    created: d,
+  }) as GameDepItem
+const items = [
+  mk('a', 1, 9, '2024-01-01', ['x']),
+  mk('b', 5, 1, '2024-03-01', ['y']),
+]
 
 describe('useGameDepList', () => {
   it('sorts by votes, views and date', () => {
@@ -35,8 +45,7 @@ describe('useGameDepList', () => {
 
 describe('useGameDepDetail', () => {
   it('tracks the tab', () => {
-    const { result } = renderHook(
-      () => useGameDepDetail(DEP_DETAIL))
+    const { result } = renderHook(() => useGameDepDetail(DEP_DETAIL))
     act(() => result.current.setTabIndex(2))
     expect(result.current.tabIndex).toBe(2)
   })

@@ -18,30 +18,22 @@ jest.mock('@/hooks/useTenantList', () => ({
 
 function renderWithStore(ui: React.ReactElement) {
   const { store } = makeStore()
-  return render(
-    <Provider store={store}>{ui}</Provider>,
-  )
+  return render(<Provider store={store}>{ui}</Provider>)
 }
 
 describe('Home Page', () => {
   it('renders welcome message', () => {
     renderWithStore(<Home />)
-    expect(
-      screen.getByText(/Welcome to PyraCMS/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Welcome to PyraCMS/i)).toBeInTheDocument()
   })
 
   it('renders create site button', () => {
     renderWithStore(<Home />)
-    expect(
-      screen.getByTestId('create-site-button'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('create-site-button')).toBeInTheDocument()
   })
 
   it('renders the portal page container', () => {
     renderWithStore(<Home />)
-    expect(
-      screen.getByTestId('portal-page'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('portal-page')).toBeInTheDocument()
   })
 })

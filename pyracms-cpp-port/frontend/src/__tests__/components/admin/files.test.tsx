@@ -5,8 +5,13 @@ import FileIcon from '@/components/admin/FileIcon'
 import UploadDropzone from '@/components/admin/UploadDropzone'
 
 const file = (id: number, type: string) => ({
-  id, name: `f${id}`, size: 2048, type, downloads: 3,
-  uploadedAt: '2024-01-01', uuid: `u${id}`,
+  id,
+  name: `f${id}`,
+  size: 2048,
+  type,
+  downloads: 3,
+  uploadedAt: '2024-01-01',
+  uuid: `u${id}`,
 })
 
 it('FileCard shows meta and deletes', () => {
@@ -19,20 +24,27 @@ it('FileCard shows meta and deletes', () => {
 })
 
 it('FileGrid renders cards', () => {
-  render(<FileGrid files={[file(1, 'a/b'), file(2, 'a/b')]}
-    onDelete={jest.fn()} />)
+  render(
+    <FileGrid files={[file(1, 'a/b'), file(2, 'a/b')]} onDelete={jest.fn()} />,
+  )
   expect(screen.getByTestId('file-card-2')).toBeInTheDocument()
 })
 
 it.each(['image/png', 'application/pdf', 'text/x', 'other'])(
-  'FileIcon handles %s', (t) => {
+  'FileIcon handles %s',
+  (t) => {
     const { container } = render(<FileIcon type={t} />)
     expect(container.querySelector('svg')).toBeInTheDocument()
-  })
+  },
+)
 
 it('UploadDropzone handles drag and selection', () => {
-  const p = { onDragOver: jest.fn(), onDragLeave: jest.fn(),
-    onDrop: jest.fn(), onFilesSelected: jest.fn() }
+  const p = {
+    onDragOver: jest.fn(),
+    onDragLeave: jest.fn(),
+    onDrop: jest.fn(),
+    onFilesSelected: jest.fn(),
+  }
   const { rerender } = render(<UploadDropzone dragOver={false} {...p} />)
   const zone = screen.getByTestId('upload-dropzone')
   fireEvent.dragOver(zone)
@@ -48,6 +60,7 @@ it('UploadDropzone handles drag and selection', () => {
   fireEvent.change(input, { target: { files: [] } })
   expect(p.onFilesSelected).toHaveBeenCalledTimes(1)
   rerender(<UploadDropzone dragOver {...p} onFilesSelected={undefined} />)
-  fireEvent.change(screen.getByTestId('upload-file-input'),
-    { target: { files: [f] } })
+  fireEvent.change(screen.getByTestId('upload-file-input'), {
+    target: { files: [f] },
+  })
 })

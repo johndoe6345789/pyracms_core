@@ -21,14 +21,16 @@ beforeEach(() => {
 
 describe('useSuperAdminTenants — null/missing fields', () => {
   it('handles null values without throwing', async () => {
-    const raw = [{
-      id: null,
-      slug: null,
-      displayName: null,
-      ownerUsername: null,
-      isActive: null,
-      createdAt: null,
-    }]
+    const raw = [
+      {
+        id: null,
+        slug: null,
+        displayName: null,
+        ownerUsername: null,
+        isActive: null,
+        createdAt: null,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminTenants())
 

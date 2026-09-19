@@ -30,7 +30,8 @@ export async function tenantIdOf(slug: string): Promise<number | null> {
   try {
     const res = await fetch(
       `${serverApiOrigin()}/api/tenants/${encodeURIComponent(slug)}`,
-      { next: { revalidate: 3600 } })
+      { next: { revalidate: 3600 } },
+    )
     if (!res.ok) return null
     const id = (await res.json()).id
     return typeof id === 'number' ? id : null

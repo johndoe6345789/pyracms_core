@@ -1,6 +1,11 @@
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material'
 import { UserRow } from '@/hooks/useAdminUsers'
 import UserRowView from './UserRowView'
@@ -31,19 +36,11 @@ export default function UserTable({
         <TableHead>
           <TableRow>
             {HEADS.map((h) => (
-              <TableCell
-                key={h}
-                scope="col"
-                sx={{ fontWeight: 700 }}
-              >
+              <TableCell key={h} scope="col" sx={{ fontWeight: 700 }}>
                 {h}
               </TableCell>
             ))}
-            <TableCell
-              scope="col"
-              sx={{ fontWeight: 700 }}
-              align="right"
-            >
+            <TableCell scope="col" sx={{ fontWeight: 700 }} align="right">
               Actions
             </TableCell>
           </TableRow>

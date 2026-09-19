@@ -11,19 +11,28 @@ import { useGameDepEditor } from '@/hooks/useGameDepEditor'
 import { useSaveGame } from '@/hooks/useSaveGame'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
 
-interface Props { slug: string; name: string; detail: GameDepDetailData }
+interface Props {
+  slug: string
+  name: string
+  detail: GameDepDetailData
+}
 
 /** Edit form pre-filled from the loaded game. */
 export default function GameEditor({ slug, name, detail }: Props) {
   const { saving, error, save } = useSaveGame(slug, name)
   const editor = useGameDepEditor(
-    detail.displayName, detail.description, detail.tags, detail.revisions,
+    detail.displayName,
+    detail.description,
+    detail.tags,
+    detail.revisions,
   )
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
       <GameEditCrumbs
-        slug={slug} name={name} displayName={editor.displayName}
+        slug={slug}
+        name={name}
+        displayName={editor.displayName}
       />
       <Typography variant="h3" component="h1" gutterBottom>
         Edit Game
@@ -57,11 +66,13 @@ export default function GameEditor({ slug, name, detail }: Props) {
       <GameEditActions
         cancelHref={`/site/${slug}/games/${name}`}
         saving={saving}
-        onSave={() => save({
-          displayName: editor.displayName,
-          description: editor.description,
-          tags: editor.tags,
-        })}
+        onSave={() =>
+          save({
+            displayName: editor.displayName,
+            description: editor.description,
+            tags: editor.tags,
+          })
+        }
       />
     </Container>
   )

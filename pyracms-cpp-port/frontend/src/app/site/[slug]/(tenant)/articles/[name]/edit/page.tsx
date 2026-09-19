@@ -1,16 +1,12 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import {
-  Container, Typography, Box, Button, Alert,
-} from '@mui/material'
+import { Container, Typography, Box, Button, Alert } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { useTenantId } from '@/hooks/useTenantId'
 import { BackButton } from '@/components/common/BackButton'
-import {
-  ArticleEditorForm,
-} from '@/components/articles/ArticleEditorForm'
+import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
 import { useEditArticle } from './useEditArticle'
 
 export default function EditArticlePage() {
@@ -18,16 +14,15 @@ export default function EditArticlePage() {
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
-  const { editor, saving, error, save, markSummaryEdited } =
-    useEditArticle(slug, name, tenantId)
+  const { editor, saving, error, save, markSummaryEdited } = useEditArticle(
+    slug,
+    name,
+    tenantId,
+  )
   const back = `/site/${slug}/articles/${name}`
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{ py: 6 }}
-      data-testid="edit-article-page"
-    >
+    <Container maxWidth="md" sx={{ py: 6 }} data-testid="edit-article-page">
       <Box sx={{ mb: 4 }}>
         <BackButton
           href={back}

@@ -19,8 +19,7 @@ it('reads active state from the API banned flag', async () => {
   mockApi.get.mockResolvedValueOnce({ data: USERS })
   const { result } = renderHook(() => useSuperAdminUsers())
   await waitFor(() => expect(result.current.loading).toBe(false))
-  expect(result.current.users.map((u) => u.isActive))
-    .toEqual([true, false])
+  expect(result.current.users.map((u) => u.isActive)).toEqual([true, false])
 })
 
 it('rolls the toggle back when the API refuses', async () => {
@@ -28,7 +27,8 @@ it('rolls the toggle back when the API refuses', async () => {
   mockApi.put.mockRejectedValueOnce(new Error('403'))
   const { result } = renderHook(() => useSuperAdminUsers())
   await waitFor(() => expect(result.current.loading).toBe(false))
-  await act(async () => { result.current.toggleBan(1) })
-  await waitFor(() =>
-    expect(result.current.users[0]!.isActive).toBe(true))
+  await act(async () => {
+    result.current.toggleBan(1)
+  })
+  await waitFor(() => expect(result.current.users[0]!.isActive).toBe(true))
 })

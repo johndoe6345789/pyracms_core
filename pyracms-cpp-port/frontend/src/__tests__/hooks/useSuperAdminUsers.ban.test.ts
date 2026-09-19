@@ -3,8 +3,7 @@ import '@testing-library/jest-dom'
 import { useSuperAdminUsers } from '@/hooks/useSuperAdminUsers'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_USERS } from
-  '../helpers/superAdminUsersFixtures'
+import { RAW_USERS } from '../helpers/superAdminUsersFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -29,16 +28,17 @@ describe('useSuperAdminUsers — toggleBan', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.users[0]!.isActive).toBe(true)
 
-    await act(async () => { result.current.toggleBan(1) })
+    await act(async () => {
+      result.current.toggleBan(1)
+    })
 
     await waitFor(() => {
       expect(result.current.users[0]!.isActive).toBe(false)
     })
 
-    expect(mockApi.put).toHaveBeenCalledWith(
-      '/api/users/1/ban',
-      { banned: true },
-    )
+    expect(mockApi.put).toHaveBeenCalledWith('/api/users/1/ban', {
+      banned: true,
+    })
   })
 
   it('unbans an inactive user: sets isActive=true', async () => {
@@ -50,15 +50,16 @@ describe('useSuperAdminUsers — toggleBan', () => {
     // user id=2 starts with isActive=false
     expect(result.current.users[1]!.isActive).toBe(false)
 
-    await act(async () => { result.current.toggleBan(2) })
+    await act(async () => {
+      result.current.toggleBan(2)
+    })
 
     await waitFor(() => {
       expect(result.current.users[1]!.isActive).toBe(true)
     })
 
-    expect(mockApi.put).toHaveBeenCalledWith(
-      '/api/users/2/ban',
-      { banned: false },
-    )
+    expect(mockApi.put).toHaveBeenCalledWith('/api/users/2/ban', {
+      banned: false,
+    })
   })
 })

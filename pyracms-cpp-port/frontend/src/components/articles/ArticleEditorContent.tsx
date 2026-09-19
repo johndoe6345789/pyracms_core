@@ -2,9 +2,7 @@
 
 import type { ArticleEditorState } from '@/hooks/useArticleEditor'
 import type { EditorMode } from './EditorModeSelector'
-import {
-  MonacoEditorComponent,
-} from './MonacoEditor'
+import { MonacoEditorComponent } from './MonacoEditor'
 import { RichTextEditor } from './RichTextEditor'
 import { BBCodeEditor } from './BBCodeEditor'
 import { MarkdownEditor } from './MarkdownEditor'
@@ -17,43 +15,41 @@ interface ArticleEditorContentProps {
 }
 
 export function ArticleEditorContent({
-  mode, editor,
+  mode,
+  editor,
 }: ArticleEditorContentProps) {
   if (mode === 'monaco') {
-    return (<>
-      <ViewModeToggle
-        viewMode={editor.viewMode}
-        setViewMode={editor.setViewMode} />
-      {editor.viewMode === 'edit' ? (
-        <MonacoEditorComponent
-          value={editor.content}
-          onChange={editor.setContent}
-          language={editor.renderer}
-          autoSaveKey="article-editor" />
-      ) : (
-        <ContentPreview
-          content={editor.content}
-          renderer={editor.renderer} />
-      )}
-    </>)
+    return (
+      <>
+        <ViewModeToggle
+          viewMode={editor.viewMode}
+          setViewMode={editor.setViewMode}
+        />
+        {editor.viewMode === 'edit' ? (
+          <MonacoEditorComponent
+            value={editor.content}
+            onChange={editor.setContent}
+            language={editor.renderer}
+            autoSaveKey="article-editor"
+          />
+        ) : (
+          <ContentPreview content={editor.content} renderer={editor.renderer} />
+        )}
+      </>
+    )
   }
   if (mode === 'wysiwyg') {
     return (
-      <RichTextEditor
-        value={editor.content}
-        onChange={editor.setContent} />)
+      <RichTextEditor value={editor.content} onChange={editor.setContent} />
+    )
   }
   if (mode === 'bbcode') {
-    return (
-      <BBCodeEditor
-        value={editor.content}
-        onChange={editor.setContent} />)
+    return <BBCodeEditor value={editor.content} onChange={editor.setContent} />
   }
   if (mode === 'markdown') {
     return (
-      <MarkdownEditor
-        value={editor.content}
-        onChange={editor.setContent} />)
+      <MarkdownEditor value={editor.content} onChange={editor.setContent} />
+    )
   }
   return null
 }

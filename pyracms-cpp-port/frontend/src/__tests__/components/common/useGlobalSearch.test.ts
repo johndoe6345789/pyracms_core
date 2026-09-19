@@ -1,13 +1,13 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { fireEvent } from '@testing-library/react'
-import { useGlobalSearch }
-  from '@/components/common/search/useGlobalSearch'
+import { useGlobalSearch } from '@/components/common/search/useGlobalSearch'
 import api from '@/lib/api'
 import { usePathname } from 'next/navigation'
 import { useTenantId } from '@/hooks/useTenantId'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 jest.mock('next/navigation', () => ({ usePathname: jest.fn() }))
 jest.mock('@/hooks/useTenantId', () => ({ useTenantId: jest.fn() }))
@@ -34,16 +34,24 @@ describe('useGlobalSearch', () => {
     get.mockResolvedValue({ data: { items: [{ id: 1, title: 'A' }, {}] } })
     const { result } = renderHook(() => useGlobalSearch())
     act(() => result.current.setQ('a'))
-    act(() => { jest.advanceTimersByTime(400) })
+    act(() => {
+      jest.advanceTimersByTime(400)
+    })
     expect(get).not.toHaveBeenCalled()
     act(() => result.current.setQ('ab'))
-    act(() => { jest.advanceTimersByTime(400) })
+    act(() => {
+      jest.advanceTimersByTime(400)
+    })
     jest.useRealTimers()
     await waitFor(() => expect(result.current.res).toHaveLength(2))
-    expect(result.current.res[1]).toMatchObject(
-      { type: 'article', url: '#', title: '' })
+    expect(result.current.res[1]).toMatchObject({
+      type: 'article',
+      url: '#',
+      title: '',
+    })
     expect(get.mock.calls[0][0]).toBe(
-      '/api/search/autocomplete?q=ab&tenant_id=7')
+      '/api/search/autocomplete?q=ab&tenant_id=7',
+    )
   })
 
   it('searches the site named in the path, not a fixed tenant', async () => {
@@ -67,7 +75,10 @@ describe('useGlobalSearch', () => {
   it('clears results on error and when closed', async () => {
     get.mockRejectedValue(new Error('x'))
     const { result } = renderHook(() => useGlobalSearch())
-    act(() => { result.current.setOpen(true); result.current.setQ('qq') })
+    act(() => {
+      result.current.setOpen(true)
+      result.current.setQ('qq')
+    })
     await waitFor(() => expect(get).toHaveBeenCalled())
     expect(result.current.res).toEqual([])
     act(() => result.current.setOpen(false))

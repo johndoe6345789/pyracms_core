@@ -6,8 +6,12 @@ import { Typography } from '@mui/material'
 export function TypingIndicator({ count }: { count: number }) {
   if (count <= 0) return null
   return (
-    <Typography variant="caption" color="text.secondary"
-      sx={{ display: 'block', mt: 1 }} data-testid="typing-indicator">
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ display: 'block', mt: 1 }}
+      data-testid="typing-indicator"
+    >
       {count === 1 ? 'Someone is typing...' : 'Several people are typing...'}
     </Typography>
   )

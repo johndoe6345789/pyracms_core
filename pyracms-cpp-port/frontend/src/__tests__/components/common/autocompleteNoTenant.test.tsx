@@ -3,7 +3,8 @@ import SearchAutocomplete from '@/components/common/SearchAutocomplete'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 
@@ -13,7 +14,9 @@ it('sends no request without a tenant', async () => {
   render(<SearchAutocomplete />)
   const box = screen.getByTestId('search-autocomplete-input')
   fireEvent.change(box.querySelector('input')!, { target: { value: 'ab' } })
-  await act(async () => { jest.advanceTimersByTime(250) })
+  await act(async () => {
+    jest.advanceTimersByTime(250)
+  })
   jest.useRealTimers()
   expect(get).not.toHaveBeenCalled()
 })

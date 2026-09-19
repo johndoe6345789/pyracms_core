@@ -45,18 +45,16 @@ describe('handleSubmit – API error response', () => {
     expect(result.current.error).toBe('Failed to create site')
   })
 
-  it('falls back to generic message when response.data is absent',
-    async () => {
-      mockPost.mockRejectedValueOnce({ response: {} })
-      const { result } = renderHook(() => useCreateSite())
+  it('falls back to generic message when response.data is absent', async () => {
+    mockPost.mockRejectedValueOnce({ response: {} })
+    const { result } = renderHook(() => useCreateSite())
 
-      await act(async () => {
-        await result.current.handleSubmit(fakeSubmitEvent())
-      })
+    await act(async () => {
+      await result.current.handleSubmit(fakeSubmitEvent())
+    })
 
-      expect(result.current.error).toBe('Failed to create site')
-    },
-  )
+    expect(result.current.error).toBe('Failed to create site')
+  })
 
   it('does not navigate on API error', async () => {
     mockPost.mockRejectedValueOnce({

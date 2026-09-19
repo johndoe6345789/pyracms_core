@@ -16,13 +16,21 @@ interface PostCardHeaderProps {
 }
 
 export function PostCardHeader({
-  author, date, isOwner, showAuthor = true, ...actions
+  author,
+  date,
+  isOwner,
+  showAuthor = true,
+  ...actions
 }: PostCardHeaderProps) {
   return (
-    <Box sx={{
-      display: 'flex', mb: 2,
-      justifyContent: 'space-between', alignItems: 'center',
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        mb: 2,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
         {showAuthor && (
           <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main' }}>

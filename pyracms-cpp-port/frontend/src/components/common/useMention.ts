@@ -1,7 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import api from '@/lib/api'
 
-export interface MentionUser { id: number; username: string }
+export interface MentionUser {
+  id: number
+  username: string
+}
 type El = HTMLTextAreaElement | HTMLInputElement
 
 export function useMention(inputRef: React.RefObject<El | null>) {
@@ -19,13 +22,15 @@ export function useMention(inputRef: React.RefObject<El | null>) {
       if (timer.current) clearTimeout(timer.current)
       timer.current = setTimeout(async () => {
         try {
-          const r = await api.get(
-            '/api/users?search=' + mention + '&limit=5')
+          const r = await api.get('/api/users?search=' + mention + '&limit=5')
           setList(Array.isArray(r.data) ? r.data : [])
-        } catch { setList([]) }
+        } catch {
+          setList([])
+        }
       }, 200)
     } else {
-      setList([]); setAnchor(null)
+      setList([])
+      setAnchor(null)
     }
   }, [inputRef])
 
@@ -40,6 +45,9 @@ export function useMention(inputRef: React.RefObject<El | null>) {
     }
   }, [inputRef, handle])
 
-  const clear = () => { setList([]); setAnchor(null) }
+  const clear = () => {
+    setList([])
+    setAnchor(null)
+  }
   return { list, anchor, clear }
 }

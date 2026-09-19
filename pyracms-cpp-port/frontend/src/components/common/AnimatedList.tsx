@@ -13,7 +13,8 @@ const item = {
 }
 
 export default function AnimatedList({
-  children, staggerDelay = 0.05,
+  children,
+  staggerDelay = 0.05,
 }: AnimatedListProps) {
   const variants = {
     hidden: { opacity: 0 },

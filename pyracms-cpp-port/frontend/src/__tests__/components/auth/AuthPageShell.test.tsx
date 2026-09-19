@@ -15,12 +15,8 @@ describe('AuthPageShell', () => {
         <p data-testid="child-content">Hello world</p>
       </AuthPageShell>,
     )
-    expect(
-      screen.getByTestId('child-content'),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByTestId('child-content'),
-    ).toHaveTextContent('Hello world')
+    expect(screen.getByTestId('child-content')).toBeInTheDocument()
+    expect(screen.getByTestId('child-content')).toHaveTextContent('Hello world')
   })
 
   it('has role="main" landmark', () => {
@@ -44,9 +40,7 @@ describe('AuthPageShell', () => {
     const allRules = Array.from(document.styleSheets)
       .flatMap((sheet) => {
         try {
-          return Array.from(sheet.cssRules).map(
-            (r) => r.cssText,
-          )
+          return Array.from(sheet.cssRules).map((r) => r.cssText)
         } catch {
           return []
         }

@@ -16,8 +16,12 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({
-  value, onChange, language, onLanguageChange,
-  readOnly = false, height = '400px',
+  value,
+  onChange,
+  language,
+  onLanguageChange,
+  readOnly = false,
+  height = '400px',
 }: CodeEditorProps) {
   const theme = useTheme()
   const monacoTheme = theme.palette.mode === 'dark' ? 'vs-dark' : 'light'
@@ -38,10 +42,14 @@ export function CodeEditor({
       {onLanguageChange && !readOnly && (
         <LanguageSelect value={language} onChange={onLanguageChange} />
       )}
-      <Box sx={{
-        border: 1, borderColor: 'divider', borderRadius: 1,
-        overflow: 'hidden',
-      }}>
+      <Box
+        sx={{
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'hidden',
+        }}
+      >
         <Editor
           height={height}
           language={language}

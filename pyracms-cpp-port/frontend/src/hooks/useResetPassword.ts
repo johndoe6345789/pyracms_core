@@ -21,9 +21,12 @@ export function useResetPassword(token: string) {
     if (!token) return f.fail('This reset link is missing its token')
     const problem = passwordProblem(password, confirm)
     if (problem) return f.fail(problem)
-    return f.run(() => api.post('/api/auth/reset-password', {
-      token, password,
-    }))
+    return f.run(() =>
+      api.post('/api/auth/reset-password', {
+        token,
+        password,
+      }),
+    )
   }
   return { password, setPassword, confirm, setConfirm, submit, ...f }
 }

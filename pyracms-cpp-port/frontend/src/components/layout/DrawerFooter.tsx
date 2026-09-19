@@ -8,9 +8,13 @@ export interface FooterAction {
 }
 
 /** Secondary action pinned to the bottom of the drawer. */
-export default function DrawerFooter(
-  { footer, onClose }: { footer: FooterAction; onClose: () => void },
-) {
+export default function DrawerFooter({
+  footer,
+  onClose,
+}: {
+  footer: FooterAction
+  onClose: () => void
+}) {
   return (
     <>
       <Divider />

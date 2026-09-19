@@ -7,9 +7,7 @@ describe('CreateSiteButton', () => {
     beforeEach(() => renderButton(false))
 
     it('renders a button/link with data-testid', () => {
-      expect(
-        screen.getByTestId('create-site-button'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('create-site-button')).toBeInTheDocument()
     })
 
     it('links to /auth/login/create-site', () => {
@@ -20,22 +18,17 @@ describe('CreateSiteButton', () => {
       )
     })
 
-    it(
-      'has aria-label "Sign in to create a new site"',
-      () => {
-        expect(
-          screen.getByTestId('create-site-button'),
-        ).toHaveAttribute(
-          'aria-label',
-          'Sign in to create a new site',
-        )
-      },
-    )
+    it('has aria-label "Sign in to create a new site"', () => {
+      expect(screen.getByTestId('create-site-button')).toHaveAttribute(
+        'aria-label',
+        'Sign in to create a new site',
+      )
+    })
 
     it('displays "Create New Site" button text', () => {
-      expect(
-        screen.getByTestId('create-site-button'),
-      ).toHaveTextContent('Create New Site')
+      expect(screen.getByTestId('create-site-button')).toHaveTextContent(
+        'Create New Site',
+      )
     })
   })
 })

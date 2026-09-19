@@ -1,5 +1,10 @@
 import {
-  Box, Card, CardContent, IconButton, Tooltip, Typography,
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Typography,
 } from '@mui/material'
 import { DeleteOutlined } from '@mui/icons-material'
 import { FileItem } from '@/hooks/useFileManager'
@@ -30,10 +35,7 @@ const iconBoxSx = {
   color: 'text.secondary',
 }
 
-export default function FileCard({
-  file,
-  onDelete,
-}: FileCardProps) {
+export default function FileCard({ file, onDelete }: FileCardProps) {
   return (
     <Card
       variant="outlined"
@@ -51,11 +53,7 @@ export default function FileCard({
         <Box sx={iconBoxSx}>
           <FileIcon type={file.type} />
         </Box>
-        <Typography
-          variant="body1"
-          title={file.name}
-          sx={nameSx}
-        >
+        <Typography variant="body1" title={file.name} sx={nameSx}>
           {file.name}
         </Typography>
         <FileCardMeta file={file} />

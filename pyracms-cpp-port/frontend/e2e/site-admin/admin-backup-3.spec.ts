@@ -12,23 +12,13 @@ test.describe('Admin Backup', () => {
     await goToAdmin(page, '/backup')
   })
 
-  test(
-    'hidden file input is attached to DOM',
-    async ({ page }) => {
-      await expect(
-        page.locator(
-          'input[type="file"][accept=".json"]',
-        ),
-      ).toBeAttached()
-    },
-  )
+  test('hidden file input is attached to DOM', async ({ page }) => {
+    await expect(
+      page.locator('input[type="file"][accept=".json"]'),
+    ).toBeAttached()
+  })
 
-  test(
-    'admin sidebar is present on backup page',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-sidebar'),
-      ).toBeVisible()
-    },
-  )
+  test('admin sidebar is present on backup page', async ({ page }) => {
+    await expect(page.getByTestId('admin-sidebar')).toBeVisible()
+  })
 })

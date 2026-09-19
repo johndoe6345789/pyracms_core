@@ -1,10 +1,6 @@
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import {
-  fillForm,
-  renderLogin,
-  submitForm,
-} from '../helpers/loginHookHelpers'
+import { fillForm, renderLogin, submitForm } from '../helpers/loginHookHelpers'
 
 const mockPush = jest.fn()
 
@@ -33,23 +29,19 @@ describe('useLogin – error responses', () => {
     localStorage.clear()
   })
 
-  it('sets error from response.data.error when token is absent',
-    async () => {
-      mockApi.post.mockResolvedValueOnce({
-        data: { error: 'Invalid credentials' },
-      })
-      const result = await submitValid()
-      expect(result.current.error).toBe('Invalid credentials')
-    },
-  )
+  it('sets error from response.data.error when token is absent', async () => {
+    mockApi.post.mockResolvedValueOnce({
+      data: { error: 'Invalid credentials' },
+    })
+    const result = await submitValid()
+    expect(result.current.error).toBe('Invalid credentials')
+  })
 
-  it('falls back when token is absent and no error msg exists',
-    async () => {
-      mockApi.post.mockResolvedValueOnce({ data: {} })
-      const result = await submitValid()
-      expect(result.current.error).toBe('Login failed')
-    },
-  )
+  it('falls back when token is absent and no error msg exists', async () => {
+    mockApi.post.mockResolvedValueOnce({ data: {} })
+    const result = await submitValid()
+    expect(result.current.error).toBe('Login failed')
+  })
 
   it('does not navigate when token is absent', async () => {
     mockApi.post.mockResolvedValueOnce({ data: {} })

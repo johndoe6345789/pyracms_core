@@ -13,19 +13,18 @@ export function SnippetGrid({ s, slug }: Props) {
       <Grid container spacing={3}>
         {s.loading
           ? [0, 1, 2].map((i) => (
-            <Grid item xs={12} sm={6} md={4} key={i}>
-              <Skeleton variant="rounded" height={240} />
-            </Grid>
-          ))
+              <Grid item xs={12} sm={6} md={4} key={i}>
+                <Skeleton variant="rounded" height={240} />
+              </Grid>
+            ))
           : s.snippets.map((snippet) => (
-            <Grid item xs={12} sm={6} md={4} key={snippet.id}>
-              <SnippetCard {...snippet} siteSlug={slug} />
-            </Grid>
-          ))}
+              <Grid item xs={12} sm={6} md={4} key={snippet.id}>
+                <SnippetCard {...snippet} siteSlug={slug} />
+              </Grid>
+            ))}
       </Grid>
       {!s.loading && !s.error && s.snippets.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 6 }}
-          data-testid="no-snippets-msg">
+        <Box sx={{ textAlign: 'center', py: 6 }} data-testid="no-snippets-msg">
           <Typography color="text.secondary" gutterBottom>
             {s.total === 0
               ? 'No snippets yet. Share the first one!'

@@ -24,8 +24,10 @@ export default function PictureViewer({
       }}
     >
       {!src ? (
-        <Box data-testid="picture-missing"
-          sx={{ p: 6, textAlign: 'center', color: 'text.secondary' }}>
+        <Box
+          data-testid="picture-missing"
+          sx={{ p: 6, textAlign: 'center', color: 'text.secondary' }}
+        >
           Image unavailable
         </Box>
       ) : isVideo ? (

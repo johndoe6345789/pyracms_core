@@ -1,8 +1,6 @@
 'use client'
 
-import {
-  Box, Typography, Button, Stack,
-} from '@mui/material'
+import { Box, Typography, Button, Stack } from '@mui/material'
 import { LockOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 
@@ -38,14 +36,9 @@ export default function AuthPromptCard() {
         color="text.secondary"
         sx={{ mb: 4, maxWidth: 420, mx: 'auto' }}
       >
-        You need an account to create and manage
-        your own site on PyraCMS.
+        You need an account to create and manage your own site on PyraCMS.
       </Typography>
-      <Stack
-        direction="row"
-        spacing={2}
-        justifyContent="center"
-      >
+      <Stack direction="row" spacing={2} justifyContent="center">
         <Button
           variant="contained"
           size="large"

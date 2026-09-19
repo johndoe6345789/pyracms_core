@@ -14,17 +14,25 @@ interface Props {
   onDelete?: () => void
 }
 
-export default function AlbumHeader(
-  {
-    albumName, count, canUpload = true, uploading = false, onFiles,
-    description, onEdit, onDelete,
-  }: Props,
-) {
+export default function AlbumHeader({
+  albumName,
+  count,
+  canUpload = true,
+  uploading = false,
+  onFiles,
+  description,
+  onEdit,
+  onDelete,
+}: Props) {
   return (
-    <Box sx={{
-      display: 'flex', justifyContent: 'space-between',
-      alignItems: 'center', mb: 4,
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 4,
+      }}
+    >
       <Box>
         <Typography variant="h3" component="h1" gutterBottom>
           {albumName}
@@ -35,32 +43,49 @@ export default function AlbumHeader(
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
-      {onEdit && <Button variant="outlined" onClick={onEdit}
-        data-testid="edit-album-btn">Edit</Button>}
-      {onDelete && <Button variant="outlined" color="error"
-        onClick={onDelete} data-testid="delete-album-btn">Delete</Button>}
-      {canUpload && <Button
-        variant="contained"
-        startIcon={<UploadOutlined />}
-        size="large"
-        component="label"
-        data-testid="upload-picture-btn"
-        aria-label="Upload pictures"
-        disabled={uploading}
-      >
-        {uploading ? 'Uploading...' : 'Upload'}
-        <input
-          type="file"
-          hidden
-          accept="image/*"
-          multiple
-          data-testid="upload-file-input"
-          onChange={(e) => {
-            if (e.target.files?.length) onFiles?.(e.target.files)
-            e.target.value = ''
-          }}
-        />
-      </Button>}
+        {onEdit && (
+          <Button
+            variant="outlined"
+            onClick={onEdit}
+            data-testid="edit-album-btn"
+          >
+            Edit
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={onDelete}
+            data-testid="delete-album-btn"
+          >
+            Delete
+          </Button>
+        )}
+        {canUpload && (
+          <Button
+            variant="contained"
+            startIcon={<UploadOutlined />}
+            size="large"
+            component="label"
+            data-testid="upload-picture-btn"
+            aria-label="Upload pictures"
+            disabled={uploading}
+          >
+            {uploading ? 'Uploading...' : 'Upload'}
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              multiple
+              data-testid="upload-file-input"
+              onChange={(e) => {
+                if (e.target.files?.length) onFiles?.(e.target.files)
+                e.target.value = ''
+              }}
+            />
+          </Button>
+        )}
       </Box>
     </Box>
   )

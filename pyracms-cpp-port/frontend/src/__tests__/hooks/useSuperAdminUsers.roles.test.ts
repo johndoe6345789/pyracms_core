@@ -21,13 +21,15 @@ beforeEach(() => {
 
 describe('useSuperAdminUsers — role mapping from numeric field', () => {
   it('maps role=0 to Guest', async () => {
-    const raw = [{
-      id: 10,
-      username: 'guest',
-      email: 'g@x.com',
-      role: 0,
-      isActive: true,
-    }]
+    const raw = [
+      {
+        id: 10,
+        username: 'guest',
+        email: 'g@x.com',
+        role: 0,
+        isActive: true,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 
@@ -38,13 +40,15 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
   })
 
   it('maps role=2 to Moderator', async () => {
-    const raw = [{
-      id: 11,
-      username: 'mod',
-      email: 'm@x.com',
-      role: 2,
-      isActive: true,
-    }]
+    const raw = [
+      {
+        id: 11,
+        username: 'mod',
+        email: 'm@x.com',
+        role: 2,
+        isActive: true,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 
@@ -55,13 +59,15 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
   })
 
   it('maps role=4 to SuperAdmin', async () => {
-    const raw = [{
-      id: 12,
-      username: 'super',
-      email: 's@x.com',
-      role: 4,
-      isActive: true,
-    }]
+    const raw = [
+      {
+        id: 12,
+        username: 'super',
+        email: 's@x.com',
+        role: 4,
+        isActive: true,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 

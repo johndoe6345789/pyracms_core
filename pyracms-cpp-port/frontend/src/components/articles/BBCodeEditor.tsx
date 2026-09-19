@@ -22,9 +22,7 @@ const frameSx = {
   overflow: 'hidden',
 }
 
-export function BBCodeEditor(
-  { value, onChange }: BBCodeEditorProps
-) {
+export function BBCodeEditor({ value, onChange }: BBCodeEditorProps) {
   const { ref, insertTag } = useBBCodeInsert(value, onChange)
 
   return (

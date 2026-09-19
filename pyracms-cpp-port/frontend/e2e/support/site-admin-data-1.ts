@@ -28,9 +28,7 @@ export const MOCK_USERS = [
   },
 ]
 
-export const MOCK_TENANTS = [
-  { id: 1, slug: SITE_SLUG, name: 'Demo Site' },
-]
+export const MOCK_TENANTS = [{ id: 1, slug: SITE_SLUG, name: 'Demo Site' }]
 
 export const MOCK_SETTINGS = [
   { id: 1, key: 'site_name', value: 'Demo' },

@@ -1,10 +1,8 @@
 'use client'
 
 import { Suspense } from 'react'
-import AuthPageShell
-  from '@/components/auth/AuthPageShell'
-import RegisterForm
-  from '@/components/auth/RegisterForm'
+import AuthPageShell from '@/components/auth/AuthPageShell'
+import RegisterForm from '@/components/auth/RegisterForm'
 import OAuthButtons from '@/components/auth/OAuthButtons'
 import { useAuthParams } from '@/hooks/useAuthParams'
 

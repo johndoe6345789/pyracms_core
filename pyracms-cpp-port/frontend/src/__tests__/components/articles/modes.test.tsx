@@ -1,7 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import {
-  EditorModeSelector,
-} from '@/components/articles/EditorModeSelector'
+import { EditorModeSelector } from '@/components/articles/EditorModeSelector'
 import { ViewModeToggle } from '@/components/articles/ViewModeToggle'
 import { isIncompatible } from '@/components/articles/editorModes'
 

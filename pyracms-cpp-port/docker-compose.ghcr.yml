@@ -96,6 +96,13 @@ services:
       # Elasticsearch
       ELASTICSEARCH_URL: http://elasticsearch:9200
       SEARCH_ENGINE: elasticsearch
+      # Uploaded-file storage: local (default) or s3 (docs/STORAGE.md).
+      # s3 needs the bundled store (--profile storage) or your own endpoint.
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://objectstore:9000}
+      S3_BUCKET: ${S3_BUCKET:-pyracms}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-pyracms-dev}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-pyracms-dev-secret}
       # OAuth (uncomment and fill in for OAuth support; prefer an env file)
       # OAUTH_GITHUB_CLIENT_ID: ""
       # OAUTH_GITHUB_CLIENT_SECRET: ""
@@ -121,6 +128,9 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+      objectstore-init:
+        condition: service_completed_successfully
+        required: false   # only present with --profile storage
 
   frontend:
     image: ghcr.io/johndoe6345789/pyracms-frontend:${PYRACMS_VERSION:-latest}
@@ -155,9 +165,84 @@ services:
       - frontend
       - backend
 
+  # ---- Optional S3-compatible object store for uploaded files -------------
+  # https://github.com/johndoe6345789/object-store  (docs/STORAGE.md)
+  #   docker compose --profile storage up -d
+  #   STORAGE_BACKEND=s3 docker compose --profile storage up -d backend
+  # Its own database (`objectstore`) lives in the postgres service above.
+  objectstore-db:
+    profiles: [storage]
+    image: postgres:15-alpine@sha256:a46e076249ce434e41203b8c1dadfaa025b9726331d72390df038385d6dc29cd
+    restart: "no"
+    entrypoint: ["sh", "/objectstore-init.sh", "db"]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-pyracms}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-pyracms}
+      OBJECTSTORE_DB: ${OBJECTSTORE_DB:-objectstore}
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./scripts/objectstore-init.sh:/objectstore-init.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  objectstore:
+    profiles: [storage]
+    image: ghcr.io/johndoe6345789/object-store:latest@sha256:0bc19d893dcc14e2a9504091147e4b2d3a3fe2c8efa340b9a3cd7a7e07809a1e
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:-pyracms}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-pyracms}
+      PGDATABASE: ${OBJECTSTORE_DB:-objectstore}
+      # The server itself reads a libpq string (the PG* vars serve the migrations).
+      S3_DB_CONN: host=postgres port=5432 dbname=${OBJECTSTORE_DB:-objectstore} user=${POSTGRES_USER:-pyracms} password=${POSTGRES_PASSWORD:-pyracms}
+      S3_PORT: 9000
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      # Loopback only (the backend reaches it as http://objectstore:9000).
+      - "127.0.0.1:${OBJECTSTORE_PORT:-9099}:9000"
+    volumes:
+      - objectstore_data:/data/s3
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      objectstore-db:
+        condition: service_completed_successfully
+
+  # Creates PyraCMS's API key (S3_ACCESS_KEY / S3_SECRET_KEY). Dev falls back
+  # to throwaway keys; production must set real ones (scripts/gen-env.sh).
+  objectstore-init:
+    profiles: [storage]
+    image: postgres:15-alpine@sha256:a46e076249ce434e41203b8c1dadfaa025b9726331d72390df038385d6dc29cd
+    restart: "no"
+    entrypoint: ["sh", "/objectstore-init.sh", "key"]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-pyracms}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-pyracms}
+      OBJECTSTORE_DB: ${OBJECTSTORE_DB:-objectstore}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-pyracms-dev}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-pyracms-dev-secret}
+      OBJECTSTORE_REMOVE_SEED: ${OBJECTSTORE_REMOVE_SEED:-0}
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./scripts/objectstore-init.sh:/objectstore-init.sh:ro
+    depends_on:
+      objectstore:
+        condition: service_healthy
 
 volumes:
   postgres_data:
   redis_data:
   es_data:
   uploads_data:
+  objectstore_data:

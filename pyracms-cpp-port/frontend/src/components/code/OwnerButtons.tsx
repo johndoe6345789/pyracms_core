@@ -11,13 +11,21 @@ interface Props {
 export function OwnerButtons({ onEdit, onDelete }: Props) {
   return (
     <>
-      <Button variant="outlined" startIcon={<EditOutlined />}
-        onClick={onEdit} data-testid="edit-snippet-btn">
+      <Button
+        variant="outlined"
+        startIcon={<EditOutlined />}
+        onClick={onEdit}
+        data-testid="edit-snippet-btn"
+      >
         Edit
       </Button>
-      <Button variant="outlined" color="error"
+      <Button
+        variant="outlined"
+        color="error"
         startIcon={<DeleteOutlined />}
-        onClick={onDelete} data-testid="delete-snippet-btn">
+        onClick={onDelete}
+        data-testid="delete-snippet-btn"
+      >
         Delete
       </Button>
     </>

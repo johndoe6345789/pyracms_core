@@ -13,9 +13,11 @@ export function useGameDepPages(type: GameDepType) {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    api.get(`/api/gamedep/${type}?limit=100`)
-      .then((r) => setItems(
-        Array.isArray(r.data) ? r.data.map(mapListItem) : []))
+    api
+      .get(`/api/gamedep/${type}?limit=100`)
+      .then((r) =>
+        setItems(Array.isArray(r.data) ? r.data.map(mapListItem) : []),
+      )
       .catch(() => setError('Could not load the list.'))
       .finally(() => setLoading(false))
   }, [type])

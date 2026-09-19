@@ -4,11 +4,7 @@ import { Box, Button, ButtonGroup } from '@mui/material'
 import { BUTTONS } from './bbcodeButtons'
 
 interface BBCodeToolbarProps {
-  onInsertTag: (
-    tag: string,
-    hasAttr?: boolean,
-    attrPrompt?: string
-  ) => void
+  onInsertTag: (tag: string, hasAttr?: boolean, attrPrompt?: string) => void
 }
 
 const barSx = {
@@ -23,22 +19,14 @@ const barSx = {
   flexWrap: 'wrap',
 }
 
-export function BBCodeToolbar(
-  { onInsertTag }: BBCodeToolbarProps
-) {
+export function BBCodeToolbar({ onInsertTag }: BBCodeToolbarProps) {
   return (
-    <Box
-      sx={barSx}
-      role="toolbar"
-      aria-label="BBCode formatting toolbar"
-    >
+    <Box sx={barSx} role="toolbar" aria-label="BBCode formatting toolbar">
       <ButtonGroup variant="outlined" size="small">
         {BUTTONS.map((btn) => (
           <Button
             key={btn.tag}
-            onClick={() => onInsertTag(
-              btn.tag, btn.hasAttr, btn.attrPrompt
-            )}
+            onClick={() => onInsertTag(btn.tag, btn.hasAttr, btn.attrPrompt)}
             title={btn.label}
             aria-label={btn.label}
             data-testid={`bbcode-${btn.tag}`}

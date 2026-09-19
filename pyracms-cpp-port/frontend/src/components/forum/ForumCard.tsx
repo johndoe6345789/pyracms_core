@@ -1,7 +1,11 @@
 'use client'
 
 import {
-  Card, CardActionArea, CardContent, Typography, Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  Typography,
+  Box,
 } from '@mui/material'
 import { ForumOutlined } from '@mui/icons-material'
 import Link from 'next/link'
@@ -15,9 +19,7 @@ interface ForumCardProps {
   isLast: boolean
 }
 
-export function ForumCard(
-  { forum, slug, isFirst, isLast }: ForumCardProps,
-) {
+export function ForumCard({ forum, slug, isFirst, isLast }: ForumCardProps) {
   return (
     <Card
       variant="outlined"

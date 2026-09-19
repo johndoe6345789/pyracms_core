@@ -3,8 +3,8 @@ import { loginAsAdmin } from '../support/portal-auth-helpers-1'
 
 test.describe('Admin redirect — /admin', () => {
   test(
-    'authenticated admin visiting /admin is redirected '
-    + 'to a tenant admin dashboard or shown no-tenant error',
+    'authenticated admin visiting /admin is redirected ' +
+      'to a tenant admin dashboard or shown no-tenant error',
     async ({ page }) => {
       await loginAsAdmin(page)
       await page.goto('/admin')
@@ -17,12 +17,11 @@ test.describe('Admin redirect — /admin', () => {
         page.url().includes('/admin') ||
         page.url().match(/\/site\/[^/]+\/admin/)
 
-      const noTenantText =
-        page.getByText(/No tenants found/i)
+      const noTenantText = page.getByText(/No tenants found/i)
       const adminDashboard = page.locator(
-        '[data-testid*="admin-dashboard"],'
-        + '[data-testid*="admin-panel"],'
-        + '[data-testid*="admin-layout"]',
+        '[data-testid*="admin-dashboard"],' +
+          '[data-testid*="admin-panel"],' +
+          '[data-testid*="admin-layout"]',
       )
 
       if (onAdminRoute) {
@@ -43,17 +42,14 @@ test.describe('Admin redirect — /admin', () => {
   )
 
   test(
-    'authenticated admin: /admin does not display the '
-    + 'login form',
+    'authenticated admin: /admin does not display the ' + 'login form',
     async ({ page }) => {
       await loginAsAdmin(page)
       await page.goto('/admin')
       await page.waitForLoadState('networkidle')
 
       // After successful auth the login form must not appear.
-      await expect(
-        page.getByTestId('login-submit'),
-      ).not.toBeVisible()
+      await expect(page.getByTestId('login-submit')).not.toBeVisible()
     },
   )
 })

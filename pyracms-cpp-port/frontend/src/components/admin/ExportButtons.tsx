@@ -15,7 +15,9 @@ export default function ExportButtons({
 }: ExportButtonsProps) {
   return (
     <>
-      <Typography variant="h4" sx={{ mb: 3 }}>Export</Typography>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Export
+      </Typography>
       <Grid container spacing={3} sx={{ mb: 5 }}>
         <ExportCard
           icon={<SettingsOutlined sx={ICON_SX} />}

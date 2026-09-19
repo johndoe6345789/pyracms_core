@@ -21,13 +21,15 @@ beforeEach(() => {
 
 describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
   it('maps isAdmin=true to SiteAdmin when role is undefined', async () => {
-    const raw = [{
-      id: 20,
-      username: 'admin',
-      email: 'a@x.com',
-      isAdmin: true,
-      isActive: true,
-    }]
+    const raw = [
+      {
+        id: 20,
+        username: 'admin',
+        email: 'a@x.com',
+        isAdmin: true,
+        isActive: true,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 
@@ -38,13 +40,15 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
   })
 
   it('maps isAdmin=false to User when role is undefined', async () => {
-    const raw = [{
-      id: 21,
-      username: 'plain',
-      email: 'p@x.com',
-      isAdmin: false,
-      isActive: true,
-    }]
+    const raw = [
+      {
+        id: 21,
+        username: 'plain',
+        email: 'p@x.com',
+        isAdmin: false,
+        isActive: true,
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 
@@ -53,5 +57,4 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
     expect(result.current.users[0]!.role).toBe(UserRole.User)
     expect(result.current.users[0]!.roleLabel).toBe('Normal User')
   })
-
 })

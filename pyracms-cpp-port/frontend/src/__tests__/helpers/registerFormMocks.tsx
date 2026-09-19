@@ -48,9 +48,7 @@ export function resetRegisterMocks() {
 }
 
 /** Overrides the useRegister return value. */
-export function mockState(
-  overrides: Partial<MockUseRegisterReturn>,
-) {
+export function mockState(overrides: Partial<MockUseRegisterReturn>) {
   mockUseRegister.mockReturnValue({ ...defaultReturn, ...overrides })
 }
 

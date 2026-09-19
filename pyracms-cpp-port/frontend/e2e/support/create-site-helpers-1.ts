@@ -32,5 +32,7 @@ export async function waitForNoSpinner(page: Page): Promise<void> {
   await page
     .locator('[aria-label="Loading tenants"]')
     .waitFor({ state: 'detached', timeout: 10_000 })
-    .catch(() => { /* already gone */ })
+    .catch(() => {
+      /* already gone */
+    })
 }

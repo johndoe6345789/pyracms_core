@@ -16,8 +16,11 @@ export function PostDeleteDialog({ open, onClose, onConfirm }: Props) {
         <Button onClick={onClose} data-testid="post-delete-cancel-btn">
           Cancel
         </Button>
-        <Button color="error" onClick={onConfirm}
-          data-testid="post-delete-confirm-btn">
+        <Button
+          color="error"
+          onClick={onConfirm}
+          data-testid="post-delete-confirm-btn"
+        >
           Delete
         </Button>
       </DialogActions>

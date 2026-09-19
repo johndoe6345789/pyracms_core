@@ -16,9 +16,7 @@ describe('RoleSelectCell', () => {
 
   it('data-testid includes the username', () => {
     renderCell({ username: 'carol' })
-    expect(
-      screen.getByTestId('role-select-carol'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('role-select-carol')).toBeInTheDocument()
   })
 
   it('aria-label includes the username', () => {
@@ -26,10 +24,7 @@ describe('RoleSelectCell', () => {
     const input = screen.getByRole('combobox', {
       hidden: true,
     })
-    expect(input).toHaveAttribute(
-      'aria-label',
-      'Role for dave',
-    )
+    expect(input).toHaveAttribute('aria-label', 'Role for dave')
   })
 
   it('shows Guest label when role is Guest', () => {

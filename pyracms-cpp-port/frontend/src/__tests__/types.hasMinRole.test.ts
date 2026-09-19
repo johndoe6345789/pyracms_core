@@ -38,8 +38,11 @@ describe('hasMinRole', () => {
   it('returns true for SuperAdmin against every role level', () => {
     const user = makeUser({ role: UserRole.SuperAdmin })
     const allRoles: UserRole[] = [
-      UserRole.Guest, UserRole.User, UserRole.Moderator,
-      UserRole.SiteAdmin, UserRole.SuperAdmin,
+      UserRole.Guest,
+      UserRole.User,
+      UserRole.Moderator,
+      UserRole.SiteAdmin,
+      UserRole.SuperAdmin,
     ]
     allRoles.forEach((role) => {
       expect(hasMinRole(user, role)).toBe(true)
@@ -49,8 +52,10 @@ describe('hasMinRole', () => {
   it('returns false for Guest user against every role above Guest', () => {
     const user = makeUser({ role: UserRole.Guest })
     const rolesAboveGuest: UserRole[] = [
-      UserRole.User, UserRole.Moderator,
-      UserRole.SiteAdmin, UserRole.SuperAdmin,
+      UserRole.User,
+      UserRole.Moderator,
+      UserRole.SiteAdmin,
+      UserRole.SuperAdmin,
     ]
     rolesAboveGuest.forEach((role) => {
       expect(hasMinRole(user, role)).toBe(false)

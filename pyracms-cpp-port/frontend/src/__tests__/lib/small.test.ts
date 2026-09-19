@@ -6,15 +6,16 @@ import { parseTurbologin } from '@/lib/turbologin'
 
 describe('apiErrorMessage', () => {
   it('uses the server error, then the fallback', () => {
-    expect(apiErrorMessage(
-      { response: { data: { error: 'nope' } } }, 'fb')).toBe('nope')
+    expect(
+      apiErrorMessage({ response: { data: { error: 'nope' } } }, 'fb'),
+    ).toBe('nope')
     expect(apiErrorMessage({ response: {} }, 'fb')).toBe('fb')
   })
   it('reports connectivity problems', () => {
-    expect(apiErrorMessage(new Error('x'), 'fb'))
-      .toBe('Unable to connect to server')
-    expect(apiErrorMessage(null, 'fb'))
-      .toBe('Unable to connect to server')
+    expect(apiErrorMessage(new Error('x'), 'fb')).toBe(
+      'Unable to connect to server',
+    )
+    expect(apiErrorMessage(null, 'fb')).toBe('Unable to connect to server')
   })
 })
 
@@ -51,8 +52,11 @@ describe('launcherStore', () => {
   it('survives corrupt or unavailable storage', () => {
     localStorage.setItem('pyracms.launcher.installed', '{bad')
     expect(installedStore.get()).toEqual({})
-    const spy = jest.spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => { throw new Error('full') })
+    const spy = jest
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('full')
+      })
     expect(() => installedStore.set('a', '1')).not.toThrow()
     spy.mockRestore()
   })
@@ -65,7 +69,10 @@ describe('parseTurbologin', () => {
     expect(parseTurbologin('{"user":"u"}')).toMatchObject({ ok: false })
   })
   it('accepts a valid login', () => {
-    expect(parseTurbologin('{"user":"u","pass":"p"}'))
-      .toEqual({ ok: true, user: 'u', pass: 'p' })
+    expect(parseTurbologin('{"user":"u","pass":"p"}')).toEqual({
+      ok: true,
+      user: 'u',
+      pass: 'p',
+    })
   })
 })

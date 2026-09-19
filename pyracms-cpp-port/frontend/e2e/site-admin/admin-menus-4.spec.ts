@@ -15,60 +15,38 @@ test.describe('Admin Menus', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'create-group dialog submit button is disabled when empty',
-    async ({ page }) => {
-      await page
-        .getByRole('button', {
-          name: /new menu group/i,
-        })
-        .click()
-      await expect(
-        page.getByTestId('submit-group-btn'),
-      ).toBeDisabled()
-    },
-  )
+  test('create-group dialog submit button is disabled when empty', async ({
+    page,
+  }) => {
+    await page
+      .getByRole('button', {
+        name: /new menu group/i,
+      })
+      .click()
+    await expect(page.getByTestId('submit-group-btn')).toBeDisabled()
+  })
 
-  test(
-    'create-group submit enables when name typed',
-    async ({ page }) => {
-      await page
-        .getByRole('button', {
-          name: /new menu group/i,
-        })
-        .click()
-      await page
-        .getByTestId('group-name-input')
-        .fill('footer')
-      await expect(
-        page.getByTestId('submit-group-btn'),
-      ).toBeEnabled()
-    },
-  )
+  test('create-group submit enables when name typed', async ({ page }) => {
+    await page
+      .getByRole('button', {
+        name: /new menu group/i,
+      })
+      .click()
+    await page.getByTestId('group-name-input').fill('footer')
+    await expect(page.getByTestId('submit-group-btn')).toBeEnabled()
+  })
 
-  test(
-    'cancel button in create-group dialog closes it',
-    async ({ page }) => {
-      await page
-        .getByRole('button', {
-          name: /new menu group/i,
-        })
-        .click()
-      await page
-        .getByTestId('cancel-group-btn')
-        .click()
-      await expect(
-        page.getByTestId('create-group-dialog'),
-      ).not.toBeVisible()
-    },
-  )
+  test('cancel button in create-group dialog closes it', async ({ page }) => {
+    await page
+      .getByRole('button', {
+        name: /new menu group/i,
+      })
+      .click()
+    await page.getByTestId('cancel-group-btn').click()
+    await expect(page.getByTestId('create-group-dialog')).not.toBeVisible()
+  })
 
-  test(
-    'mocked menu item row is visible in table',
-    async ({ page }) => {
-      await expect(
-        page.getByText('Main Nav'),
-      ).toBeVisible()
-    },
-  )
+  test('mocked menu item row is visible in table', async ({ page }) => {
+    await expect(page.getByText('Main Nav')).toBeVisible()
+  })
 })

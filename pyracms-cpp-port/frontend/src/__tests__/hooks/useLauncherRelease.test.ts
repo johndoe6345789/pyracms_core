@@ -23,7 +23,11 @@ describe('useLauncherRelease', () => {
 
   it('ignores a late answer after unmount', async () => {
     let done: (v: null) => void = () => {}
-    fetchMock.mockReturnValue(new Promise((r) => { done = r }))
+    fetchMock.mockReturnValue(
+      new Promise((r) => {
+        done = r
+      }),
+    )
     const { unmount, result } = renderHook(() => useLauncherRelease())
     unmount()
     done(null)

@@ -13,8 +13,14 @@ const m = asMockApi<'get'>(api)
 
 function Host() {
   const [v, setV] = useState('')
-  return <MentionTextField value={v} onValue={setV} multiline
-    inputProps={{ 'data-testid': 'box' }} />
+  return (
+    <MentionTextField
+      value={v}
+      onValue={setV}
+      multiline
+      inputProps={{ 'data-testid': 'box' }}
+    />
+  )
 }
 
 it('inserts the mention over the partial name', () => {
@@ -30,7 +36,9 @@ it('suggests users and inserts the picked one', async () => {
   fireEvent.change(box, { target: { value: 'hey @al', selectionStart: 7 } })
   box.setSelectionRange(7, 7)
   fireEvent.input(box)
-  await act(async () => { jest.advanceTimersByTime(250) })
+  await act(async () => {
+    jest.advanceTimersByTime(250)
+  })
   fireEvent.click(await screen.findByTestId('mention-item-1'))
   expect(box.value).toBe('hey @alice ')
   jest.useRealTimers()

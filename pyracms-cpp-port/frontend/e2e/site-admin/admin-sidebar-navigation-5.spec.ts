@@ -12,32 +12,21 @@ test.describe('Admin sidebar navigation', () => {
     await goToAdmin(page)
   })
 
-  test(
-    '"Back to Site" link is visible in sidebar',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-back-to-site'),
-      ).toBeVisible()
-    },
-  )
+  test('"Back to Site" link is visible in sidebar', async ({ page }) => {
+    await expect(page.getByTestId('admin-back-to-site')).toBeVisible()
+  })
 
-  test(
-    '"Back to Site" link text reads "Back to Site"',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-back-to-site'),
-      ).toContainText('Back to Site')
-    },
-  )
+  test('"Back to Site" link text reads "Back to Site"', async ({ page }) => {
+    await expect(page.getByTestId('admin-back-to-site')).toContainText(
+      'Back to Site',
+    )
+  })
 
-  test(
-    'secondary navigation has aria-label',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('navigation', {
-          name: /admin secondary navigation/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('secondary navigation has aria-label', async ({ page }) => {
+    await expect(
+      page.getByRole('navigation', {
+        name: /admin secondary navigation/i,
+      }),
+    ).toBeVisible()
+  })
 })

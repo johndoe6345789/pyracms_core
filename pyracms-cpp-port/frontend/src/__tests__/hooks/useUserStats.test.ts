@@ -8,12 +8,20 @@ jest.mock('@/lib/api', () => ({
   default: { get: jest.fn() },
 }))
 const m = asMockApi<'get'>(api)
-beforeEach(() => { m.get.mockReset(); clearUserStatsCache() })
+beforeEach(() => {
+  m.get.mockReset()
+  clearUserStatsCache()
+})
 
 it('fetches stats once per author', async () => {
-  m.get.mockResolvedValue({ data: {
-    postCount: 4, threadCount: 1, joinedAt: '2020-01-02T03:04', reputation: 9,
-  } })
+  m.get.mockResolvedValue({
+    data: {
+      postCount: 4,
+      threadCount: 1,
+      joinedAt: '2020-01-02T03:04',
+      reputation: 9,
+    },
+  })
   const a = renderHook(() => useUserStats(5, 2))
   const b = renderHook(() => useUserStats(5, 2))
   await waitFor(() => expect(a.result.current?.postCount).toBe(4))

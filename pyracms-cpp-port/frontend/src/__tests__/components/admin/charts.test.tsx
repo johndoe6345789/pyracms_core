@@ -3,7 +3,8 @@ import { PageViewChart } from '@/components/admin/charts/PageViewChart'
 import { TopContentChart } from '@/components/admin/charts/TopContentChart'
 import { TrafficPieChart } from '@/components/admin/charts/TrafficPieChart'
 import {
-  ReferrersTable, SearchesTable,
+  ReferrersTable,
+  SearchesTable,
 } from '@/components/admin/analytics/AnalyticsTables'
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
@@ -23,7 +24,12 @@ it('PageViewChart switches ranges', () => {
 })
 
 it('analytics tables render rows', () => {
-  render(<><ReferrersTable /><SearchesTable /></>)
+  render(
+    <>
+      <ReferrersTable />
+      <SearchesTable />
+    </>,
+  )
   expect(screen.getByText('Google Search')).toBeInTheDocument()
   expect(screen.getByText('react hooks')).toBeInTheDocument()
 })

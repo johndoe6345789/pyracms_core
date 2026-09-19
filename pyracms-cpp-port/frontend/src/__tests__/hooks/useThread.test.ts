@@ -5,8 +5,12 @@ import { asMockApi } from '../helpers/mockApi'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(),
-    delete: jest.fn() },
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  },
 }))
 jest.mock('@/hooks/useForumUser', () => ({
   useForumUser: () => ({ userId: 1, isModerator: false }),
@@ -14,9 +18,17 @@ jest.mock('@/hooks/useForumUser', () => ({
 const mock = asMockApi<'get' | 'post' | 'put' | 'delete'>(api)
 
 const data = {
-  name: 'T', description: 'D', forumId: 3, forumName: 'F',
-  pinned: false, locked: true, viewCount: 9,
-  posts: [{ id: 1, userId: 1, content: 'a' }, { id: 2, userId: 2 }],
+  name: 'T',
+  description: 'D',
+  forumId: 3,
+  forumName: 'F',
+  pinned: false,
+  locked: true,
+  viewCount: 9,
+  posts: [
+    { id: 1, userId: 1, content: 'a' },
+    { id: 2, userId: 2 },
+  ],
 }
 
 async function setup() {
@@ -37,7 +49,10 @@ it('loads and maps the thread', async () => {
   const { result } = await setup()
   expect(mock.get).toHaveBeenCalledWith('/api/forum/threads/10?tenant_id=4')
   expect(result.current.thread).toMatchObject({
-    title: 'T', forumId: '3', locked: true, views: 9,
+    title: 'T',
+    forumId: '3',
+    locked: true,
+    views: 9,
   })
   expect(result.current.posts.map((p) => p.isOwner)).toEqual([true, false])
   expect(result.current.posts[1]!.author).toBe('Unknown')

@@ -11,67 +11,46 @@ test.describe('Tenant management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'no-match empty state shows "No tenants found."',
-    async ({ page }) => {
-      await page.route('**/api/tenants', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_TENANTS),
-        }),
-      )
+  test('no-match empty state shows "No tenants found."', async ({ page }) => {
+    await page.route('**/api/tenants', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_TENANTS),
+      }),
+    )
 
-      await page.goto('/super-admin/tenants')
-      await page
-        .getByTestId('super-admin-tenants-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForTenantsLoaded(page)
+    await page.goto('/super-admin/tenants')
+    await page
+      .getByTestId('super-admin-tenants-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForTenantsLoaded(page)
 
-      const filterInput = page.getByTestId(
-        'tenant-filter-input',
-      )
-      await filterInput.fill('__no_match__')
-      await expect(
-        page.getByText('No tenants found.'),
-      ).toBeVisible()
-    },
-  )
+    const filterInput = page.getByTestId('tenant-filter-input')
+    await filterInput.fill('__no_match__')
+    await expect(page.getByText('No tenants found.')).toBeVisible()
+  })
 
-  test(
-    'confirm delete removes tenant from the list',
-    async ({ page }) => {
-      await waitForTenantsLoaded(page)
+  test('confirm delete removes tenant from the list', async ({ page }) => {
+    await waitForTenantsLoaded(page)
 
-      const deleteButtons = page.locator(
-        '[data-testid^="delete-tenant-"]',
-      )
-      const count = await deleteButtons.count()
+    const deleteButtons = page.locator('[data-testid^="delete-tenant-"]')
+    const count = await deleteButtons.count()
 
-      if (count === 0) {
-        test.skip()
-        return
-      }
+    if (count === 0) {
+      test.skip()
+      return
+    }
 
-      const firstRow = page
-        .locator('[data-testid^="tenant-row-"]')
-        .first()
-      const testId =
-        (await firstRow.getAttribute('data-testid')) ?? ''
-      const slug = testId.replace('tenant-row-', '')
+    const firstRow = page.locator('[data-testid^="tenant-row-"]').first()
+    const testId = (await firstRow.getAttribute('data-testid')) ?? ''
+    const slug = testId.replace('tenant-row-', '')
 
-      await deleteButtons.first().click()
-      await page
-        .getByTestId('confirm-delete-tenant')
-        .click()
+    await deleteButtons.first().click()
+    await page.getByTestId('confirm-delete-tenant').click()
 
-      // Dialog closes and the row disappears
-      await expect(
-        page.getByTestId('tenant-delete-dialog'),
-      ).not.toBeVisible()
-      await expect(
-        page.getByTestId(`tenant-row-${slug}`),
-      ).not.toBeVisible()
-    },
-  )
+    // Dialog closes and the row disappears
+    await expect(page.getByTestId('tenant-delete-dialog')).not.toBeVisible()
+    await expect(page.getByTestId(`tenant-row-${slug}`)).not.toBeVisible()
+  })
 })

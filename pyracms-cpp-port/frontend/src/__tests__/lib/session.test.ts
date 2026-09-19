@@ -1,5 +1,9 @@
 import {
-  scopeFromPath, setToken, getToken, clearToken, currentToken,
+  scopeFromPath,
+  setToken,
+  getToken,
+  clearToken,
+  currentToken,
   replaceToken,
 } from '@/lib/session'
 
@@ -55,8 +59,11 @@ describe('session helpers', () => {
   })
 
   it('returns null when storage throws', () => {
-    const spy = jest.spyOn(Storage.prototype, 'getItem')
-      .mockImplementation(() => { throw new Error('x') })
+    const spy = jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation(() => {
+        throw new Error('x')
+      })
     expect(getToken('a')).toBeNull()
     spy.mockRestore()
   })

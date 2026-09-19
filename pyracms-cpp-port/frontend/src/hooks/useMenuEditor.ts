@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { SelectChangeEvent } from '@mui/material'
-import {
-  MenuGroup, MenuItemRow, fetchMenuGroups,
-} from './admin/menuData'
+import { MenuGroup, MenuItemRow, fetchMenuGroups } from './admin/menuData'
 import { useMenuItemEdit } from './admin/useMenuItemEdit'
 import { useMenuAddItem } from './admin/useMenuAddItem'
 import { useMenuGroupCreate } from './admin/useMenuGroupCreate'
@@ -35,16 +33,15 @@ export function useMenuEditor(tenantId: number | null) {
       .finally(() => setLoading(false))
   }, [tenantId])
 
-  const currentGroup = menuGroups.find(
-    (g) => g.name === selectedGroup,
-  )
+  const currentGroup = menuGroups.find((g) => g.name === selectedGroup)
   const currentItems = currentGroup?.items ?? []
   const edit = useMenuItemEdit(selectedGroup, setMenuGroups)
-  const add = useMenuAddItem(
-    currentGroup, selectedGroup, setMenuGroups,
-  )
+  const add = useMenuAddItem(currentGroup, selectedGroup, setMenuGroups)
   const create = useMenuGroupCreate(
-    tenantId, menuGroups, setMenuGroups, setSelectedGroup,
+    tenantId,
+    menuGroups,
+    setMenuGroups,
+    setSelectedGroup,
   )
 
   const handleGroupChange = (e: SelectChangeEvent) => {
@@ -53,9 +50,14 @@ export function useMenuEditor(tenantId: number | null) {
   }
 
   return {
-    menuGroups, loading, selectedGroup, currentItems,
+    menuGroups,
+    loading,
+    selectedGroup,
+    currentItems,
     handleGroupChange,
     error: edit.editError || add.addError || create.groupError,
-    ...edit, ...add, ...create,
+    ...edit,
+    ...add,
+    ...create,
   }
 }

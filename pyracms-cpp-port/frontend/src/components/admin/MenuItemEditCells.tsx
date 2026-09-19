@@ -1,11 +1,13 @@
 import {
-  TableCell, TextField, FormControl, Select, MenuItem,
+  TableCell,
+  TextField,
+  FormControl,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 
-type Updater = (
-  fn: (p: MenuItemRow | null) => MenuItemRow | null
-) => void
+type Updater = (fn: (p: MenuItemRow | null) => MenuItemRow | null) => void
 
 interface Props {
   editRow: MenuItemRow | null
@@ -14,9 +16,7 @@ interface Props {
 
 const PERMS = ['public', 'authenticated', 'admin']
 
-export default function MenuItemEditCells({
-  editRow, onEditRowChange,
-}: Props) {
+export default function MenuItemEditCells({ editRow, onEditRowChange }: Props) {
   const set = (patch: Partial<MenuItemRow>) =>
     onEditRowChange((p) => (p ? { ...p, ...patch } : p))
   return (
@@ -41,13 +41,16 @@ export default function MenuItemEditCells({
       </TableCell>
       <TableCell>
         <TextField
-          size="small" type="number"
+          size="small"
+          type="number"
           value={editRow?.position ?? 0}
           sx={{ width: 80 }}
           data-testid="position-input"
-          onChange={(e) => set({
-            position: parseInt(e.target.value, 10) || 0,
-          })}
+          onChange={(e) =>
+            set({
+              position: parseInt(e.target.value, 10) || 0,
+            })
+          }
         />
       </TableCell>
       <TableCell>
@@ -55,11 +58,12 @@ export default function MenuItemEditCells({
           <Select
             value={editRow?.permissions ?? 'public'}
             data-testid="perms-select"
-            onChange={(e) =>
-              set({ permissions: e.target.value })}
+            onChange={(e) => set({ permissions: e.target.value })}
           >
             {PERMS.map((v) => (
-              <MenuItem key={v} value={v}>{v}</MenuItem>
+              <MenuItem key={v} value={v}>
+                {v}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>

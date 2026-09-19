@@ -39,9 +39,7 @@ export default function UserActions({
           size="small"
           color={banned ? 'success' : 'warning'}
           onClick={() => onToggleBan(id)}
-          aria-label={
-            banned ? `Unban ${username}` : `Ban ${username}`
-          }
+          aria-label={banned ? `Unban ${username}` : `Ban ${username}`}
           data-testid={`ban-user-${id}`}
         >
           {banned ? (

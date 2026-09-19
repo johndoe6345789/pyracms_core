@@ -30,10 +30,15 @@ export function UserHeader({ user }: { user: UserProfile }) {
           {user.username[0]?.toUpperCase()}
         </Avatar>
         <Box sx={{ flex: 1 }}>
-          <Box sx={{
-            display: 'flex', alignItems: 'center', gap: 2, mb: 1,
-            flexWrap: 'wrap',
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              mb: 1,
+              flexWrap: 'wrap',
+            }}
+          >
             <Typography variant="h4" fontWeight={700}>
               {user.username}
             </Typography>
@@ -47,13 +52,15 @@ export function UserHeader({ user }: { user: UserProfile }) {
           )}
           <ProfileInfo
             {...(user.website ? { website: user.website } : {})}
-            joinDate={user.createdAt.split('T')[0] ?? ''} />
-          <ProfileStats postCount={user.postCount}
-            reputation={user.reputation} />
+            joinDate={user.createdAt.split('T')[0] ?? ''}
+          />
+          <ProfileStats
+            postCount={user.postCount}
+            reputation={user.reputation}
+          />
         </Box>
       </Box>
-      <ProfileBadges
-        badges={[{ label: level.name, color: level.color }]} />
+      <ProfileBadges badges={[{ label: level.name, color: level.color }]} />
     </Paper>
   )
 }

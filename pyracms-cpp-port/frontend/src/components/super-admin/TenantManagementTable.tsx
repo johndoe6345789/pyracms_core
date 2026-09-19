@@ -2,9 +2,16 @@
 
 import { useState } from 'react'
 import {
-  Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow,
-  Paper, Typography, Box, CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+  CircularProgress,
 } from '@mui/material'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import TenantTableRow from './TenantTableRow'
@@ -14,8 +21,13 @@ import { ErrorAlert } from '../common/ErrorAlert'
 
 export default function TenantManagementTable() {
   const {
-    tenants, loading, confirmDeleteId,
-    handleDelete, confirmDelete, cancelDelete, deleteError,
+    tenants,
+    loading,
+    confirmDeleteId,
+    handleDelete,
+    confirmDelete,
+    cancelDelete,
+    deleteError,
   } = useSuperAdminTenants()
 
   const [filter, setFilter] = useState('')
@@ -64,8 +76,7 @@ export default function TenantManagementTable() {
               </TableRow>
             )}
             {visible.map((t) => (
-              <TenantTableRow key={t.id} tenant={t}
-                onDelete={handleDelete} />
+              <TenantTableRow key={t.id} tenant={t} onDelete={handleDelete} />
             ))}
           </TableBody>
         </Table>

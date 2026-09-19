@@ -53,11 +53,7 @@ describe('validateRegisterForm', () => {
   })
 
   it('accepts optional firstName / lastName being absent', () => {
-    const {
-      firstName: _f,
-      lastName: _l,
-      ...minimal
-    } = VALID_FORM
+    const { firstName: _f, lastName: _l, ...minimal } = VALID_FORM
     expect(validateRegisterForm(minimal)).toBe('')
   })
 })

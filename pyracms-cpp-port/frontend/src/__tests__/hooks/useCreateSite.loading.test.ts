@@ -23,7 +23,9 @@ describe('loading flag', () => {
   it('is true while the request is in-flight', async () => {
     let resolvePost!: (v: unknown) => void
     mockPost.mockReturnValueOnce(
-      new Promise((res) => { resolvePost = res }),
+      new Promise((res) => {
+        resolvePost = res
+      }),
     )
 
     const { result } = renderHook(() => useCreateSite())
@@ -36,7 +38,9 @@ describe('loading flag', () => {
     expect(result.current.loading).toBe(true)
 
     // Now resolve the promise and wait for state to settle
-    await act(async () => { resolvePost({ data: {} }) })
+    await act(async () => {
+      resolvePost({ data: {} })
+    })
 
     expect(result.current.loading).toBe(false)
   })

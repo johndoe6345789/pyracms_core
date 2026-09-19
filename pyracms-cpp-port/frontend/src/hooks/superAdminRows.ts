@@ -22,7 +22,7 @@ export interface GlobalUserRow {
 type Raw = Record<string, unknown>
 
 const day = (v: unknown): string =>
-  typeof v === 'string' ? v.split('T')[0] ?? '' : ''
+  typeof v === 'string' ? (v.split('T')[0] ?? '') : ''
 
 /** Maps an API tenant record to a table row. */
 export function mapTenantRow(t: Raw): TenantRow {
@@ -52,8 +52,7 @@ export function mapUserRow(u: Raw): GlobalUserRow {
     role,
     roleLabel: USER_ROLE_LABELS[role],
     // The API reports `banned` (admins only); older shapes used isActive
-    isActive: u.banned !== undefined
-      ? !u.banned : Boolean(u.isActive ?? true),
+    isActive: u.banned !== undefined ? !u.banned : Boolean(u.isActive ?? true),
     createdAt: day(u.createdAt),
   }
 }

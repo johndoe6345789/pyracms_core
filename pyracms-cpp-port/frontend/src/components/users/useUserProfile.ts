@@ -6,7 +6,10 @@ type Row = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => (typeof v === 'number' ? v : 0)
 const opt = (url: string): Promise<Row> =>
-  api.get(url).then((r) => (r.data ?? {}) as Row).catch(() => ({}))
+  api
+    .get(url)
+    .then((r) => (r.data ?? {}) as Row)
+    .catch(() => ({}))
 
 /** Merge the list row, the full user record and the reputation totals. */
 export function mapProfile(d: Row, det: Row, rep: Row): UserProfile {
@@ -31,9 +34,11 @@ export function useUserProfile(username: string) {
     const fetchUser = async () => {
       try {
         const res = await api.get(
-          `/api/users?username=${encodeURIComponent(username)}`)
+          `/api/users?username=${encodeURIComponent(username)}`,
+        )
         const d: Row | undefined = Array.isArray(res.data)
-          ? res.data[0] : undefined
+          ? res.data[0]
+          : undefined
         if (d) {
           const [det, rep] = await Promise.all([
             opt(`/api/users/${num(d.id)}`),
@@ -41,7 +46,9 @@ export function useUserProfile(username: string) {
           ])
           setUser(mapProfile(d, det, rep))
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       setLoading(false)
     }
     fetchUser()

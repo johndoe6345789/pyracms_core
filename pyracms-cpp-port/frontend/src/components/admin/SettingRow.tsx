@@ -1,11 +1,6 @@
-import {
-  TableRow, TableCell,
-  TextField, Typography,
-} from '@mui/material'
+import { TableRow, TableCell, TextField, Typography } from '@mui/material'
 import { Setting } from '@/hooks/useAdminSettings'
-import {
-  SettingEditActions, SettingViewActions,
-} from './SettingRowActions'
+import { SettingEditActions, SettingViewActions } from './SettingRowActions'
 
 interface SettingRowProps {
   setting: Setting
@@ -19,16 +14,23 @@ interface SettingRowProps {
 }
 
 export default function SettingRow({
-  setting, isEditing, editValue,
-  onEditValueChange, onStartEdit,
-  onSaveEdit, onCancelEdit, onDelete,
+  setting,
+  isEditing,
+  editValue,
+  onEditValueChange,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete,
 }: SettingRowProps) {
   return (
     <TableRow hover>
-      <TableCell sx={{
-        fontFamily: 'monospace',
-        fontWeight: 600,
-      }}>
+      <TableCell
+        sx={{
+          fontFamily: 'monospace',
+          fontWeight: 600,
+        }}
+      >
         {setting.key}
       </TableCell>
       <TableCell>
@@ -39,22 +41,14 @@ export default function SettingRow({
             autoFocus
             fullWidth
             data-testid="setting-value-input"
-            onChange={(e) =>
-              onEditValueChange(
-                e.target.value,
-              )}
+            onChange={(e) => onEditValueChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter')
-                onSaveEdit(setting.id)
-              if (e.key === 'Escape')
-                onCancelEdit()
+              if (e.key === 'Enter') onSaveEdit(setting.id)
+              if (e.key === 'Escape') onCancelEdit()
             }}
           />
         ) : (
-          <Typography
-            variant="body1"
-            sx={{ fontFamily: 'monospace' }}
-          >
+          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
             {setting.value}
           </Typography>
         )}
@@ -62,16 +56,13 @@ export default function SettingRow({
       <TableCell align="right">
         {isEditing ? (
           <SettingEditActions
-            onSave={() =>
-              onSaveEdit(setting.id)}
+            onSave={() => onSaveEdit(setting.id)}
             onCancel={onCancelEdit}
           />
         ) : (
           <SettingViewActions
-            onEdit={() =>
-              onStartEdit(setting)}
-            onDelete={() =>
-              onDelete(setting.id)}
+            onEdit={() => onStartEdit(setting)}
+            onDelete={() => onDelete(setting.id)}
           />
         )}
       </TableCell>

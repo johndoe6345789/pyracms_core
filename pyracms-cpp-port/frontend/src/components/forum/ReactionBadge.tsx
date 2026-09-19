@@ -17,15 +17,9 @@ export function ReactionBadge({
   reacted,
   onClick,
 }: ReactionBadgeProps) {
-  const borderColor = reacted
-    ? 'primary.main'
-    : 'divider'
-  const bgColor = reacted
-    ? 'primary.main' + '14'
-    : 'transparent'
-  const countColor = reacted
-    ? 'primary.main'
-    : 'text.secondary'
+  const borderColor = reacted ? 'primary.main' : 'divider'
+  const bgColor = reacted ? 'primary.main' + '14' : 'transparent'
+  const countColor = reacted ? 'primary.main' : 'text.secondary'
 
   return (
     <Tooltip title={label}>
@@ -49,10 +43,7 @@ export function ReactionBadge({
           transition: 'all 0.15s ease',
         }}
       >
-        <Typography
-          variant="body2"
-          component="span"
-        >
+        <Typography variant="body2" component="span">
           {emoji}
         </Typography>
         <Typography

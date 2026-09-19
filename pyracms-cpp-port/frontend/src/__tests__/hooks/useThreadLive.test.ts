@@ -23,7 +23,8 @@ it('subscribes and unsubscribes to the thread', () => {
   expect(send).toHaveBeenCalledWith({ type: 'thread_subscribe', threadId: 5 })
   unmount()
   expect(send).toHaveBeenCalledWith({
-    type: 'thread_unsubscribe', threadId: 5,
+    type: 'thread_unsubscribe',
+    threadId: 5,
   })
 })
 
@@ -43,14 +44,15 @@ it('tracks typing users and clears stale ones', () => {
   act(() => onMessage({ type: 'typing_stop', userId: 2 }))
   expect(result.current.typingUsers).toHaveLength(0)
   act(() => onMessage({ type: 'typing_start', userId: 3 }))
-  act(() => { jest.advanceTimersByTime(8000) })
+  act(() => {
+    jest.advanceTimersByTime(8000)
+  })
   expect(result.current.typingUsers).toHaveLength(0)
 })
 
 it('reports new posts and sends typing events', () => {
   const onNewPost = jest.fn()
-  const { result } = renderHook(() =>
-    useThreadLive({ threadId: 5, onNewPost }))
+  const { result } = renderHook(() => useThreadLive({ threadId: 5, onNewPost }))
   act(() => onMessage({ type: 'new_post', id: 1 }))
   expect(onNewPost).toHaveBeenCalled()
   act(() => onMessage({ type: 'other' }))

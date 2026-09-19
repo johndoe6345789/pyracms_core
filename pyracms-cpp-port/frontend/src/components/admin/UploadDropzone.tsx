@@ -35,23 +35,21 @@ export default function UploadDropzone({
         transition: 'all 0.2s',
       }}
     >
-      <CardContent sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        py: 5,
-      }}>
+      <CardContent
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          py: 5,
+        }}
+      >
         <CloudUploadOutlined
           sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }}
         />
         <Typography variant="h5" sx={{ mb: 1 }}>
           Drag and drop files here
         </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mb: 2 }}
-        >
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           or click the button below to browse
         </Typography>
         <UploadButton onFilesSelected={onFilesSelected} />

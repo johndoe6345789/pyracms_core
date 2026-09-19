@@ -3,8 +3,13 @@ import { PostCard } from '@/components/forum/PostCard'
 import type { Post } from '@/hooks/useThread'
 
 const post: Post = {
-  id: '1', author: 'ann', date: '2024-01-01 10:00', content: 'hello',
-  likes: 2, dislikes: 1, isOwner: true,
+  id: '1',
+  author: 'ann',
+  date: '2024-01-01 10:00',
+  content: 'hello',
+  likes: 2,
+  dislikes: 1,
+  isOwner: true,
 }
 
 it('renders the post and votes', () => {
@@ -41,11 +46,13 @@ it('edits and saves', async () => {
   fireEvent.click(screen.getByTestId('post-edit-btn'))
   fireEvent.change(
     screen.getByTestId('post-edit-input').querySelector('textarea')!,
-    { target: { value: 'changed' } })
+    { target: { value: 'changed' } },
+  )
   fireEvent.click(screen.getByTestId('post-save-btn'))
   expect(onEdit).toHaveBeenCalledWith('1', 'changed')
-  await waitFor(() => expect(screen.queryByTestId('post-edit-input'))
-    .toBeNull())
+  await waitFor(() =>
+    expect(screen.queryByTestId('post-edit-input')).toBeNull(),
+  )
 })
 
 it('cancels editing', () => {

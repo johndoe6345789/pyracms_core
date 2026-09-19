@@ -17,7 +17,9 @@ export function OutputPane({ text, testId, error }: Props) {
       component="pre"
       data-testid={testId}
       sx={{
-        m: 0, px: 3, py: 2,
+        m: 0,
+        px: 3,
+        py: 2,
         bgcolor: error ? '#1c1017' : '#1e293b',
         color: error ? '#fca5a5' : '#e2e8f0',
         fontFamily: FONT,

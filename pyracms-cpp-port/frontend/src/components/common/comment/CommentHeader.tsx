@@ -6,14 +6,9 @@ import { Box, Typography, Link } from '@mui/material'
 import type { Comment } from './types'
 import { timeAgo } from './types'
 
-export default function CommentHeader({
-  comment,
-}: {
-  comment: Comment
-}) {
+export default function CommentHeader({ comment }: { comment: Comment }) {
   const slug = useParams()?.slug as string | undefined
-  const edited =
-    comment.updatedAt !== comment.createdAt
+  const edited = comment.updatedAt !== comment.createdAt
   return (
     <Box
       sx={{
@@ -25,25 +20,24 @@ export default function CommentHeader({
     >
       <Typography variant="body2" fontWeight={600}>
         {slug ? (
-          <Link component={NextLink} color="inherit" underline="hover"
+          <Link
+            component={NextLink}
+            color="inherit"
+            underline="hover"
             href={`/site/${slug}/users/${comment.username}`}
-            data-testid="comment-author-link">
+            data-testid="comment-author-link"
+          >
             {comment.username}
           </Link>
-        ) : comment.username}
+        ) : (
+          comment.username
+        )}
       </Typography>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-      >
+      <Typography variant="caption" color="text.secondary">
         {timeAgo(comment.createdAt)}
       </Typography>
       {edited && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          fontStyle="italic"
-        >
+        <Typography variant="caption" color="text.secondary" fontStyle="italic">
           (edited)
         </Typography>
       )}

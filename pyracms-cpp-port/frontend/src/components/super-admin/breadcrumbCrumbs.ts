@@ -8,8 +8,10 @@ const SEGMENT_LABELS: Record<string, string> = {
 
 /** Capitalise first letter, fall back to the raw slug. */
 function labelFor(segment: string): string {
-  return SEGMENT_LABELS[segment]
-    ?? segment.charAt(0).toUpperCase() + segment.slice(1)
+  return (
+    SEGMENT_LABELS[segment] ??
+    segment.charAt(0).toUpperCase() + segment.slice(1)
+  )
 }
 
 export interface Crumb {

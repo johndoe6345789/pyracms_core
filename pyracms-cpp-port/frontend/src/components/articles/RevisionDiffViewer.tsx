@@ -1,30 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material'
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { RevisionDiffBody, EmptyNote } from './RevisionDiffBody'
-import {
-  RevisionSelect,
-  type DiffRevision,
-} from './RevisionSelect'
+import { RevisionSelect, type DiffRevision } from './RevisionSelect'
 
 interface RevisionDiffViewerProps {
   revisions: DiffRevision[]
 }
 
-export function RevisionDiffViewer(
-  { revisions }: RevisionDiffViewerProps
-) {
+export function RevisionDiffViewer({ revisions }: RevisionDiffViewerProps) {
   const multi = revisions.length > 1
-  const [leftId, setLeftId] = useState(
-    multi ? revisions[0]?.id ?? '' : ''
-  )
+  const [leftId, setLeftId] = useState(multi ? (revisions[0]?.id ?? '') : '')
   const [rightId, setRightId] = useState(
-    multi ? revisions[revisions.length - 1]?.id ?? '' : ''
+    multi ? (revisions[revisions.length - 1]?.id ?? '') : '',
   )
   const [splitView, setSplitView] = useState(true)
 
@@ -60,8 +49,7 @@ export function RevisionDiffViewer(
         <ToggleButtonGroup
           value={splitView ? 'split' : 'unified'}
           exclusive
-          onChange={(_, val) =>
-            val && setSplitView(val === 'split')}
+          onChange={(_, val) => val && setSplitView(val === 'split')}
           size="small"
         >
           <ToggleButton value="split">Side by Side</ToggleButton>
@@ -69,11 +57,7 @@ export function RevisionDiffViewer(
         </ToggleButtonGroup>
       </Box>
 
-      <RevisionDiffBody
-        left={left}
-        right={right}
-        splitView={splitView}
-      />
+      <RevisionDiffBody left={left} right={right} splitView={splitView} />
     </Box>
   )
 }

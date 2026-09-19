@@ -51,7 +51,8 @@ export function useArticle(name: string, tenantId: number | null) {
   useEffect(() => {
     if (!name || !tenantId) return
     setLoading(true)
-    api.get(`/api/articles/${name}?tenant_id=${tenantId}`)
+    api
+      .get(`/api/articles/${name}?tenant_id=${tenantId}`)
       .then((res) => setArticle(mapArticle(res.data)))
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -60,14 +61,21 @@ export function useArticle(name: string, tenantId: number | null) {
   const handleVote = (isLike: boolean) => {
     if (!tenantId) return
     setError('')
-    api.post(`/api/articles/${name}/vote`,
-      { is_like: isLike, tenant_id: tenantId })
+    api
+      .post(`/api/articles/${name}/vote`, {
+        is_like: isLike,
+        tenant_id: tenantId,
+      })
       .then(() => {
-        setArticle((prev) => prev ? {
-          ...prev,
-          likes: prev.likes + (isLike ? 1 : 0),
-          dislikes: prev.dislikes + (isLike ? 0 : 1),
-        } : prev)
+        setArticle((prev) =>
+          prev
+            ? {
+                ...prev,
+                likes: prev.likes + (isLike ? 1 : 0),
+                dislikes: prev.dislikes + (isLike ? 0 : 1),
+              }
+            : prev,
+        )
       })
       .catch(fail('Could not record vote'))
   }

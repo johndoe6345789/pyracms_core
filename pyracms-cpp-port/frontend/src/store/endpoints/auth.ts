@@ -1,7 +1,5 @@
 import type { ApiBuilder } from '../apiBase'
-import type {
-  User, LoginRequest, RegisterRequest, AuthResponse,
-} from '@/types'
+import type { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types'
 
 export const authEndpoints = (builder: ApiBuilder) => ({
   login: builder.mutation<AuthResponse, LoginRequest>({

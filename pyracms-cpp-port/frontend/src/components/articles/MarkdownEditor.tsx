@@ -3,10 +3,7 @@
 import { useState } from 'react'
 import { Box, TextField } from '@mui/material'
 import { EditorToolbar } from './EditorToolbar'
-import {
-  EditorViewToggle,
-  type ViewMode,
-} from './EditorViewToggle'
+import { EditorViewToggle, type ViewMode } from './EditorViewToggle'
 import { EditorPreviewPane } from './EditorPreviewPane'
 import { MarkdownPreview } from './MarkdownPreview'
 import { getMarkdownActions } from './toolbarActions'
@@ -18,9 +15,7 @@ interface MarkdownEditorProps {
   onChange: (v: string) => void
 }
 
-export function MarkdownEditor(
-  { value, onChange }: MarkdownEditorProps
-) {
+export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const { ref, insert } = useTextInsert(value, onChange)
   const [viewMode, setViewMode] = useState<ViewMode>('split')
   const showEd = viewMode !== 'preview'
@@ -29,10 +24,7 @@ export function MarkdownEditor(
   return (
     <section aria-label="Markdown editor">
       <Box sx={frameSx}>
-        <EditorToolbar
-          actions={getMarkdownActions()}
-          onAction={insert}
-        >
+        <EditorToolbar actions={getMarkdownActions()} onAction={insert}>
           <EditorViewToggle
             viewMode={viewMode}
             onViewModeChange={setViewMode}

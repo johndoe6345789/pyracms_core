@@ -10,10 +10,24 @@ jest.mock('@/lib/api', () => ({
 const mock = asMockApi<'get'>(api)
 
 const items = [
-  { id: 1, title: 'Alpha', language: 'python', code: 'x', runCount: 1,
-    authorUsername: 'ann', createdAt: '2024-01-01T00:00:00Z' },
-  { id: 2, title: 'Beta', language: 'go', code: 'y', runCount: 9,
-    authorUsername: 'bob', createdAt: '2024-02-01T00:00:00Z' },
+  {
+    id: 1,
+    title: 'Alpha',
+    language: 'python',
+    code: 'x',
+    runCount: 1,
+    authorUsername: 'ann',
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    title: 'Beta',
+    language: 'go',
+    code: 'y',
+    runCount: 9,
+    authorUsername: 'bob',
+    createdAt: '2024-02-01T00:00:00Z',
+  },
 ]
 
 beforeEach(() => mock.get.mockReset())

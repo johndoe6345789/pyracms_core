@@ -7,12 +7,18 @@ import LanguageSelect from '@/components/common/LanguageSelect'
 describe('ThemeToggle', () => {
   it('dispatches the chosen mode', () => {
     const { store } = makeStore()
-    render(<Provider store={store}><ThemeToggle /></Provider>)
+    render(
+      <Provider store={store}>
+        <ThemeToggle />
+      </Provider>,
+    )
     fireEvent.click(screen.getByTestId('theme-toggle'))
     fireEvent.click(screen.getByTestId('theme-dark'))
     expect(store.getState().ui.colorMode).toBe('dark')
-    expect(screen.getByTestId('theme-toggle'))
-      .toHaveAttribute('aria-label', 'Toggle theme, current: Dark')
+    expect(screen.getByTestId('theme-toggle')).toHaveAttribute(
+      'aria-label',
+      'Toggle theme, current: Dark',
+    )
   })
 })
 
@@ -35,7 +41,9 @@ describe('LanguageSelect', () => {
 
   it('labels the active language using the translated word', () => {
     render(<LanguageSelect />)
-    expect(screen.getByTestId('language-select'))
-      .toHaveAttribute('aria-label', 'Language: English')
+    expect(screen.getByTestId('language-select')).toHaveAttribute(
+      'aria-label',
+      'Language: English',
+    )
   })
 })

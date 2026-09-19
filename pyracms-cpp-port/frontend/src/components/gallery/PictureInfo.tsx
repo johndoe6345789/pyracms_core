@@ -8,15 +8,16 @@ interface PictureInfoProps {
 }
 
 export default function PictureInfo({
-  title, description, tags,
+  title,
+  description,
+  tags,
 }: PictureInfoProps) {
   return (
     <>
       <Typography variant="h3" component="h1" gutterBottom>
         {title}
       </Typography>
-      <Typography variant="body1" color="text.secondary"
-        sx={{ mb: 3 }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {description}
       </Typography>
       <Box sx={{ mb: 3 }}>

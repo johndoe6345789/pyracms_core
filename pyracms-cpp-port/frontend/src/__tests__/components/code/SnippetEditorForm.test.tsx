@@ -15,24 +15,39 @@ jest.mock('@/lib/api', () => ({
 const mock = asMockApi<'post'>(api)
 
 const editor = (over: Partial<SnippetEditor> = {}): SnippetEditor => ({
-  title: 'T', setTitle: jest.fn(), code: 'x', setCode: jest.fn(),
-  language: 'python', setLanguage: jest.fn(), savedId: null,
-  saving: false, error: '', save: jest.fn().mockResolvedValue('7'),
+  title: 'T',
+  setTitle: jest.fn(),
+  code: 'x',
+  setCode: jest.fn(),
+  language: 'python',
+  setLanguage: jest.fn(),
+  savedId: null,
+  saving: false,
+  error: '',
+  save: jest.fn().mockResolvedValue('7'),
   ...over,
 })
 
 const setup = (e = editor()) => {
   const onSaved = jest.fn()
   const onCancel = jest.fn()
-  render(<SnippetEditorForm editor={e} saveLabel="Save It"
-    onSaved={onSaved} onCancel={onCancel} />)
+  render(
+    <SnippetEditorForm
+      editor={e}
+      saveLabel="Save It"
+      onSaved={onSaved}
+      onCancel={onCancel}
+    />,
+  )
   return { e, onSaved, onCancel }
 }
 
 it('edits the title', () => {
   const { e } = setup()
-  fireEvent.change(screen.getByTestId('snippet-title-input')
-    .querySelector('input')!, { target: { value: 'N' } })
+  fireEvent.change(
+    screen.getByTestId('snippet-title-input').querySelector('input')!,
+    { target: { value: 'N' } },
+  )
   expect(e.setTitle).toHaveBeenCalledWith('N')
 })
 
@@ -56,8 +71,9 @@ it('saves then runs and shows output', async () => {
   mock.post.mockResolvedValue({ data: { output: 'out', exitCode: 0 } })
   setup()
   fireEvent.click(screen.getByTestId('run-btn'))
-  expect(await screen.findByTestId('code-output-stdout'))
-    .toHaveTextContent('out')
+  expect(await screen.findByTestId('code-output-stdout')).toHaveTextContent(
+    'out',
+  )
 })
 
 it('shows errors and blocks invalid states', () => {

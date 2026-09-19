@@ -2,17 +2,29 @@
 
 import { useState } from 'react'
 import {
-  Box, Paper, Typography, ToggleButton, ToggleButtonGroup,
+  Box,
+  Paper,
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from 'recharts'
 import { DateRange, DATA_MAP } from './pageViewData'
 
 const headSx = {
-  display: 'flex', justifyContent: 'space-between',
-  alignItems: 'center', mb: 2,
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  mb: 2,
 }
 
 export function PageViewChart() {
@@ -41,12 +53,18 @@ export function PageViewChart() {
           <Tooltip />
           <Legend />
           <Line
-            type="monotone" dataKey="views" stroke="#1976d2"
-            strokeWidth={2} name="Total Views"
+            type="monotone"
+            dataKey="views"
+            stroke="#1976d2"
+            strokeWidth={2}
+            name="Total Views"
           />
           <Line
-            type="monotone" dataKey="unique" stroke="#2e7d32"
-            strokeWidth={2} name="Unique Visitors"
+            type="monotone"
+            dataKey="unique"
+            stroke="#2e7d32"
+            strokeWidth={2}
+            name="Unique Visitors"
           />
         </LineChart>
       </ResponsiveContainer>

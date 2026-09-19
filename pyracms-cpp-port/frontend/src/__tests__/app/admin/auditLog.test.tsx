@@ -4,18 +4,27 @@ import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-jest.mock('@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock)
+jest.mock(
+  '@/hooks/useTenantId',
+  () => require('../../helpers/scopeMocks').tenantMock,
+)
 
 beforeEach(() => jest.resetAllMocks())
 
 it('renders audit entries from /api/audit', async () => {
-  m.get.mockResolvedValue({ data: [{ id: 1, actor: 'ann',
-    action: 'user.ban', target: 'bob',
-    createdAt: '2026-01-01T00:00:00Z' }] })
+  m.get.mockResolvedValue({
+    data: [
+      {
+        id: 1,
+        actor: 'ann',
+        action: 'user.ban',
+        target: 'bob',
+        createdAt: '2026-01-01T00:00:00Z',
+      },
+    ],
+  })
   render(<AuditLogPage />)
-  expect(await screen.findByTestId('audit-row-1'))
-    .toHaveTextContent('user.ban')
+  expect(await screen.findByTestId('audit-row-1')).toHaveTextContent('user.ban')
   expect(m.get).toHaveBeenCalledWith('/api/audit?tenant_id=1&limit=100')
 })
 
@@ -28,6 +37,7 @@ it('shows an empty state', async () => {
 it('shows the API error', async () => {
   m.get.mockRejectedValue({ response: { data: { error: 'forbidden' } } })
   render(<AuditLogPage />)
-  expect(await screen.findByTestId('audit-error'))
-    .toHaveTextContent('forbidden')
+  expect(await screen.findByTestId('audit-error')).toHaveTextContent(
+    'forbidden',
+  )
 })

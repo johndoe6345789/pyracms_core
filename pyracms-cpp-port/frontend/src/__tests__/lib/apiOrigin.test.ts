@@ -27,8 +27,9 @@ describe('apiOrigin', () => {
 describe('wsUrl', () => {
   it('uses ws for http and wss for https origins', () => {
     process.env.NEXT_PUBLIC_API_URL = 'http://h.test'
-    expect(wsUrl('/api/ws/notifications'))
-      .toBe('ws://h.test/api/ws/notifications')
+    expect(wsUrl('/api/ws/notifications')).toBe(
+      'ws://h.test/api/ws/notifications',
+    )
     process.env.NEXT_PUBLIC_API_URL = 'https://h.test'
     expect(wsUrl('/api/ws/collab')).toBe('wss://h.test/api/ws/collab')
   })

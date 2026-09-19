@@ -7,11 +7,7 @@ import {
   PersonOutlined,
   SportsEsportsOutlined,
 } from '@mui/icons-material'
-import {
-  Box,
-  Chip,
-  Typography,
-} from '@mui/material'
+import { Box, Chip, Typography } from '@mui/material'
 import { type SearchResult } from '@/hooks/useSearchPage'
 
 export const TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -30,11 +26,7 @@ const TYPE_COLORS: Record<string, string> = {
   user: '#9c27b0',
 }
 
-export function SearchResultTitle({
-  result,
-}: {
-  result: SearchResult
-}) {
+export function SearchResultTitle({ result }: { result: SearchResult }) {
   const color = TYPE_COLORS[result.type] || '#666'
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>

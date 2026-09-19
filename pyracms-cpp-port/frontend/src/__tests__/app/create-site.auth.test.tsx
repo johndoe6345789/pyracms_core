@@ -5,19 +5,20 @@ import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderPage } from '../helpers/createSitePage'
 
-jest.mock('next/link', () =>
-  require('../helpers/createSitePageMocks').MockLink)
-jest.mock('@/components/create-site/AuthPromptCard', () =>
-  require('../helpers/createSitePageMocks').MockAuthPromptCard)
-jest.mock('@/components/create-site/CreateSiteForm', () =>
-  require('../helpers/createSitePageMocks').MockCreateSiteForm)
+jest.mock('next/link', () => require('../helpers/createSitePageMocks').MockLink)
+jest.mock(
+  '@/components/create-site/AuthPromptCard',
+  () => require('../helpers/createSitePageMocks').MockAuthPromptCard,
+)
+jest.mock(
+  '@/components/create-site/CreateSiteForm',
+  () => require('../helpers/createSitePageMocks').MockCreateSiteForm,
+)
 
 describe('CreateSitePage', () => {
   it('shows AuthPromptCard when not authenticated', () => {
     renderPage(false)
-    expect(
-      screen.getByTestId('mock-auth-prompt-card'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('mock-auth-prompt-card')).toBeInTheDocument()
   })
 
   it('does not show CreateSiteForm when not authenticated', () => {
@@ -29,9 +30,7 @@ describe('CreateSitePage', () => {
 
   it('shows CreateSiteForm when authenticated', () => {
     renderPage(true)
-    expect(
-      screen.getByTestId('mock-create-site-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('mock-create-site-form')).toBeInTheDocument()
   })
 
   it('does not show AuthPromptCard when authenticated', () => {

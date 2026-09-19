@@ -6,15 +6,19 @@ import TenantLayout from '@/app/site/[slug]/(tenant)/layout'
 import SiteHomePage from '@/app/site/[slug]/(tenant)/page'
 import { st } from '../helpers/tenantPagesMocks'
 
-jest.mock('next/navigation',
-  () => require('../helpers/tenantPagesMocks').navMock())
+jest.mock('next/navigation', () =>
+  require('../helpers/tenantPagesMocks').navMock(),
+)
 jest.mock('@/lib/api', () => require('../helpers/tenantPagesMocks').apiMock())
-jest.mock('@/components/common/TenantBreadcrumbs',
-  () => require('../helpers/tenantPagesMocks').crumbsMock())
-jest.mock('@/hooks/useTenantId',
-  () => ({ useTenantId: () => ({ tenantId: 1, loading: false }) }))
-jest.mock('@/hooks/useTenant',
-  () => require('../helpers/tenantPagesMocks').tenantMock())
+jest.mock('@/components/common/TenantBreadcrumbs', () =>
+  require('../helpers/tenantPagesMocks').crumbsMock(),
+)
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 1, loading: false }),
+}))
+jest.mock('@/hooks/useTenant', () =>
+  require('../helpers/tenantPagesMocks').tenantMock(),
+)
 
 describe('auth pages', () => {
   it('render the forms', () => {
@@ -27,10 +31,17 @@ describe('auth pages', () => {
 })
 
 describe('tenant pages', () => {
-  beforeEach(() => { st.notFound = false; st.push.mockClear() })
+  beforeEach(() => {
+    st.notFound = false
+    st.push.mockClear()
+  })
 
   it('layout wraps children with chrome', () => {
-    renderWithStore(<TenantLayout><p>kid</p></TenantLayout>)
+    renderWithStore(
+      <TenantLayout>
+        <p>kid</p>
+      </TenantLayout>,
+    )
     expect(screen.getByText('kid')).toBeInTheDocument()
     expect(screen.getByTestId('crumbs')).toBeInTheDocument()
     expect(screen.getByTestId('skip-to-content')).toBeInTheDocument()

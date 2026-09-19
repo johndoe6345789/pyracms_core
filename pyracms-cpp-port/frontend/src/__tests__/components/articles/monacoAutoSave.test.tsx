@@ -36,7 +36,9 @@ describe('useAutoSave', () => {
   it('saves after a delay and restores when empty', () => {
     const onChange = jest.fn()
     renderHook(() => useAutoSave('abc', onChange, 'key'))
-    act(() => { jest.advanceTimersByTime(1000) })
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
     expect(localStorage.getItem('autosave-key')).toBe('abc')
     renderHook(() => useAutoSave('', onChange, 'key'))
     expect(onChange).toHaveBeenCalledWith('abc')
@@ -45,7 +47,9 @@ describe('useAutoSave', () => {
   it('does nothing without a key', () => {
     const onChange = jest.fn()
     renderHook(() => useAutoSave('abc', onChange))
-    act(() => { jest.advanceTimersByTime(1000) })
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
     expect(onChange).not.toHaveBeenCalled()
     expect(localStorage.length).toBe(0)
   })

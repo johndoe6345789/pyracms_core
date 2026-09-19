@@ -37,8 +37,11 @@ export function SnippetReadView(p: Props) {
       </Box>
       <Box
         sx={{
-          border: 1, borderColor: 'divider',
-          borderRadius: 1, overflow: 'hidden', mb: 3,
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'hidden',
+          mb: 3,
         }}
         data-testid="snippet-code-block"
       >

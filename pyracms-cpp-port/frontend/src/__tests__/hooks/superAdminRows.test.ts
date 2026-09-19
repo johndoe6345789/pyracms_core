@@ -3,15 +3,34 @@ import { UserRole } from '@/types'
 
 describe('mapTenantRow', () => {
   it('maps a full record', () => {
-    expect(mapTenantRow({ id: '3', slug: 's', displayName: 'S',
-      ownerUsername: 'o', isActive: false,
-      createdAt: '2024-05-06T07:08:09Z' })).toEqual({ id: 3, slug: 's',
-      name: 'S', owner: 'o', isActive: false, createdAt: '2024-05-06' })
+    expect(
+      mapTenantRow({
+        id: '3',
+        slug: 's',
+        displayName: 'S',
+        ownerUsername: 'o',
+        isActive: false,
+        createdAt: '2024-05-06T07:08:09Z',
+      }),
+    ).toEqual({
+      id: 3,
+      slug: 's',
+      name: 'S',
+      owner: 'o',
+      isActive: false,
+      createdAt: '2024-05-06',
+    })
   })
 
   it('falls back to slug and defaults', () => {
-    expect(mapTenantRow({ id: 1, slug: 'x' })).toEqual({ id: 1, slug: 'x',
-      name: 'x', owner: '', isActive: true, createdAt: '' })
+    expect(mapTenantRow({ id: 1, slug: 'x' })).toEqual({
+      id: 1,
+      slug: 'x',
+      name: 'x',
+      owner: '',
+      isActive: true,
+      createdAt: '',
+    })
     expect(mapTenantRow({ id: 2 })).toMatchObject({ slug: '', name: '' })
   })
 })
@@ -25,10 +44,24 @@ describe('roleOf and mapUserRow', () => {
   })
 
   it('maps users with defaults', () => {
-    expect(mapUserRow({ id: 1, username: 'u', email: 'e', role: 2,
-      createdAt: '2024-01-02T00:00:00Z' })).toMatchObject({
-      role: 2, roleLabel: 'Moderator', createdAt: '2024-01-02' })
-    expect(mapUserRow({ id: 2 })).toMatchObject({ username: '',
-      email: '', isActive: true, createdAt: '' })
+    expect(
+      mapUserRow({
+        id: 1,
+        username: 'u',
+        email: 'e',
+        role: 2,
+        createdAt: '2024-01-02T00:00:00Z',
+      }),
+    ).toMatchObject({
+      role: 2,
+      roleLabel: 'Moderator',
+      createdAt: '2024-01-02',
+    })
+    expect(mapUserRow({ id: 2 })).toMatchObject({
+      username: '',
+      email: '',
+      isActive: true,
+      createdAt: '',
+    })
   })
 })

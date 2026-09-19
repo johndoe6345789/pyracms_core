@@ -6,18 +6,11 @@ import type { Snippet } from '@/lib/snippets'
 
 const DEFAULT_CODE = 'print("Hello, world!")\n'
 
-export function useSnippetEditor(
-  tenantId: number | null,
-  initial?: Snippet,
-) {
-  const [title, setTitle] =
-    useState(initial?.title ?? '')
-  const [code, setCode] =
-    useState(initial?.code ?? DEFAULT_CODE)
-  const [language, setLanguage] =
-    useState(initial?.language ?? 'python')
-  const [savedId, setSavedId] =
-    useState<string | null>(initial?.id ?? null)
+export function useSnippetEditor(tenantId: number | null, initial?: Snippet) {
+  const [title, setTitle] = useState(initial?.title ?? '')
+  const [code, setCode] = useState(initial?.code ?? DEFAULT_CODE)
+  const [language, setLanguage] = useState(initial?.language ?? 'python')
+  const [savedId, setSavedId] = useState<string | null>(initial?.id ?? null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,18 +30,23 @@ export function useSnippetEditor(
         return savedId
       }
       const res = await api.post('/api/snippets', {
-        ...body, tenant_id: tenantId,
+        ...body,
+        tenant_id: tenantId,
       })
       const id = String(res.data.id)
       setSavedId(id)
       return id
     } catch (e) {
-      const status = (e as {
-        response?: { status?: number }
-      }).response?.status
-      setError(status === 401
-        ? 'Please log in to save snippets.'
-        : 'Failed to save snippet.')
+      const status = (
+        e as {
+          response?: { status?: number }
+        }
+      ).response?.status
+      setError(
+        status === 401
+          ? 'Please log in to save snippets.'
+          : 'Failed to save snippet.',
+      )
       return null
     } finally {
       setSaving(false)
@@ -56,11 +54,17 @@ export function useSnippetEditor(
   }
 
   return {
-    title, setTitle, code, setCode,
-    language, setLanguage, savedId,
-    saving, error, save,
+    title,
+    setTitle,
+    code,
+    setCode,
+    language,
+    setLanguage,
+    savedId,
+    saving,
+    error,
+    save,
   }
 }
 
-export type SnippetEditor =
-  ReturnType<typeof useSnippetEditor>
+export type SnippetEditor = ReturnType<typeof useSnippetEditor>

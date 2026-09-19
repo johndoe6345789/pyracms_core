@@ -13,9 +13,12 @@ interface Props {
 /** Author sidebar of a post, built from the forum stats endpoint. */
 export function PostAuthorInfo({ username, stats }: Props) {
   return (
-    <UserPostInfo username={username}
+    <UserPostInfo
+      username={username}
       joinDate={formatForumDate(stats.joinedAt).split(' ')[0] ?? ''}
-      postCount={stats.postCount} reputation={stats.reputation}
-      rank={getLevel(stats.reputation).name} />
+      postCount={stats.postCount}
+      reputation={stats.reputation}
+      rank={getLevel(stats.reputation).name}
+    />
   )
 }

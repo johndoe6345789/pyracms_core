@@ -10,7 +10,9 @@ import { CategoryAccordion } from '@/components/forum/CategoryAccordion'
 import { ForumSearchPanel } from '@/components/forum/ForumSearchPanel'
 import { ForumAdminDialog } from '@/components/forum/ForumAdminDialog'
 import {
-  ForumLoading, ForumError, ForumEmpty,
+  ForumLoading,
+  ForumError,
+  ForumEmpty,
 } from '@/components/forum/ForumStatus'
 
 export default function ForumPage() {
@@ -24,8 +26,12 @@ export default function ForumPage() {
   const busy = tenantLoading || loading
   const addCategory = () => admin.open({ kind: 'category', mode: 'create' })
   const addBtn = canAdmin && (
-    <Button variant="contained" onClick={addCategory}
-      data-testid="add-category-btn" sx={{ mt: 2 }}>
+    <Button
+      variant="contained"
+      onClick={addCategory}
+      data-testid="add-category-btn"
+      sx={{ mt: 2 }}
+    >
       Add category
     </Button>
   )
@@ -37,8 +43,10 @@ export default function ForumPage() {
     body = <ForumError message={error || 'Site not found.'} />
   } else if (categories.length === 0) {
     body = canAdmin ? (
-      <ForumEmpty title="No categories yet"
-        hint="Create the first category to start organising forums.">
+      <ForumEmpty
+        title="No categories yet"
+        hint="Create the first category to start organising forums."
+      >
         {addBtn}
       </ForumEmpty>
     ) : (
@@ -49,8 +57,12 @@ export default function ForumPage() {
     )
   } else {
     body = categories.map((category) => (
-      <CategoryAccordion key={category.id} category={category} slug={slug}
-        admin={canAdmin ? admin : undefined} />
+      <CategoryAccordion
+        key={category.id}
+        category={category}
+        slug={slug}
+        admin={canAdmin ? admin : undefined}
+      />
     ))
   }
 
@@ -68,8 +80,11 @@ export default function ForumPage() {
       </Box>
       {tenantId && (
         <Box sx={{ mb: 3 }}>
-          <ForumSearchPanel slug={slug} tenantId={tenantId}
-            forums={forumNames} />
+          <ForumSearchPanel
+            slug={slug}
+            tenantId={tenantId}
+            forums={forumNames}
+          />
         </Box>
       )}
       {body}

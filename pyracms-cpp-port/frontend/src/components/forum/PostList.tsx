@@ -22,9 +22,7 @@ interface Props {
 export function PostList(p: Props) {
   const pages = Math.max(1, Math.ceil(p.posts.length / PAGE_SIZE))
   const current = Math.min(p.page, pages)
-  const visible = p.posts.slice(
-    (current - 1) * PAGE_SIZE, current * PAGE_SIZE,
-  )
+  const visible = p.posts.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
   return (
     <>
       <Box

@@ -31,7 +31,15 @@ export function usePostCardState(h: Handlers) {
     setEditContent(h.content)
   }
   return {
-    editing, setEditing, editContent, setEditContent,
-    confirmDel, setConfirmDel, error, save, remove, cancel,
+    editing,
+    setEditing,
+    editContent,
+    setEditContent,
+    confirmDel,
+    setConfirmDel,
+    error,
+    save,
+    remove,
+    cancel,
   }
 }

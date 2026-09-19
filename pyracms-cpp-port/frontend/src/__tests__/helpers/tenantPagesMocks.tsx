@@ -16,11 +16,15 @@ export const apiMock = () => ({
 })
 export const libMock = () => ({
   __esModule: true,
-  default: (p: { slug: string; initialName?: string }) =>
-    <div data-testid="lib">{p.slug}:{p.initialName ?? '-'}</div>,
+  default: (p: { slug: string; initialName?: string }) => (
+    <div data-testid="lib">
+      {p.slug}:{p.initialName ?? '-'}
+    </div>
+  ),
 })
 export const crumbsMock = () => ({
-  __esModule: true, default: () => <div data-testid="crumbs" />,
+  __esModule: true,
+  default: () => <div data-testid="crumbs" />,
 })
 export const tenantMock = () => ({
   titleFromSlug: (s: string) => s,

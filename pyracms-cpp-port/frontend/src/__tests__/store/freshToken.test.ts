@@ -18,7 +18,8 @@ it('stores the token for the current site and updates redux', () => {
     expect.objectContaining({
       type: 'auth/setCredentials',
       payload: { user, token: 'new' },
-    }))
+    }),
+  )
 })
 
 it('uses the platform slot on portal pages', () => {

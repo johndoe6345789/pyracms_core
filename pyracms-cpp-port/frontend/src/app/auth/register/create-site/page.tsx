@@ -1,9 +1,7 @@
 'use client'
 
-import AuthPageShell
-  from '@/components/auth/AuthPageShell'
-import RegisterForm
-  from '@/components/auth/RegisterForm'
+import AuthPageShell from '@/components/auth/AuthPageShell'
+import RegisterForm from '@/components/auth/RegisterForm'
 
 /** Register page that redirects to /create-site on success. */
 export default function RegisterCreateSitePage() {

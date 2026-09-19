@@ -13,54 +13,29 @@ test.describe('Admin sidebar navigation', () => {
     await goToAdmin(page)
   })
 
-  test(
-    'clicking Settings nav item navigates to settings page',
-    async ({ page }) => {
-      await page
-        .getByTestId('admin-nav-settings')
-        .click()
-      await expect(page).toHaveURL(
-        new RegExp(
-          `/site/${SITE_SLUG}/admin/settings`,
-        ),
-      )
-      await expect(
-        page.getByTestId('admin-settings-page'),
-      ).toBeVisible()
-    },
-  )
+  test('clicking Settings nav item navigates to settings page', async ({
+    page,
+  }) => {
+    await page.getByTestId('admin-nav-settings').click()
+    await expect(page).toHaveURL(
+      new RegExp(`/site/${SITE_SLUG}/admin/settings`),
+    )
+    await expect(page.getByTestId('admin-settings-page')).toBeVisible()
+  })
 
-  test(
-    'clicking Features nav item navigates to features page',
-    async ({ page }) => {
-      await page
-        .getByTestId('admin-nav-feature-toggles')
-        .click()
-      await expect(page).toHaveURL(
-        new RegExp(
-          `/site/${SITE_SLUG}/admin/features`,
-        ),
-      )
-      await expect(
-        page.getByTestId('admin-features-page'),
-      ).toBeVisible()
-    },
-  )
+  test('clicking Features nav item navigates to features page', async ({
+    page,
+  }) => {
+    await page.getByTestId('admin-nav-feature-toggles').click()
+    await expect(page).toHaveURL(
+      new RegExp(`/site/${SITE_SLUG}/admin/features`),
+    )
+    await expect(page.getByTestId('admin-features-page')).toBeVisible()
+  })
 
-  test(
-    'clicking Menus nav item navigates to menus page',
-    async ({ page }) => {
-      await page
-        .getByTestId('admin-nav-menus')
-        .click()
-      await expect(page).toHaveURL(
-        new RegExp(
-          `/site/${SITE_SLUG}/admin/menus`,
-        ),
-      )
-      await expect(
-        page.getByTestId('admin-menus-page'),
-      ).toBeVisible()
-    },
-  )
+  test('clicking Menus nav item navigates to menus page', async ({ page }) => {
+    await page.getByTestId('admin-nav-menus').click()
+    await expect(page).toHaveURL(new RegExp(`/site/${SITE_SLUG}/admin/menus`))
+    await expect(page.getByTestId('admin-menus-page')).toBeVisible()
+  })
 })

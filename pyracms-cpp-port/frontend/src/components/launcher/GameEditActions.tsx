@@ -9,17 +9,17 @@ interface Props {
 }
 
 /** Cancel / Save buttons at the bottom of the edit page. */
-export default function GameEditActions(
-  { cancelHref, saving, onSave }: Props,
-) {
+export default function GameEditActions({ cancelHref, saving, onSave }: Props) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
       <Button variant="outlined" component={Link} href={cancelHref}>
         Cancel
       </Button>
       <Button
-        variant="contained" startIcon={<SaveOutlined />}
-        disabled={saving} onClick={onSave}
+        variant="contained"
+        startIcon={<SaveOutlined />}
+        disabled={saving}
+        onClick={onSave}
       >
         {saving ? 'Saving...' : 'Save Changes'}
       </Button>

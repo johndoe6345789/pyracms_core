@@ -15,11 +15,20 @@ export function useGameDepItem(type: GameDepType, name: string) {
   useEffect(() => {
     let live = true
     setLoading(true)
-    api.get(`/api/gamedep/${type}/${encodeURIComponent(name)}`)
-      .then((r) => { if (live) setItem(mapDetail(r.data)) })
-      .catch(() => { if (live) setItem(null) })
-      .finally(() => { if (live) setLoading(false) })
-    return () => { live = false }
+    api
+      .get(`/api/gamedep/${type}/${encodeURIComponent(name)}`)
+      .then((r) => {
+        if (live) setItem(mapDetail(r.data))
+      })
+      .catch(() => {
+        if (live) setItem(null)
+      })
+      .finally(() => {
+        if (live) setLoading(false)
+      })
+    return () => {
+      live = false
+    }
   }, [type, name])
 
   return { item, loading }

@@ -13,8 +13,8 @@ export const metadata: Metadata = {
     template: '%s | PyraCMS',
   },
   description:
-    'A multi-tenant content management system with articles, '
-    + 'forums, galleries, and more.',
+    'A multi-tenant content management system with articles, ' +
+    'forums, galleries, and more.',
   openGraph: {
     type: 'website',
     siteName: 'PyraCMS',
@@ -48,9 +48,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <StoreProvider>
-            <ThemeWrapper>
-              {children}
-            </ThemeWrapper>
+            <ThemeWrapper>{children}</ThemeWrapper>
           </StoreProvider>
         </NextIntlClientProvider>
       </body>

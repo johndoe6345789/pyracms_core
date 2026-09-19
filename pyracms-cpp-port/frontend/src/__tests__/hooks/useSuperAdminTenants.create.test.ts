@@ -3,8 +3,7 @@ import '@testing-library/jest-dom'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_TENANTS } from
-  '../helpers/superAdminTenantsFixtures'
+import { RAW_TENANTS } from '../helpers/superAdminTenantsFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -46,10 +45,11 @@ describe('useSuperAdminTenants — createTenant', () => {
       })
     })
 
-    expect(mockApi.post).toHaveBeenCalledWith(
-      '/api/tenants',
-      { slug: 'new-co', displayName: 'New Co', ownerUsername: 'carol' },
-    )
+    expect(mockApi.post).toHaveBeenCalledWith('/api/tenants', {
+      slug: 'new-co',
+      displayName: 'New Co',
+      ownerUsername: 'carol',
+    })
     expect(result.current.tenants).toHaveLength(3)
     const added = result.current.tenants[2]!
     expect(added.id).toBe(99)

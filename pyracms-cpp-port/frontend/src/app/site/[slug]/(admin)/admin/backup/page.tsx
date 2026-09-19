@@ -1,8 +1,6 @@
 'use client'
 
-import {
-  Box, Divider, Snackbar, Alert, Typography,
-} from '@mui/material'
+import { Box, Divider, Snackbar, Alert, Typography } from '@mui/material'
 import { useParams } from 'next/navigation'
 import { useBackupRestore } from '@/hooks/useBackupRestore'
 import { useTenantId } from '@/hooks/useTenantId'
@@ -13,9 +11,13 @@ export default function AdminBackupPage() {
   const slug = useParams().slug as string
   const { tenantId } = useTenantId(slug)
   const {
-    snackbar, fileInputRef,
-    handleExportSettings, handleExportMenus,
-    handleImportClick, handleFileChange, handleCloseSnackbar,
+    snackbar,
+    fileInputRef,
+    handleExportSettings,
+    handleExportMenus,
+    handleImportClick,
+    handleFileChange,
+    handleCloseSnackbar,
   } = useBackupRestore(tenantId)
 
   return (
@@ -23,11 +25,7 @@ export default function AdminBackupPage() {
       <Typography variant="h3" sx={{ mb: 1 }}>
         Backup &amp; Restore
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Export and import your PyraCMS configuration data.
       </Typography>
       <ExportButtons

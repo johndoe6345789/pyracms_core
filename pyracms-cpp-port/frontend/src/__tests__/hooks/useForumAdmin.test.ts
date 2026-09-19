@@ -19,8 +19,10 @@ describe('useForumAdmin', () => {
     const { result } = renderHook(() => useForumAdmin(1, done))
     act(() => result.current.open(dlg))
     await act(() => result.current.submit(' A '))
-    expect(m.post).toHaveBeenCalledWith(
-      '/api/forum/categories', { name: 'A', tenantId: 1 })
+    expect(m.post).toHaveBeenCalledWith('/api/forum/categories', {
+      name: 'A',
+      tenantId: 1,
+    })
     expect(done).toHaveBeenCalled()
     expect(result.current.dialog).toBeNull()
   })

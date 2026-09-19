@@ -1,12 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  TextField, InputAdornment, IconButton,
-} from '@mui/material'
-import {
-  Visibility, VisibilityOff,
-} from '@mui/icons-material'
+import { TextField, InputAdornment, IconButton } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 interface PasswordFieldProps {
   value: string
@@ -23,12 +19,9 @@ export default function PasswordField({
   sx,
   'data-testid': testId,
 }: PasswordFieldProps) {
-  const [showPassword, setShowPassword] =
-    useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const toggleLabel = showPassword
-    ? 'Hide password'
-    : 'Show password'
+  const toggleLabel = showPassword ? 'Hide password' : 'Show password'
 
   return (
     <TextField
@@ -47,16 +40,12 @@ export default function PasswordField({
         endAdornment: (
           <InputAdornment position="end">
             <IconButton
-              onClick={() =>
-                setShowPassword(!showPassword)
-              }
+              onClick={() => setShowPassword(!showPassword)}
               edge="end"
               aria-label={toggleLabel}
               data-testid="toggle-password"
             >
-              {showPassword
-                ? <VisibilityOff />
-                : <Visibility />}
+              {showPassword ? <VisibilityOff /> : <Visibility />}
             </IconButton>
           </InputAdornment>
         ),

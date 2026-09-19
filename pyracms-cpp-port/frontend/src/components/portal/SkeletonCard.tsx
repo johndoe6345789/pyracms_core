@@ -9,7 +9,9 @@ export default function SkeletonCard() {
         <Skeleton variant="text" width="100%" />
         <Skeleton variant="text" width="80%" />
         <Skeleton
-          variant="rectangular" width={80} height={24}
+          variant="rectangular"
+          width={80}
+          height={24}
           sx={{ mt: 2, borderRadius: 1 }}
         />
       </CardContent>

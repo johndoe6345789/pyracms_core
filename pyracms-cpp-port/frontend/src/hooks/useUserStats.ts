@@ -43,8 +43,12 @@ export function useUserStats(userId?: number, tenantId?: number | null) {
   useEffect(() => {
     if (!userId || !tenantId) return
     let live = true
-    load(userId, tenantId).then((s) => { if (live) setStats(s) })
-    return () => { live = false }
+    load(userId, tenantId).then((s) => {
+      if (live) setStats(s)
+    })
+    return () => {
+      live = false
+    }
   }, [userId, tenantId])
   return stats
 }

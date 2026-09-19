@@ -26,9 +26,7 @@ export function titleFromSlug(slug: string): string {
  * `notFound` is true once the API confirmed the site does not exist.
  */
 export function useTenant(slug: string) {
-  const [tenant, setTenant] = useState<TenantInfo | null>(
-    cache[slug] ?? null,
-  )
+  const [tenant, setTenant] = useState<TenantInfo | null>(cache[slug] ?? null)
   const [loading, setLoading] = useState(!cache[slug])
   const [notFound, setNotFound] = useState(false)
 
@@ -41,7 +39,8 @@ export function useTenant(slug: string) {
       return
     }
     let cancelled = false
-    api.get(`/api/tenants/${slug}`)
+    api
+      .get(`/api/tenants/${slug}`)
       .then((res) => {
         if (cancelled) return
         const info: TenantInfo = {
@@ -59,8 +58,12 @@ export function useTenant(slug: string) {
           setNotFound(true)
         }
       })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [slug])
 
   return { tenant, loading, notFound }

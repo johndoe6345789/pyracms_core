@@ -24,14 +24,27 @@ export function useChangePasswordForm(userId: number | undefined) {
     if (problem) return f.fail(problem)
     const ok = await f.run(async () => {
       const r = await api.put(`/api/users/${userId}/password`, {
-        currentPassword: current, newPassword: next,
+        currentPassword: current,
+        newPassword: next,
       })
       adoptFreshToken(r.data, user, dispatch)
     })
-    if (ok) { setCurrent(''); setNext(''); setConfirm('') }
+    if (ok) {
+      setCurrent('')
+      setNext('')
+      setConfirm('')
+    }
     return ok
   }
 
-  return { current, setCurrent, next, setNext, confirm, setConfirm,
-    submit, ...f }
+  return {
+    current,
+    setCurrent,
+    next,
+    setNext,
+    confirm,
+    setConfirm,
+    submit,
+    ...f,
+  }
 }

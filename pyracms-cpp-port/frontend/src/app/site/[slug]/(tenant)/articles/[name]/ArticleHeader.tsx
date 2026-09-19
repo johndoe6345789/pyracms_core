@@ -1,13 +1,7 @@
 import { Typography } from '@mui/material'
-import {
-  ArticleMetadata,
-} from '@/components/articles/ArticleMetadata'
-import {
-  ArticleTagChips,
-} from '@/components/articles/ArticleTagChips'
-import {
-  ArticleActions,
-} from '@/components/articles/ArticleActions'
+import { ArticleMetadata } from '@/components/articles/ArticleMetadata'
+import { ArticleTagChips } from '@/components/articles/ArticleTagChips'
+import { ArticleActions } from '@/components/articles/ArticleActions'
 import type { Article } from '@/hooks/useArticle'
 
 export default function ArticleHeader({
@@ -30,11 +24,7 @@ export default function ArticleHeader({
         renderer={article.renderer}
         views={article.views}
       />
-      <ArticleTagChips
-        tags={article.tags}
-        color="primary"
-        searchSlug={slug}
-      />
+      <ArticleTagChips tags={article.tags} color="primary" searchSlug={slug} />
       <ArticleActions
         slug={slug}
         name={name}

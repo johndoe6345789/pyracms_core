@@ -17,8 +17,12 @@ it('acl editor surfaces a save failure', async () => {
   m.put.mockRejectedValue(boom)
   const { result } = renderHook(() => useAclEditor(1))
   await waitFor(() => expect(result.current.loading).toBe(false))
-  act(() => { result.current.setNewPrincipal('p') })
-  act(() => { result.current.setNewPermission('x') })
+  act(() => {
+    result.current.setNewPrincipal('p')
+  })
+  act(() => {
+    result.current.setNewPermission('x')
+  })
   act(() => result.current.handleAdd())
   await waitFor(() => expect(result.current.error).toBe('boom'))
 })

@@ -16,7 +16,10 @@ interface Props {
 }
 
 export function SnippetEditorForm({
-  editor: e, saveLabel, onSaved, onCancel,
+  editor: e,
+  saveLabel,
+  onSaved,
+  onCancel,
 }: Props) {
   const { running, result, run } = useSnippetRun()
 

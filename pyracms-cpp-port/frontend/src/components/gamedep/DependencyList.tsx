@@ -1,9 +1,4 @@
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from '@mui/material'
+import { List, ListItem, ListItemText, Typography } from '@mui/material'
 import Link from 'next/link'
 import { LinkOutlined } from '@mui/icons-material'
 import type { Dependency } from '@/hooks/useGameDepDetail'

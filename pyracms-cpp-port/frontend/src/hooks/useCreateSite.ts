@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import {
-  INITIAL, SLUG_PATTERN, SLUG_ERROR, nameToSlug, createSiteError,
+  INITIAL,
+  SLUG_PATTERN,
+  SLUG_ERROR,
+  nameToSlug,
+  createSiteError,
   type CreateSiteForm,
 } from './createSiteForm'
 
@@ -36,8 +40,11 @@ export function useCreateSite() {
       return
     }
     if (field === 'name') {
-      setForm((prev) => ({ ...prev, name: value,
-        slug: prev.slug === '' ? nameToSlug(value) : prev.slug }))
+      setForm((prev) => ({
+        ...prev,
+        name: value,
+        slug: prev.slug === '' ? nameToSlug(value) : prev.slug,
+      }))
       return
     }
     setForm((prev) => ({ ...prev, [field]: value }))

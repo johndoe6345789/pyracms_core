@@ -5,8 +5,11 @@ export default function AdminDrawerHeader() {
   return (
     <Box
       sx={{
-        px: 2, pb: 2, display: 'flex',
-        alignItems: 'center', gap: 1,
+        px: 2,
+        pb: 2,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
       }}
     >
       <AdminPanelSettingsOutlined

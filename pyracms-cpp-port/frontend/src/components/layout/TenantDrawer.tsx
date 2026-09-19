@@ -14,7 +14,12 @@ interface TenantDrawerProps {
 
 /** Burger drawer for a site: every module plus Admin for site admins. */
 export default function TenantDrawer({
-  slug, siteName, description, canAdmin, open, onClose,
+  slug,
+  siteName,
+  description,
+  canAdmin,
+  open,
+  onClose,
 }: TenantDrawerProps) {
   return (
     <AppDrawer

@@ -8,9 +8,11 @@ import ThemeToggle from '@/components/common/ThemeToggle'
 import LanguageSelect from '@/components/common/LanguageSelect'
 
 /** Search, language, theme, notifications and the user bubble. */
-export default function TopBarTools(
-  { downloadHref = '/download' }: { downloadHref?: string },
-) {
+export default function TopBarTools({
+  downloadHref = '/download',
+}: {
+  downloadHref?: string
+}) {
   return (
     <Box
       sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}
@@ -19,8 +21,12 @@ export default function TopBarTools(
         <GlobalSearch />
       </Box>
       <Tooltip title="Get the launcher">
-        <IconButton component={Link} href={downloadHref}
-          aria-label="Get the launcher" data-testid="get-launcher">
+        <IconButton
+          component={Link}
+          href={downloadHref}
+          aria-label="Get the launcher"
+          data-testid="get-launcher"
+        >
           <DownloadOutlined />
         </IconButton>
       </Tooltip>

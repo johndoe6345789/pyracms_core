@@ -1,14 +1,18 @@
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import SearchDialog from '@/components/common/search/SearchDialog'
-import SearchResultsList
-  from '@/components/common/search/SearchResultsList'
+import SearchResultsList from '@/components/common/search/SearchResultsList'
 
 const push = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
 }))
-const hook = { open: true, setOpen: jest.fn(), q: 'hello',
-  setQ: jest.fn(), res: [] as unknown[] }
+const hook = {
+  open: true,
+  setOpen: jest.fn(),
+  q: 'hello',
+  setQ: jest.fn(),
+  res: [] as unknown[],
+}
 jest.mock('@/components/common/search/useGlobalSearch', () => ({
   useGlobalSearch: () => hook,
 }))
@@ -21,17 +25,24 @@ const r = (id: string, type: string, snippet = 's') =>
 describe('SearchResultsList', () => {
   it('shows nothing for short queries and a message for misses', () => {
     const { container, rerender } = render(
-      <SearchResultsList results={[]} query="a" onSelect={jest.fn()} />)
+      <SearchResultsList results={[]} query="a" onSelect={jest.fn()} />,
+    )
     expect(container).toBeEmptyDOMElement()
-    rerender(<SearchResultsList results={[]} query="abc"
-      onSelect={jest.fn()} />)
+    rerender(
+      <SearchResultsList results={[]} query="abc" onSelect={jest.fn()} />,
+    )
     expect(screen.getByText(/No results for/)).toBeInTheDocument()
   })
 
   it('groups results by type and truncates snippets', () => {
     const onSelect = jest.fn()
-    render(<SearchResultsList query="x" onSelect={onSelect} results={[
-      r('1', 'article', 'x'.repeat(100)), r('2', 'user')]} />)
+    render(
+      <SearchResultsList
+        query="x"
+        onSelect={onSelect}
+        results={[r('1', 'article', 'x'.repeat(100)), r('2', 'user')]}
+      />,
+    )
     expect(screen.getByText('articles')).toBeInTheDocument()
     expect(screen.getByText(/x{80}\.\.\./)).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('search-result-2'))
@@ -40,14 +51,24 @@ describe('SearchResultsList', () => {
 })
 
 describe('SearchDialog', () => {
-  const p = { open: true, query: 'q', results: [], onClose: jest.fn(),
-    onQueryChange: jest.fn(), onSelect: jest.fn(), onSearchPage: jest.fn() }
+  const p = {
+    open: true,
+    query: 'q',
+    results: [],
+    onClose: jest.fn(),
+    onQueryChange: jest.fn(),
+    onSelect: jest.fn(),
+    onSearchPage: jest.fn(),
+  }
 
   it('reports typing and Enter, focusing on open', () => {
     jest.useFakeTimers()
     render(<SearchDialog {...p} />)
-    act(() => { jest.advanceTimersByTime(150) })
-    const input = screen.getByTestId('search-dialog-input')
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+    const input = screen
+      .getByTestId('search-dialog-input')
       .querySelector('input')!
     expect(input).toHaveFocus()
     fireEvent.change(input, { target: { value: 'z' } })
@@ -60,8 +81,10 @@ describe('SearchDialog', () => {
 
   it('ignores Enter without a query', () => {
     render(<SearchDialog {...p} query="" />)
-    fireEvent.keyDown(screen.getByTestId('search-dialog-input')
-      .querySelector('input')!, { key: 'Enter' })
+    fireEvent.keyDown(
+      screen.getByTestId('search-dialog-input').querySelector('input')!,
+      { key: 'Enter' },
+    )
     expect(p.onSearchPage).not.toHaveBeenCalled()
   })
 })

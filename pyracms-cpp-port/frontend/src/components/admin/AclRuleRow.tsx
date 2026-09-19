@@ -1,6 +1,4 @@
-import {
-  TableCell, TableRow, IconButton, Tooltip, Chip,
-} from '@mui/material'
+import { TableCell, TableRow, IconButton, Tooltip, Chip } from '@mui/material'
 import { DeleteOutlined } from '@mui/icons-material'
 import { AclRule } from '@/hooks/useAclEditor'
 
@@ -9,10 +7,7 @@ interface AclRuleRowProps {
   onDelete: (id: number) => void
 }
 
-export default function AclRuleRow({
-  rule,
-  onDelete,
-}: AclRuleRowProps) {
+export default function AclRuleRow({ rule, onDelete }: AclRuleRowProps) {
   const allow = rule.action === 'Allow'
   return (
     <TableRow hover data-testid={`acl-row-${rule.id}`}>
@@ -24,12 +19,8 @@ export default function AclRuleRow({
           variant="outlined"
         />
       </TableCell>
-      <TableCell sx={{ fontWeight: 600 }}>
-        {rule.principal}
-      </TableCell>
-      <TableCell sx={{ fontFamily: 'monospace' }}>
-        {rule.permission}
-      </TableCell>
+      <TableCell sx={{ fontWeight: 600 }}>{rule.principal}</TableCell>
+      <TableCell sx={{ fontFamily: 'monospace' }}>{rule.permission}</TableCell>
       <TableCell align="right">
         <Tooltip title="Delete">
           <IconButton

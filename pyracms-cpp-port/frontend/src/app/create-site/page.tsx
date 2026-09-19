@@ -4,12 +4,9 @@ import { useEffect } from 'react'
 import { Box, Container, Paper } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
-import AuthPromptCard
-  from '@/components/create-site/AuthPromptCard'
-import CreateSiteForm
-  from '@/components/create-site/CreateSiteForm'
-import CreateSiteHeader
-  from '@/components/create-site/CreateSiteHeader'
+import AuthPromptCard from '@/components/create-site/AuthPromptCard'
+import CreateSiteForm from '@/components/create-site/CreateSiteForm'
+import CreateSiteHeader from '@/components/create-site/CreateSiteHeader'
 
 export default function CreateSitePage() {
   const isAuthenticated = useSelector(
@@ -26,9 +23,7 @@ export default function CreateSitePage() {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        background:
-          'linear-gradient(135deg,'
-          + ' #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg,' + ' #667eea 0%, #764ba2 100%)',
         py: 8,
       }}
       data-testid="create-site-page"
@@ -45,9 +40,7 @@ export default function CreateSitePage() {
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
           }}
         >
-          {isAuthenticated
-            ? <CreateSiteForm />
-            : <AuthPromptCard />}
+          {isAuthenticated ? <CreateSiteForm /> : <AuthPromptCard />}
         </Paper>
       </Container>
     </Box>

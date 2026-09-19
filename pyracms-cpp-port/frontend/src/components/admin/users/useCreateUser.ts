@@ -13,10 +13,7 @@ export function useCreateUser(
   const [creating, setCreating] = useState(false)
 
   const canSubmit =
-    !creating &&
-    !!username.trim() &&
-    !!email.trim() &&
-    !!password.trim()
+    !creating && !!username.trim() && !!email.trim() && !!password.trim()
 
   const submit = () => {
     if (!username.trim() || !email.trim() || !password.trim()) {
@@ -40,17 +37,26 @@ export function useCreateUser(
         onCreated()
       })
       .catch((err) => {
-        setError(
-          err?.response?.data?.error || 'Failed to create user',
-        )
+        setError(err?.response?.data?.error || 'Failed to create user')
       })
       .finally(() => setCreating(false))
   }
 
   return {
-    open, setOpen, username, setUsername, email, setEmail,
-    password, setPassword, fullName, setFullName, error,
-    creating, canSubmit, submit,
+    open,
+    setOpen,
+    username,
+    setUsername,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    fullName,
+    setFullName,
+    error,
+    creating,
+    canSubmit,
+    submit,
   }
 }
 

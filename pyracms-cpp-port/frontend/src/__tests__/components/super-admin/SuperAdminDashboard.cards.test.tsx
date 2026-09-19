@@ -1,8 +1,7 @@
 /** Tests for SuperAdminDashboard: heading, subtitle, cards. */
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import SuperAdminDashboard from
-  '@/components/super-admin/SuperAdminDashboard'
+import SuperAdminDashboard from '@/components/super-admin/SuperAdminDashboard'
 
 describe('SuperAdminDashboard', () => {
   beforeEach(() => {
@@ -41,27 +40,19 @@ describe('SuperAdminDashboard', () => {
 
   describe('quick-link cards presence', () => {
     it('renders the Manage Tenants card', () => {
-      expect(
-        screen.getByTestId('quick-tenants'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-tenants')).toBeInTheDocument()
     })
 
     it('renders the Global Users card', () => {
-      expect(
-        screen.getByTestId('quick-users'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-users')).toBeInTheDocument()
     })
 
     it('renders the Platform Settings card', () => {
-      expect(
-        screen.getByTestId('quick-settings'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-settings')).toBeInTheDocument()
     })
 
     it('renders the Create New Site card', () => {
-      expect(
-        screen.getByTestId('quick-create-site'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('quick-create-site')).toBeInTheDocument()
     })
 
     it('renders exactly 4 cards', () => {
@@ -69,8 +60,8 @@ describe('SuperAdminDashboard', () => {
       expect(
         screen.getAllByRole('link', {
           name: new RegExp(
-            'manage tenants|global users|platform settings'
-            + '|create new site',
+            'manage tenants|global users|platform settings' +
+              '|create new site',
             'i',
           ),
         }),

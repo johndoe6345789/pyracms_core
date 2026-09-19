@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import CreateThreadPage from
-  '@/app/site/[slug]/(tenant)/forum/thread/create/page'
+import CreateThreadPage from '@/app/site/[slug]/(tenant)/forum/thread/create/page'
 
 let query = 'forumId=2'
 let authed = true
@@ -17,9 +16,15 @@ jest.mock('@/hooks/useForumUser', () => ({
 }))
 jest.mock('@/hooks/useCreateThread', () => ({
   useCreateThread: () => ({
-    title: '', setTitle: jest.fn(), description: '',
-    setDescription: jest.fn(), content: '', setContent: jest.fn(),
-    loading: false, error: '', handleSubmit: submit,
+    title: '',
+    setTitle: jest.fn(),
+    description: '',
+    setDescription: jest.fn(),
+    content: '',
+    setContent: jest.fn(),
+    loading: false,
+    error: '',
+    handleSubmit: submit,
   }),
 }))
 
@@ -44,6 +49,8 @@ it('renders the form and submits', () => {
   render(<CreateThreadPage />)
   fireEvent.click(screen.getByTestId('create-thread-submit'))
   expect(submit).toHaveBeenCalled()
-  expect(screen.getByTestId('create-thread-cancel'))
-    .toHaveAttribute('href', '/site/s/forum/2')
+  expect(screen.getByTestId('create-thread-cancel')).toHaveAttribute(
+    'href',
+    '/site/s/forum/2',
+  )
 })

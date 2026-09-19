@@ -12,30 +12,31 @@ export function useAdminUsers() {
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedUser, setSelectedUser] =
-    useState<UserRow | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null)
   const [actionError, setActionError] = useState('')
   const edit = useUserEdit(setUsers)
 
   useEffect(() => {
-    api.get('/api/users')
-      .then(res => setUsers((res.data || []).map(mapUser)))
+    api
+      .get('/api/users')
+      .then((res) => setUsers((res.data || []).map(mapUser)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
   const handleToggleBan = (id: number) => {
-    const user = users.find(u => u.id === id)
+    const user = users.find((u) => u.id === id)
     if (!user) return
     const banned = !user.banned
     setActionError('')
-    api.put(`/api/users/${id}/ban`, { banned })
+    api
+      .put(`/api/users/${id}/ban`, { banned })
       .then(() => {
-        setUsers(prev => prev.map(u =>
-          u.id === id ? { ...u, banned } : u))
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id ? { ...u, banned } : u)),
+        )
       })
-      .catch(err => setActionError(
-        apiError(err, 'Failed to update user')))
+      .catch((err) => setActionError(apiError(err, 'Failed to update user')))
   }
 
   const handleDeleteClick = (user: UserRow) => {
@@ -53,17 +54,24 @@ export function useAdminUsers() {
     handleDeleteCancel()
     if (!target) return
     setActionError('')
-    api.delete(`/api/users/${target.id}`)
+    api
+      .delete(`/api/users/${target.id}`)
       .then(() => {
-        setUsers(prev => prev.filter(u => u.id !== target.id))
+        setUsers((prev) => prev.filter((u) => u.id !== target.id))
       })
-      .catch(err => setActionError(
-        apiError(err, 'Failed to delete user')))
+      .catch((err) => setActionError(apiError(err, 'Failed to delete user')))
   }
 
   return {
-    users, loading, deleteDialogOpen, selectedUser, actionError,
-    handleToggleBan, handleDeleteClick,
-    handleDeleteConfirm, handleDeleteCancel, ...edit,
+    users,
+    loading,
+    deleteDialogOpen,
+    selectedUser,
+    actionError,
+    handleToggleBan,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleDeleteCancel,
+    ...edit,
   }
 }

@@ -2,8 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Search — /search', () => {
   test(
-    'mocked API: clicking a search result navigates '
-    + 'to its URL',
+    'mocked API: clicking a search result navigates ' + 'to its URL',
     async ({ page }) => {
       const targetUrl = '/site/demo/articles/hello-world'
 
@@ -42,8 +41,7 @@ test.describe('Search — /search', () => {
   )
 
   test(
-    'mocked API: empty state is shown when API '
-    + 'returns zero items',
+    'mocked API: empty state is shown when API ' + 'returns zero items',
     async ({ page }) => {
       await page.route('**/api/search*', (route) => {
         if (route.request().url().includes('autocomplete')) {
@@ -63,9 +61,9 @@ test.describe('Search — /search', () => {
       await page.goto('/search?q=zzz')
       await page.waitForLoadState('networkidle')
 
-      await expect(
-        page.getByTestId('search-empty'),
-      ).toBeVisible({ timeout: 8_000 })
+      await expect(page.getByTestId('search-empty')).toBeVisible({
+        timeout: 8_000,
+      })
     },
   )
 })

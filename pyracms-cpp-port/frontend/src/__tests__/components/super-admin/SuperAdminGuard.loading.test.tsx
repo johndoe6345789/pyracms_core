@@ -8,32 +8,22 @@ describe('SuperAdminGuard', () => {
     it('renders a CircularProgress spinner', () => {
       renderGuard(false, false)
       // MUI CircularProgress has role="progressbar" by default.
-      expect(
-        screen.getByRole('progressbar'),
-      ).toBeInTheDocument()
+      expect(screen.getByRole('progressbar')).toBeInTheDocument()
     })
 
     it('spinner has accessible aria-label "Loading"', () => {
       renderGuard(false, false)
-      expect(
-        screen.getByLabelText('Loading'),
-      ).toBeInTheDocument()
+      expect(screen.getByLabelText('Loading')).toBeInTheDocument()
     })
 
     it('does not render children while loading', () => {
       renderGuard(false, true)
-      expect(
-        screen.queryByTestId('guarded-child'),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('guarded-child')).not.toBeInTheDocument()
     })
 
-    it('does not render the access-denied container while loading',
-      () => {
-        renderGuard(false, false)
-        expect(
-          screen.queryByTestId('super-admin-denied'),
-        ).not.toBeInTheDocument()
-      },
-    )
+    it('does not render the access-denied container while loading', () => {
+      renderGuard(false, false)
+      expect(screen.queryByTestId('super-admin-denied')).not.toBeInTheDocument()
+    })
   })
 })

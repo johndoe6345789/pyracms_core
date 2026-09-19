@@ -3,8 +3,7 @@ import { loginAsAdmin } from '../support/portal-auth-helpers-1'
 
 test.describe('Admin redirect — /admin', () => {
   test(
-    'mocked tenants: /admin shows error text when '
-    + 'API call fails',
+    'mocked tenants: /admin shows error text when ' + 'API call fails',
     async ({ page }) => {
       await loginAsAdmin(page)
 
@@ -20,16 +19,15 @@ test.describe('Admin redirect — /admin', () => {
       await page.waitForLoadState('networkidle')
 
       if (page.url().includes('/admin')) {
-        await expect(
-          page.getByText(/Failed to load tenants/i),
-        ).toBeVisible({ timeout: 8_000 })
+        await expect(page.getByText(/Failed to load tenants/i)).toBeVisible({
+          timeout: 8_000,
+        })
       }
     },
   )
 
   test(
-    '/admin shows a loading spinner before the tenant '
-    + 'API resolves',
+    '/admin shows a loading spinner before the tenant ' + 'API resolves',
     async ({ page }) => {
       await loginAsAdmin(page)
 

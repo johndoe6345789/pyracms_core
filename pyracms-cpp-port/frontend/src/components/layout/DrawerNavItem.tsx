@@ -1,5 +1,8 @@
 import {
-  ListItem, ListItemButton, ListItemIcon, ListItemText,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material'
 import Link from 'next/link'
 import { drawerItemSx } from './drawerStyles'
@@ -14,7 +17,8 @@ interface Props {
 /** One destination row inside the drawer. */
 export default function DrawerNavItem({ item, active, onClose }: Props) {
   const testId = item.testId
-    ? `drawer-${item.testId}` : `drawer-nav-${item.key}`
+    ? `drawer-${item.testId}`
+    : `drawer-nav-${item.key}`
   return (
     <ListItem disablePadding sx={{ mb: 0.25 }}>
       <ListItemButton

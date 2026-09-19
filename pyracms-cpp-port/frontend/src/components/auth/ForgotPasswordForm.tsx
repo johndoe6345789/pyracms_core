@@ -4,12 +4,15 @@ import { Alert, Box, Button, TextField, Typography } from '@mui/material'
 import Link from 'next/link'
 import { useForgotPassword } from '@/hooks/useForgotPassword'
 
-export default function ForgotPasswordForm(
-  { tenant }: { tenant?: string | undefined },
-) {
+export default function ForgotPasswordForm({
+  tenant,
+}: {
+  tenant?: string | undefined
+}) {
   const s = useForgotPassword(tenant)
   const back = tenant
-    ? `/auth/login?tenant=${encodeURIComponent(tenant)}` : '/auth/login'
+    ? `/auth/login?tenant=${encodeURIComponent(tenant)}`
+    : '/auth/login'
   return (
     <Box component="form" onSubmit={s.submit} data-testid="forgot-form">
       <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
@@ -29,18 +32,33 @@ export default function ForgotPasswordForm(
         </Alert>
       ) : (
         <>
-          <TextField fullWidth required type="email" label="Email"
-            margin="normal" value={s.email}
+          <TextField
+            fullWidth
+            required
+            type="email"
+            label="Email"
+            margin="normal"
+            value={s.email}
             onChange={(e) => s.setEmail(e.target.value)}
-            inputProps={{ 'data-testid': 'forgot-email' }} />
-          <Button fullWidth type="submit" variant="contained" size="large"
-            disabled={s.busy} sx={{ mt: 2 }} data-testid="forgot-submit">
+            inputProps={{ 'data-testid': 'forgot-email' }}
+          />
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={s.busy}
+            sx={{ mt: 2 }}
+            data-testid="forgot-submit"
+          >
             {s.busy ? 'Sending...' : 'Send reset link'}
           </Button>
         </>
       )}
       <Box sx={{ textAlign: 'center', mt: 3 }}>
-        <Link href={back} data-testid="forgot-back">Back to sign in</Link>
+        <Link href={back} data-testid="forgot-back">
+          Back to sign in
+        </Link>
       </Box>
     </Box>
   )

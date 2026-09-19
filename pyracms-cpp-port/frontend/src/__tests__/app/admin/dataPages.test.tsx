@@ -1,5 +1,9 @@
 import {
-  render, screen, fireEvent, waitFor, within,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
 } from '@testing-library/react'
 import AdminFilesPage from '@/app/site/[slug]/(admin)/admin/files/page'
 import AdminMenusPage from '@/app/site/[slug]/(admin)/admin/menus/page'
@@ -11,8 +15,10 @@ import { renderWithStore } from '../../helpers/renderWithStore'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-jest.mock('@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock)
+jest.mock(
+  '@/hooks/useTenantId',
+  () => require('../../helpers/scopeMocks').tenantMock,
+)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -25,8 +31,9 @@ it('files page lists, uploads and deletes', async () => {
   routeGet({ '/api/files': [{ id: 1, filename: 'a.txt', uuid: 'u' }] })
   render(<AdminFilesPage />)
   await screen.findByTestId('file-card-1')
-  fireEvent.change(screen.getByTestId('upload-file-input'),
-    { target: { files: [new File(['x'], 'up.txt')] } })
+  fireEvent.change(screen.getByTestId('upload-file-input'), {
+    target: { files: [new File(['x'], 'up.txt')] },
+  })
   await screen.findByTestId('file-card-9')
   fireEvent.click(screen.getByTestId('delete-file-1'))
   fireEvent.click(screen.getByTestId('confirm-submit-btn'))

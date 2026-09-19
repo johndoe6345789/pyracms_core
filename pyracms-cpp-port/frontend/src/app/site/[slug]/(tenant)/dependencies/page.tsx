@@ -29,15 +29,22 @@ export default function DependenciesPage() {
           </Typography>
         </Box>
         {signedIn && (
-          <Button variant="contained" component={Link}
+          <Button
+            variant="contained"
+            component={Link}
             href={`/site/${slug}/dependencies/new`}
-            data-testid="new-dep-btn">
+            data-testid="new-dep-btn"
+          >
             New dependency
           </Button>
         )}
       </Box>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <SearchFilterBar
         search={list.search}
         onSearchChange={list.setSearch}

@@ -2,20 +2,18 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('@/components/super-admin/GlobalUsersTable', () =>
-  require('@/__tests__/helpers/superAdminPagesMocks')
-    .usersTableMock)
+jest.mock(
+  '@/components/super-admin/GlobalUsersTable',
+  () => require('@/__tests__/helpers/superAdminPagesMocks').usersTableMock,
+)
 
-import SuperAdminUsersPage
-  from '@/app/super-admin/users/page'
+import SuperAdminUsersPage from '@/app/super-admin/users/page'
 
 describe('/super-admin/users page', () => {
   beforeEach(() => render(<SuperAdminUsersPage />))
 
   it('renders the page wrapper', () => {
-    expect(
-      screen.getByTestId('super-admin-users-page'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('super-admin-users-page')).toBeInTheDocument()
   })
 
   it('renders the "Global Users" h1 heading', () => {
@@ -28,8 +26,6 @@ describe('/super-admin/users page', () => {
   })
 
   it('renders the GlobalUsersTable', () => {
-    expect(
-      screen.getByTestId('mock-global-users-table'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('mock-global-users-table')).toBeInTheDocument()
   })
 })

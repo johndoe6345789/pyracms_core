@@ -13,7 +13,11 @@ jest.mock('next/navigation', () => ({
 }))
 
 describe('UserBubble', () => {
-  beforeEach(() => { push.mockClear(); params = {}; localStorage.clear() })
+  beforeEach(() => {
+    push.mockClear()
+    params = {}
+    localStorage.clear()
+  })
 
   it('shows a plain sign-in chip on the portal', () => {
     renderWithStore(<UserBubble />)
@@ -25,8 +29,7 @@ describe('UserBubble', () => {
   it('links a site guest back to that site', () => {
     params = { slug: 'demo' }
     renderWithStore(<UserBubble />)
-    const href = screen.getByTestId('guest-login-link')
-      .getAttribute('href')
+    const href = screen.getByTestId('guest-login-link').getAttribute('href')
     expect(href).toContain('tenant=demo')
     expect(href).toContain('redirect=%2Fsite%2Fdemo%2Fforum')
   })
@@ -34,8 +37,9 @@ describe('UserBubble', () => {
   it('treats a session for another site as a guest', () => {
     params = { slug: 'demo' }
     renderWithStore(<UserBubble />, makeUser({ tenantSlug: 'other' }))
-    expect(screen.getByTestId('guest-login-link'))
-      .toHaveTextContent('Sign in here')
+    expect(screen.getByTestId('guest-login-link')).toHaveTextContent(
+      'Sign in here',
+    )
   })
 
   it('shows portal links and super admin', () => {
@@ -55,8 +59,10 @@ describe('UserBubble', () => {
   it('shows site links and signs out of that site', () => {
     params = { slug: 'demo' }
     setToken('demo', 'tok')
-    const { store } = renderWithStore(<UserBubble />,
-      makeUser({ tenantSlug: 'demo' }))
+    const { store } = renderWithStore(
+      <UserBubble />,
+      makeUser({ tenantSlug: 'demo' }),
+    )
     fireEvent.click(screen.getByTestId('user-bubble-btn'))
     expect(screen.getByTestId('admin-link')).toBeInTheDocument()
     expect(screen.getByTestId('settings-link')).toBeInTheDocument()

@@ -1,8 +1,5 @@
 import { Box, IconButton, Typography } from '@mui/material'
-import {
-  ThumbUpOutlined,
-  ThumbDownOutlined,
-} from '@mui/icons-material'
+import { ThumbUpOutlined, ThumbDownOutlined } from '@mui/icons-material'
 
 interface VoteButtonsProps {
   likes: number

@@ -3,16 +3,12 @@ import { screen, within } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { UserRole, USER_ROLE_LABELS } from '@/types'
-import {
-  renderCell, openMenu,
-} from '../../helpers/roleSelectCell'
+import { renderCell, openMenu } from '../../helpers/roleSelectCell'
 
 /** Asserts the open listbox contains the label for `role`. */
 function expectOption(role: UserRole) {
   expect(
-    within(screen.getByRole('listbox')).getByText(
-      USER_ROLE_LABELS[role],
-    ),
+    within(screen.getByRole('listbox')).getByText(USER_ROLE_LABELS[role]),
   ).toBeInTheDocument()
 }
 
@@ -22,9 +18,7 @@ describe('RoleSelectCell', () => {
     openMenu()
     const listbox = screen.getByRole('listbox')
     for (const label of Object.values(USER_ROLE_LABELS)) {
-      expect(
-        within(listbox).getByText(label),
-      ).toBeInTheDocument()
+      expect(within(listbox).getByText(label)).toBeInTheDocument()
     }
   })
 

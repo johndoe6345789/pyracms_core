@@ -21,12 +21,20 @@ export function ThreadHeader({ thread, actions }: Props) {
       </Box>
       <Box sx={{ display: 'flex', gap: 1, my: 1 }}>
         {thread.pinned && (
-          <Chip icon={<PushPinOutlined />} label="Pinned" size="small"
-            color="primary" />
+          <Chip
+            icon={<PushPinOutlined />}
+            label="Pinned"
+            size="small"
+            color="primary"
+          />
         )}
         {thread.locked && (
-          <Chip icon={<LockOutlined />} label="Locked" size="small"
-            variant="outlined" />
+          <Chip
+            icon={<LockOutlined />}
+            label="Locked"
+            size="small"
+            variant="outlined"
+          />
         )}
       </Box>
       {thread.description && (

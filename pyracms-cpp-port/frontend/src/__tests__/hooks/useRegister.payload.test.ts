@@ -36,20 +36,14 @@ describe('useRegister', () => {
       result.current.updateField('lastName', 'Jones')
     })
     await submit(result)
-    expect(mockApi.post).toHaveBeenCalledWith(
-      '/api/auth/register',
-      {
-        username: 'carol',
-        email: 'carol@example.com',
-        password: 'securepass',
-        firstName: 'Carol',
-        lastName: 'Jones',
-      },
-    )
-    const payload = mockApi.post.mock.calls[0]![1] as Record<
-      string,
-      unknown
-    >
+    expect(mockApi.post).toHaveBeenCalledWith('/api/auth/register', {
+      username: 'carol',
+      email: 'carol@example.com',
+      password: 'securepass',
+      firstName: 'Carol',
+      lastName: 'Jones',
+    })
+    const payload = mockApi.post.mock.calls[0]![1] as Record<string, unknown>
     expect(payload).not.toHaveProperty('confirmPassword')
   })
 })

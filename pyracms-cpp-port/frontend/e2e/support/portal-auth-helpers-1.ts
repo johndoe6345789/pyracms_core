@@ -11,10 +11,9 @@ export async function loginAsAdmin(page: Page): Promise<void> {
   await page.getByTestId('username-input').fill('admin')
   await page.getByTestId('password-input').fill('password123')
   await page.getByTestId('login-submit').click()
-  await page.waitForURL(
-    (url) => !url.pathname.startsWith('/auth/login'),
-    { timeout: 10_000 },
-  )
+  await page.waitForURL((url) => !url.pathname.startsWith('/auth/login'), {
+    timeout: 10_000,
+  })
 }
 
 /**
@@ -46,22 +45,12 @@ export async function fillRegisterForm(
     lastName: string
   },
 ) {
-  await page
-    .getByTestId('register-username-input')
-    .fill(opts.username)
-  await page
-    .getByTestId('register-email-input')
-    .fill(opts.email)
-  await page
-    .getByTestId('register-password-input')
-    .fill(opts.password)
+  await page.getByTestId('register-username-input').fill(opts.username)
+  await page.getByTestId('register-email-input').fill(opts.email)
+  await page.getByTestId('register-password-input').fill(opts.password)
   await page
     .getByTestId('register-confirm-password-input')
     .fill(opts.confirmPassword)
-  await page
-    .getByTestId('register-firstname-input')
-    .fill(opts.firstName)
-  await page
-    .getByTestId('register-lastname-input')
-    .fill(opts.lastName)
+  await page.getByTestId('register-firstname-input').fill(opts.firstName)
+  await page.getByTestId('register-lastname-input').fill(opts.lastName)
 }

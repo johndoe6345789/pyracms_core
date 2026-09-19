@@ -8,9 +8,11 @@ import { isProviderUrl, stashOAuth } from '@/lib/oauth'
 import { useOAuthProviders } from '@/hooks/useOAuthProviders'
 
 /** "Continue with ..." buttons; hidden unless a provider is configured. */
-export default function OAuthButtons(
-  { redirectTo }: { redirectTo?: string | undefined },
-) {
+export default function OAuthButtons({
+  redirectTo,
+}: {
+  redirectTo?: string | undefined
+}) {
   const { providers } = useOAuthProviders()
   const [error, setError] = useState('')
 
@@ -31,13 +33,21 @@ export default function OAuthButtons(
     <Box sx={{ mt: 2 }} data-testid="oauth-buttons">
       <Divider sx={{ mb: 2 }}>or</Divider>
       {providers.map((p) => (
-        <Button key={p.id} fullWidth variant="outlined" sx={{ mb: 1 }}
-          onClick={() => start(p.id)} data-testid={`oauth-${p.id}`}>
+        <Button
+          key={p.id}
+          fullWidth
+          variant="outlined"
+          sx={{ mb: 1 }}
+          onClick={() => start(p.id)}
+          data-testid={`oauth-${p.id}`}
+        >
           Continue with {p.label}
         </Button>
       ))}
       {error && (
-        <Alert severity="error" data-testid="oauth-error">{error}</Alert>
+        <Alert severity="error" data-testid="oauth-error">
+          {error}
+        </Alert>
       )}
     </Box>
   )

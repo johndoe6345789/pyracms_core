@@ -30,8 +30,7 @@ export function getProgress(points: number): number {
 }
 
 export function getNextLevel(points: number): Level | null {
-  const idx = LEVELS.findIndex(
-    (l) => l.min <= points && points < l.max)
+  const idx = LEVELS.findIndex((l) => l.min <= points && points < l.max)
   if (idx >= 0 && idx < LEVELS.length - 1) return LEVELS[idx + 1] ?? null
   return null
 }

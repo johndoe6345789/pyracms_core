@@ -1,8 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { useSearchPage } from '@/hooks/useSearchPage'
 import { fetchSearch } from '@/hooks/searchTypes'
-import { formatDay, formatDateTime, parseApiDate }
-  from '@/hooks/articleDate'
+import { formatDay, formatDateTime, parseApiDate } from '@/hooks/articleDate'
 import api from '@/lib/api'
 
 const push = jest.fn()
@@ -15,13 +14,17 @@ jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 7 }),
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
-const payload = { data: { items: [{ id: 1 }], totalCount: 11,
-  facets: { article: 11 } } }
+const payload = {
+  data: { items: [{ id: 1 }], totalCount: 11, facets: { article: 11 } },
+}
 beforeEach(() => {
-  get.mockReset(); push.mockReset(); qs = 'q=hello&site=demo'
+  get.mockReset()
+  push.mockReset()
+  qs = 'q=hello&site=demo'
 })
 
 describe('fetchSearch', () => {
@@ -47,9 +50,13 @@ describe('useSearchPage', () => {
     qs = 'tenant_id=9'
     get.mockResolvedValue(payload)
     const { result } = renderHook(() => useSearchPage())
-    await act(async () => { result.current.handleSearch('foo') })
+    await act(async () => {
+      result.current.handleSearch('foo')
+    })
     expect(push).toHaveBeenCalledWith('/search?tenant_id=9&q=foo')
-    await act(async () => { result.current.handleTypeChange('snippet') })
+    await act(async () => {
+      result.current.handleTypeChange('snippet')
+    })
     expect(result.current.activeType).toBe('snippet')
     expect(get.mock.calls.at(-1)![0]).toContain('type=snippet')
   })
@@ -57,10 +64,14 @@ describe('useSearchPage', () => {
   it('clears state for empty queries and errors', async () => {
     qs = ''
     const { result } = renderHook(() => useSearchPage())
-    await act(async () => { result.current.handleSearch('') })
+    await act(async () => {
+      result.current.handleSearch('')
+    })
     expect(result.current.results).toEqual([])
     get.mockRejectedValue(new Error('x'))
-    await act(async () => { result.current.handleSearch('boom') })
+    await act(async () => {
+      result.current.handleSearch('boom')
+    })
     expect(result.current.results).toEqual([])
     expect(result.current.loading).toBe(false)
   })
@@ -68,8 +79,9 @@ describe('useSearchPage', () => {
 
 describe('article dates', () => {
   it('parses API timestamps', () => {
-    expect(parseApiDate('2024-03-05 10:20:30+00').toISOString())
-      .toBe('2024-03-05T10:20:30.000Z')
+    expect(parseApiDate('2024-03-05 10:20:30+00').toISOString()).toBe(
+      '2024-03-05T10:20:30.000Z',
+    )
   })
 
   it('formats days and date-times', () => {

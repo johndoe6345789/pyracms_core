@@ -10,7 +10,9 @@ import {
 } from '@mui/icons-material'
 
 const item = (label: string, path: string, icon: React.ElementType) => ({
-  label, path, icon: React.createElement(icon),
+  label,
+  path,
+  icon: React.createElement(icon),
 })
 
 export const NAV_ITEMS = [

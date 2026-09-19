@@ -1,16 +1,12 @@
 'use client'
 
 import { Typography, Box } from '@mui/material'
-import {
-  useAclEditor,
-} from '@/hooks/useAclEditor'
+import { useAclEditor } from '@/hooks/useAclEditor'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
-import AddAclRuleForm from
-  '@/components/admin/AddAclRuleForm'
+import AddAclRuleForm from '@/components/admin/AddAclRuleForm'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import AclRuleTable from
-  '@/components/admin/AclRuleTable'
+import AclRuleTable from '@/components/admin/AclRuleTable'
 
 export default function AdminAclPage() {
   const params = useParams()
@@ -31,19 +27,11 @@ export default function AdminAclPage() {
 
   return (
     <Box data-testid="admin-acl-page">
-      <Typography
-        variant="h3"
-        sx={{ mb: 1 }}
-      >
+      <Typography variant="h3" sx={{ mb: 1 }}>
         ACL Editor
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
-        Manage access control list rules
-        for the platform.
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Manage access control list rules for the platform.
       </Typography>
       <ErrorAlert error={error} testId="acl-error" />
       <AddAclRuleForm
@@ -51,18 +39,11 @@ export default function AdminAclPage() {
         newPrincipal={newPrincipal}
         newPermission={newPermission}
         onActionChange={setNewAction}
-        onPrincipalChange={
-          setNewPrincipal
-        }
-        onPermissionChange={
-          setNewPermission
-        }
+        onPrincipalChange={setNewPrincipal}
+        onPermissionChange={setNewPermission}
         onAdd={handleAdd}
       />
-      <AclRuleTable
-        rules={rules}
-        onDelete={handleDelete}
-      />
+      <AclRuleTable rules={rules} onDelete={handleDelete} />
     </Box>
   )
 }

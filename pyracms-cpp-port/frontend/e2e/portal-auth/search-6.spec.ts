@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Search — /search', () => {
   test(
-    'mocked API: FacetSidebar "Articles" filter is '
-    + 'visible when articles facet has count > 0',
+    'mocked API: FacetSidebar "Articles" filter is ' +
+      'visible when articles facet has count > 0',
     async ({ page }) => {
       await page.route('**/api/search*', (route) => {
         if (route.request().url().includes('autocomplete')) {

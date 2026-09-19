@@ -4,15 +4,11 @@ import { Typography, Box } from '@mui/material'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
-import MenuGroupSelect from
-  '@/components/admin/MenuGroupSelect'
-import MenuItemTable from
-  '@/components/admin/MenuItemTable'
-import AddMenuItemCard from
-  '@/components/admin/menus/AddMenuItemCard'
+import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
+import MenuItemTable from '@/components/admin/MenuItemTable'
+import AddMenuItemCard from '@/components/admin/menus/AddMenuItemCard'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import CreateGroupDialog from
-  '@/components/admin/menus/CreateGroupDialog'
+import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
 
 export default function AdminMenusPage() {
   const params = useParams()
@@ -25,11 +21,7 @@ export default function AdminMenusPage() {
       <Typography variant="h3" sx={{ mb: 1 }}>
         Menu Editor
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Manage navigation menus and menu items.
       </Typography>
       <ErrorAlert error={editor.error} testId="menu-editor-error" />

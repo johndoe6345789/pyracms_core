@@ -1,8 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 
-import RoleSelectCell from
-  '@/components/super-admin/RoleSelectCell'
+import RoleSelectCell from '@/components/super-admin/RoleSelectCell'
 import { UserRole } from '@/types'
 
 interface RenderOptions {
@@ -42,7 +41,5 @@ export function renderCell({
 
 /** Opens the Select dropdown. */
 export function openMenu() {
-  fireEvent.mouseDown(
-    screen.getByRole('combobox', { hidden: true }),
-  )
+  fireEvent.mouseDown(screen.getByRole('combobox', { hidden: true }))
 }

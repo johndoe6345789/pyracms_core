@@ -1,7 +1,11 @@
 'use client'
 
 import {
-  Alert, Box, CircularProgress, Container, Typography,
+  Alert,
+  Box,
+  CircularProgress,
+  Container,
+  Typography,
 } from '@mui/material'
 import { BackButton } from '@/components/common/BackButton'
 
@@ -24,9 +28,13 @@ export function SnippetNotFound({ base }: { base: string }) {
   )
 }
 
-export function SnippetActionError(
-  { message, onClose }: { message: string; onClose: () => void },
-) {
+export function SnippetActionError({
+  message,
+  onClose,
+}: {
+  message: string
+  onClose: () => void
+}) {
   if (!message) return null
   return (
     <Alert severity="error" sx={{ mb: 2 }} onClose={onClose}>

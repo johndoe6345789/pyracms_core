@@ -17,9 +17,7 @@ interface Props {
   onClose: () => void
 }
 
-export default function TurboErrorDialog(
-  { open, message, onClose }: Props,
-) {
+export default function TurboErrorDialog({ open, message, onClose }: Props) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>Turbologin Failed</DialogTitle>
@@ -35,8 +33,9 @@ export default function TurboErrorDialog(
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
-        <Button onClick={() =>
-          window.open(VAULT, '_blank', 'noopener,noreferrer')}>
+        <Button
+          onClick={() => window.open(VAULT, '_blank', 'noopener,noreferrer')}
+        >
           Open Vault
         </Button>
       </DialogActions>

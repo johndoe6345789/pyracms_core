@@ -4,10 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {
-  navigationMock,
-  apiMock,
-} from '../helpers/createSiteHook'
+import { navigationMock, apiMock } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())

@@ -71,6 +71,7 @@ on a site (verified by `scripts/smoke.sh`).
 | `JWT_EXPIRY_SECONDS`, `MAX_UPLOAD_MB` | Backend tuning; nginx caps `/api/` bodies at 50 MB. Raise both together. |
 | `NGINX_BIND`, `NGINX_PORT` | Host publish address. Keep `127.0.0.1` behind a proxy. |
 | `BACKUP_*` | See `OPERATIONS.md`. |
+| `STORAGE_BACKEND`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Where uploaded files live: `local` (default) or an S3-compatible object store (compose profile `storage`). See `STORAGE.md`. |
 
 Changing `NEXT_PUBLIC_API_URL` requires a frontend rebuild; leave it empty
 (same-origin) unless the API lives on another host.

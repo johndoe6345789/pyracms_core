@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
-  Avatar, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Divider,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material'
 import { LogoutOutlined } from '@mui/icons-material'
 import { useParams, usePathname } from 'next/navigation'
@@ -15,8 +21,11 @@ import UserMenuHeader from './UserMenuHeader'
 import { siteMenuItems, portalMenuItems } from './userMenuItems'
 
 const avatarSx = {
-  width: 32, height: 32, bgcolor: 'primary.main',
-  fontSize: '0.875rem', fontWeight: 700,
+  width: 32,
+  height: 32,
+  bgcolor: 'primary.main',
+  fontSize: '0.875rem',
+  fontWeight: 700,
 } as const
 
 export default function UserBubble() {
@@ -32,13 +41,12 @@ export default function UserBubble() {
 
   // Accounts are per-site. A session that belongs to another site is a
   // guest here; platform accounts (no tenantSlug) are valid everywhere.
-  const signedIn = isAuthenticated
-    && (!slug || !user?.tenantSlug || user.tenantSlug === slug)
+  const signedIn =
+    isAuthenticated && (!slug || !user?.tenantSlug || user.tenantSlug === slug)
 
   if (!signedIn) {
     return (
-      <GuestChip slug={slug} pathname={pathname}
-        otherSite={isAuthenticated} />
+      <GuestChip slug={slug} pathname={pathname} otherSite={isAuthenticated} />
     )
   }
   const init = user?.username?.charAt(0).toUpperCase() || '?'
@@ -49,13 +57,16 @@ export default function UserBubble() {
     <>
       <IconButton
         onClick={(e) => setEl(e.currentTarget)}
-        sx={{ p: 0.5 }} aria-label="User menu"
+        sx={{ p: 0.5 }}
+        aria-label="User menu"
         data-testid="user-bubble-btn"
       >
         <Avatar sx={avatarSx}>{init}</Avatar>
       </IconButton>
       <Menu
-        anchorEl={el} open={Boolean(el)} onClose={close}
+        anchorEl={el}
+        open={Boolean(el)}
+        onClose={close}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 220, mt: 1 } } }}
@@ -65,7 +76,9 @@ export default function UserBubble() {
         {links}
         <Divider />
         <MenuItem onClick={doLogout} data-testid="logout-btn">
-          <ListItemIcon><LogoutOutlined fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <LogoutOutlined fontSize="small" />
+          </ListItemIcon>
           <ListItemText>Sign Out</ListItemText>
         </MenuItem>
       </Menu>

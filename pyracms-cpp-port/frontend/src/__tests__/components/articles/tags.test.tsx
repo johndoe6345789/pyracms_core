@@ -8,8 +8,13 @@ const input = () =>
 
 const setup = (tags: string[] = ['a']) => {
   const set = jest.fn()
-  render(<ArticleTagEditor tagsInput={tags.join(', ')} setTagsInput={set}
-    tags={tags} />)
+  render(
+    <ArticleTagEditor
+      tagsInput={tags.join(', ')}
+      setTagsInput={set}
+      tags={tags}
+    />,
+  )
   return set
 }
 
@@ -34,18 +39,24 @@ it('splits comma input and deletes chips', () => {
   const set = setup()
   fireEvent.change(input(), { target: { value: 'b, ,a,c' } })
   expect(set).toHaveBeenCalledWith('a, b')
-  fireEvent.click(within(screen.getByTestId('editable-tag-chip-a'))
-    .getByTestId('CancelIcon'))
+  fireEvent.click(
+    within(screen.getByTestId('editable-tag-chip-a')).getByTestId('CancelIcon'),
+  )
   expect(set).toHaveBeenCalledWith('')
 })
 
 it('useTagDraft handles empty tags and other keys', () => {
   const set = jest.fn()
   const { result } = renderHook(() => useTagDraft([], set))
-  act(() => result.current.handleKeyDown(
-    { key: 'Backspace', preventDefault: jest.fn() }))
-  act(() => result.current.handleKeyDown(
-    { key: 'x', preventDefault: jest.fn() }))
+  act(() =>
+    result.current.handleKeyDown({
+      key: 'Backspace',
+      preventDefault: jest.fn(),
+    }),
+  )
+  act(() =>
+    result.current.handleKeyDown({ key: 'x', preventDefault: jest.fn() }),
+  )
   act(() => result.current.addTag('   '))
   expect(set).not.toHaveBeenCalled()
   expect(result.current.draftTag).toBe('')

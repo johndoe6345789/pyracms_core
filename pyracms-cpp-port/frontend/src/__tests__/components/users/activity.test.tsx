@@ -7,17 +7,23 @@ import { AchievementCard } from '@/components/users/AchievementCard'
 import { ico } from '@/components/users/achievementIcons'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 
 const act = (i: number, type = 'article', d = 'desc') => ({
-  id: String(i), type, title: `T${i}`, description: d, date: 'today',
+  id: String(i),
+  type,
+  title: `T${i}`,
+  description: d,
+  date: 'today',
 })
 
 describe('activity', () => {
   it('ActivityItem renders description only when present', () => {
     const { rerender } = render(
-      <ActivityItem activity={act(1)} isLast={false} />)
+      <ActivityItem activity={act(1)} isLast={false} />,
+    )
     expect(screen.getByText('desc')).toBeInTheDocument()
     rerender(<ActivityItem activity={act(1, 'weird', '')} isLast />)
     expect(screen.queryByText('desc')).toBeNull()
@@ -38,7 +44,8 @@ describe('activity', () => {
 
   it('ActivityTimeline paginates and filters', () => {
     const acts = Array.from({ length: 7 }, (_, i) =>
-      act(i, i === 6 ? 'snippet' : 'article'))
+      act(i, i === 6 ? 'snippet' : 'article'),
+    )
     render(<ActivityTimeline activities={acts} />)
     expect(screen.queryByTestId('activity-item-5')).toBeNull()
     fireEvent.click(screen.getByTestId('load-more-activity'))
@@ -51,14 +58,20 @@ describe('activity', () => {
 })
 
 describe('AchievementCard', () => {
-  const a = { id: 1, name: 'n', displayName: 'Nice', description: 'd',
-    icon: 'code', earned: true, earnedAt: '2024-01-02T00:00:00Z' }
+  const a = {
+    id: 1,
+    name: 'n',
+    displayName: 'Nice',
+    description: 'd',
+    icon: 'code',
+    earned: true,
+    earnedAt: '2024-01-02T00:00:00Z',
+  }
 
   it('shows the earned date only when earned', () => {
     const { rerender } = render(<AchievementCard a={a} />)
     expect(screen.getByText('Nice')).toBeInTheDocument()
-    expect(screen.getByTestId('achievement-n').textContent)
-      .toMatch(/\d/)
+    expect(screen.getByTestId('achievement-n').textContent).toMatch(/\d/)
     rerender(<AchievementCard a={{ ...a, earned: false, icon: 'zzz' }} />)
     expect(screen.getByTestId('achievement-n').textContent).toBe('Nice')
   })

@@ -1,6 +1,4 @@
-import {
-  screen, fireEvent,
-} from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 import AdminUsersPage from '@/app/site/[slug]/(admin)/admin/users/page'
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
@@ -14,8 +12,11 @@ const admin = makeUser({ id: 9, role: UserRole.SiteAdmin })
 beforeEach(() => {
   jest.resetAllMocks()
   localStorage.clear()
-  routeGet({ '/api/users': [
-    { id: 1, username: 'bob', fullName: 'Bob', email: 'b@x', role: 1 }] })
+  routeGet({
+    '/api/users': [
+      { id: 1, username: 'bob', fullName: 'Bob', email: 'b@x', role: 1 },
+    ],
+  })
   m.put.mockResolvedValue({})
   m.delete.mockResolvedValue({})
 })
@@ -30,10 +31,12 @@ it('shows the API error and keeps the dialog open', async () => {
 })
 
 it('shows ban and delete errors from the API', async () => {
-  m.put.mockRejectedValue(
-    { response: { data: { error: 'The site owner cannot be changed' } } })
-  m.delete.mockRejectedValue(
-    { response: { data: { error: 'Cannot delete: in use' } } })
+  m.put.mockRejectedValue({
+    response: { data: { error: 'The site owner cannot be changed' } },
+  })
+  m.delete.mockRejectedValue({
+    response: { data: { error: 'Cannot delete: in use' } },
+  })
   renderWithStore(<AdminUsersPage />, admin)
   fireEvent.click(await screen.findByTestId('ban-user-1'))
   await screen.findByText('The site owner cannot be changed')

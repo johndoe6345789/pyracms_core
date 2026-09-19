@@ -4,15 +4,22 @@ import { SnippetHeader } from '@/components/code/SnippetHeader'
 import { mapSnippet } from '@/lib/snippets'
 
 const props = {
-  id: '5', title: 'Hello', language: 'python', siteSlug: 's',
+  id: '5',
+  title: 'Hello',
+  language: 'python',
+  siteSlug: 's',
   code: Array.from({ length: 10 }, (_, i) => `line${i}`).join('\n'),
-  author: 'ann', date: '2024-01-01', runCount: 3,
+  author: 'ann',
+  date: '2024-01-01',
+  runCount: 3,
 }
 
 it('renders card details and links', () => {
   render(<SnippetCard {...props} />)
-  expect(screen.getByTestId('snippet-link-5'))
-    .toHaveAttribute('href', '/site/s/snippets/5')
+  expect(screen.getByTestId('snippet-link-5')).toHaveAttribute(
+    'href',
+    '/site/s/snippets/5',
+  )
   expect(screen.getByText('3 runs')).toBeInTheDocument()
   expect(screen.getByText(/line5/)).toBeInTheDocument()
   expect(screen.queryByText(/line6/)).toBeNull()
@@ -35,14 +42,23 @@ it('copies the link by default', () => {
   render(<SnippetCard {...props} />)
   fireEvent.click(screen.getByTestId('share-snippet-5'))
   expect(writeText).toHaveBeenCalledWith(
-    `${window.location.origin}/site/s/snippets/5`)
+    `${window.location.origin}/site/s/snippets/5`,
+  )
 })
 
 it('renders the snippet header with fork badge', () => {
-  render(<SnippetHeader s={mapSnippet({
-    id: 1, title: 'T', language: 'go', authorUsername: 'bob',
-    forkedFrom: 2, createdAt: '2024-05-06T00:00:00Z',
-  })} />)
+  render(
+    <SnippetHeader
+      s={mapSnippet({
+        id: 1,
+        title: 'T',
+        language: 'go',
+        authorUsername: 'bob',
+        forkedFrom: 2,
+        createdAt: '2024-05-06T00:00:00Z',
+      })}
+    />,
+  )
   expect(screen.getByText('by bob')).toBeInTheDocument()
   expect(screen.getByText('Fork')).toBeInTheDocument()
 })

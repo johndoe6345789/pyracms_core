@@ -31,12 +31,7 @@ export default function SuperAdminBreadcrumbs() {
     >
       <Breadcrumbs
         aria-label="Super admin breadcrumb navigation"
-        separator={
-          <NavigateNextOutlined
-            fontSize="small"
-            aria-hidden="true"
-          />
-        }
+        separator={<NavigateNextOutlined fontSize="small" aria-hidden="true" />}
       >
         {crumbs.slice(0, -1).map((crumb) => (
           <BreadcrumbLink key={crumb.href} crumb={crumb} />

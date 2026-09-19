@@ -17,11 +17,12 @@ interface Props {
 }
 
 export default function LoginForm({ redirectTo, tenant }: Props) {
-  const {
-    formData, updateField, error, loading, handleSubmit, loginDirect,
-  } = useLogin(redirectTo, tenant)
-  const { turboError, handleTurboLogin, clearTurboError } =
-    useTurboLogin(loginDirect, redirectTo)
+  const { formData, updateField, error, loading, handleSubmit, loginDirect } =
+    useLogin(redirectTo, tenant)
+  const { turboError, handleTurboLogin, clearTurboError } = useTurboLogin(
+    loginDirect,
+    redirectTo,
+  )
 
   return (
     <>
@@ -31,20 +32,22 @@ export default function LoginForm({ redirectTo, tenant }: Props) {
         onClose={clearTurboError}
       />
       <LoginHeader error={error} tenant={tenant} />
-      {tenant && (
-        <AuthScopeNotice tenant={tenant} platformHref="/auth/login" />
-      )}
+      {tenant && <AuthScopeNotice tenant={tenant} platformHref="/auth/login" />}
       <form
         onSubmit={handleSubmit}
         data-testid="login-form"
         aria-label="Login form"
       >
         <TextField
-          fullWidth label="Username" margin="normal" required
+          fullWidth
+          label="Username"
+          margin="normal"
+          required
           value={formData.username}
           onChange={(e) => updateField('username', e.target.value)}
           inputProps={{
-            'data-testid': 'username-input', 'aria-label': 'Username',
+            'data-testid': 'username-input',
+            'aria-label': 'Username',
           }}
           aria-describedby={error ? 'login-error-msg' : undefined}
           sx={{ mb: 2 }}
@@ -55,8 +58,11 @@ export default function LoginForm({ redirectTo, tenant }: Props) {
           data-testid="password-input"
           sx={{ mb: 3 }}
         />
-        <LoginActions loading={loading} onTurbo={handleTurboLogin}
-          tenant={tenant} />
+        <LoginActions
+          loading={loading}
+          onTurbo={handleTurboLogin}
+          tenant={tenant}
+        />
       </form>
       <LoginFooter tenant={tenant} />
     </>

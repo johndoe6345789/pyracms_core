@@ -6,16 +6,24 @@ import EditUserDialog from '@/components/admin/users/EditUserDialog'
 import UsersHeader from '@/components/admin/users/UsersHeader'
 import UserTable from '@/components/admin/UserTable'
 
-const user = { id: 3, username: 'bob', fullName: 'Bob B', email: 'b@x',
-  created: 'c', banned: false, role: 1 }
+const user = {
+  id: 3,
+  username: 'bob',
+  fullName: 'Bob B',
+  email: 'b@x',
+  created: 'c',
+  banned: false,
+  role: 1,
+}
 
-const box = (id: string) =>
-  within(screen.getByTestId(id)).getByRole('textbox')
+const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
 
 const setup = (over = {}) => {
   const p = { onClose: jest.fn(), onSave: jest.fn() }
-  renderWithStore(<EditUserDialog user={user} saving={false} error="" {...p}
-    {...over} />, makeUser({ role: UserRole.SiteAdmin }))
+  renderWithStore(
+    <EditUserDialog user={user} saving={false} error="" {...p} {...over} />,
+    makeUser({ role: UserRole.SiteAdmin }),
+  )
   return p
 }
 
@@ -25,8 +33,11 @@ it('prefills and saves trimmed profile fields', () => {
   fireEvent.change(box('edit-fullname-input'), { target: { value: ' Rob ' } })
   fireEvent.change(box('edit-email-input'), { target: { value: ' r@x ' } })
   fireEvent.click(screen.getByTestId('save-edit-user-btn'))
-  expect(p.onSave).toHaveBeenCalledWith(
-    { fullName: 'Rob', email: 'r@x', role: 1 })
+  expect(p.onSave).toHaveBeenCalledWith({
+    fullName: 'Rob',
+    email: 'r@x',
+    role: 1,
+  })
   fireEvent.click(screen.getByTestId('cancel-edit-user-btn'))
   expect(p.onClose).toHaveBeenCalled()
 })
@@ -40,13 +51,21 @@ it('blocks saving without an email or while saving', () => {
 it('shows the saving label and errors', () => {
   setup({ saving: true, error: 'Forbidden' })
   expect(screen.getByTestId('save-edit-user-btn')).toHaveTextContent(
-    'Saving...')
+    'Saving...',
+  )
   expect(screen.getByTestId('edit-user-error')).toHaveTextContent('Forbidden')
 })
 
 it('stays closed without a user', () => {
-  renderWithStore(<EditUserDialog user={null} saving={false} error=""
-    onClose={jest.fn()} onSave={jest.fn()} />)
+  renderWithStore(
+    <EditUserDialog
+      user={null}
+      saving={false}
+      error=""
+      onClose={jest.fn()}
+      onSave={jest.fn()}
+    />,
+  )
   expect(screen.queryByTestId('edit-user-dialog')).toBeNull()
 })
 
@@ -59,8 +78,14 @@ it('UsersHeader triggers create', () => {
 
 it('UserTable forwards onEdit to the edit action', () => {
   const onEdit = jest.fn()
-  render(<UserTable users={[user]} onToggleBan={jest.fn()}
-    onDelete={jest.fn()} onEdit={onEdit} />)
+  render(
+    <UserTable
+      users={[user]}
+      onToggleBan={jest.fn()}
+      onDelete={jest.fn()}
+      onEdit={onEdit}
+    />,
+  )
   fireEvent.click(screen.getByTestId('edit-user-3'))
   expect(onEdit).toHaveBeenCalledWith(user)
 })

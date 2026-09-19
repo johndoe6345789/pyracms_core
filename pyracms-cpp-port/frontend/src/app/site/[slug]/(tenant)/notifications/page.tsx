@@ -2,8 +2,15 @@
 
 import NextLink from 'next/link'
 import {
-  Container, Typography, Button, Box, List, ListItem,
-  ListItemText, IconButton, Link,
+  Container,
+  Typography,
+  Button,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Link,
 } from '@mui/material'
 import { DeleteOutline } from '@mui/icons-material'
 import { useSelector } from 'react-redux'
@@ -35,27 +42,45 @@ export default function NotificationsPage() {
         </Typography>
       )}
       {isAuth && !loading && items.length === 0 && (
-        <Typography color="text.secondary">
-          No notifications.
-        </Typography>
+        <Typography color="text.secondary">No notifications.</Typography>
       )}
       <List>
         {items.map((n) => {
           const href = safeHref(n.link)
           return (
-            <ListItem key={n.id} divider data-testid={`note-${n.id}`}
-              secondaryAction={<IconButton aria-label="Delete"
-                onClick={() => remove(n.id)}><DeleteOutline />
-              </IconButton>}>
+            <ListItem
+              key={n.id}
+              divider
+              data-testid={`note-${n.id}`}
+              secondaryAction={
+                <IconButton aria-label="Delete" onClick={() => remove(n.id)}>
+                  <DeleteOutline />
+                </IconButton>
+              }
+            >
               <ListItemText
-                primary={href ? <Link component={NextLink}
-                  href={href}>{n.title}</Link> : n.title}
+                primary={
+                  href ? (
+                    <Link component={NextLink} href={href}>
+                      {n.title}
+                    </Link>
+                  ) : (
+                    n.title
+                  )
+                }
                 secondary={n.message}
                 primaryTypographyProps={{
-                  fontWeight: n.is_read ? 400 : 700 }} />
+                  fontWeight: n.is_read ? 400 : 700,
+                }}
+              />
               {!n.is_read && (
-                <Button size="small" onClick={() => markRead(n.id)}
-                  sx={{ mr: 4 }}>Mark read</Button>
+                <Button
+                  size="small"
+                  onClick={() => markRead(n.id)}
+                  sx={{ mr: 4 }}
+                >
+                  Mark read
+                </Button>
               )}
             </ListItem>
           )

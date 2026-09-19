@@ -1,36 +1,42 @@
 import { Box, Typography, Link as MuiLink } from '@mui/material'
 import {
-  LocationOnOutlined, LanguageOutlined,
+  LocationOnOutlined,
+  LanguageOutlined,
   CalendarTodayOutlined,
 } from '@mui/icons-material'
 import { safeHref } from '@/lib/safeUrl'
 
 const iSx = {
-  fontSize: 18, color: 'text.secondary',
+  fontSize: 18,
+  color: 'text.secondary',
 }
 const rowSx = {
   display: 'flex',
-  alignItems: 'center', gap: 0.5,
+  alignItems: 'center',
+  gap: 0.5,
 }
 
 interface ProfileInfoProps {
-  location?: string; website?: string
+  location?: string
+  website?: string
   joinDate: string
 }
 
-export function ProfileInfo({
-  location, website, joinDate,
-}: ProfileInfoProps) {
+export function ProfileInfo({ location, website, joinDate }: ProfileInfoProps) {
   return (
-    <Box sx={{
-      display: 'flex', flexWrap: 'wrap',
-      gap: 2, mb: 2,
-    }} data-testid="profile-info">
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 2,
+        mb: 2,
+      }}
+      data-testid="profile-info"
+    >
       {location && (
         <Box sx={rowSx}>
           <LocationOnOutlined sx={iSx} />
-          <Typography variant="body2"
-            color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             {location}
           </Typography>
         </Box>
@@ -38,18 +44,20 @@ export function ProfileInfo({
       {website && (
         <Box sx={rowSx}>
           <LanguageOutlined sx={iSx} />
-          <MuiLink href={safeHref(website)}
-            target="_blank" rel="noopener noreferrer ugc"
+          <MuiLink
+            href={safeHref(website)}
+            target="_blank"
+            rel="noopener noreferrer ugc"
             variant="body2"
-            data-testid="website-link">
+            data-testid="website-link"
+          >
             {website}
           </MuiLink>
         </Box>
       )}
       <Box sx={rowSx}>
         <CalendarTodayOutlined sx={iSx} />
-        <Typography variant="body2"
-          color="text.secondary">
+        <Typography variant="body2" color="text.secondary">
           Joined {joinDate}
         </Typography>
       </Box>

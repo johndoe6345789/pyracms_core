@@ -11,55 +11,49 @@ test.describe('User management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'active user row shows "Active" status chip',
-    async ({ page }) => {
-      await page.route('**/api/users', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_USERS),
-        }),
-      )
+  test('active user row shows "Active" status chip', async ({ page }) => {
+    await page.route('**/api/users', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_USERS),
+      }),
+    )
 
-      await page.goto('/super-admin/users')
-      await page
-        .getByTestId('super-admin-users-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForUsersLoaded(page)
+    await page.goto('/super-admin/users')
+    await page
+      .getByTestId('super-admin-users-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForUsersLoaded(page)
 
-      const userRow = page.getByTestId('user-row-user1')
-      await expect(userRow).toBeVisible()
-      await expect(userRow).toContainText('Active')
-    },
-  )
+    const userRow = page.getByTestId('user-row-user1')
+    await expect(userRow).toBeVisible()
+    await expect(userRow).toContainText('Active')
+  })
 
   // Role change
 
-  test(
-    'role select has aria-label "Role for {username}"',
-    async ({ page }) => {
-      await page.route('**/api/users', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_USERS),
-        }),
-      )
+  test('role select has aria-label "Role for {username}"', async ({ page }) => {
+    await page.route('**/api/users', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_USERS),
+      }),
+    )
 
-      await page.goto('/super-admin/users')
-      await page
-        .getByTestId('super-admin-users-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForUsersLoaded(page)
+    await page.goto('/super-admin/users')
+    await page
+      .getByTestId('super-admin-users-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForUsersLoaded(page)
 
-      const select =
-        page.getByTestId('role-select-user1')
-      await expect(select).toBeVisible()
-      // The inner <input> carries the aria-label
-      await expect(
-        select.locator('input'),
-      ).toHaveAttribute('aria-label', 'Role for user1')
-    },
-  )
+    const select = page.getByTestId('role-select-user1')
+    await expect(select).toBeVisible()
+    // The inner <input> carries the aria-label
+    await expect(select.locator('input')).toHaveAttribute(
+      'aria-label',
+      'Role for user1',
+    )
+  })
 })

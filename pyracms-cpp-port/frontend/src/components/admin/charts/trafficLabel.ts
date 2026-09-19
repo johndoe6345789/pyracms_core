@@ -1,6 +1,7 @@
 /** Builds the pie slice label text. */
 export const renderLabel = ({
-  name, percent,
+  name,
+  percent,
 }: {
   name: string
   percent: number

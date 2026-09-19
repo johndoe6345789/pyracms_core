@@ -13,4 +13,12 @@ NGINX_BIND=${NGINX_BIND:-127.0.0.1}
 NGINX_PORT=${NGINX_PORT:-3199}
 # Public origin (no trailing slash): e-mail links, CORS, sitemap, OG tags.
 SITE_URL=${SITE_URL:-http://localhost:${NGINX_PORT:-3199}}
+# Uploaded-file storage (docs/STORAGE.md). Switch to s3 and start the
+# bundled store with: --profile storage. Keys are generated here, never the
+# object store's built-in minioadmin seed key (removed by OBJECTSTORE_REMOVE_SEED).
+STORAGE_BACKEND=local
+S3_BUCKET=pyracms
+S3_ACCESS_KEY=$(rand 10)
+S3_SECRET_KEY=$(rand 24)
+OBJECTSTORE_REMOVE_SEED=1
 ENV

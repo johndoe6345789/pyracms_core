@@ -6,11 +6,7 @@ import { useAdminGate } from '@/hooks/useAdminGate'
 import AdminForbidden from './AdminForbidden'
 
 /** Shows `children` only to this site's administrators. */
-export default function AdminGate({
-  children,
-}: {
-  children: ReactNode
-}) {
+export default function AdminGate({ children }: { children: ReactNode }) {
   const { slug, allowed, checking } = useAdminGate()
   if (checking) {
     return (

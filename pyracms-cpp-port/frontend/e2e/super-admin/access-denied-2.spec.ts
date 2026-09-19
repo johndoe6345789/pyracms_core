@@ -8,8 +8,7 @@ test.describe('Access denied — regular user', () => {
   })
 
   test(
-    'regular user (role < SuperAdmin) is blocked from '
-    + '/super-admin',
+    'regular user (role < SuperAdmin) is blocked from ' + '/super-admin',
     async ({ page }) => {
       await goToSuperAdmin(page)
 

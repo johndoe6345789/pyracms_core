@@ -12,12 +12,9 @@ test.describe('Settings page', () => {
   })
 
   test(
-    'breadcrumb "Super Admin" link navigates to '
-    + '/super-admin',
+    'breadcrumb "Super Admin" link navigates to ' + '/super-admin',
     async ({ page }) => {
-      await page
-        .getByTestId('breadcrumb-link-super-admin')
-        .click()
+      await page.getByTestId('breadcrumb-link-super-admin').click()
       await expect(page).toHaveURL(/\/super-admin$/)
     },
   )

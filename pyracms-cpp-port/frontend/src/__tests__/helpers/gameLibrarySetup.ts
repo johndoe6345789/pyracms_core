@@ -5,6 +5,9 @@ export const rows = [
   { name: 'b', displayName: 'Beta', tags: [] },
 ]
 export const grid = () => within(screen.getByTestId('browse-grid'))
-export const okGet = (url: string) => Promise.resolve(
-  url.includes('limit') ? { data: rows }
-    : { data: { name: 'a', displayName: 'Alpha', revisions: [] } })
+export const okGet = (url: string) =>
+  Promise.resolve(
+    url.includes('limit')
+      ? { data: rows }
+      : { data: { name: 'a', displayName: 'Alpha', revisions: [] } },
+  )

@@ -1,7 +1,12 @@
 'use client'
 
 import {
-  Paper, TextField, FormControl, InputLabel, Select, MenuItem,
+  Paper,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { FilterDate } from './FilterDate'
 
@@ -22,7 +27,10 @@ export function SearchFilters(p: SearchFiltersProps) {
     <Paper
       variant="outlined"
       sx={{
-        p: 2, display: 'flex', gap: 2, flexWrap: 'wrap',
+        p: 2,
+        display: 'flex',
+        gap: 2,
+        flexWrap: 'wrap',
         borderColor: 'divider',
       }}
     >
@@ -44,14 +52,24 @@ export function SearchFilters(p: SearchFiltersProps) {
         >
           <MenuItem value="">All Forums</MenuItem>
           {p.availableForums.map((f) => (
-            <MenuItem key={f} value={f}>{f}</MenuItem>
+            <MenuItem key={f} value={f}>
+              {f}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
-      <FilterDate label="Date From" value={p.dateFrom}
-        testId="search-filter-date-from" onChange={p.onDateFromChange} />
-      <FilterDate label="Date To" value={p.dateTo}
-        testId="search-filter-date-to" onChange={p.onDateToChange} />
+      <FilterDate
+        label="Date From"
+        value={p.dateFrom}
+        testId="search-filter-date-from"
+        onChange={p.onDateFromChange}
+      />
+      <FilterDate
+        label="Date To"
+        value={p.dateTo}
+        testId="search-filter-date-to"
+        onChange={p.onDateToChange}
+      />
     </Paper>
   )
 }

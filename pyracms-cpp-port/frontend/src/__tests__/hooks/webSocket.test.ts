@@ -14,9 +14,11 @@ beforeEach(() => {
 
 describe('useWebSocket', () => {
   it('connects with the token, relays messages and sends', () => {
-    const onMessage = jest.fn(); const onConnect = jest.fn()
-    const { result } = renderHook(() => useWebSocket(
-      { url: 'http://h/ws?a=1', onMessage, onConnect }))
+    const onMessage = jest.fn()
+    const onConnect = jest.fn()
+    const { result } = renderHook(() =>
+      useWebSocket({ url: 'http://h/ws?a=1', onMessage, onConnect }),
+    )
     const ws = FakeWs.all[0]!
     expect(ws.url).toBe('ws://h/ws?a=1&token=tok')
     act(() => ws.onopen())
@@ -42,22 +44,29 @@ describe('useWebSocket', () => {
     renderHook(() => useWebSocket({ url: 'http://h/ws', onDisconnect }))
     act(() => FakeWs.all[0]!.onerror())
     expect(onDisconnect).toHaveBeenCalled()
-    act(() => { jest.advanceTimersByTime(3100) })
+    act(() => {
+      jest.advanceTimersByTime(3100)
+    })
     expect(FakeWs.all).toHaveLength(2)
     jest.useRealTimers()
   })
 
   it('does not reconnect after unmount or when disabled', () => {
     jest.useFakeTimers()
-    const off = renderHook(() => useWebSocket(
-      { url: 'http://h/ws', autoReconnect: false }))
+    const off = renderHook(() =>
+      useWebSocket({ url: 'http://h/ws', autoReconnect: false }),
+    )
     act(() => FakeWs.all[0]!.close())
-    act(() => { jest.advanceTimersByTime(5000) })
+    act(() => {
+      jest.advanceTimersByTime(5000)
+    })
     expect(FakeWs.all).toHaveLength(1)
     off.unmount()
     const on = renderHook(() => useWebSocket({ url: 'http://h/ws' }))
     on.unmount()
-    act(() => { jest.advanceTimersByTime(5000) })
+    act(() => {
+      jest.advanceTimersByTime(5000)
+    })
     expect(FakeWs.all).toHaveLength(2)
     jest.useRealTimers()
   })

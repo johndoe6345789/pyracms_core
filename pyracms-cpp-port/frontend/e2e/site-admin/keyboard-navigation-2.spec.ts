@@ -12,37 +12,20 @@ test.describe('Keyboard navigation', () => {
     await goToAdmin(page)
   })
 
-  test(
-    'skip-to-content href points to admin-main-content',
-    async ({ page }) => {
-      const href = await page
-        .getByTestId('skip-to-content')
-        .getAttribute('href')
-      expect(href).toBe('#admin-main-content')
-    },
-  )
+  test('skip-to-content href points to admin-main-content', async ({
+    page,
+  }) => {
+    const href = await page.getByTestId('skip-to-content').getAttribute('href')
+    expect(href).toBe('#admin-main-content')
+  })
 
-  test(
-    'admin-site-link is keyboard focusable',
-    async ({ page }) => {
-      await page
-        .getByTestId('admin-site-link')
-        .focus()
-      await expect(
-        page.getByTestId('admin-site-link'),
-      ).toBeFocused()
-    },
-  )
+  test('admin-site-link is keyboard focusable', async ({ page }) => {
+    await page.getByTestId('admin-site-link').focus()
+    await expect(page.getByTestId('admin-site-link')).toBeFocused()
+  })
 
-  test(
-    'quick-link cards are keyboard focusable',
-    async ({ page }) => {
-      await page
-        .getByTestId('quick-link-users')
-        .focus()
-      await expect(
-        page.getByTestId('quick-link-users'),
-      ).toBeFocused()
-    },
-  )
+  test('quick-link cards are keyboard focusable', async ({ page }) => {
+    await page.getByTestId('quick-link-users').focus()
+    await expect(page.getByTestId('quick-link-users')).toBeFocused()
+  })
 })

@@ -2,8 +2,11 @@
 
 import { Box, Typography, IconButton, Button } from '@mui/material'
 import {
-  ThumbUpOutlined, ThumbDownOutlined,
-  ReplyOutlined, EditOutlined, DeleteOutlined,
+  ThumbUpOutlined,
+  ThumbDownOutlined,
+  ReplyOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@mui/icons-material'
 import type { Comment } from './types'
 
@@ -23,7 +26,8 @@ export default function CommentActions(p: Props) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <IconButton
-        size="small" disabled={!p.isAuthenticated}
+        size="small"
+        disabled={!p.isAuthenticated}
         onClick={() => p.onVote(true)}
         aria-label="Upvote"
         data-testid="comment-upvote-btn"
@@ -34,37 +38,52 @@ export default function CommentActions(p: Props) {
         {likes}
       </Typography>
       <IconButton
-        size="small" disabled={!p.isAuthenticated}
+        size="small"
+        disabled={!p.isAuthenticated}
         onClick={() => p.onVote(false)}
         aria-label="Downvote"
         data-testid="comment-downvote-btn"
       >
         <ThumbDownOutlined fontSize="small" />
       </IconButton>
-      <Typography variant="caption" color="text.secondary"
-        data-testid="comment-dislikes">
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        data-testid="comment-dislikes"
+      >
         {dislikes}
       </Typography>
       {p.isAuthenticated && p.depth < 4 && (
-        <Button size="small"
+        <Button
+          size="small"
           startIcon={<ReplyOutlined />}
           onClick={p.onReply}
           sx={{ ml: 1, textTransform: 'none' }}
           data-testid="comment-reply-btn"
-        >Reply</Button>
+        >
+          Reply
+        </Button>
       )}
-      {p.isOwner && (<>
-        <IconButton size="small" onClick={p.onEdit}
-          aria-label="Edit comment"
-          data-testid="comment-edit-btn">
-          <EditOutlined fontSize="small" />
-        </IconButton>
-        <IconButton size="small" onClick={p.onDelete}
-          aria-label="Delete comment"
-          data-testid="comment-delete-btn">
-          <DeleteOutlined fontSize="small" />
-        </IconButton>
-      </>)}
+      {p.isOwner && (
+        <>
+          <IconButton
+            size="small"
+            onClick={p.onEdit}
+            aria-label="Edit comment"
+            data-testid="comment-edit-btn"
+          >
+            <EditOutlined fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={p.onDelete}
+            aria-label="Delete comment"
+            data-testid="comment-delete-btn"
+          >
+            <DeleteOutlined fontSize="small" />
+          </IconButton>
+        </>
+      )}
     </Box>
   )
 }

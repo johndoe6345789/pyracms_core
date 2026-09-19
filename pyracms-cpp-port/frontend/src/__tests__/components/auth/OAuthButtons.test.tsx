@@ -3,7 +3,8 @@ import OAuthButtons from '@/components/auth/OAuthButtons'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 const assign = jest.fn()
@@ -11,7 +12,9 @@ jest.mock('@/lib/navigate', () => ({ goTo: (u: string) => assign(u) }))
 
 describe('OAuthButtons', () => {
   beforeEach(() => {
-    get.mockReset(); assign.mockReset(); sessionStorage.clear()
+    get.mockReset()
+    assign.mockReset()
+    sessionStorage.clear()
   })
 
   it('renders nothing when no provider is configured', async () => {
@@ -25,16 +28,20 @@ describe('OAuthButtons', () => {
     get.mockResolvedValue({ data: { url: 'https://gh.test/auth' } })
     render(<OAuthButtons redirectTo="/site/x" />)
     fireEvent.click(await screen.findByTestId('oauth-github'))
-    await waitFor(() => expect(assign).toHaveBeenCalledWith(
-      'https://gh.test/auth'))
-    expect(JSON.parse(sessionStorage.getItem('oauth:pending')!))
-      .toEqual({ provider: 'github', redirectTo: '/site/x' })
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith('https://gh.test/auth'),
+    )
+    expect(JSON.parse(sessionStorage.getItem('oauth:pending')!)).toEqual({
+      provider: 'github',
+      redirectTo: '/site/x',
+    })
   })
 
   it('shows an error when the provider url is unusable', async () => {
-    get.mockResolvedValueOnce({ data: { url: 'https://ok' } })
-      .mockRejectedValueOnce(new Error('x')).mockRejectedValueOnce(
-        new Error('x'))
+    get
+      .mockResolvedValueOnce({ data: { url: 'https://ok' } })
+      .mockRejectedValueOnce(new Error('x'))
+      .mockRejectedValueOnce(new Error('x'))
     get.mockResolvedValue({ data: { url: 'javascript:1' } })
     render(<OAuthButtons />)
     fireEvent.click(await screen.findByTestId('oauth-github'))

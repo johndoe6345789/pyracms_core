@@ -35,17 +35,13 @@ export default function RevisionTable({ revisions }: RevisionTableProps) {
                   {rev.version}
                 </Typography>
               </TableCell>
-              <TableCell>
-                {new Date(rev.date).toLocaleDateString()}
-              </TableCell>
+              <TableCell>{new Date(rev.date).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Chip
                   label={rev.published ? 'Published' : 'Draft'}
                   color={rev.published ? 'success' : 'default'}
                   size="small"
-                  {...(rev.published
-                    ? { icon: <CheckCircleOutlined /> }
-                    : {})}
+                  {...(rev.published ? { icon: <CheckCircleOutlined /> } : {})}
                 />
               </TableCell>
             </TableRow>

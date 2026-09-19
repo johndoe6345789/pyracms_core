@@ -3,10 +3,21 @@ import { RichTextEditor } from '@/components/articles/RichTextEditor'
 import { RichTextToolbar } from '@/components/articles/RichTextToolbar'
 
 const chain: Record<string, jest.Mock> = {}
-;['focus', 'toggleBold', 'toggleItalic', 'toggleHeading',
-  'toggleBulletList', 'toggleOrderedList', 'toggleCodeBlock',
-  'toggleBlockquote', 'setLink', 'setImage', 'run',
-].forEach((k) => { chain[k] = jest.fn(() => chain) })
+;[
+  'focus',
+  'toggleBold',
+  'toggleItalic',
+  'toggleHeading',
+  'toggleBulletList',
+  'toggleOrderedList',
+  'toggleCodeBlock',
+  'toggleBlockquote',
+  'setLink',
+  'setImage',
+  'run',
+].forEach((k) => {
+  chain[k] = jest.fn(() => chain)
+})
 
 const editor = {
   chain: () => chain,
@@ -26,7 +37,8 @@ jest.mock('@tiptap/react', () => ({
 }))
 jest.mock('@tiptap/starter-kit', () => ({ __esModule: true, default: {} }))
 jest.mock('@tiptap/extension-link', () => ({
-  __esModule: true, default: { configure: () => ({}) },
+  __esModule: true,
+  default: { configure: () => ({}) },
 }))
 jest.mock('@tiptap/extension-image', () => ({ __esModule: true, default: {} }))
 
@@ -37,8 +49,16 @@ beforeEach(() => {
 
 it('toolbar buttons run editor commands', () => {
   render(<RichTextToolbar editor={editor as never} />)
-  for (const id of ['bold', 'italic', 'heading-2', 'heading-3',
-    'bullet-list', 'ordered-list', 'code-block', 'blockquote']) {
+  for (const id of [
+    'bold',
+    'italic',
+    'heading-2',
+    'heading-3',
+    'bullet-list',
+    'ordered-list',
+    'code-block',
+    'blockquote',
+  ]) {
     fireEvent.click(screen.getByTestId(`rich-${id}`))
   }
   expect(chain.toggleBold).toHaveBeenCalled()
@@ -61,8 +81,9 @@ it('link and image prompt for urls', () => {
 
 it('RichTextEditor syncs content and reports updates', () => {
   const onChange = jest.fn()
-  const { rerender } = render(<RichTextEditor value="<p>a</p>"
-    onChange={onChange} />)
+  const { rerender } = render(
+    <RichTextEditor value="<p>a</p>" onChange={onChange} />,
+  )
   expect(editor.commands.setContent).not.toHaveBeenCalled()
   rerender(<RichTextEditor value="<p>b</p>" onChange={onChange} />)
   expect(editor.commands.setContent).toHaveBeenCalledWith('<p>b</p>', false)

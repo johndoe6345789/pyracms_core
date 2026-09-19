@@ -8,10 +8,12 @@ jest.mock('next-intl/server', () => ({
   getMessages: async () => ({ common: { save: 'Speichern' } }),
 }))
 jest.mock('@/store/StoreProvider', () => ({
-  __esModule: true, default: (p: { children: React.ReactNode }) => p.children,
+  __esModule: true,
+  default: (p: { children: React.ReactNode }) => p.children,
 }))
 jest.mock('@/components/common/ThemeWrapper', () => ({
-  __esModule: true, default: (p: { children: React.ReactNode }) => p.children,
+  __esModule: true,
+  default: (p: { children: React.ReactNode }) => p.children,
 }))
 
 describe('RootLayout', () => {

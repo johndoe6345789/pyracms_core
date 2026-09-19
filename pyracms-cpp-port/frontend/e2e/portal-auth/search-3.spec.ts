@@ -4,8 +4,7 @@ test.describe('Search — /search', () => {
   // ---- NEW: mocked API — results list interaction ----
 
   test(
-    'mocked API: search results are rendered as '
-    + 'clickable links',
+    'mocked API: search results are rendered as ' + 'clickable links',
     async ({ page }) => {
       await page.route('**/api/search*', (route) => {
         // Only mock GET requests without "autocomplete"

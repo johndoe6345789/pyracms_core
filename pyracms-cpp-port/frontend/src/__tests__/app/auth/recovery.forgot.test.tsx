@@ -18,20 +18,26 @@ describe('ForgotPasswordForm', () => {
     type('forgot-email', ' a@b.co ')
     fireEvent.submit(screen.getByTestId('forgot-form'))
     expect(await screen.findByTestId('forgot-done')).toBeInTheDocument()
-    expect(m.post).toHaveBeenCalledWith('/api/auth/forgot-password',
-      { email: 'a@b.co', tenant: 'demo' })
-    expect(screen.getByTestId('forgot-back'))
-      .toHaveAttribute('href', '/auth/login?tenant=demo')
+    expect(m.post).toHaveBeenCalledWith('/api/auth/forgot-password', {
+      email: 'a@b.co',
+      tenant: 'demo',
+    })
+    expect(screen.getByTestId('forgot-back')).toHaveAttribute(
+      'href',
+      '/auth/login?tenant=demo',
+    )
   })
   it('shows API errors, platform scope has no tenant', async () => {
     m.post.mockRejectedValue({ response: { data: { error: 'Slow down' } } })
     render(<ForgotPasswordForm />)
     type('forgot-email', 'a@b.co')
     fireEvent.submit(screen.getByTestId('forgot-form'))
-    expect(await screen.findByTestId('forgot-error'))
-      .toHaveTextContent('Slow down')
-    expect(m.post).toHaveBeenCalledWith('/api/auth/forgot-password',
-      { email: 'a@b.co' })
+    expect(await screen.findByTestId('forgot-error')).toHaveTextContent(
+      'Slow down',
+    )
+    expect(m.post).toHaveBeenCalledWith('/api/auth/forgot-password', {
+      email: 'a@b.co',
+    })
   })
   it('rejects an empty email', () => {
     render(<ForgotPasswordForm />)

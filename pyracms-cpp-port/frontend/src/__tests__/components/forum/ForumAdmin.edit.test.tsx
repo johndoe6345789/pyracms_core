@@ -1,9 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
 import { asMockApi } from '../../helpers/mockApi'
-import {
-  Harness, refresh, click, type,
-} from '../../helpers/forumAdminHarness'
+import { Harness, refresh, click, type } from '../../helpers/forumAdminHarness'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -24,8 +22,12 @@ describe('forum admin UI', () => {
     type('forum-admin-desc', 'stuff')
     click('forum-admin-submit')
     await waitFor(() => expect(refresh).toHaveBeenCalled())
-    expect(m.post).toHaveBeenCalledWith('/api/forum/forums',
-      { name: 'News', description: 'stuff', categoryId: 1, tenantId: 7 })
+    expect(m.post).toHaveBeenCalledWith('/api/forum/forums', {
+      name: 'News',
+      description: 'stuff',
+      categoryId: 1,
+      tenantId: 7,
+    })
   })
   it('renames a category, prefilled', async () => {
     render(<Harness />)
@@ -33,16 +35,24 @@ describe('forum admin UI', () => {
     expect(screen.getByTestId('forum-admin-name')).toHaveValue('Gen')
     type('forum-admin-name', 'General')
     click('forum-admin-submit')
-    await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/forum/categories/1', { name: 'General', tenantId: 7 }))
+    await waitFor(() =>
+      expect(m.put).toHaveBeenCalledWith('/api/forum/categories/1', {
+        name: 'General',
+        tenantId: 7,
+      }),
+    )
   })
   it('edits a forum', async () => {
     render(<Harness />)
     click('edit-forum-2')
     expect(screen.getByTestId('forum-admin-desc')).toHaveValue('talk')
     click('forum-admin-submit')
-    await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/forum/forums/2',
-      { name: 'Chat', description: 'talk', tenantId: 7 }))
+    await waitFor(() =>
+      expect(m.put).toHaveBeenCalledWith('/api/forum/forums/2', {
+        name: 'Chat',
+        description: 'talk',
+        tenantId: 7,
+      }),
+    )
   })
 })

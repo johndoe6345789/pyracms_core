@@ -1,11 +1,7 @@
 import { TextField } from '@mui/material'
 import type { CreateUserState } from './useCreateUser'
 
-export default function CreateUserFields({
-  s,
-}: {
-  s: CreateUserState
-}) {
+export default function CreateUserFields({ s }: { s: CreateUserState }) {
   return (
     <>
       <TextField

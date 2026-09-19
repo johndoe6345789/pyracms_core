@@ -10,9 +10,12 @@ interface Props {
 }
 
 /** A titled group of destinations. */
-export default function DrawerSection(
-  { section, index, pathname, onClose }: Props,
-) {
+export default function DrawerSection({
+  section,
+  index,
+  pathname,
+  onClose,
+}: Props) {
   return (
     <Box
       component="nav"

@@ -24,7 +24,12 @@ interface Props {
  * grouped destinations with an active accent, pinned footer action.
  */
 export default function AppDrawer({
-  open, onClose, title, subtitle, sections, footer,
+  open,
+  onClose,
+  title,
+  subtitle,
+  sections,
+  footer,
   testId = 'tenant-drawer',
 }: Props) {
   const pathname = usePathname() ?? ''

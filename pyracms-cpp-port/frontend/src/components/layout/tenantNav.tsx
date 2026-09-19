@@ -18,19 +18,22 @@ export function tenantModuleEntries(slug: string): NavEntry[] {
   }))
 }
 
-export function tenantSections(
-  slug: string,
-  canAdmin: boolean,
-): NavSection[] {
+export function tenantSections(slug: string, canAdmin: boolean): NavSection[] {
   const site: NavEntry[] = [
     {
-      key: 'home', label: 'Home', href: `/site/${slug}`,
-      icon: <HomeOutlined />, exact: true,
+      key: 'home',
+      label: 'Home',
+      href: `/site/${slug}`,
+      icon: <HomeOutlined />,
+      exact: true,
     },
     ...tenantModuleEntries(slug),
     {
-      key: 'search', label: 'Search', href: '/search',
-      icon: <SearchOutlined />, testId: 'search',
+      key: 'search',
+      label: 'Search',
+      href: '/search',
+      icon: <SearchOutlined />,
+      testId: 'search',
     },
     launcherEntry(`/site/${slug}/download`),
   ]
@@ -38,10 +41,15 @@ export function tenantSections(
   if (canAdmin) {
     sections.push({
       title: 'Manage',
-      items: [{
-        key: 'admin', label: 'Admin', href: `/site/${slug}/admin`,
-        icon: <AdminPanelSettingsOutlined />, testId: 'admin',
-      }],
+      items: [
+        {
+          key: 'admin',
+          label: 'Admin',
+          href: `/site/${slug}/admin`,
+          icon: <AdminPanelSettingsOutlined />,
+          testId: 'admin',
+        },
+      ],
     })
   }
   return sections

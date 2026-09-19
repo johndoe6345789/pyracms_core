@@ -11,18 +11,27 @@ describe('gallery parts', () => {
   it('AlbumHeader shows name/count and accepts files', () => {
     render(<AlbumHeader albumName="Trip" count={4} />)
     expect(screen.getByText('Trip')).toBeInTheDocument()
-    expect(screen.getByText(/4 pictures in this album/))
-      .toBeInTheDocument()
-    fireEvent.change(screen.getByTestId('upload-file-input'),
-      { target: { files: [] } })
+    expect(screen.getByText(/4 pictures in this album/)).toBeInTheDocument()
+    fireEvent.change(screen.getByTestId('upload-file-input'), {
+      target: { files: [] },
+    })
   })
 
   it('GalleryBreadcrumbs shows album crumb only when given', () => {
-    const { rerender } = render(<GalleryBreadcrumbs slug="s" label="l"
-      testId="bc" current="Cur" />)
+    const { rerender } = render(
+      <GalleryBreadcrumbs slug="s" label="l" testId="bc" current="Cur" />,
+    )
     expect(screen.queryByText('Al')).toBeNull()
-    rerender(<GalleryBreadcrumbs slug="s" label="l" testId="bc"
-      current="Cur" albumName="Al" albumUrl="/a" />)
+    rerender(
+      <GalleryBreadcrumbs
+        slug="s"
+        label="l"
+        testId="bc"
+        current="Cur"
+        albumName="Al"
+        albumUrl="/a"
+      />,
+    )
     expect(screen.getByText('Al')).toHaveAttribute('href', '/a')
   })
 
@@ -36,8 +45,12 @@ describe('gallery parts', () => {
   })
 
   it('PictureFooter wires actions', () => {
-    const p = { onLike: jest.fn(), onDislike: jest.fn(),
-      onSetCover: jest.fn(), onDelete: jest.fn() }
+    const p = {
+      onLike: jest.fn(),
+      onDislike: jest.fn(),
+      onSetCover: jest.fn(),
+      onDelete: jest.fn(),
+    }
     render(<PictureFooter likes={1} dislikes={2} {...p} />)
     fireEvent.click(screen.getByTestId('set-cover-btn'))
     fireEvent.click(screen.getByTestId('delete-picture-btn'))
@@ -53,7 +66,8 @@ describe('gallery parts', () => {
 
   it('PictureViewer switches image and video', () => {
     const { rerender } = render(
-      <PictureViewer src="/a.png" title="A" isVideo={false} />)
+      <PictureViewer src="/a.png" title="A" isVideo={false} />,
+    )
     expect(screen.getByAltText('A')).toBeInTheDocument()
     rerender(<PictureViewer src="/a.mp4" title="A" isVideo />)
     expect(screen.queryByAltText('A')).toBeNull()
@@ -61,7 +75,6 @@ describe('gallery parts', () => {
 
   it('VideoPlayer renders a source', () => {
     const { container } = render(<VideoPlayer src="/v.mp4" />)
-    expect(container.querySelector('source'))
-      .toHaveAttribute('src', '/v.mp4')
+    expect(container.querySelector('source')).toHaveAttribute('src', '/v.mp4')
   })
 })

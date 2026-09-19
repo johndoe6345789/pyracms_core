@@ -19,7 +19,10 @@ export interface SearchResponse {
 }
 
 export async function fetchSearch(
-  q: string, tenantId: string, type: string, pg: number,
+  q: string,
+  tenantId: string,
+  type: string,
+  pg: number,
 ): Promise<SearchResponse> {
   const params = new URLSearchParams({
     q,

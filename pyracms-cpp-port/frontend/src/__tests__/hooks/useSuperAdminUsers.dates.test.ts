@@ -30,13 +30,15 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
   })
 
   it('truncates ISO timestamp to date portion', async () => {
-    const raw = [{
-      id: 23,
-      username: 'y',
-      email: 'y@x.com',
-      isAdmin: false,
-      createdAt: '2025-07-04T00:00:00Z',
-    }]
+    const raw = [
+      {
+        id: 23,
+        username: 'y',
+        email: 'y@x.com',
+        isAdmin: false,
+        createdAt: '2025-07-04T00:00:00Z',
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminUsers())
 

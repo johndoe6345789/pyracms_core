@@ -3,8 +3,12 @@ import { UserProfileCard } from '@/components/users/UserProfileCard'
 
 describe('UserProfileCard', () => {
   const base = {
-    username: 'bob', bio: 'hi', joinDate: 'J', postCount: 1,
-    reputation: 2, badges: [],
+    username: 'bob',
+    bio: 'hi',
+    joinDate: 'J',
+    postCount: 1,
+    reputation: 2,
+    badges: [],
   }
 
   it('renders minimal profile and toggles follow', () => {
@@ -18,9 +22,18 @@ describe('UserProfileCard', () => {
   })
 
   it('renders every optional part and works without callback', () => {
-    render(<UserProfileCard {...base} isFollowing avatarUrl="http://a/x.png"
-      location="L" website="http://w" githubUrl="http://g"
-      twitterUrl="http://t" badges={[{ label: 'B', color: '#000' }]} />)
+    render(
+      <UserProfileCard
+        {...base}
+        isFollowing
+        avatarUrl="http://a/x.png"
+        location="L"
+        website="http://w"
+        githubUrl="http://g"
+        twitterUrl="http://t"
+        badges={[{ label: 'B', color: '#000' }]}
+      />,
+    )
     const btn = screen.getByTestId('follow-button')
     expect(btn).toHaveTextContent('Unfollow')
     fireEvent.click(btn)

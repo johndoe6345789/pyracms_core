@@ -11,62 +11,42 @@ test.describe('User management', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'shows "Global Users" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', { name: 'Global Users' }),
-      ).toBeVisible()
-    },
-  )
+  test('shows "Global Users" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Global Users' }),
+    ).toBeVisible()
+  })
 
-  test(
-    'global users table is rendered',
-    async ({ page }) => {
-      await waitForUsersLoaded(page)
+  test('global users table is rendered', async ({ page }) => {
+    await waitForUsersLoaded(page)
 
-      await expect(
-        page.getByTestId('global-users-table'),
-      ).toBeVisible()
-    },
-  )
+    await expect(page.getByTestId('global-users-table')).toBeVisible()
+  })
 
-  test(
-    'at least one user-row-* is visible',
-    async ({ page }) => {
-      await waitForUsersLoaded(page)
+  test('at least one user-row-* is visible', async ({ page }) => {
+    await waitForUsersLoaded(page)
 
-      const rows = page.locator(
-        '[data-testid^="user-row-"]',
-      )
-      const count = await rows.count()
+    const rows = page.locator('[data-testid^="user-row-"]')
+    const count = await rows.count()
 
-      if (count === 0) {
-        await expect(
-          page.getByText('No users found.'),
-        ).toBeVisible()
-      } else {
-        await expect(rows.first()).toBeVisible()
-      }
-    },
-  )
+    if (count === 0) {
+      await expect(page.getByText('No users found.')).toBeVisible()
+    } else {
+      await expect(rows.first()).toBeVisible()
+    }
+  })
 
-  test(
-    'role select dropdowns are present for each user',
-    async ({ page }) => {
-      await waitForUsersLoaded(page)
+  test('role select dropdowns are present for each user', async ({ page }) => {
+    await waitForUsersLoaded(page)
 
-      const roleSelects = page.locator(
-        '[data-testid^="role-select-"]',
-      )
-      const count = await roleSelects.count()
+    const roleSelects = page.locator('[data-testid^="role-select-"]')
+    const count = await roleSelects.count()
 
-      if (count === 0) {
-        test.skip()
-        return
-      }
+    if (count === 0) {
+      test.skip()
+      return
+    }
 
-      await expect(roleSelects.first()).toBeVisible()
-    },
-  )
+    await expect(roleSelects.first()).toBeVisible()
+  })
 })

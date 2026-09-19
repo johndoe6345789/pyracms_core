@@ -15,61 +15,35 @@ test.describe('Admin Files', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    'page loads — admin-files-page container visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('admin-files-page'),
-      ).toBeVisible()
-    },
-  )
+  test('page loads — admin-files-page container visible', async ({ page }) => {
+    await expect(page.getByTestId('admin-files-page')).toBeVisible()
+  })
 
-  test(
-    'page has "File Manager" heading',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('heading', {
-          name: /file manager/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('page has "File Manager" heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', {
+        name: /file manager/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    'upload dropzone is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('upload-dropzone'),
-      ).toBeVisible()
-    },
-  )
+  test('upload dropzone is rendered', async ({ page }) => {
+    await expect(page.getByTestId('upload-dropzone')).toBeVisible()
+  })
 
-  test(
-    'dropzone has correct region aria-label',
-    async ({ page }) => {
-      await expect(
-        page.getByRole('region', {
-          name: /file upload dropzone/i,
-        }),
-      ).toBeVisible()
-    },
-  )
+  test('dropzone has correct region aria-label', async ({ page }) => {
+    await expect(
+      page.getByRole('region', {
+        name: /file upload dropzone/i,
+      }),
+    ).toBeVisible()
+  })
 
-  test(
-    '"Upload Files" button is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('upload-files-btn'),
-      ).toBeVisible()
-    },
-  )
+  test('"Upload Files" button is visible', async ({ page }) => {
+    await expect(page.getByTestId('upload-files-btn')).toBeVisible()
+  })
 
-  test(
-    'file grid is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('file-grid'),
-      ).toBeVisible()
-    },
-  )
+  test('file grid is rendered', async ({ page }) => {
+    await expect(page.getByTestId('file-grid')).toBeVisible()
+  })
 })

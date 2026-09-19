@@ -15,7 +15,8 @@ export function useTagCloud(tenantId: number | null) {
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
-    api.get(`/api/articles/tags/cloud?tenant_id=${tenantId}`)
+    api
+      .get(`/api/articles/tags/cloud?tenant_id=${tenantId}`)
       .then((res) => setTags(res.data || []))
       .catch(() => setTags([]))
       .finally(() => setLoading(false))

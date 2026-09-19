@@ -3,37 +3,50 @@
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material'
 import { useDashboardStats } from './useDashboardStats'
 
-export default function DashboardStats(
-  { tenantId }: { tenantId: number | null },
-) {
+export default function DashboardStats({
+  tenantId,
+}: {
+  tenantId: number | null
+}) {
   const stats = useDashboardStats(tenantId)
 
   return (
     <Grid container spacing={3} sx={{ mb: 4 }}>
       {stats.map((stat, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
-          <Card sx={{
-            height: '100%',
-            background: `linear-gradient(135deg, ${stat.color}15 0%, `
-              + `${stat.color}05 100%)`,
-            border: `1px solid ${stat.color}30`,
-            transition: 'transform 0.2s, box-shadow 0.2s',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 },
-          }}>
+          <Card
+            sx={{
+              height: '100%',
+              background:
+                `linear-gradient(135deg, ${stat.color}15 0%, ` +
+                `${stat.color}05 100%)`,
+              border: `1px solid ${stat.color}30`,
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 },
+            }}
+          >
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Box sx={{
-                  bgcolor: stat.color, borderRadius: 2,
-                  p: 1, display: 'flex', mr: 2,
-                }}>
+                <Box
+                  sx={{
+                    bgcolor: stat.color,
+                    borderRadius: 2,
+                    p: 1,
+                    display: 'flex',
+                    mr: 2,
+                  }}
+                >
                   <stat.icon sx={{ color: 'white', fontSize: 28 }} />
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 700 }}>
                   {stat.value}
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary"
-                sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontWeight: 600 }}
+              >
                 {stat.title}
               </Typography>
             </CardContent>

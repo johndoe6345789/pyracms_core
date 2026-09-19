@@ -15,57 +15,27 @@ test.describe('Admin Users', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    '"Create User" button is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('create-user-btn'),
-      ).toBeVisible()
-    },
-  )
+  test('"Create User" button is visible', async ({ page }) => {
+    await expect(page.getByTestId('create-user-btn')).toBeVisible()
+  })
 
-  test(
-    'clicking "Create User" opens create-user dialog',
-    async ({ page }) => {
-      await page
-        .getByTestId('create-user-btn')
-        .click()
-      await expect(
-        page.getByTestId('create-user-dialog'),
-      ).toBeVisible()
-    },
-  )
+  test('clicking "Create User" opens create-user dialog', async ({ page }) => {
+    await page.getByTestId('create-user-btn').click()
+    await expect(page.getByTestId('create-user-dialog')).toBeVisible()
+  })
 
-  test(
-    'create dialog has username, email, fullname, password inputs',
-    async ({ page }) => {
-      await page
-        .getByTestId('create-user-btn')
-        .click()
-      await expect(
-        page.getByTestId('new-username-input'),
-      ).toBeVisible()
-      await expect(
-        page.getByTestId('new-email-input'),
-      ).toBeVisible()
-      await expect(
-        page.getByTestId('new-fullname-input'),
-      ).toBeVisible()
-      await expect(
-        page.getByTestId('new-password-input'),
-      ).toBeVisible()
-    },
-  )
+  test('create dialog has username, email, fullname, password inputs', async ({
+    page,
+  }) => {
+    await page.getByTestId('create-user-btn').click()
+    await expect(page.getByTestId('new-username-input')).toBeVisible()
+    await expect(page.getByTestId('new-email-input')).toBeVisible()
+    await expect(page.getByTestId('new-fullname-input')).toBeVisible()
+    await expect(page.getByTestId('new-password-input')).toBeVisible()
+  })
 
-  test(
-    'submit button is disabled when fields are empty',
-    async ({ page }) => {
-      await page
-        .getByTestId('create-user-btn')
-        .click()
-      await expect(
-        page.getByTestId('submit-create-btn'),
-      ).toBeDisabled()
-    },
-  )
+  test('submit button is disabled when fields are empty', async ({ page }) => {
+    await page.getByTestId('create-user-btn').click()
+    await expect(page.getByTestId('submit-create-btn')).toBeDisabled()
+  })
 })

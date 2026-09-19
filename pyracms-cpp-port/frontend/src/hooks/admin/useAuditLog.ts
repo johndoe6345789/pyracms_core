@@ -33,7 +33,8 @@ export function useAuditLog(tenantId: number | null, limit = 100) {
   const [error, setError] = useState('')
   useEffect(() => {
     if (!tenantId) return
-    api.get(`/api/audit?tenant_id=${tenantId}&limit=${limit}`)
+    api
+      .get(`/api/audit?tenant_id=${tenantId}&limit=${limit}`)
       .then((r) => setRows(((r.data || []) as Raw[]).map(mapAudit)))
       .catch((e) => setError(apiErrorMessage(e, 'Could not load audit log')))
       .finally(() => setLoading(false))

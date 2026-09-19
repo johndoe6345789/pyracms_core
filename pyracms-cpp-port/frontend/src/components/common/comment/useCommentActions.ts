@@ -17,8 +17,7 @@ export function useCommentActions(
     if (!isAuth) return
     setError('')
     try {
-      await api.post(
-        `/api/comments/${commentId}/vote`, { isLike })
+      await api.post(`/api/comments/${commentId}/vote`, { isLike })
       onRefresh()
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not record vote'))
@@ -29,10 +28,9 @@ export function useCommentActions(
     setSaving(true)
     setError('')
     try {
-      await api.put(
-        `/api/comments/${commentId}`,
-        { body: editTxt })
-      setEditing(false); onRefresh()
+      await api.put(`/api/comments/${commentId}`, { body: editTxt })
+      setEditing(false)
+      onRefresh()
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not save comment'))
     }
@@ -41,21 +39,30 @@ export function useCommentActions(
   const del = async () => {
     setError('')
     try {
-      await api.delete(
-        `/api/comments/${commentId}`)
-      setDelOpen(false); onRefresh()
+      await api.delete(`/api/comments/${commentId}`)
+      setDelOpen(false)
+      onRefresh()
     } catch (e) {
       setDelOpen(false)
       setError(apiErrorMessage(e, 'Could not delete comment'))
     }
   }
   const cancelEdit = () => {
-    setEditing(false); setEditTxt(content)
+    setEditing(false)
+    setEditTxt(content)
   }
   return {
-    editing, setEditing,
-    editTxt, setEditTxt,
-    delOpen, setDelOpen,
-    saving, error, vote, saveEdit, del, cancelEdit,
+    editing,
+    setEditing,
+    editTxt,
+    setEditTxt,
+    delOpen,
+    setDelOpen,
+    saving,
+    error,
+    vote,
+    saveEdit,
+    del,
+    cancelEdit,
   }
 }

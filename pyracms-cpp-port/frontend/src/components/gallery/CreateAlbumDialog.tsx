@@ -1,14 +1,15 @@
 import {
-  Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, TextField, Alert,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
 } from '@mui/material'
 import type { CreateAlbumState } from '@/hooks/useCreateAlbum'
 
-export default function CreateAlbumDialog({
-  s,
-}: {
-  s: CreateAlbumState
-}) {
+export default function CreateAlbumDialog({ s }: { s: CreateAlbumState }) {
   return (
     <Dialog
       open={s.open}
@@ -21,8 +22,10 @@ export default function CreateAlbumDialog({
       <DialogTitle id="create-album-title">Create Album</DialogTitle>
       <DialogContent
         sx={{
-          display: 'flex', flexDirection: 'column',
-          gap: 2, pt: '16px !important',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          pt: '16px !important',
         }}
       >
         {s.error && (

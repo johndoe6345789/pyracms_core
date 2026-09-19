@@ -1,21 +1,14 @@
-import {
-  TableRow, TableCell, Typography,
-} from '@mui/material'
+import { TableRow, TableCell, Typography } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
-import {
-  EditActions, ViewActions,
-} from './MenuItemViewActions'
-import MenuItemEditCells
-  from './MenuItemEditCells'
+import { EditActions, ViewActions } from './MenuItemViewActions'
+import MenuItemEditCells from './MenuItemEditCells'
 
 interface Props {
   item: MenuItemRow
   editing: boolean
   editRow: MenuItemRow | null
   onEditRowChange: (
-    updater: (
-      prev: MenuItemRow | null
-    ) => MenuItemRow | null
+    updater: (prev: MenuItemRow | null) => MenuItemRow | null,
   ) => void
   onStartEdit: (item: MenuItemRow) => void
   onSaveEdit: () => void
@@ -24,9 +17,14 @@ interface Props {
 }
 
 export default function MenuItemTableRow({
-  item, editing, editRow,
-  onEditRowChange, onStartEdit,
-  onSaveEdit, onCancelEdit, onDelete,
+  item,
+  editing,
+  editRow,
+  onEditRowChange,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete,
 }: Props) {
   return (
     <TableRow hover>
@@ -39,31 +37,21 @@ export default function MenuItemTableRow({
         <>
           <TableCell>{item.name}</TableCell>
           <TableCell>
-            <Typography
-              sx={{ fontFamily: 'monospace' }}
-            >
+            <Typography sx={{ fontFamily: 'monospace' }}>
               {item.route}
             </Typography>
           </TableCell>
-          <TableCell>
-            {item.position}
-          </TableCell>
-          <TableCell>
-            {item.permissions}
-          </TableCell>
+          <TableCell>{item.position}</TableCell>
+          <TableCell>{item.permissions}</TableCell>
         </>
       )}
       <TableCell align="right">
         {editing ? (
-          <EditActions
-            onSave={onSaveEdit}
-            onCancel={onCancelEdit}
-          />
+          <EditActions onSave={onSaveEdit} onCancel={onCancelEdit} />
         ) : (
           <ViewActions
             onEdit={() => onStartEdit(item)}
-            onDelete={() =>
-              onDelete(item.id)}
+            onDelete={() => onDelete(item.id)}
           />
         )}
       </TableCell>

@@ -12,10 +12,7 @@ type SetFiles = React.Dispatch<React.SetStateAction<FileItem[]>>
  * @param tenantId - The active tenant ID, or null.
  * @param setFiles - State setter for the file list.
  */
-export function useFileUpload(
-  tenantId: number | null,
-  setFiles: SetFiles,
-) {
+export function useFileUpload(tenantId: number | null, setFiles: SetFiles) {
   const [dragOver, setDragOver] = useState(false)
   const { error: uploadError, setError, fail } = useActionError()
 
@@ -62,7 +59,11 @@ export function useFileUpload(
   )
 
   return {
-    dragOver, handleDragOver, handleDragLeave, handleDrop,
-    uploadFiles, uploadError,
+    dragOver,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    uploadFiles,
+    uploadError,
   }
 }

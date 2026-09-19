@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react'
 import {
-  PeopleOutlined, FolderOutlined, SettingsOutlined,
-  ToggleOnOutlined, MenuBookOutlined, SecurityOutlined,
+  PeopleOutlined,
+  FolderOutlined,
+  SettingsOutlined,
+  ToggleOnOutlined,
+  MenuBookOutlined,
+  SecurityOutlined,
   BackupOutlined,
 } from '@mui/icons-material'
 

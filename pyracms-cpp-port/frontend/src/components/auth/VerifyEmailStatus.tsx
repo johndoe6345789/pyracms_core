@@ -20,7 +20,9 @@ export default function VerifyEmailStatus({ token }: { token: string }) {
         </Alert>
       )}
       {status === 'error' && (
-        <Alert severity="error" data-testid="verify-error">{message}</Alert>
+        <Alert severity="error" data-testid="verify-error">
+          {message}
+        </Alert>
       )}
       <Box sx={{ mt: 3 }}>
         <Link href="/auth/login" data-testid="verify-login-link">

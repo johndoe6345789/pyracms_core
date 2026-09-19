@@ -1,16 +1,12 @@
 'use client'
 
-import {
-  Box, Button, Typography, Alert,
-} from '@mui/material'
+import { Box, Button, Typography, Alert } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import { useCreateSite } from '@/hooks/useCreateSite'
 import CreateSiteFields from './CreateSiteFields'
 
 export default function CreateSiteForm() {
-  const {
-    form, updateField, loading, error, handleSubmit,
-  } = useCreateSite()
+  const { form, updateField, loading, error, handleSubmit } = useCreateSite()
 
   return (
     <Box>
@@ -22,11 +18,7 @@ export default function CreateSiteForm() {
       >
         Create Your Site
       </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mb: 3 }}
-      >
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Choose a name and URL slug for your new site.
       </Typography>
 
@@ -47,10 +39,7 @@ export default function CreateSiteForm() {
         data-testid="create-site-form"
         aria-label="Create site form"
       >
-        <CreateSiteFields
-          form={form}
-          updateField={updateField}
-        />
+        <CreateSiteFields form={form} updateField={updateField} />
         <Button
           fullWidth
           variant="contained"
@@ -59,14 +48,11 @@ export default function CreateSiteForm() {
           disabled={loading}
           startIcon={<AddCircleOutline />}
           data-testid="create-site-submit"
-          aria-label={
-            loading ? 'Creating site' : 'Create site'
-          }
+          aria-label={loading ? 'Creating site' : 'Create site'}
           sx={{
             py: 1.5,
             background:
-              'linear-gradient(135deg, #667eea 0%,'
-              + ' #764ba2 100%)',
+              'linear-gradient(135deg, #667eea 0%,' + ' #764ba2 100%)',
           }}
         >
           {loading ? 'Creating...' : 'Create Site'}

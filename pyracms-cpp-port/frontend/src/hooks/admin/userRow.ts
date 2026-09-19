@@ -17,8 +17,7 @@ export function mapUser(u: Record<string, unknown>): UserRow {
     username: (u.username as string) || '',
     fullName: (u.fullName as string) || '',
     email: (u.email as string) || '',
-    created:
-      typeof created === 'string' ? created.split('T')[0] ?? '' : '',
+    created: typeof created === 'string' ? (created.split('T')[0] ?? '') : '',
     banned: (u.banned as boolean) || false,
     role: typeof u.role === 'number' ? u.role : 1,
   }

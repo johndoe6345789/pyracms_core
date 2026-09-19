@@ -5,8 +5,7 @@ import {
   DescriptionOutlined,
 } from '@mui/icons-material'
 
-export type EditorMode =
-  'monaco' | 'wysiwyg' | 'bbcode' | 'markdown'
+export type EditorMode = 'monaco' | 'wysiwyg' | 'bbcode' | 'markdown'
 
 const INCOMPATIBLE_PAIRS: [EditorMode, EditorMode][] = [
   ['wysiwyg', 'bbcode'],
@@ -15,13 +14,8 @@ const INCOMPATIBLE_PAIRS: [EditorMode, EditorMode][] = [
   ['markdown', 'wysiwyg'],
 ]
 
-export function isIncompatible(
-  from: EditorMode,
-  to: EditorMode
-): boolean {
-  return INCOMPATIBLE_PAIRS.some(
-    ([a, b]) => a === from && b === to
-  )
+export function isIncompatible(from: EditorMode, to: EditorMode): boolean {
+  return INCOMPATIBLE_PAIRS.some(([a, b]) => a === from && b === to)
 }
 
 const ic = { mr: 0.5, fontSize: 18 }

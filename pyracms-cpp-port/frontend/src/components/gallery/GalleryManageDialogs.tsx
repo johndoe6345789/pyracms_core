@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   TextField,
 } from '@mui/material'
 import GalleryDeleteDialog from './GalleryDeleteDialog'
@@ -27,7 +32,10 @@ export default function GalleryManageDialogs(p: Props) {
   const [name, setName] = useState(p.name)
   const [desc, setDesc] = useState(p.description)
   const noun = p.kind === 'albums' ? 'album' : 'picture'
-  const close = () => { g.clearError(); p.onClose() }
+  const close = () => {
+    g.clearError()
+    p.onClose()
+  }
   const err = g.error && (
     <Alert severity="error" sx={{ mt: 1 }} data-testid="gallery-manage-error">
       {g.error}
@@ -35,35 +43,66 @@ export default function GalleryManageDialogs(p: Props) {
   )
   return (
     <>
-      <Dialog open={p.open === 'edit'} onClose={close} fullWidth
-        data-testid="gallery-edit-dialog">
+      <Dialog
+        open={p.open === 'edit'}
+        onClose={close}
+        fullWidth
+        data-testid="gallery-edit-dialog"
+      >
         <DialogTitle>Edit {noun}</DialogTitle>
         <DialogContent>
-          <TextField fullWidth margin="dense" label="Title" value={name}
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Title"
+            value={name}
             onChange={(e) => setName(e.target.value)}
             inputProps={{ maxLength: 256, 'data-testid': 'gallery-edit-name' }}
           />
-          <TextField fullWidth margin="dense" label="Description" multiline
-            minRows={3} value={desc}
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Description"
+            multiline
+            minRows={3}
+            value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            inputProps={{ 'data-testid': 'gallery-edit-desc' }} />
+            inputProps={{ 'data-testid': 'gallery-edit-desc' }}
+          />
           {err}
         </DialogContent>
         <DialogActions>
           <Button onClick={close}>Cancel</Button>
-          <Button variant="contained" disabled={g.busy || !name.trim()}
+          <Button
+            variant="contained"
+            disabled={g.busy || !name.trim()}
             data-testid="gallery-edit-save"
-            onClick={() => g.update(name.trim(), desc, () => {
-              p.onClose(); p.onChanged()
-            })}>
+            onClick={() =>
+              g.update(name.trim(), desc, () => {
+                p.onClose()
+                p.onChanged()
+              })
+            }
+          >
             Save
           </Button>
         </DialogActions>
       </Dialog>
-      <GalleryDeleteDialog open={p.open === 'delete'} noun={noun}
-        name={p.name} albums={p.kind === 'albums'} busy={g.busy}
-        err={err} onClose={close}
-        onConfirm={() => g.remove(() => { p.onClose(); p.onDeleted() })} />
+      <GalleryDeleteDialog
+        open={p.open === 'delete'}
+        noun={noun}
+        name={p.name}
+        albums={p.kind === 'albums'}
+        busy={g.busy}
+        err={err}
+        onClose={close}
+        onConfirm={() =>
+          g.remove(() => {
+            p.onClose()
+            p.onDeleted()
+          })
+        }
+      />
     </>
   )
 }

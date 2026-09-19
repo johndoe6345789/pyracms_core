@@ -16,7 +16,6 @@ export function ForumSearchPanel({ slug, tenantId, forums }: Props) {
     if (r.threadId) router.push(`/site/${slug}/forum/thread/${r.threadId}`)
   }
   return (
-    <ForumSearchBar tenantId={tenantId} forums={forums}
-      onResultClick={open} />
+    <ForumSearchBar tenantId={tenantId} forums={forums} onResultClick={open} />
   )
 }

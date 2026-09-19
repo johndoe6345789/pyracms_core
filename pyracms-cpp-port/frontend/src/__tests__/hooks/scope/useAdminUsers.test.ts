@@ -7,8 +7,7 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 beforeEach(() => {
   jest.resetAllMocks()
   m.get.mockResolvedValue({
-    data: [{ id: 1, username: 'u', createdAt: '2024-01-02T03:04' },
-      { id: 2 }],
+    data: [{ id: 1, username: 'u', createdAt: '2024-01-02T03:04' }, { id: 2 }],
   })
   m.put.mockResolvedValue({})
   m.delete.mockResolvedValue({})

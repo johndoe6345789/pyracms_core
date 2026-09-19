@@ -6,8 +6,14 @@ import { setCredentials } from '@/store/slices/authSlice'
 import type { User } from '@/types'
 
 export const makeUser = (over: Partial<User> = {}): User => ({
-  id: 1, username: 'alice', email: 'a@x.io', isActive: true,
-  isAdmin: false, createdAt: '', updatedAt: '', ...over,
+  id: 1,
+  username: 'alice',
+  email: 'a@x.io',
+  isActive: true,
+  isAdmin: false,
+  createdAt: '',
+  updatedAt: '',
+  ...over,
 })
 
 /** Renders `ui` in a fresh store, optionally signed in as `user`. */

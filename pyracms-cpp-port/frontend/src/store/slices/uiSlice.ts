@@ -31,7 +31,8 @@ const uiSlice = createSlice({
       state.colorMode = action.payload
     },
     addFlashMessage: (
-      state, action: PayloadAction<Omit<FlashMessage, 'id' | 'timestamp'>>,
+      state,
+      action: PayloadAction<Omit<FlashMessage, 'id' | 'timestamp'>>,
     ) => {
       state.flashMessages.push({
         ...action.payload,
@@ -41,7 +42,8 @@ const uiSlice = createSlice({
     },
     removeFlashMessage: (state, action: PayloadAction<string>) => {
       state.flashMessages = state.flashMessages.filter(
-        (m) => m.id !== action.payload)
+        (m) => m.id !== action.payload,
+      )
     },
     toggleSidebar: (state) => {
       state.sidebarCollapsed = !state.sidebarCollapsed
@@ -53,8 +55,11 @@ const uiSlice = createSlice({
 })
 
 export const {
-  setColorMode, addFlashMessage, removeFlashMessage,
-  toggleSidebar, setNotificationBellOpen,
+  setColorMode,
+  addFlashMessage,
+  removeFlashMessage,
+  toggleSidebar,
+  setNotificationBellOpen,
 } = uiSlice.actions
 export default uiSlice.reducer
 export type { ColorMode, FlashMessage, UiState }

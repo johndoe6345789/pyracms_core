@@ -9,8 +9,14 @@ describe('header and actions', () => {
   it('switches views and opens the mobile drawer', () => {
     const onView = jest.fn()
     const onOpen = jest.fn()
-    render(<LibraryHeader mobile view="browse" onView={onView}
-      onOpenDrawer={onOpen} />)
+    render(
+      <LibraryHeader
+        mobile
+        view="browse"
+        onView={onView}
+        onOpenDrawer={onOpen}
+      />,
+    )
     fireEvent.click(screen.getByText('Library'))
     expect(onView).toHaveBeenCalledWith('library')
     fireEvent.click(screen.getByLabelText('Open library'))
@@ -18,22 +24,38 @@ describe('header and actions', () => {
   })
 
   it('has no mobile button on desktop', () => {
-    render(<LibraryHeader mobile={false} view="browse"
-      onView={jest.fn()} onOpenDrawer={jest.fn()} />)
+    render(
+      <LibraryHeader
+        mobile={false}
+        view="browse"
+        onView={jest.fn()}
+        onOpenDrawer={jest.fn()}
+      />,
+    )
     expect(screen.queryByLabelText('Open library')).toBeNull()
   })
 
   it('renders each primary label', () => {
-    const { rerender } = render(<PrimaryActionButton label="Update"
-      disabled={false} onClick={jest.fn()} />)
+    const { rerender } = render(
+      <PrimaryActionButton
+        label="Update"
+        disabled={false}
+        onClick={jest.fn()}
+      />,
+    )
     expect(screen.getByText('Update')).toBeInTheDocument()
     rerender(<PrimaryActionButton label="Play" disabled onClick={jest.fn()} />)
     expect(screen.getByTestId('primary-action')).toBeDisabled()
   })
 
   it('lists versions', () => {
-    render(<VersionSelect versions={detail.revisions} value="2"
-      onChange={jest.fn()} />)
+    render(
+      <VersionSelect
+        versions={detail.revisions}
+        value="2"
+        onChange={jest.fn()}
+      />,
+    )
     expect(screen.getByText('v2')).toBeInTheDocument()
   })
 })

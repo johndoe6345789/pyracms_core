@@ -22,14 +22,31 @@ export default function ChangePasswordForm({ userId }: { userId: number }) {
             Password changed.
           </Alert>
         )}
-        <PasswordField label="Current password" value={s.current}
-          onChange={s.setCurrent} data-testid="pw-current" />
-        <PasswordField label="New password" value={s.next}
-          onChange={s.setNext} data-testid="pw-new" />
-        <PasswordField label="Confirm new password" value={s.confirm}
-          onChange={s.setConfirm} data-testid="pw-confirm" />
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}
-          disabled={s.busy} data-testid="pw-submit">
+        <PasswordField
+          label="Current password"
+          value={s.current}
+          onChange={s.setCurrent}
+          data-testid="pw-current"
+        />
+        <PasswordField
+          label="New password"
+          value={s.next}
+          onChange={s.setNext}
+          data-testid="pw-new"
+        />
+        <PasswordField
+          label="Confirm new password"
+          value={s.confirm}
+          onChange={s.setConfirm}
+          data-testid="pw-confirm"
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ mt: 2 }}
+          disabled={s.busy}
+          data-testid="pw-submit"
+        >
           {s.busy ? 'Saving...' : 'Change password'}
         </Button>
       </Box>

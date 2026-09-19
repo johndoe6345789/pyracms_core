@@ -15,63 +15,29 @@ test.describe('Admin ACL', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
   })
 
-  test(
-    '"Add Rule" button is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('add-acl-rule-btn'),
-      ).toBeVisible()
-    },
-  )
+  test('"Add Rule" button is visible', async ({ page }) => {
+    await expect(page.getByTestId('add-acl-rule-btn')).toBeVisible()
+  })
 
-  test(
-    '"Add Rule" button disabled when fields are empty',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('add-acl-rule-btn'),
-      ).toBeDisabled()
-    },
-  )
+  test('"Add Rule" button disabled when fields are empty', async ({ page }) => {
+    await expect(page.getByTestId('add-acl-rule-btn')).toBeDisabled()
+  })
 
-  test(
-    '"Add Rule" button enables when fields are filled',
-    async ({ page }) => {
-      await page
-        .getByTestId('acl-principal-input')
-        .fill('editor')
-      await page
-        .getByTestId('acl-permission-input')
-        .fill('edit_articles')
-      await expect(
-        page.getByTestId('add-acl-rule-btn'),
-      ).toBeEnabled()
-    },
-  )
+  test('"Add Rule" button enables when fields are filled', async ({ page }) => {
+    await page.getByTestId('acl-principal-input').fill('editor')
+    await page.getByTestId('acl-permission-input').fill('edit_articles')
+    await expect(page.getByTestId('add-acl-rule-btn')).toBeEnabled()
+  })
 
-  test(
-    'ACL rule table is rendered',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-rule-table'),
-      ).toBeVisible()
-    },
-  )
+  test('ACL rule table is rendered', async ({ page }) => {
+    await expect(page.getByTestId('acl-rule-table')).toBeVisible()
+  })
 
-  test(
-    'mocked ACL rule row is visible',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-row-1'),
-      ).toBeVisible()
-    },
-  )
+  test('mocked ACL rule row is visible', async ({ page }) => {
+    await expect(page.getByTestId('acl-row-1')).toBeVisible()
+  })
 
-  test(
-    'mocked rule shows principal "admin"',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('acl-row-1'),
-      ).toContainText('admin')
-    },
-  )
+  test('mocked rule shows principal "admin"', async ({ page }) => {
+    await expect(page.getByTestId('acl-row-1')).toContainText('admin')
+  })
 })

@@ -1,6 +1,8 @@
 import { Box, Typography, LinearProgress } from '@mui/material'
 import {
-  passwordStrength, STRENGTH_LABELS, STRENGTH_COLOURS,
+  passwordStrength,
+  STRENGTH_LABELS,
+  STRENGTH_COLOURS,
 } from './passwordStrength'
 
 interface StrengthBarProps {

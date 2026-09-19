@@ -24,13 +24,19 @@ describe('robots', () => {
 })
 
 describe('sitemap', () => {
-  it('lists the home page and every tenant\'s articles', async () => {
+  it("lists the home page and every tenant's articles", async () => {
     fetchMock.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/tenants')) {
-        return ok([{ id: 5, slug: 'acme' }, { id: 6, slug: 'zed' }])
+        return ok([
+          { id: 5, slug: 'acme' },
+          { id: 6, slug: 'zed' },
+        ])
       }
-      return ok(url.includes('tenant_id=5')
-        ? [{ name: 'a b', createdAt: '2024-01-01T00:00:00Z' }] : [])
+      return ok(
+        url.includes('tenant_id=5')
+          ? [{ name: 'a b', createdAt: '2024-01-01T00:00:00Z' }]
+          : [],
+      )
     })
     const s = await sitemap()
     expect(s.map((e) => e.url)).toEqual([
@@ -40,7 +46,8 @@ describe('sitemap', () => {
       'https://site.test/site/zed',
     ])
     expect(fetchMock.mock.calls.map((c) => c[0])).toContain(
-      'http://api/api/articles?tenant_id=5&limit=100')
+      'http://api/api/articles?tenant_id=5&limit=100',
+    )
   })
   it('returns only home when the api fails', async () => {
     fetchMock.mockResolvedValueOnce({ ok: false })

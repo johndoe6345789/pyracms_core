@@ -9,55 +9,38 @@ test.describe('Keyboard navigation', () => {
   })
 
   test(
-    'Enter key on Dashboard nav navigates to '
-    + '/super-admin',
+    'Enter key on Dashboard nav navigates to ' + '/super-admin',
     async ({ page }) => {
       await page.goto('/super-admin/users')
-      const dashNav = page.getByTestId(
-        'super-admin-nav-dashboard',
-      )
+      const dashNav = page.getByTestId('super-admin-nav-dashboard')
       await dashNav.focus()
       await page.keyboard.press('Enter')
       await expect(page).toHaveURL(/\/super-admin$/)
     },
   )
 
-  test(
-    'Tab order: Dashboard → Tenants → Users → Settings',
-    async ({ page }) => {
-      const dashboard = page.getByTestId(
-        'super-admin-nav-dashboard',
-      )
-      await dashboard.focus()
-      await expect(dashboard).toBeFocused()
+  test('Tab order: Dashboard → Tenants → Users → Settings', async ({
+    page,
+  }) => {
+    const dashboard = page.getByTestId('super-admin-nav-dashboard')
+    await dashboard.focus()
+    await expect(dashboard).toBeFocused()
 
-      await page.keyboard.press('Tab')
-      await expect(
-        page.getByTestId('super-admin-nav-tenants'),
-      ).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('super-admin-nav-tenants')).toBeFocused()
 
-      await page.keyboard.press('Tab')
-      await expect(
-        page.getByTestId('super-admin-nav-users'),
-      ).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('super-admin-nav-users')).toBeFocused()
 
-      await page.keyboard.press('Tab')
-      await expect(
-        page.getByTestId('super-admin-nav-settings'),
-      ).toBeFocused()
-    },
-  )
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('super-admin-nav-settings')).toBeFocused()
+  })
 
-  test(
-    'Space key on Dashboard nav item activates it',
-    async ({ page }) => {
-      await page.goto('/super-admin/tenants')
-      const dashNav = page.getByTestId(
-        'super-admin-nav-dashboard',
-      )
-      await dashNav.focus()
-      await page.keyboard.press('Space')
-      await expect(page).toHaveURL(/\/super-admin$/)
-    },
-  )
+  test('Space key on Dashboard nav item activates it', async ({ page }) => {
+    await page.goto('/super-admin/tenants')
+    const dashNav = page.getByTestId('super-admin-nav-dashboard')
+    await dashNav.focus()
+    await page.keyboard.press('Space')
+    await expect(page).toHaveURL(/\/super-admin$/)
+  })
 })

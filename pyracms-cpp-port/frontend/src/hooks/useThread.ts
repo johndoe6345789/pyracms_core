@@ -6,7 +6,11 @@ import { useForumUser } from './useForumUser'
 import { useThreadReply } from './useThreadReply'
 import { useThreadMod } from './useThreadMod'
 import {
-  EMPTY_THREAD, mapPosts, mapThread, type RawPost, type ThreadInfo,
+  EMPTY_THREAD,
+  mapPosts,
+  mapThread,
+  type RawPost,
+  type ThreadInfo,
 } from './threadTypes'
 
 export type { Post, ThreadInfo } from './threadTypes'
@@ -33,11 +37,13 @@ export function useThread(threadId: string, tenantId: number | null) {
         setRawPosts(res.data.posts || [])
         setError('')
       })
-      .catch((err) => setError(
-        err?.response?.status === 404
-          ? 'This thread does not exist.'
-          : 'Could not load the thread. Please try again.',
-      ))
+      .catch((err) =>
+        setError(
+          err?.response?.status === 404
+            ? 'This thread does not exist.'
+            : 'Could not load the thread. Please try again.',
+        ),
+      )
   }, [threadId, tenantId])
 
   useEffect(() => {

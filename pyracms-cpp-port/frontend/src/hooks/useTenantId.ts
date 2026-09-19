@@ -16,8 +16,9 @@ export function useTenantId(slug: string) {
       setLoading(false)
       return
     }
-    api.get(`/api/tenants/${slug}`)
-      .then(res => {
+    api
+      .get(`/api/tenants/${slug}`)
+      .then((res) => {
         const id = res.data.id
         cache[slug] = id
         setTenantId(id)

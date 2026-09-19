@@ -25,9 +25,7 @@ export default function EditForm({
         minRows={2}
         size="small"
         value={editText}
-        onChange={(e) =>
-          setEditText(e.target.value)
-        }
+        onChange={(e) => setEditText(e.target.value)}
         data-testid="comment-edit-input"
       />
       <Box

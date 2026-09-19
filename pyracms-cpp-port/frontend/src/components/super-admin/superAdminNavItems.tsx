@@ -1,5 +1,8 @@
 import {
-  DashboardOutlined, DnsOutlined, PeopleOutlined, TuneOutlined,
+  DashboardOutlined,
+  DnsOutlined,
+  PeopleOutlined,
+  TuneOutlined,
 } from '@mui/icons-material'
 
 export const NAV_ITEMS = [

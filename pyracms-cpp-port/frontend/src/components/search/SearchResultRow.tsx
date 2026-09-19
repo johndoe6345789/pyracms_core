@@ -1,17 +1,9 @@
 'use client'
 
 import { ArticleOutlined } from '@mui/icons-material'
-import {
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from '@mui/material'
+import { ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material'
 import { type SearchResult } from '@/hooks/useSearchPage'
-import {
-  SearchResultTitle,
-  TYPE_ICONS,
-} from './SearchResultTitle'
+import { SearchResultTitle, TYPE_ICONS } from './SearchResultTitle'
 import { highlightMatch } from './highlightMatch'
 import { safeHref } from '@/lib/safeUrl'
 
@@ -41,7 +33,7 @@ export function SearchResultRow({
       </ListItemIcon>
       <ListItemText
         primary={<SearchResultTitle result={result} />}
-        secondary={(
+        secondary={
           <Typography
             variant="body2"
             component="span"
@@ -49,7 +41,7 @@ export function SearchResultRow({
               __html: highlightMatch(result.snippet || '', query),
             }}
           />
-        )}
+        }
       />
     </ListItem>
   )

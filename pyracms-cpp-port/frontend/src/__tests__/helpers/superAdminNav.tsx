@@ -36,10 +36,5 @@ const DEFAULT_WIDTH = 260
 
 /** Render with a default width. Optionally pass onNavClick. */
 export function renderNav(onNavClick?: jest.Mock) {
-  return render(
-    <SuperAdminNav
-      width={DEFAULT_WIDTH}
-      onNavClick={onNavClick}
-    />,
-  )
+  return render(<SuperAdminNav width={DEFAULT_WIDTH} onNavClick={onNavClick} />)
 }

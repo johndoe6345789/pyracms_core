@@ -3,7 +3,10 @@ import AppDrawer from '@/components/layout/AppDrawer'
 import TopBarLinks from '@/components/layout/TopBarLinks'
 import { isActive } from '@/components/layout/navTypes'
 import {
-  tenantSections, tenantModuleEntries, portalEntries, portalSections,
+  tenantSections,
+  tenantModuleEntries,
+  portalEntries,
+  portalSections,
   TENANT_FOOTER,
 } from '@/components/layout/navConfig'
 
@@ -34,16 +37,25 @@ describe('nav config', () => {
 
 describe('AppDrawer', () => {
   const onClose = jest.fn()
-  const render1 = (footer?: boolean) => render(
-    <AppDrawer open onClose={onClose} title="T" subtitle="Sub"
-      sections={tenantSections('demo', true)}
-      {...(footer ? { footer: TENANT_FOOTER } : {})} />)
+  const render1 = (footer?: boolean) =>
+    render(
+      <AppDrawer
+        open
+        onClose={onClose}
+        title="T"
+        subtitle="Sub"
+        sections={tenantSections('demo', true)}
+        {...(footer ? { footer: TENANT_FOOTER } : {})}
+      />,
+    )
 
   it('renders header, active item and footer', () => {
     render1(true)
     expect(screen.getByText('Sub')).toBeInTheDocument()
-    expect(screen.getByTestId('drawer-nav-forum'))
-      .toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('drawer-nav-forum')).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
     expect(screen.getByTestId('drawer-admin')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('drawer-portal'))
     expect(onClose).toHaveBeenCalled()
@@ -59,10 +71,16 @@ describe('AppDrawer', () => {
 
 describe('TopBarLinks', () => {
   it('marks the active link', () => {
-    render(<TopBarLinks items={tenantModuleEntries('demo')}
-      pathname="/site/demo/forum" />)
-    expect(screen.getByTestId('nav-forum'))
-      .toHaveAttribute('aria-current', 'page')
+    render(
+      <TopBarLinks
+        items={tenantModuleEntries('demo')}
+        pathname="/site/demo/forum"
+      />,
+    )
+    expect(screen.getByTestId('nav-forum')).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
     expect(screen.getByTestId('nav-tags')).not.toHaveAttribute('aria-current')
   })
 })

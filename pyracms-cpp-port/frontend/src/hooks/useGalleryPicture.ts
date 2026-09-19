@@ -25,8 +25,9 @@ export function useGalleryPicture(pictureId: string) {
   useEffect(() => {
     if (!pictureId) return
     setLoading(true)
-    api.get(`/api/gallery/pictures/${pictureId}`)
-      .then(res => {
+    api
+      .get(`/api/gallery/pictures/${pictureId}`)
+      .then((res) => {
         const p = res.data
         setPicture({
           title: p.displayName || p.title || '',
@@ -46,10 +47,9 @@ export function useGalleryPicture(pictureId: string) {
   }, [pictureId, tick])
 
   const vote = (like: boolean, key: 'likes' | 'dislikes') =>
-    api.post(`/api/gallery/pictures/${pictureId}/vote`, { like })
-      .then(() => {
-        setPicture(prev => prev ? { ...prev, [key]: prev[key] + 1 } : prev)
-      })
+    api.post(`/api/gallery/pictures/${pictureId}/vote`, { like }).then(() => {
+      setPicture((prev) => (prev ? { ...prev, [key]: prev[key] + 1 } : prev))
+    })
 
   const handleLike = () => vote(true, 'likes')
   const handleDislike = () => vote(false, 'dislikes')
@@ -58,7 +58,11 @@ export function useGalleryPicture(pictureId: string) {
     api.put(`/api/gallery/pictures/${pictureId}/default`)
 
   return {
-    picture, loading, handleLike, handleDislike,
-    handleSetCover, refresh: () => setTick((t) => t + 1),
+    picture,
+    loading,
+    handleLike,
+    handleDislike,
+    handleSetCover,
+    refresh: () => setTick((t) => t + 1),
   }
 }

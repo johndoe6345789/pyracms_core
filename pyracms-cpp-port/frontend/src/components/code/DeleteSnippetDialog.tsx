@@ -1,8 +1,12 @@
 'use client'
 
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  DialogContentText, Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  Button,
 } from '@mui/material'
 
 interface Props {
@@ -22,8 +26,11 @@ export function DeleteSnippetDialog({ open, onClose, onConfirm }: Props) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button color="error" onClick={onConfirm}
-          data-testid="confirm-delete-btn">
+        <Button
+          color="error"
+          onClick={onConfirm}
+          data-testid="confirm-delete-btn"
+        >
           Delete
         </Button>
       </DialogActions>

@@ -23,8 +23,11 @@ export interface LauncherRelease {
 }
 
 export const OS_LABEL: Record<ReleaseOs, string> = {
-  win: 'Windows', mac: 'macOS', lin: 'Linux',
+  win: 'Windows',
+  mac: 'macOS',
+  lin: 'Linux',
 }
 export const ARCH_LABEL: Record<ReleaseArch, string> = {
-  x86_64: 'x86_64', arm64: 'ARM64',
+  x86_64: 'x86_64',
+  arm64: 'ARM64',
 }

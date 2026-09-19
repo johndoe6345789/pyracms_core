@@ -2,13 +2,17 @@ import type { Metadata } from 'next'
 import { serverApiOrigin, siteOrigin, tenantIdOf } from './siteOrigin'
 
 async function articleUrl(
-  kind: 'opengraph' | 'jsonld', slug: string, name: string,
+  kind: 'opengraph' | 'jsonld',
+  slug: string,
+  name: string,
 ): Promise<string | null> {
   const tenantId = await tenantIdOf(slug)
   if (!tenantId) return null
   const base = encodeURIComponent(`${await siteOrigin()}/site/${slug}`)
-  return `${serverApiOrigin()}/api/articles/${encodeURIComponent(name)}`
-    + `/${kind}?tenant_id=${tenantId}&base_url=${base}`
+  return (
+    `${serverApiOrigin()}/api/articles/${encodeURIComponent(name)}` +
+    `/${kind}?tenant_id=${tenantId}&base_url=${base}`
+  )
 }
 
 export async function generateArticleMetadata(
@@ -31,8 +35,8 @@ export async function generateArticleMetadata(
         type: 'article',
         title: og['og:title'] || name,
         description: og['og:description'] || '',
-        url: og['og:url']
-          || `${await siteOrigin()}/site/${slug}/articles/${name}`,
+        url:
+          og['og:url'] || `${await siteOrigin()}/site/${slug}/articles/${name}`,
         publishedTime: og['article:published_time'],
         authors: og['article:author'] ? [og['article:author']] : undefined,
       },

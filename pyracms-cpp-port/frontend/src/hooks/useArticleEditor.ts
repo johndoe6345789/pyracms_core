@@ -28,17 +28,14 @@ interface EditorDefaults {
 }
 
 export function useArticleEditor(
-  defaults: EditorDefaults = {}
+  defaults: EditorDefaults = {},
 ): ArticleEditorState {
   const [title, setTitle] = useState(defaults.title ?? '')
   const [content, setContent] = useState(defaults.content ?? '')
-  const [renderer, setRenderer] =
-    useState(defaults.renderer ?? 'Markdown')
+  const [renderer, setRenderer] = useState(defaults.renderer ?? 'Markdown')
   const [summary, setSummary] = useState('')
-  const [tagsInput, setTagsInput] =
-    useState(defaults.tags?.join(', ') ?? '')
-  const [viewMode, setViewMode] =
-    useState<'edit' | 'preview'>('edit')
+  const [tagsInput, setTagsInput] = useState(defaults.tags?.join(', ') ?? '')
+  const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
 
   const parsedTags = tagsInput
     .split(',')
@@ -46,12 +43,18 @@ export function useArticleEditor(
     .filter(Boolean)
 
   return {
-    title, setTitle,
-    content, setContent,
-    renderer, setRenderer,
-    summary, setSummary,
-    tagsInput, setTagsInput,
-    viewMode, setViewMode,
+    title,
+    setTitle,
+    content,
+    setContent,
+    renderer,
+    setRenderer,
+    summary,
+    setSummary,
+    tagsInput,
+    setTagsInput,
+    viewMode,
+    setViewMode,
     parsedTags,
   }
 }

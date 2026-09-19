@@ -20,12 +20,14 @@ export function mapNotification(r: Raw): Notification {
 /** The list route replies with a bare array (older ones wrapped it). */
 export function mapNotificationList(data: unknown): Notification[] {
   const rows = Array.isArray(data)
-    ? data : (data as { notifications?: unknown })?.notifications
+    ? data
+    : (data as { notifications?: unknown })?.notifications
   return Array.isArray(rows) ? rows.map(mapNotification) : []
 }
 
 export const fetchNotifications = (limit: number, offset = 0) =>
-  api.get(`/api/notifications?limit=${limit}&offset=${offset}`)
+  api
+    .get(`/api/notifications?limit=${limit}&offset=${offset}`)
     .then((r) => mapNotificationList(r.data))
 
 export const markNotificationRead = (id: number) =>

@@ -1,6 +1,13 @@
 import {
-  Typography, Paper, Box, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow,
+  Typography,
+  Paper,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material'
 
 interface Props {
@@ -9,11 +16,7 @@ interface Props {
   children: React.ReactNode
 }
 
-export default function AnalyticsPanel({
-  title,
-  heads,
-  children,
-}: Props) {
+export default function AnalyticsPanel({ title, heads, children }: Props) {
   return (
     <Paper variant="outlined" sx={{ borderColor: 'divider' }}>
       <Box sx={{ px: 3, py: 2 }}>
@@ -24,10 +27,7 @@ export default function AnalyticsPanel({
           <TableHead>
             <TableRow>
               {heads.map((h) => (
-                <TableCell
-                  key={h.label}
-                  align={h.right ? 'right' : 'left'}
-                >
+                <TableCell key={h.label} align={h.right ? 'right' : 'left'}>
                   {h.label}
                 </TableCell>
               ))}

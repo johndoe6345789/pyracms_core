@@ -56,9 +56,7 @@ export function pickTheme(imported: unknown): ThemeConfig {
   return out as unknown as ThemeConfig
 }
 
-export function importTheme(
-  apply: (t: ThemeConfig) => void,
-) {
+export function importTheme(apply: (t: ThemeConfig) => void) {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = '.json'

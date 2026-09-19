@@ -11,7 +11,8 @@ import DependencyList from '@/components/gamedep/DependencyList'
 import ScreenshotGrid from '@/components/gamedep/ScreenshotGrid'
 import TabPanel from '@/components/common/TabPanel'
 import {
-  useGameDepDetail, type GameDepDetailData,
+  useGameDepDetail,
+  type GameDepDetailData,
 } from '@/hooks/useGameDepDetail'
 import { useGameDepItem } from '@/hooks/useGameDepItem'
 import CommentSection from '@/components/common/CommentSection'
@@ -29,22 +30,30 @@ export default function DependencyDetailPage() {
   )
 }
 
-function DepView(
-  { slug, name, data }: { slug: string; name: string; data: GameDepDetailData },
-) {
+function DepView({
+  slug,
+  name,
+  data,
+}: {
+  slug: string
+  name: string
+  data: GameDepDetailData
+}) {
   const { detail, tabIndex, setTabIndex } = useGameDepDetail(data)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Breadcrumbs sx={{ mb: 3 }}
-        separator={<NavigateNextOutlined fontSize="small" />}>
-        <Link href={`/site/${slug}/dependencies`}
-          style={{ color: 'inherit', textDecoration: 'none' }}>
+      <Breadcrumbs
+        sx={{ mb: 3 }}
+        separator={<NavigateNextOutlined fontSize="small" />}
+      >
+        <Link
+          href={`/site/${slug}/dependencies`}
+          style={{ color: 'inherit', textDecoration: 'none' }}
+        >
           Dependencies
         </Link>
-        <Typography color="text.primary">
-          {detail.displayName}
-        </Typography>
+        <Typography color="text.primary">{detail.displayName}</Typography>
       </Breadcrumbs>
 
       <GameDepDetail
@@ -60,16 +69,14 @@ function DepView(
           <BinaryMatrix binaries={detail.binaries} />
         </TabPanel>
         <TabPanel value={tabIndex} index={2}>
-          <DependencyList dependencies={detail.dependencies}
-            slug={slug} />
+          <DependencyList dependencies={detail.dependencies} slug={slug} />
         </TabPanel>
         <TabPanel value={tabIndex} index={3}>
           <ScreenshotGrid screenshots={detail.screenshots} />
         </TabPanel>
       </GameDepDetail>
       {data.id !== undefined && (
-        <CommentSection contentType="dependency"
-          contentId={data.id} />
+        <CommentSection contentType="dependency" contentId={data.id} />
       )}
     </Container>
   )

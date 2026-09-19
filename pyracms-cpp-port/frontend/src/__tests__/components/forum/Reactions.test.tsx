@@ -15,7 +15,10 @@ beforeEach(() => {
 })
 
 const r = (label: string, count: number, reacted: boolean) => ({
-  emoji: label, label, count, reacted,
+  emoji: label,
+  label,
+  count,
+  reacted,
 })
 
 describe('PostReactions', () => {
@@ -29,8 +32,9 @@ describe('PostReactions', () => {
     render(<PostReactions postId="7" reactions={[]} />)
     fireEvent.click(screen.getByTestId('add-reaction-btn'))
     fireEvent.click(screen.getByTestId('reaction-pick-party'))
-    expect(m.put).toHaveBeenCalledWith(
-      '/api/forum/posts/7/reactions', { emoji: 'party' })
+    expect(m.put).toHaveBeenCalledWith('/api/forum/posts/7/reactions', {
+      emoji: 'party',
+    })
     expect(screen.getByTestId('reaction-party')).toHaveTextContent('1')
   })
   it('rolls back when the call fails', async () => {
@@ -39,11 +43,13 @@ describe('PostReactions', () => {
     fireEvent.click(screen.getByTestId('reaction-wow'))
     expect(screen.getByTestId('reaction-wow')).toHaveTextContent('3')
     await waitFor(() =>
-      expect(screen.getByTestId('reaction-wow')).toHaveTextContent('2'))
+      expect(screen.getByTestId('reaction-wow')).toHaveTextContent('2'),
+    )
   })
   it('is inert for guests', () => {
-    render(<PostReactions postId="7" disabled
-      reactions={[r('wow', 2, false)]} />)
+    render(
+      <PostReactions postId="7" disabled reactions={[r('wow', 2, false)]} />,
+    )
     expect(screen.getByTestId('add-reaction-btn')).toBeDisabled()
     fireEvent.click(screen.getByTestId('reaction-wow'))
     expect(m.put).not.toHaveBeenCalled()

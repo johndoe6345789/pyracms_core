@@ -29,8 +29,12 @@ it('loads rules and adds/deletes', async () => {
     result.current.setNewPermission(' x ')
   })
   act(() => result.current.handleAdd())
-  expect(result.current.rules[1]).toEqual(
-    { id: 3, action: 'Allow', principal: 'p', permission: 'x' })
+  expect(result.current.rules[1]).toEqual({
+    id: 3,
+    action: 'Allow',
+    principal: 'p',
+    permission: 'x',
+  })
   expect(m.put).toHaveBeenCalledTimes(1)
   act(() => result.current.handleDelete(2))
   expect(result.current.rules).toHaveLength(1)

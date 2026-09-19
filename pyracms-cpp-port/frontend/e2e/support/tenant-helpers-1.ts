@@ -9,19 +9,14 @@ import { MOCK_ARTICLES_LIST, MOCK_TENANT } from './tenant-data-1'
  */
 export async function loginAsAdmin(page: Page): Promise<void> {
   await page.goto('/auth/login')
-  await page
-    .getByTestId('username-input')
-    .fill('admin')
-  await page
-    .getByTestId('password-input')
-    .fill('password123')
+  await page.getByTestId('username-input').fill('admin')
+  await page.getByTestId('password-input').fill('password123')
   await page.getByTestId('login-submit').click()
   // Wait for the login page to be left
   await page
-    .waitForURL(
-      (url) => !url.pathname.startsWith('/auth/login'),
-      { timeout: 8_000 },
-    )
+    .waitForURL((url) => !url.pathname.startsWith('/auth/login'), {
+      timeout: 8_000,
+    })
     .catch(() => {
       /* ignore — some env may not redirect */
     })
@@ -33,9 +28,7 @@ export async function loginAsAdmin(page: Page): Promise<void> {
  */
 export function collectConsoleErrors(page: Page) {
   const errors: string[] = []
-  const handler = (
-    msg: import('@playwright/test').ConsoleMessage,
-  ) => {
+  const handler = (msg: import('@playwright/test').ConsoleMessage) => {
     if (msg.type() === 'error') errors.push(msg.text())
   }
   page.on('console', handler)

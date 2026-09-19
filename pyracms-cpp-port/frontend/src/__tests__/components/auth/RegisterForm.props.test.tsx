@@ -18,16 +18,12 @@ beforeEach(resetRegisterMocks)
 describe('RegisterForm – redirectTo prop', () => {
   it('passes redirectTo to useRegister when provided', () => {
     renderForm('/dashboard')
-    expect(mockUseRegister).toHaveBeenCalledWith(
-      '/dashboard', undefined,
-    )
+    expect(mockUseRegister).toHaveBeenCalledWith('/dashboard', undefined)
   })
 
   it('passes undefined to useRegister when redirectTo is omitted', () => {
     renderForm()
-    expect(mockUseRegister).toHaveBeenCalledWith(
-      undefined, undefined,
-    )
+    expect(mockUseRegister).toHaveBeenCalledWith(undefined, undefined)
   })
 })
 
@@ -50,13 +46,9 @@ describe('RegisterForm – confirm-password field integration', () => {
 
   it('calls updateField("confirmPassword", …) on input change', () => {
     renderForm()
-    fireEvent.change(
-      screen.getByTestId('register-confirm-password-input'),
-      { target: { value: 'MyPass1!' } },
-    )
-    expect(mockUpdateField).toHaveBeenCalledWith(
-      'confirmPassword',
-      'MyPass1!',
-    )
+    fireEvent.change(screen.getByTestId('register-confirm-password-input'), {
+      target: { value: 'MyPass1!' },
+    })
+    expect(mockUpdateField).toHaveBeenCalledWith('confirmPassword', 'MyPass1!')
   })
 })

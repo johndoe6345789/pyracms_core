@@ -17,12 +17,19 @@ it('renders rules and deletes', () => {
 
 const setup = (principal = '', permission = '') => {
   const p = {
-    onActionChange: jest.fn(), onPrincipalChange: jest.fn(),
-    onPermissionChange: jest.fn(), onAdd: jest.fn(),
+    onActionChange: jest.fn(),
+    onPrincipalChange: jest.fn(),
+    onPermissionChange: jest.fn(),
+    onAdd: jest.fn(),
   }
   render(
-    <AddAclRuleForm newAction="Allow" newPrincipal={principal}
-      newPermission={permission} {...p} />)
+    <AddAclRuleForm
+      newAction="Allow"
+      newPrincipal={principal}
+      newPermission={permission}
+      {...p}
+    />,
+  )
   return p
 }
 
@@ -35,11 +42,13 @@ it('emits form events', () => {
   const p = setup('a', 'b')
   fireEvent.change(
     within(screen.getByTestId('acl-principal-input')).getByRole('textbox'),
-    { target: { value: 'z' } })
+    { target: { value: 'z' } },
+  )
   expect(p.onPrincipalChange).toHaveBeenCalledWith('z')
   fireEvent.change(
     within(screen.getByTestId('acl-permission-input')).getByRole('textbox'),
-    { target: { value: 'q' } })
+    { target: { value: 'q' } },
+  )
   expect(p.onPermissionChange).toHaveBeenCalledWith('q')
   fireEvent.click(screen.getByTestId('add-acl-rule-btn'))
   expect(p.onAdd).toHaveBeenCalled()

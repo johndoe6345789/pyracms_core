@@ -13,14 +13,11 @@ export function isSessionOnSite(
   user: User | null,
   slug: string,
 ): boolean {
-  return isAuthenticated
-    && (!user?.tenantSlug || user.tenantSlug === slug)
+  return isAuthenticated && (!user?.tenantSlug || user.tenantSlug === slug)
 }
 
 /** True when the signed-in session belongs to the site `slug`. */
 export function useSiteSession(slug: string): boolean {
-  const { user, isAuthenticated } = useSelector(
-    (s: RootState) => s.auth,
-  )
+  const { user, isAuthenticated } = useSelector((s: RootState) => s.auth)
   return isSessionOnSite(isAuthenticated, user, slug)
 }

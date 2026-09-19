@@ -4,8 +4,7 @@
  */
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import CreateSiteForm
-  from '@/components/create-site/CreateSiteForm'
+import CreateSiteForm from '@/components/create-site/CreateSiteForm'
 import {
   mockUseCreateSite,
   resetCreateSite,
@@ -17,8 +16,10 @@ jest.mock('@/hooks/useCreateSite', () => ({
 }))
 
 // Stub CreateSiteFields to keep these tests on the form shell.
-jest.mock('@/components/create-site/CreateSiteFields', () =>
-  require('../../helpers/createSiteForm').MockFields)
+jest.mock(
+  '@/components/create-site/CreateSiteFields',
+  () => require('../../helpers/createSiteForm').MockFields,
+)
 
 describe('CreateSiteForm', () => {
   beforeEach(resetCreateSite)
@@ -42,35 +43,31 @@ describe('CreateSiteForm', () => {
 
   it('submit button is enabled when not loading', () => {
     render(<CreateSiteForm />)
-    expect(
-      screen.getByTestId('create-site-submit'),
-    ).not.toBeDisabled()
+    expect(screen.getByTestId('create-site-submit')).not.toBeDisabled()
   })
 
   it('submit button is disabled during loading', () => {
     withHook({ loading: true })
     render(<CreateSiteForm />)
-    expect(
-      screen.getByTestId('create-site-submit'),
-    ).toBeDisabled()
+    expect(screen.getByTestId('create-site-submit')).toBeDisabled()
   })
 
   // ── aria-label on submit button ───────────────────────────
 
   it('submit button has aria-label "Create site" when idle', () => {
     render(<CreateSiteForm />)
-    expect(
-      screen.getByTestId('create-site-submit'),
-    ).toHaveAttribute('aria-label', 'Create site')
+    expect(screen.getByTestId('create-site-submit')).toHaveAttribute(
+      'aria-label',
+      'Create site',
+    )
   })
 
-  it('submit button has aria-label "Creating site" when loading',
-    () => {
-      withHook({ loading: true })
-      render(<CreateSiteForm />)
-      expect(
-        screen.getByTestId('create-site-submit'),
-      ).toHaveAttribute('aria-label', 'Creating site')
-    },
-  )
+  it('submit button has aria-label "Creating site" when loading', () => {
+    withHook({ loading: true })
+    render(<CreateSiteForm />)
+    expect(screen.getByTestId('create-site-submit')).toHaveAttribute(
+      'aria-label',
+      'Creating site',
+    )
+  })
 })

@@ -1,11 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import { PersonAddOutlined } from '@mui/icons-material'
 
-export default function UsersHeader({
-  onCreate,
-}: {
-  onCreate: () => void
-}) {
+export default function UsersHeader({ onCreate }: { onCreate: () => void }) {
   return (
     <Box
       sx={{

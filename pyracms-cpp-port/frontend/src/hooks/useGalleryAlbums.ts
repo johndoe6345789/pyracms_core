@@ -28,8 +28,9 @@ export function useGalleryAlbums(tenantId: number | null) {
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
-    api.get(`/api/gallery/albums?tenant_id=${tenantId}`)
-      .then(res => setAlbums((res.data || []).map(mapAlbum)))
+    api
+      .get(`/api/gallery/albums?tenant_id=${tenantId}`)
+      .then((res) => setAlbums((res.data || []).map(mapAlbum)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [tenantId, version])

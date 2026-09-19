@@ -18,35 +18,57 @@ jest.mock('@/components/common/NotificationBell', () => () => <i />)
 jest.mock('@/components/common/ThemeToggle', () => () => <i />)
 jest.mock('@/components/common/LanguageSelect', () => () => <i />)
 jest.mock('@/components/common/UserBubble', () => () => <i />)
-jest.mock('@/components/dashboard/DashboardStats',
-  () => () => <i data-testid="stats" />)
+jest.mock('@/components/dashboard/DashboardStats', () => () => (
+  <i data-testid="stats" />
+))
 
 beforeEach(() => jest.resetAllMocks())
 
 const media = (matches: boolean) => {
   window.matchMedia = jest.fn().mockReturnValue({
-    matches, addListener: jest.fn(), removeListener: jest.fn(),
-    addEventListener: jest.fn(), removeEventListener: jest.fn(),
+    matches,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
   })
 }
 
 it('layout renders a permanent sidebar on desktop', () => {
   media(false)
-  render(<TenantAdminLayout><p>kid</p></TenantAdminLayout>)
+  render(
+    <TenantAdminLayout>
+      <p>kid</p>
+    </TenantAdminLayout>,
+  )
   expect(screen.getByTestId('admin-sidebar')).toBeInTheDocument()
   expect(screen.getByTestId('admin-main-content')).toHaveTextContent('kid')
 })
 
 it('layout opens and closes the mobile drawer', () => {
   media(true)
-  render(<TenantAdminLayout><p>kid</p></TenantAdminLayout>)
+  render(
+    <TenantAdminLayout>
+      <p>kid</p>
+    </TenantAdminLayout>,
+  )
   screen.getByTestId('admin-menu-toggle').click()
   return waitFor(() => screen.getByTestId('admin-nav-users').click())
 })
 
 it('dashboard page shows quick links and real activity', async () => {
-  m.get.mockResolvedValue({ data: [{ id: 1, type: 'article', actor: 'a',
-    title: 'Hello', link: '/x', createdAt: '2026-01-01T00:00:00Z' }] })
+  m.get.mockResolvedValue({
+    data: [
+      {
+        id: 1,
+        type: 'article',
+        actor: 'a',
+        title: 'Hello',
+        link: '/x',
+        createdAt: '2026-01-01T00:00:00Z',
+      },
+    ],
+  })
   render(<DashboardPage />)
   expect(await screen.findByTestId('activity-1')).toBeInTheDocument()
   expect(m.get).toHaveBeenCalledWith('/api/activity?tenant_id=3&limit=10')
@@ -57,8 +79,7 @@ it('dashboard page shows quick links and real activity', async () => {
 it('redirect page goes to the first tenant', async () => {
   m.get.mockResolvedValue({ data: [{ slug: 'first' }] })
   render(<AdminRedirectPage />)
-  await waitFor(() => expect(replace).toHaveBeenCalledWith(
-    '/site/first/admin'))
+  await waitFor(() => expect(replace).toHaveBeenCalledWith('/site/first/admin'))
 })
 
 it('redirect page reports empty and failing loads', async () => {

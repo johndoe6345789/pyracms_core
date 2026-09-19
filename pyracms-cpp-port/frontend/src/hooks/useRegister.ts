@@ -13,8 +13,12 @@ import type { RegisterRequest } from '@/types'
 export { validateRegisterForm } from '@/hooks/registerValidation'
 
 const EMPTY: RegisterRequest = {
-  username: '', email: '', password: '', confirmPassword: '',
-  firstName: '', lastName: '',
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  firstName: '',
+  lastName: '',
 }
 
 /**

@@ -1,5 +1,7 @@
 import {
-  DEFAULT_THEME, exportTheme, importTheme,
+  DEFAULT_THEME,
+  exportTheme,
+  importTheme,
 } from '@/components/admin/styles/themeConfig'
 
 jest.mock('react-colorful', () => ({
@@ -11,7 +13,8 @@ jest.mock('react-colorful', () => ({
 it('exportTheme downloads json', () => {
   URL.createObjectURL = jest.fn(() => 'blob:x')
   URL.revokeObjectURL = jest.fn()
-  const click = jest.spyOn(HTMLAnchorElement.prototype, 'click')
+  const click = jest
+    .spyOn(HTMLAnchorElement.prototype, 'click')
     .mockImplementation()
   exportTheme(DEFAULT_THEME)
   expect(click).toHaveBeenCalled()
@@ -34,8 +37,7 @@ describe('importTheme', () => {
   afterEach(() => jest.restoreAllMocks())
 
   const pick = (files: File[]) => {
-    Object.defineProperty(input, 'files',
-      { value: files, configurable: true })
+    Object.defineProperty(input, 'files', { value: files, configurable: true })
     input.onchange!({ target: input } as unknown as Event)
   }
 
@@ -44,8 +46,10 @@ describe('importTheme', () => {
     importTheme(apply)
     pick([new File(['{"primaryColor":"#123"}'], 't.json')])
     await new Promise((r) => setTimeout(r, 500))
-    expect(apply).toHaveBeenCalledWith(
-      { ...DEFAULT_THEME, primaryColor: '#123' })
+    expect(apply).toHaveBeenCalledWith({
+      ...DEFAULT_THEME,
+      primaryColor: '#123',
+    })
   })
 
   it('ignores no file and logs invalid json', async () => {

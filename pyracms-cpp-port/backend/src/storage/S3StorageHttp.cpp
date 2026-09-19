@@ -6,8 +6,10 @@ S3Storage::S3Storage(StorageConfig cfg)
     : cfg_(std::move(cfg)), ep_(parseS3Endpoint(cfg_.endpoint)) {}
 
 std::string S3Storage::objectPath(const BlobKey &k) const {
-    return "/" + cfg_.bucket + "/tenants/" + std::to_string(k.tenant) +
-           (k.thumb ? "/thumbnails/" : "/") + k.id;
+    // Flat keys: the object store routes /{bucket}/{key} with one path
+    // segment, so a "tenants/<id>/" prefix would 404.
+    return "/" + cfg_.bucket + "/tenant-" + std::to_string(k.tenant) +
+           (k.thumb ? "-thumb-" : "-") + k.id;
 }
 
 drogon::HttpClientPtr S3Storage::client() {

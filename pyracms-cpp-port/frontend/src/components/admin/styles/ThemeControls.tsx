@@ -1,6 +1,12 @@
 import {
-  Typography, Paper, Divider, Slider, FormControl,
-  InputLabel, Select, MenuItem,
+  Typography,
+  Paper,
+  Divider,
+  Slider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import ColorPickerField from './ColorPickerField'
 import { FONTS, type ThemeConfig } from './themeConfig'

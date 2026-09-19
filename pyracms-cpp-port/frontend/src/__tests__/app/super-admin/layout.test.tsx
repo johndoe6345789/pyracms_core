@@ -18,7 +18,9 @@ jest.mock('next/navigation', () => ({
 const kid = <p>secret</p>
 
 describe('SuperAdminLayout', () => {
-  beforeEach(() => { mobile = false })
+  beforeEach(() => {
+    mobile = false
+  })
 
   it('blocks non-super-admins', () => {
     renderPlain(<SuperAdminLayout>{kid}</SuperAdminLayout>, makeUser())
@@ -26,21 +28,23 @@ describe('SuperAdminLayout', () => {
   })
 
   it('renders content for a super admin (desktop)', () => {
-    renderPlain(<SuperAdminLayout>{kid}</SuperAdminLayout>,
-      makeUser({ role: 4 } as never))
+    renderPlain(
+      <SuperAdminLayout>{kid}</SuperAdminLayout>,
+      makeUser({ role: 4 } as never),
+    )
     expect(screen.getByText('secret')).toBeInTheDocument()
     expect(screen.getByTestId('super-admin-sidebar')).toBeInTheDocument()
-    expect(screen.getByTestId('super-admin-breadcrumbs'))
-      .toBeInTheDocument()
+    expect(screen.getByTestId('super-admin-breadcrumbs')).toBeInTheDocument()
   })
 
   it('opens the mobile drawer from the app bar', () => {
     mobile = true
-    renderPlain(<SuperAdminLayout>{kid}</SuperAdminLayout>,
-      makeUser({ role: 4 } as never))
+    renderPlain(
+      <SuperAdminLayout>{kid}</SuperAdminLayout>,
+      makeUser({ role: 4 } as never),
+    )
     fireEvent.click(screen.getByTestId('super-admin-menu-toggle'))
-    expect(screen.getByTestId('super-admin-drawer-mobile'))
-      .toBeInTheDocument()
+    expect(screen.getByTestId('super-admin-drawer-mobile')).toBeInTheDocument()
   })
 })
 
@@ -53,8 +57,9 @@ describe('SuperAdminSidebar', () => {
   })
 
   it('renders a permanent rail on desktop', () => {
-    render(<SuperAdminSidebar isMobile={false} open={false}
-      onClose={jest.fn()} />)
+    render(
+      <SuperAdminSidebar isMobile={false} open={false} onClose={jest.fn()} />,
+    )
     expect(screen.getByTestId('super-admin-sidebar')).toBeInTheDocument()
   })
 })

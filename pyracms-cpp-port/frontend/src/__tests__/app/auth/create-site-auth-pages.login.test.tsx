@@ -20,8 +20,7 @@ jest.mock('@/hooks/useLogin', () => ({
   }),
 }))
 
-import LoginCreateSitePage
-  from '@/app/auth/login/create-site/page'
+import LoginCreateSitePage from '@/app/auth/login/create-site/page'
 
 describe('/auth/login/create-site page', () => {
   beforeEach(() => renderWithStore(<LoginCreateSitePage />))
@@ -31,9 +30,7 @@ describe('/auth/login/create-site page', () => {
   })
 
   it('renders the login form', () => {
-    expect(
-      screen.getByTestId('login-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('login-form')).toBeInTheDocument()
   })
 
   it('login form has accessible label', () => {
@@ -43,13 +40,9 @@ describe('/auth/login/create-site page', () => {
   })
 
   it('renders username and password fields', () => {
-    expect(
-      screen.getByTestId('username-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('username-input')).toBeInTheDocument()
     // PasswordField renders with data-testid on the MUI
     // wrapper; verify the submit button is present instead.
-    expect(
-      screen.getByTestId('login-submit'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('login-submit')).toBeInTheDocument()
   })
 })

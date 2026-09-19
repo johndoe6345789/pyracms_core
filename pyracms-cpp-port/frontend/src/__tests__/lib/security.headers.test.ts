@@ -2,8 +2,7 @@ import { securityHeaders, buildCsp } from '../../../security-headers'
 
 describe('security headers', () => {
   const h = Object.fromEntries(
-    securityHeaders('http://api.test:8080', false)
-      .map((x) => [x.key, x.value]),
+    securityHeaders('http://api.test:8080', false).map((x) => [x.key, x.value]),
   )
   it('sets the standard set', () => {
     expect(h['X-Frame-Options']).toBe('DENY')

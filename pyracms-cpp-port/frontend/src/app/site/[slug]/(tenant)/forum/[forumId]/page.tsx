@@ -9,7 +9,9 @@ import { ThreadListHeader } from '@/components/forum/ThreadListHeader'
 import { ThreadTable } from '@/components/forum/ThreadTable'
 import { ForumBreadcrumbs } from '@/components/forum/ForumBreadcrumbs'
 import {
-  ForumLoading, ForumError, ForumEmpty,
+  ForumLoading,
+  ForumError,
+  ForumEmpty,
 } from '@/components/forum/ForumStatus'
 
 export default function ThreadListPage() {

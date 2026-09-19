@@ -33,7 +33,9 @@ function Content() {
 export default function OAuthCallbackPage() {
   return (
     <AuthPageShell>
-      <Suspense fallback={null}><Content /></Suspense>
+      <Suspense fallback={null}>
+        <Content />
+      </Suspense>
     </AuthPageShell>
   )
 }

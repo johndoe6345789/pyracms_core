@@ -9,8 +9,7 @@ import type { Webhook } from '@/hooks/admin/webhookApi'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import WebhookTable from '@/components/admin/webhooks/WebhookTable'
 import WebhookForm from '@/components/admin/webhooks/WebhookForm'
-import DeliveriesDialog from
-  '@/components/admin/webhooks/DeliveriesDialog'
+import DeliveriesDialog from '@/components/admin/webhooks/DeliveriesDialog'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 export default function WebhooksPage() {
@@ -26,28 +25,45 @@ export default function WebhooksPage() {
         <Typography variant="h3" component="h1" gutterBottom>
           Webhooks
         </Typography>
-        <Button variant="contained" onClick={() => setForm('new')}
-          data-testid="webhook-new">New webhook</Button>
+        <Button
+          variant="contained"
+          onClick={() => setForm('new')}
+          data-testid="webhook-new"
+        >
+          New webhook
+        </Button>
       </Box>
       <ErrorAlert error={error} testId="webhook-error" />
       {!loading && hooks.length === 0 && (
-        <Typography color="text.secondary">
-          No webhooks configured.
-        </Typography>
+        <Typography color="text.secondary">No webhooks configured.</Typography>
       )}
       {hooks.length > 0 && (
-        <WebhookTable hooks={hooks} onEdit={setForm} onDelete={setDel}
-          onDeliveries={(w) => setLog(w.id)} />
+        <WebhookTable
+          hooks={hooks}
+          onEdit={setForm}
+          onDelete={setDel}
+          onDeliveries={(w) => setLog(w.id)}
+        />
       )}
       {form !== null && (
-        <WebhookForm open webhook={form === 'new' ? null : form}
-          onClose={() => setForm(null)} onSave={save} />
+        <WebhookForm
+          open
+          webhook={form === 'new' ? null : form}
+          onClose={() => setForm(null)}
+          onSave={save}
+        />
       )}
       <DeliveriesDialog webhookId={log} onClose={() => setLog(null)} />
-      <ConfirmDialog open={del !== null} title="Delete webhook"
+      <ConfirmDialog
+        open={del !== null}
+        title="Delete webhook"
         message={`Delete ${del?.url ?? ''}?`}
         onCancel={() => setDel(null)}
-        onConfirm={() => { if (del) remove(del.id); setDel(null) }} />
+        onConfirm={() => {
+          if (del) remove(del.id)
+          setDel(null)
+        }}
+      />
     </Container>
   )
 }

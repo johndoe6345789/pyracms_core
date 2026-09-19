@@ -4,19 +4,29 @@ import { TYPE_COLORS, getTypeIcon } from '@/components/users/ActivityItem'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
 
 describe('useUserActivity', () => {
   it('maps activity rows', async () => {
-    get.mockResolvedValue({ data: [{ id: 1, type: 'article', title: 'T',
-      summary: 'S', createdAt: 'when' }, { id: 2, type: 'vote' }] })
+    get.mockResolvedValue({
+      data: [
+        { id: 1, type: 'article', title: 'T', summary: 'S', createdAt: 'when' },
+        { id: 2, type: 'vote' },
+      ],
+    })
     const { result } = renderHook(() => useUserActivity(5, false))
     await waitFor(() => expect(result.current).toHaveLength(2))
-    expect(result.current[0]).toEqual({ id: '1', type: 'article',
-      title: 'T', description: 'S', date: 'when' })
+    expect(result.current[0]).toEqual({
+      id: '1',
+      type: 'article',
+      title: 'T',
+      description: 'S',
+      date: 'when',
+    })
     expect(result.current[1]!.description).toBe('')
   })
 

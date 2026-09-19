@@ -8,15 +8,21 @@ export function SnippetHeader({ s }: { s: Snippet }) {
       <Typography variant="h3" component="h1">
         {s.title}
       </Typography>
-      <Box sx={{
-        display: 'flex', alignItems: 'center',
-        gap: 1, mt: 1, flexWrap: 'wrap',
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          mt: 1,
+          flexWrap: 'wrap',
+        }}
+      >
         <Chip
           label={s.language}
           size="small"
           sx={{
-            bgcolor: color + '20', color,
+            bgcolor: color + '20',
+            color,
             fontWeight: 600,
           }}
         />

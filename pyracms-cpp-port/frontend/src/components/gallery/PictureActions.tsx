@@ -11,23 +11,16 @@ interface PictureActionsProps {
   onDelete?: () => void
 }
 
-export default function PictureActions(
-  {
-    onSetCover,
-    onEdit,
-    onDelete,
-  }: PictureActionsProps,
-) {
+export default function PictureActions({
+  onSetCover,
+  onEdit,
+  onDelete,
+}: PictureActionsProps) {
   return (
-    <Box
-      sx={{ display: 'flex', gap: 1 }}
-      data-testid="picture-actions"
-    >
+    <Box sx={{ display: 'flex', gap: 1 }} data-testid="picture-actions">
       <Button
         variant="outlined"
-        startIcon={
-          <WallpaperOutlined />
-        }
+        startIcon={<WallpaperOutlined />}
         size="small"
         onClick={onSetCover}
         data-testid="set-cover-btn"

@@ -1,8 +1,12 @@
 import Link from 'next/link'
 import {
-  Box, List, ListItem,
-  ListItemButton, ListItemIcon,
-  ListItemText, Divider,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material'
 import { ArrowBackOutlined } from '@mui/icons-material'
 import { buildAdminNavItems } from './adminNavItems'
@@ -15,19 +19,13 @@ interface Props {
   onNavigate: () => void
 }
 
-export default function AdminDrawerContent({
-  slug,
-  onNavigate,
-}: Props) {
+export default function AdminDrawerContent({ slug, onNavigate }: Props) {
   const items = buildAdminNavItems(slug)
   return (
     <Box sx={{ width: DRAWER_WIDTH, pt: 2 }}>
       <AdminDrawerHeader />
       <Divider />
-      <nav
-        aria-label="Admin navigation"
-        role="navigation"
-      >
+      <nav aria-label="Admin navigation" role="navigation">
         <List data-testid="admin-nav-list">
           {items.map((item) => (
             <ListItem key={item.path} disablePadding>
@@ -39,9 +37,7 @@ export default function AdminDrawerContent({
                   .toLowerCase()
                   .replace(/\s+/g, '-')}`}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  {item.icon}
-                </ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
               </ListItemButton>
             </ListItem>
@@ -49,10 +45,7 @@ export default function AdminDrawerContent({
         </List>
       </nav>
       <Divider />
-      <nav
-        aria-label="Admin secondary navigation"
-        role="navigation"
-      >
+      <nav aria-label="Admin secondary navigation" role="navigation">
         <List>
           <ListItem disablePadding>
             <ListItemButton

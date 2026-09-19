@@ -1,5 +1,10 @@
 import {
-  Box, Button, FormControl, InputLabel, MenuItem, Select,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   SelectChangeEvent,
 } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
@@ -13,12 +18,18 @@ interface MenuGroupSelectProps {
 }
 
 const rowSx = {
-  display: 'flex', gap: 2, mb: 4,
-  alignItems: 'center', flexWrap: 'wrap',
+  display: 'flex',
+  gap: 2,
+  mb: 4,
+  alignItems: 'center',
+  flexWrap: 'wrap',
 }
 
 export default function MenuGroupSelect({
-  menuGroups, selectedGroup, onGroupChange, onNewGroup,
+  menuGroups,
+  selectedGroup,
+  onGroupChange,
+  onNewGroup,
 }: MenuGroupSelectProps) {
   return (
     <Box sx={rowSx}>

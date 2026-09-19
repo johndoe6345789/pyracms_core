@@ -9,7 +9,8 @@ describe('LoginActions', () => {
   it('fires turbo and reflects loading', () => {
     const onTurbo = jest.fn()
     const { rerender } = render(
-      <LoginActions loading={false} onTurbo={onTurbo} />)
+      <LoginActions loading={false} onTurbo={onTurbo} />,
+    )
     fireEvent.click(screen.getByTestId('turbo-login-button'))
     expect(onTurbo).toHaveBeenCalled()
     rerender(<LoginActions loading onTurbo={onTurbo} />)
@@ -21,20 +22,28 @@ describe('LoginActions', () => {
 describe('footers', () => {
   it('links to register with and without a tenant', () => {
     const { rerender } = render(<LoginFooter />)
-    expect(screen.getByTestId('register-link'))
-      .toHaveAttribute('href', '/auth/register')
+    expect(screen.getByTestId('register-link')).toHaveAttribute(
+      'href',
+      '/auth/register',
+    )
     rerender(<LoginFooter tenant="a b" />)
-    expect(screen.getByTestId('register-link'))
-      .toHaveAttribute('href', '/auth/register?tenant=a%20b')
+    expect(screen.getByTestId('register-link')).toHaveAttribute(
+      'href',
+      '/auth/register?tenant=a%20b',
+    )
   })
 
   it('links to login with and without a tenant', () => {
     const { rerender } = render(<RegisterFooter />)
-    expect(screen.getByTestId('login-link'))
-      .toHaveAttribute('href', '/auth/login')
+    expect(screen.getByTestId('login-link')).toHaveAttribute(
+      'href',
+      '/auth/login',
+    )
     rerender(<RegisterFooter tenant="x" />)
-    expect(screen.getByTestId('login-link'))
-      .toHaveAttribute('href', '/auth/login?tenant=x')
+    expect(screen.getByTestId('login-link')).toHaveAttribute(
+      'href',
+      '/auth/login?tenant=x',
+    )
   })
 })
 
@@ -48,7 +57,10 @@ describe('TurboErrorDialog', () => {
     expect(onClose).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Open Vault'))
     expect(open).toHaveBeenCalledWith(
-      'https://vault.wardcrew.com', '_blank', 'noopener,noreferrer')
+      'https://vault.wardcrew.com',
+      '_blank',
+      'noopener,noreferrer',
+    )
     open.mockRestore()
   })
 })
@@ -57,7 +69,9 @@ describe('AuthScopeNotice', () => {
   it('names the site and links to the platform page', () => {
     render(<AuthScopeNotice tenant="demo" platformHref="/auth/login" />)
     expect(screen.getByText('demo')).toBeInTheDocument()
-    expect(screen.getByTestId('platform-account-link'))
-      .toHaveAttribute('href', '/auth/login')
+    expect(screen.getByTestId('platform-account-link')).toHaveAttribute(
+      'href',
+      '/auth/login',
+    )
   })
 })

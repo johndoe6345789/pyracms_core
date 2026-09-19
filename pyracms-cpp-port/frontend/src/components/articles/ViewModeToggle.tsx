@@ -1,24 +1,14 @@
 'use client'
 
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material'
-import {
-  EditOutlined,
-  PreviewOutlined,
-} from '@mui/icons-material'
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { EditOutlined, PreviewOutlined } from '@mui/icons-material'
 
 interface ViewModeToggleProps {
   viewMode: 'edit' | 'preview'
   setViewMode: (v: 'edit' | 'preview') => void
 }
 
-export function ViewModeToggle({
-  viewMode,
-  setViewMode,
-}: ViewModeToggleProps) {
+export function ViewModeToggle({ viewMode, setViewMode }: ViewModeToggleProps) {
   return (
     <Box
       sx={{
@@ -30,9 +20,7 @@ export function ViewModeToggle({
       <ToggleButtonGroup
         value={viewMode}
         exclusive
-        onChange={(_, val) =>
-          val && setViewMode(val)
-        }
+        onChange={(_, val) => val && setViewMode(val)}
         size="small"
         data-testid="view-mode-toggle"
       >
@@ -41,9 +29,7 @@ export function ViewModeToggle({
           data-testid="toggle-edit"
           aria-label="Edit mode"
         >
-          <EditOutlined
-            sx={{ mr: 0.5, fontSize: 18 }}
-          />
+          <EditOutlined sx={{ mr: 0.5, fontSize: 18 }} />
           Edit
         </ToggleButton>
         <ToggleButton
@@ -51,9 +37,7 @@ export function ViewModeToggle({
           data-testid="toggle-preview"
           aria-label="Preview mode"
         >
-          <PreviewOutlined
-            sx={{ mr: 0.5, fontSize: 18 }}
-          />
+          <PreviewOutlined sx={{ mr: 0.5, fontSize: 18 }} />
           Preview
         </ToggleButton>
       </ToggleButtonGroup>

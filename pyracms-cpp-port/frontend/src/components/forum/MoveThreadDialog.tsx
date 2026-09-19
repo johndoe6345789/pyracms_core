@@ -1,8 +1,16 @@
 'use client'
 
 import {
-  Dialog, DialogTitle, DialogContent, DialogContentText,
-  DialogActions, Button, FormControl, InputLabel, Select, MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 
 interface MoveThreadDialogProps {
@@ -23,16 +31,11 @@ export function MoveThreadDialog({
   onTargetForumChange,
 }: MoveThreadDialogProps) {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      data-testid="move-thread-dialog"
-    >
+    <Dialog open={open} onClose={onClose} data-testid="move-thread-dialog">
       <DialogTitle>Move Thread</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
-          Select the forum to move this
-          thread to:
+          Select the forum to move this thread to:
         </DialogContentText>
         <FormControl fullWidth size="small">
           <InputLabel>Target Forum</InputLabel>
@@ -51,10 +54,7 @@ export function MoveThreadDialog({
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          data-testid="move-thread-cancel"
-        >
+        <Button onClick={onClose} data-testid="move-thread-cancel">
           Cancel
         </Button>
         <Button

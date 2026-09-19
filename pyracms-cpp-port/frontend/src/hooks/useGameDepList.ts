@@ -11,10 +11,7 @@ export interface GameDepItem {
   created: string
 }
 
-export function useGameDepList(
-  items: GameDepItem[],
-  availableTags: string[]
-) {
+export function useGameDepList(items: GameDepItem[], availableTags: string[]) {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('votes')
   const [filterTag, setFilterTag] = useState('')

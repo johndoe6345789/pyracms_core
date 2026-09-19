@@ -1,6 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import ViewThreadPage from
-  '@/app/site/[slug]/(tenant)/forum/thread/[threadId]/page'
+import ViewThreadPage from '@/app/site/[slug]/(tenant)/forum/thread/[threadId]/page'
 
 const push = jest.fn()
 const refresh = jest.fn()
@@ -10,8 +9,13 @@ let live: { typingUsers: unknown[] } = { typingUsers: [] }
 let onNewPost: () => void = () => {}
 let t: Record<string, unknown> = {}
 const thread = {
-  title: 'Title', description: '', forumId: '3', forumName: 'F',
-  pinned: false, locked: false, views: 0,
+  title: 'Title',
+  description: '',
+  forumId: '3',
+  forumName: 'F',
+  pinned: false,
+  locked: false,
+  views: 0,
 }
 
 jest.mock('next/navigation', () => ({
@@ -37,12 +41,22 @@ beforeEach(() => {
   tenantLoading = false
   live = { typingUsers: [] }
   t = {
-    thread, posts: [], loading: false, error: '', refresh,
-    replyContent: '', setReplyContent: jest.fn(), replyError: '',
-    submitting: false, handleSubmitReply: jest.fn().mockResolvedValue(0),
-    handleDeleteThread: del, handleTogglePin: jest.fn(),
-    handleToggleLock: jest.fn(), handleVotePost: jest.fn(),
-    handleEditPost: jest.fn(), handleDeletePost: jest.fn(),
+    thread,
+    posts: [],
+    loading: false,
+    error: '',
+    refresh,
+    replyContent: '',
+    setReplyContent: jest.fn(),
+    replyError: '',
+    submitting: false,
+    handleSubmitReply: jest.fn().mockResolvedValue(0),
+    handleDeleteThread: del,
+    handleTogglePin: jest.fn(),
+    handleToggleLock: jest.fn(),
+    handleVotePost: jest.fn(),
+    handleEditPost: jest.fn(),
+    handleDeletePost: jest.fn(),
     handleQuote: jest.fn(),
   }
 })
@@ -64,8 +78,9 @@ it('shows typing, refreshes on new posts and submits', async () => {
   expect(screen.getByTestId('typing-indicator')).toBeInTheDocument()
   onNewPost()
   expect(refresh).toHaveBeenCalled()
-  fireEvent.change(screen.getByTestId('quick-reply-input'),
-    { target: { value: 'hey2' } })
+  fireEvent.change(screen.getByTestId('quick-reply-input'), {
+    target: { value: 'hey2' },
+  })
   fireEvent.click(screen.getByTestId('quick-reply-submit'))
   await waitFor(() => expect(t.handleSubmitReply).toHaveBeenCalled())
 })

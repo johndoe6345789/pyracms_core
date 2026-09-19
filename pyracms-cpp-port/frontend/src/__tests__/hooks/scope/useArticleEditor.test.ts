@@ -17,8 +17,14 @@ it('has defaults and parses tags', () => {
 })
 
 it('uses provided defaults', () => {
-  const { result } = renderHook(() => useArticleEditor(
-    { title: 'T', content: 'C', renderer: 'BBCode', tags: ['x', 'y'] }))
+  const { result } = renderHook(() =>
+    useArticleEditor({
+      title: 'T',
+      content: 'C',
+      renderer: 'BBCode',
+      tags: ['x', 'y'],
+    }),
+  )
   expect(result.current.tagsInput).toBe('x, y')
   expect(result.current.title).toBe('T')
 })

@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Setting, fetchSettings, putSetting, deleteSetting,
+  Setting,
+  fetchSettings,
+  putSetting,
+  deleteSetting,
 } from './admin/settingsApi'
 import { useSettingAdd } from './admin/useSettingAdd'
 import { useActionError } from './useActionError'
@@ -48,8 +51,9 @@ export function useAdminSettings(tenantId: number | null) {
     setError('')
     putSetting(setting.key, editValue, tenantId)
       .then(() => {
-        setSettings((prev) => prev.map((s) =>
-          s.id === id ? { ...s, value: editValue } : s))
+        setSettings((prev) =>
+          prev.map((s) => (s.id === id ? { ...s, value: editValue } : s)),
+        )
         handleCancelEdit()
       })
       .catch(fail('Could not save setting'))
@@ -67,10 +71,16 @@ export function useAdminSettings(tenantId: number | null) {
   }
 
   return {
-    settings, loading, editingId,
+    settings,
+    loading,
+    editingId,
     error: editError || add.addError,
-    editValue, setEditValue,
-    handleStartEdit, handleSaveEdit, handleCancelEdit,
-    handleDelete, ...add,
+    editValue,
+    setEditValue,
+    handleStartEdit,
+    handleSaveEdit,
+    handleCancelEdit,
+    handleDelete,
+    ...add,
   }
 }

@@ -42,7 +42,13 @@ const brandSx = {
  * left (always), brand, inline links on wide screens, tools on the right.
  */
 export default function AppTopBar({
-  brand, brandHref, items, drawerOpen, onMenuClick, navLabel, downloadHref,
+  brand,
+  brandHref,
+  items,
+  drawerOpen,
+  onMenuClick,
+  navLabel,
+  downloadHref,
 }: Props) {
   const pathname = usePathname() ?? ''
   return (

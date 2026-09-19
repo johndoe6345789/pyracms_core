@@ -13,33 +13,26 @@ test.describe('Tenant management', () => {
 
   // Delete button + dialog
 
-  test(
-    'clicking delete opens confirmation dialog',
-    async ({ page }) => {
-      await waitForTenantsLoaded(page)
+  test('clicking delete opens confirmation dialog', async ({ page }) => {
+    await waitForTenantsLoaded(page)
 
-      const deleteButtons = page.locator(
-        '[data-testid^="delete-tenant-"]',
-      )
-      const count = await deleteButtons.count()
+    const deleteButtons = page.locator('[data-testid^="delete-tenant-"]')
+    const count = await deleteButtons.count()
 
-      if (count === 0) {
-        test.skip()
-        return
-      }
+    if (count === 0) {
+      test.skip()
+      return
+    }
 
-      await deleteButtons.first().click()
+    await deleteButtons.first().click()
 
-      const dialog =
-        page.getByTestId('tenant-delete-dialog')
-      await expect(dialog).toBeVisible()
-      await expect(dialog).toContainText('Delete Tenant?')
-    },
-  )
+    const dialog = page.getByTestId('tenant-delete-dialog')
+    await expect(dialog).toBeVisible()
+    await expect(dialog).toContainText('Delete Tenant?')
+  })
 
   test(
-    'delete dialog contains warning text about '
-    + 'irreversibility',
+    'delete dialog contains warning text about ' + 'irreversibility',
     async ({ page }) => {
       await page.route('**/api/tenants', (route) =>
         route.fulfill({
@@ -55,13 +48,11 @@ test.describe('Tenant management', () => {
         .waitFor({ state: 'visible', timeout: 10_000 })
       await waitForTenantsLoaded(page)
 
-      await page
-        .getByTestId('delete-tenant-alpha')
-        .click()
+      await page.getByTestId('delete-tenant-alpha').click()
 
-      await expect(
-        page.getByTestId('tenant-delete-dialog'),
-      ).toContainText('cannot be undone')
+      await expect(page.getByTestId('tenant-delete-dialog')).toContainText(
+        'cannot be undone',
+      )
     },
   )
 })

@@ -3,8 +3,7 @@ import '@testing-library/jest-dom'
 import { useSuperAdminUsers } from '@/hooks/useSuperAdminUsers'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_USERS, MAPPED_USERS } from
-  '../helpers/superAdminUsersFixtures'
+import { RAW_USERS, MAPPED_USERS } from '../helpers/superAdminUsersFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,

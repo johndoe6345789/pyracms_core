@@ -1,6 +1,12 @@
 import {
-  Table, TableBody, TableContainer, TableHead, TableRow,
-  TableCell, Paper, Typography,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableCell,
+  Paper,
+  Typography,
 } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 import MenuItemTableRow from './MenuItemTableRow'
@@ -10,7 +16,7 @@ interface MenuItemTableProps {
   editingId: number | null
   editRow: MenuItemRow | null
   onEditRowChange: (
-    updater: (prev: MenuItemRow | null) => MenuItemRow | null
+    updater: (prev: MenuItemRow | null) => MenuItemRow | null,
   ) => void
   onStartEdit: (item: MenuItemRow) => void
   onSaveEdit: () => void
@@ -18,9 +24,7 @@ interface MenuItemTableProps {
   onDelete: (id: number) => void
 }
 
-const HEADERS = [
-  'Name', 'Route / URL', 'Position', 'Permissions',
-]
+const HEADERS = ['Name', 'Route / URL', 'Position', 'Permissions']
 
 export default function MenuItemTable(p: MenuItemTableProps) {
   const { items } = p

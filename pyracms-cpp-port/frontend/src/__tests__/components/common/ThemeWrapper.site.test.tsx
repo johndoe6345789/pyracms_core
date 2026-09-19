@@ -12,10 +12,13 @@ import api from '@/lib/api'
 let path = '/site/wrap/x'
 jest.mock('next/navigation', () => ({ usePathname: () => path }))
 jest.mock('@/hooks/useAuthHydration', () => ({ useAuthHydration: jest.fn() }))
-jest.mock('@/hooks/useTenantId',
-  () => ({ useTenantId: () => ({ tenantId: 3, loading: false }) }))
-jest.mock('@/lib/api',
-  () => ({ __esModule: true, default: { get: jest.fn() } }))
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 3, loading: false }),
+}))
+jest.mock('@/lib/api', () => ({
+  __esModule: true,
+  default: { get: jest.fn() },
+}))
 const get = (api as unknown as { get: jest.Mock }).get
 
 function Probe() {
@@ -23,24 +26,37 @@ function Probe() {
 }
 function show() {
   window.matchMedia = jest.fn().mockReturnValue({
-    matches: false, addEventListener: jest.fn(),
-    removeEventListener: jest.fn() })
+    matches: false,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  })
   const store = configureStore({
-    reducer: { auth: authReducer, ui: uiReducer } })
+    reducer: { auth: authReducer, ui: uiReducer },
+  })
   store.dispatch(setColorMode('light'))
-  return render(<Provider store={store}>
-    <ThemeWrapper><Probe /></ThemeWrapper></Provider>)
+  return render(
+    <Provider store={store}>
+      <ThemeWrapper>
+        <Probe />
+      </ThemeWrapper>
+    </Provider>,
+  )
 }
 
 it('applies the saved site theme, then a freshly saved one', async () => {
-  get.mockResolvedValue({ data: { value: JSON.stringify(
-    { ...DEFAULT_THEME, primaryColor: '#123456' }) } })
+  get.mockResolvedValue({
+    data: {
+      value: JSON.stringify({ ...DEFAULT_THEME, primaryColor: '#123456' }),
+    },
+  })
   show()
-  await waitFor(() => expect(screen.getByTestId('c'))
-    .toHaveTextContent('#123456'))
+  await waitFor(() =>
+    expect(screen.getByTestId('c')).toHaveTextContent('#123456'),
+  )
   expect(get).toHaveBeenCalledWith('/api/settings/site_theme?tenant_id=3')
-  act(() => announceSiteTheme('wrap',
-    { ...DEFAULT_THEME, primaryColor: '#abcdef' }))
+  act(() =>
+    announceSiteTheme('wrap', { ...DEFAULT_THEME, primaryColor: '#abcdef' }),
+  )
   expect(screen.getByTestId('c')).toHaveTextContent('#abcdef')
 })
 

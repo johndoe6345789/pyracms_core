@@ -13,7 +13,9 @@ function Content() {
 export default function VerifyEmailPage() {
   return (
     <AuthPageShell>
-      <Suspense fallback={null}><Content /></Suspense>
+      <Suspense fallback={null}>
+        <Content />
+      </Suspense>
     </AuthPageShell>
   )
 }

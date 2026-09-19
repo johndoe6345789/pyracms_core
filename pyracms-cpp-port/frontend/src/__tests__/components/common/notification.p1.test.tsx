@@ -6,20 +6,28 @@ jest.mock('@/hooks/useWebSocket', () => ({
   useWebSocket: () => undefined,
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn(), put: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn(), put: jest.fn() },
 }))
 const m = api as unknown as Record<string, jest.Mock>
 beforeEach(() => Object.values(m).forEach((f) => f.mockReset()))
 
-const n = (id: number, read = false, type = 'reply') => ({ id, type,
-  title: `t${id}`, message: 'm', link: null, is_read: read,
-  created_at: '' })
+const n = (id: number, read = false, type = 'reply') => ({
+  id,
+  type,
+  title: `t${id}`,
+  message: 'm',
+  link: null,
+  is_read: read,
+  created_at: '',
+})
 
 describe('NotificationList', () => {
   const p = { loading: false, isAuthenticated: true, onMarkRead: jest.fn() }
   it('covers guest, loading and empty', () => {
-    const { rerender } = render(<NotificationList {...p}
-      isAuthenticated={false} notifications={[]} />)
+    const { rerender } = render(
+      <NotificationList {...p} isAuthenticated={false} notifications={[]} />,
+    )
     expect(screen.getByText(/Sign in/)).toBeInTheDocument()
     rerender(<NotificationList {...p} loading notifications={[]} />)
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
@@ -28,8 +36,9 @@ describe('NotificationList', () => {
   })
 
   it('marks items read and falls back to the system icon', () => {
-    render(<NotificationList {...p} notifications={
-      [n(1), n(2, true, 'unknown')]} />)
+    render(
+      <NotificationList {...p} notifications={[n(1), n(2, true, 'unknown')]} />,
+    )
     fireEvent.click(screen.getByTestId('notification-item-2'))
     expect(p.onMarkRead).toHaveBeenCalledWith(2)
   })

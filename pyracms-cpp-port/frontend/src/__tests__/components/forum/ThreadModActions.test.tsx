@@ -2,14 +2,25 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { ThreadModActions } from '@/components/forum/ThreadModActions'
 
 jest.mock('@/hooks/useForumCategories', () => ({
-  useForumCategories: () => ({ categories: [{
-    id: '1', name: 'Cat',
-    forums: [{ id: '5', name: 'Tech' }, { id: '6', name: 'Off' }],
-  }] }),
+  useForumCategories: () => ({
+    categories: [
+      {
+        id: '1',
+        name: 'Cat',
+        forums: [
+          { id: '5', name: 'Tech' },
+          { id: '6', name: 'Off' },
+        ],
+      },
+    ],
+  }),
 }))
 
 const base = {
-  threadId: '9', isPinned: false, isLocked: false, tenantId: 1,
+  threadId: '9',
+  isPinned: false,
+  isLocked: false,
+  tenantId: 1,
 }
 
 it('moves a thread to the picked forum', () => {

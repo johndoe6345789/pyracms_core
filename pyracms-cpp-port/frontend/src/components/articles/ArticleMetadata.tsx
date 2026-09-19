@@ -30,10 +30,12 @@ const itemSx = {
   gap: 0.5,
 }
 
-export function ArticleMetadata(
-  { author, date, renderer, views }:
-    ArticleMetadataProps
-) {
+export function ArticleMetadata({
+  author,
+  date,
+  renderer,
+  views,
+}: ArticleMetadataProps) {
   const items: [ElementType, string, string][] = [
     [PersonOutlined, author, 'meta-author'],
     [CalendarTodayOutlined, date, 'meta-date'],

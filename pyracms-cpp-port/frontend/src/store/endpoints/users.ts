@@ -24,13 +24,11 @@ export const userEndpoints = (builder: ApiBuilder) => ({
       method: 'PUT',
       body: data,
     }),
-    invalidatesTags: (_result, _error, { id }) => [
-      { type: 'User', id },
-      'Me',
-    ],
+    invalidatesTags: (_result, _error, { id }) => [{ type: 'User', id }, 'Me'],
   }),
   changePassword: builder.mutation<
-    PasswordChangeReply, { id: number; data: ChangePasswordRequest }
+    PasswordChangeReply,
+    { id: number; data: ChangePasswordRequest }
   >({
     query: ({ id, data }) => ({
       url: `/api/users/${id}/password`,

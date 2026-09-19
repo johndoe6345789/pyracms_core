@@ -16,9 +16,8 @@ type Raw = Record<string, unknown>
 
 const mapPicture = (p: Raw, i: number): GalleryPicture => ({
   id: String(p.id),
-  title: (p.displayName || p.title) as string || `Photo ${i + 1}`,
-  src: (p.url || p.thumbnailUrl
-    || galleryFileUrl(p.fileUuid, true)) as string,
+  title: ((p.displayName || p.title) as string) || `Photo ${i + 1}`,
+  src: (p.url || p.thumbnailUrl || galleryFileUrl(p.fileUuid, true)) as string,
   cols: i % 5 === 0 ? 2 : 1,
   rows: i % 7 === 0 ? 2 : 1,
 })
@@ -35,8 +34,9 @@ export function useGalleryAlbum(albumId: string) {
   useEffect(() => {
     if (!albumId) return
     setLoading(true)
-    api.get(`/api/gallery/albums/${albumId}`)
-      .then(res => {
+    api
+      .get(`/api/gallery/albums/${albumId}`)
+      .then((res) => {
         const data = res.data
         setAlbumName(data.displayName || data.name || '')
         setDescription(data.description || '')
@@ -48,6 +48,11 @@ export function useGalleryAlbum(albumId: string) {
   }, [albumId, tick])
 
   return {
-    albumName, albumDescription, ownerId, pictures, loading, refresh,
+    albumName,
+    albumDescription,
+    ownerId,
+    pictures,
+    loading,
+    refresh,
   }
 }

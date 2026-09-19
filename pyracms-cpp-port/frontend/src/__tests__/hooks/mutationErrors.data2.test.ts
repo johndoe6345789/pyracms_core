@@ -20,8 +20,9 @@ it('super admin users surface role and ban failures', async () => {
   await waitFor(() => expect(result.current.error).toBe('boom'))
   m.put.mockRejectedValue({ response: { data: {} } })
   act(() => result.current.toggleBan(1))
-  await waitFor(() => expect(result.current.error)
-    .toBe('Could not update user status'))
+  await waitFor(() =>
+    expect(result.current.error).toBe('Could not update user status'),
+  )
 })
 
 it('settings surface save and delete failures', async () => {

@@ -10,7 +10,8 @@ type Props = Parameters<typeof ThreadActions>[0] & {
 function Loaded({ tenantId, ...rest }: Props) {
   const { categories } = useForumCategories(tenantId)
   const forums = categories.flatMap((c) =>
-    c.forums.map((f) => ({ id: f.id, name: `${c.name} / ${f.name}` })))
+    c.forums.map((f) => ({ id: f.id, name: `${c.name} / ${f.name}` })),
+  )
   return <ThreadActions {...rest} forums={forums} />
 }
 

@@ -3,11 +3,8 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import GlobalUsersTable from
-  '@/components/super-admin/GlobalUsersTable'
-import {
-  USER_ALICE, USER_BOB, resetHook,
-} from '../../helpers/globalUsersHook'
+import GlobalUsersTable from '@/components/super-admin/GlobalUsersTable'
+import { USER_ALICE, USER_BOB, resetHook } from '../../helpers/globalUsersHook'
 
 jest.mock('@/hooks/useSuperAdminUsers', () => ({
   useSuperAdminUsers: () =>

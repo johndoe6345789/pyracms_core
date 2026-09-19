@@ -12,21 +12,16 @@ test.describe('Tenant management', () => {
   })
 
   test(
-    'at least one tenant-row-* is visible when '
-    + 'tenants exist',
+    'at least one tenant-row-* is visible when ' + 'tenants exist',
     async ({ page }) => {
       await waitForTenantsLoaded(page)
 
-      const rows = page.locator(
-        '[data-testid^="tenant-row-"]',
-      )
+      const rows = page.locator('[data-testid^="tenant-row-"]')
       const count = await rows.count()
 
       if (count === 0) {
         // No tenants seeded — verify empty-state text
-        await expect(
-          page.getByText('No tenants found.'),
-        ).toBeVisible()
+        await expect(page.getByText('No tenants found.')).toBeVisible()
       } else {
         await expect(rows.first()).toBeVisible()
       }
@@ -35,29 +30,23 @@ test.describe('Tenant management', () => {
 
   // Open Site link
 
-  test(
-    '"Open Site" icon button links to /site/{slug}',
-    async ({ page }) => {
-      await page.route('**/api/tenants', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_TENANTS),
-        }),
-      )
+  test('"Open Site" icon button links to /site/{slug}', async ({ page }) => {
+    await page.route('**/api/tenants', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_TENANTS),
+      }),
+    )
 
-      await page.goto('/super-admin/tenants')
-      await page
-        .getByTestId('super-admin-tenants-page')
-        .waitFor({ state: 'visible', timeout: 10_000 })
-      await waitForTenantsLoaded(page)
+    await page.goto('/super-admin/tenants')
+    await page
+      .getByTestId('super-admin-tenants-page')
+      .waitFor({ state: 'visible', timeout: 10_000 })
+    await waitForTenantsLoaded(page)
 
-      const openBtn = page.getByTestId('open-tenant-alpha')
-      await expect(openBtn).toBeVisible()
-      await expect(openBtn).toHaveAttribute(
-        'href',
-        '/site/alpha',
-      )
-    },
-  )
+    const openBtn = page.getByTestId('open-tenant-alpha')
+    await expect(openBtn).toBeVisible()
+    await expect(openBtn).toHaveAttribute('href', '/site/alpha')
+  })
 })

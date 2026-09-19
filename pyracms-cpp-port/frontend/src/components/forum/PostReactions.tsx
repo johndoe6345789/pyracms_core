@@ -16,7 +16,9 @@ interface PostReactionsProps {
 
 /** Reaction badges; toggles optimistically and rolls back on failure. */
 export function PostReactions({
-  postId, reactions, disabled = false,
+  postId,
+  reactions,
+  disabled = false,
 }: PostReactionsProps) {
   const [list, setList] = useState<Reaction[]>(reactions ?? [])
   const [anchor, setAnchor] = useState<null | HTMLElement>(null)
@@ -35,26 +37,40 @@ export function PostReactions({
   }
 
   return (
-    <Box sx={{
-      display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap',
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.5,
+        flexWrap: 'wrap',
+      }}
+    >
       {list.map((r) => (
-        <ReactionBadge key={r.label}
-          emoji={r.emoji} label={r.label}
-          count={r.count} reacted={r.reacted}
-          onClick={() => toggle(r.emoji, r.label)} />
+        <ReactionBadge
+          key={r.label}
+          emoji={r.emoji}
+          label={r.label}
+          count={r.count}
+          reacted={r.reacted}
+          onClick={() => toggle(r.emoji, r.label)}
+        />
       ))}
-      <IconButton size="small" disabled={disabled}
+      <IconButton
+        size="small"
+        disabled={disabled}
         onClick={(e) => setAnchor(e.currentTarget)}
         sx={{ ml: 0.5 }}
         aria-label="Add reaction"
-        data-testid="add-reaction-btn">
+        data-testid="add-reaction-btn"
+      >
         <AddReactionOutlined fontSize="small" />
       </IconButton>
-      <ReactionPicker anchorEl={anchor}
+      <ReactionPicker
+        anchorEl={anchor}
         onClose={() => setAnchor(null)}
         reactions={REACTIONS}
-        onPick={toggle} />
+        onPick={toggle}
+      />
     </Box>
   )
 }

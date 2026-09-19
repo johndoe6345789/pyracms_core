@@ -7,8 +7,14 @@ import ScreenshotGrid from '@/components/gamedep/ScreenshotGrid'
 import EditRevisionTable from '@/components/gamedep/EditRevisionTable'
 
 const item = {
-  name: 'sdl', displayName: 'SDL', description: 'desc', tags: ['t'],
-  likes: 5, dislikes: 1, views: 9, created: '2024-01-01',
+  name: 'sdl',
+  displayName: 'SDL',
+  description: 'desc',
+  tags: ['t'],
+  likes: 5,
+  dislikes: 1,
+  views: 9,
+  created: '2024-01-01',
 }
 const revs = [
   { version: '1.0', published: true, date: '2024-01-01' },
@@ -17,13 +23,18 @@ const revs = [
 
 describe('gamedep lists', () => {
   it('DependencyList handles empty and populated', () => {
-    const { rerender } = render(
-      <DependencyList dependencies={[]} slug="s" />)
+    const { rerender } = render(<DependencyList dependencies={[]} slug="s" />)
     expect(screen.getByText('No dependencies.')).toBeInTheDocument()
-    rerender(<DependencyList slug="s" dependencies={[
-      { name: 'm', displayName: 'Math', version: '1' }]} />)
-    expect(screen.getByRole('link'))
-      .toHaveAttribute('href', '/site/s/dependencies/m')
+    rerender(
+      <DependencyList
+        slug="s"
+        dependencies={[{ name: 'm', displayName: 'Math', version: '1' }]}
+      />,
+    )
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      '/site/s/dependencies/m',
+    )
   })
 
   it('GameDepCard shows stats', () => {
@@ -33,8 +44,7 @@ describe('gamedep lists', () => {
   })
 
   it('GameDepGrid builds hrefs and forwards hoverColor', () => {
-    render(<GameDepGrid items={[item]} hrefPrefix="/p"
-      hoverColor="red" />)
+    render(<GameDepGrid items={[item]} hrefPrefix="/p" hoverColor="red" />)
     expect(screen.getByRole('link')).toHaveAttribute('href', '/p/sdl')
   })
 
@@ -50,15 +60,21 @@ describe('gamedep lists', () => {
   })
 
   it('ScreenshotGrid renders images', () => {
-    render(<ScreenshotGrid screenshots={[
-      { id: '1', src: '/a.png', title: 'A' }]} />)
+    render(
+      <ScreenshotGrid screenshots={[{ id: '1', src: '/a.png', title: 'A' }]} />,
+    )
     expect(screen.getByAltText('A')).toHaveAttribute('src', '/a.png')
   })
 
   it('EditRevisionTable fires create and delete', () => {
     const [c, d] = [jest.fn(), jest.fn()]
-    render(<EditRevisionTable revisions={revs} onCreateRevision={c}
-      onDeleteRevision={d} />)
+    render(
+      <EditRevisionTable
+        revisions={revs}
+        onCreateRevision={c}
+        onDeleteRevision={d}
+      />,
+    )
     fireEvent.click(screen.getByText('Create Revision'))
     fireEvent.click(screen.getByLabelText('Delete 2.0'))
     expect(c).toHaveBeenCalled()

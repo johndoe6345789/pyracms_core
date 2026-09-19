@@ -8,22 +8,36 @@ import TagChips from '@/components/common/TagChips'
 
 describe('common simple components', () => {
   it('AnimatedList renders each child', () => {
-    render(<AnimatedList staggerDelay={0}>{[<b key="1">a</b>,
-      <i key="2">b</i>]}</AnimatedList>)
+    render(
+      <AnimatedList staggerDelay={0}>
+        {[<b key="1">a</b>, <i key="2">b</i>]}
+      </AnimatedList>,
+    )
     expect(screen.getByText('a')).toBeInTheDocument()
     expect(screen.getByText('b')).toBeInTheDocument()
   })
 
   it('PageTransition renders children', () => {
-    render(<PageTransition><p>hi</p></PageTransition>)
+    render(
+      <PageTransition>
+        <p>hi</p>
+      </PageTransition>,
+    )
     expect(screen.getByText('hi')).toBeInTheDocument()
   })
 
   it('TabPanel shows children only for the active tab', () => {
     const { rerender } = render(
-      <TabPanel value={1} index={1}>body</TabPanel>)
+      <TabPanel value={1} index={1}>
+        body
+      </TabPanel>,
+    )
     expect(screen.getByText('body')).toBeInTheDocument()
-    rerender(<TabPanel value={0} index={1}>body</TabPanel>)
+    rerender(
+      <TabPanel value={0} index={1}>
+        body
+      </TabPanel>,
+    )
     expect(screen.queryByText('body')).toBeNull()
   })
 
@@ -36,8 +50,7 @@ describe('common simple components', () => {
 
   it('VoteButtons fires like and dislike', () => {
     const [l, d] = [jest.fn(), jest.fn()]
-    render(<VoteButtons likes={3} dislikes={4} onLike={l}
-      onDislike={d} />)
+    render(<VoteButtons likes={3} dislikes={4} onLike={l} onDislike={d} />)
     const [b1, b2] = screen.getAllByRole('button')
     fireEvent.click(b1!)
     fireEvent.click(b2!)

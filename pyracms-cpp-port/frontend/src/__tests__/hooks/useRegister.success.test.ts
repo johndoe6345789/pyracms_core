@@ -40,9 +40,7 @@ describe('useRegister', () => {
     const { store, result } = renderRegister()
     fill(result)
     await submit(result)
-    const auth = (
-      store.getState() as { auth: { token: string } }
-    ).auth
+    const auth = (store.getState() as { auth: { token: string } }).auth
     expect(auth.token).toBe('regTok1')
   })
 

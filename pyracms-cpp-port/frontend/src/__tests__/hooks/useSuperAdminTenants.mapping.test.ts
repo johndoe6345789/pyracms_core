@@ -3,8 +3,10 @@ import '@testing-library/jest-dom'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_TENANTS, MAPPED_TENANTS } from
-  '../helpers/superAdminTenantsFixtures'
+import {
+  RAW_TENANTS,
+  MAPPED_TENANTS,
+} from '../helpers/superAdminTenantsFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -64,11 +66,13 @@ describe('useSuperAdminTenants — mapping', () => {
   })
 
   it('truncates ISO timestamp to date portion', async () => {
-    const raw = [{
-      id: 6,
-      slug: 'golf',
-      createdAt: '2025-06-01T12:00:00Z',
-    }]
+    const raw = [
+      {
+        id: 6,
+        slug: 'golf',
+        createdAt: '2025-06-01T12:00:00Z',
+      },
+    ]
     mockApi.get.mockResolvedValueOnce({ data: raw })
     const { result } = renderHook(() => useSuperAdminTenants())
 

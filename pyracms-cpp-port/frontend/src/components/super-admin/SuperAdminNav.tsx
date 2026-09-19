@@ -1,8 +1,13 @@
 'use client'
 
 import {
-  Box, List, ListItem, ListItemButton,
-  ListItemIcon, ListItemText, Divider,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
   Typography,
 } from '@mui/material'
 import { ShieldOutlined } from '@mui/icons-material'
@@ -14,18 +19,11 @@ interface Props {
   onNavClick?: (() => void) | undefined
 }
 
-export default function SuperAdminNav({
-  width, onNavClick,
-}: Props) {
+export default function SuperAdminNav({ width, onNavClick }: Props) {
   return (
     <Box sx={{ width, pt: 2 }}>
-      <Box
-        sx={{ px: 2, pb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
-      >
-        <ShieldOutlined
-          sx={{ color: 'warning.main' }}
-          aria-hidden="true"
-        />
+      <Box sx={{ px: 2, pb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <ShieldOutlined sx={{ color: 'warning.main' }} aria-hidden="true" />
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           Super Admin
         </Typography>
@@ -39,13 +37,9 @@ export default function SuperAdminNav({
                 component={Link}
                 href={item.path}
                 {...(onNavClick ? { onClick: onNavClick } : {})}
-                data-testid={
-                  `super-admin-nav-${item.label.toLowerCase()}`
-                }
+                data-testid={`super-admin-nav-${item.label.toLowerCase()}`}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  {item.icon}
-                </ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
               </ListItemButton>
             </ListItem>

@@ -1,8 +1,15 @@
 'use client'
 
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Box, Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  Pagination,
 } from '@mui/material'
 import { useState } from 'react'
 import type { ThreadSummary } from '@/hooks/useThreadList'
@@ -10,8 +17,11 @@ import { ThreadRow } from './ThreadRow'
 
 const PAGE_SIZE = 20
 const HEAD: [string, 'left' | 'center'][] = [
-  ['Thread', 'left'], ['Author', 'left'], ['Replies', 'center'],
-  ['Views', 'center'], ['Last Post', 'left'],
+  ['Thread', 'left'],
+  ['Author', 'left'],
+  ['Replies', 'center'],
+  ['Views', 'center'],
+  ['Last Post', 'left'],
 ]
 
 interface ThreadTableProps {
@@ -23,9 +33,7 @@ export function ThreadTable({ threads, slug }: ThreadTableProps) {
   const [page, setPage] = useState(1)
   const pages = Math.max(1, Math.ceil(threads.length / PAGE_SIZE))
   const current = Math.min(page, pages)
-  const visible = threads.slice(
-    (current - 1) * PAGE_SIZE, current * PAGE_SIZE,
-  )
+  const visible = threads.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
   return (
     <>
       <TableContainer
@@ -37,8 +45,7 @@ export function ThreadTable({ threads, slug }: ThreadTableProps) {
           <TableHead>
             <TableRow>
               {HEAD.map(([label, align]) => (
-                <TableCell key={label} align={align}
-                  sx={{ fontWeight: 600 }}>
+                <TableCell key={label} align={align} sx={{ fontWeight: 600 }}>
                   {label}
                 </TableCell>
               ))}

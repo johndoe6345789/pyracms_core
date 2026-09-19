@@ -16,6 +16,7 @@ TEST(FileS3Http, UploadDownloadThumbnailDelete) {
     auto dl = get("/api/files/" + uuid);
     EXPECT_EQ(dl.status, 200);
     EXPECT_EQ(dl.text, kPng);
+    EXPECT_EQ(dl.headers["content-type"], "image/png");
     EXPECT_NE(dl.headers["content-disposition"].find("pic.png"),
               std::string::npos);
     EXPECT_EQ(get("/api/files/" + uuid + "/thumbnail").text, kPng);

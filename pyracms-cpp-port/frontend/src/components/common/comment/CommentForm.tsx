@@ -9,10 +9,13 @@ import CommentFormButtons from './CommentFormButtons'
 import { MentionAutocomplete } from '../MentionAutocomplete'
 
 interface CommentFormProps {
-  contentType: string; contentId: number
+  contentType: string
+  contentId: number
   parentId?: number | null
-  placeholder?: string; submitLabel?: string
-  onSubmitted: () => void; onCancel?: () => void
+  placeholder?: string
+  submitLabel?: string
+  onSubmitted: () => void
+  onCancel?: () => void
 }
 
 /** Replace the trailing @partial token with the chosen @username. */
@@ -36,10 +39,13 @@ export default function CommentForm({
 
   const handleSubmit = async () => {
     if (!text.trim()) return
-    setSubmitting(true); setError('')
+    setSubmitting(true)
+    setError('')
     try {
-      await api.post(`/api/comments/${contentType}/${contentId}`,
-        { body: text, ...(parentId ? { parentId } : {}) })
+      await api.post(`/api/comments/${contentType}/${contentId}`, {
+        body: text,
+        ...(parentId ? { parentId } : {}),
+      })
       setText('')
       onSubmitted()
     } catch (e) {
@@ -62,11 +68,17 @@ export default function CommentForm({
         inputRef={ref}
         data-testid="comment-input"
       />
-      <MentionAutocomplete inputRef={ref}
-        onSelect={(u) => setText(insertMention(text, u))} />
-      <CommentFormButtons small={!!parentId} label={submitLabel}
+      <MentionAutocomplete
+        inputRef={ref}
+        onSelect={(u) => setText(insertMention(text, u))}
+      />
+      <CommentFormButtons
+        small={!!parentId}
+        label={submitLabel}
         disabled={submitting || !text.trim()}
-        onSubmit={handleSubmit} {...(onCancel ? { onCancel } : {})} />
+        onSubmit={handleSubmit}
+        {...(onCancel ? { onCancel } : {})}
+      />
     </Box>
   )
 }

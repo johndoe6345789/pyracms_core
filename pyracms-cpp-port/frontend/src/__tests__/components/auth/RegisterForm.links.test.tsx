@@ -1,10 +1,7 @@
 /** RegisterForm: heading, login link, testids (useRegister mocked). */
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {
-  renderForm,
-  resetRegisterMocks,
-} from '../../helpers/registerFormMocks'
+import { renderForm, resetRegisterMocks } from '../../helpers/registerFormMocks'
 
 jest.mock('@/hooks/useRegister', () => ({
   useRegister: jest.fn(),
@@ -47,15 +44,11 @@ describe('RegisterForm – login link', () => {
 describe('RegisterForm – data-testid attributes', () => {
   it('form has data-testid="register-form"', () => {
     renderForm()
-    expect(
-      screen.getByTestId('register-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-form')).toBeInTheDocument()
   })
 
   it('submit button has data-testid="register-submit"', () => {
     renderForm()
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-submit')).toBeInTheDocument()
   })
 })

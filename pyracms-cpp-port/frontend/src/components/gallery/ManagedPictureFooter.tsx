@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import PictureFooter from './PictureFooter'
-import GalleryManageDialogs, { type ManageDialog }
-  from './GalleryManageDialogs'
+import GalleryManageDialogs, { type ManageDialog } from './GalleryManageDialogs'
 import { useCanManage } from '@/hooks/useCanManage'
 import type { PictureData } from '@/hooks/useGalleryPicture'
 
@@ -24,17 +23,27 @@ export default function ManagedPictureFooter(p: Props) {
   const canManage = useCanManage(p.slug, p.picture.ownerId)
   return (
     <>
-      <PictureFooter likes={p.picture.likes} dislikes={p.picture.dislikes}
-        onLike={p.onLike} onDislike={p.onDislike}
-        onSetCover={p.onSetCover} canManage={canManage}
+      <PictureFooter
+        likes={p.picture.likes}
+        dislikes={p.picture.dislikes}
+        onLike={p.onLike}
+        onDislike={p.onDislike}
+        onSetCover={p.onSetCover}
+        canManage={canManage}
         onEdit={() => setDialog('edit')}
-        onDelete={() => setDialog('delete')} />
+        onDelete={() => setDialog('delete')}
+      />
       <GalleryManageDialogs
         key={`${p.picture.title}|${p.picture.description}`}
-        kind="pictures" id={p.pictureId} name={p.picture.title}
-        description={p.picture.description} open={dialog}
-        onClose={() => setDialog(null)} onChanged={p.onChanged}
-        onDeleted={p.onDeleted} />
+        kind="pictures"
+        id={p.pictureId}
+        name={p.picture.title}
+        description={p.picture.description}
+        open={dialog}
+        onClose={() => setDialog(null)}
+        onChanged={p.onChanged}
+        onDeleted={p.onDeleted}
+      />
     </>
   )
 }

@@ -11,33 +11,44 @@ jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 1, loading: false }),
 }))
 jest.mock('@monaco-editor/react', () => ({
-  __esModule: true, default: () => null,
+  __esModule: true,
+  default: () => null,
 }))
 const setters = {
-  setSearch: jest.fn(), setLanguage: jest.fn(), setSortBy: jest.fn(),
+  setSearch: jest.fn(),
+  setLanguage: jest.fn(),
+  setSortBy: jest.fn(),
 }
 let s: Record<string, unknown> = {}
 jest.mock('@/hooks/useSnippets', () => ({ useSnippets: () => s }))
 
 beforeEach(() => {
   s = {
-    snippets: [], total: 0, languages: ['python', 'go'], loading: false,
-    error: false, search: '', language: '', sortBy: 'date', ...setters,
+    snippets: [],
+    total: 0,
+    languages: ['python', 'go'],
+    loading: false,
+    error: false,
+    search: '',
+    language: '',
+    sortBy: 'date',
+    ...setters,
   }
 })
 
 it('shows the empty state with a create link', () => {
   render(<SnippetsPage />)
   expect(screen.getByTestId('no-snippets-msg')).toHaveTextContent(/first one/)
-  expect(screen.getByText('Create a snippet').closest('a'))
-    .toHaveAttribute('href', '/site/s/snippets/new')
+  expect(screen.getByText('Create a snippet').closest('a')).toHaveAttribute(
+    'href',
+    '/site/s/snippets/new',
+  )
 })
 
 it('shows a no-match message when filtering', () => {
   s.total = 3
   render(<SnippetsPage />)
-  expect(screen.getByText('No snippets match your search.'))
-    .toBeInTheDocument()
+  expect(screen.getByText('No snippets match your search.')).toBeInTheDocument()
 })
 
 it('shows skeletons while loading and an error', () => {
@@ -54,8 +65,10 @@ it('lists snippets and wires filters', () => {
   s.total = 1
   render(<SnippetsPage />)
   expect(screen.getByTestId('snippet-card-1')).toBeInTheDocument()
-  fireEvent.change(screen.getByTestId('snippet-search')
-    .querySelector('input')!, { target: { value: 'q' } })
+  fireEvent.change(
+    screen.getByTestId('snippet-search').querySelector('input')!,
+    { target: { value: 'q' } },
+  )
   expect(setters.setSearch).toHaveBeenCalledWith('q')
   fireEvent.click(screen.getByText('go'))
   expect(setters.setLanguage).toHaveBeenCalledWith('go')

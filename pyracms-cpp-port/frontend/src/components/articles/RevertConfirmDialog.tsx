@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  Button, Dialog,
-  DialogTitle, DialogActions,
-} from '@mui/material'
+import { Button, Dialog, DialogTitle, DialogActions } from '@mui/material'
 
 interface RevertConfirmDialogProps {
   revisionNumber: number | null
@@ -12,7 +9,9 @@ interface RevertConfirmDialogProps {
 }
 
 export function RevertConfirmDialog({
-  revisionNumber, onClose, onConfirm,
+  revisionNumber,
+  onClose,
+  onConfirm,
 }: RevertConfirmDialogProps) {
   return (
     <Dialog
@@ -24,10 +23,7 @@ export function RevertConfirmDialog({
         Revert to revision {revisionNumber}?
       </DialogTitle>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          data-testid="cancel-revert"
-        >
+        <Button onClick={onClose} data-testid="cancel-revert">
           Cancel
         </Button>
         <Button

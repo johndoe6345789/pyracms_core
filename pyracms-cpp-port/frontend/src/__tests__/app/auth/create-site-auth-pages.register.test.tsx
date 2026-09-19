@@ -28,22 +28,17 @@ jest.mock('@/hooks/useRegister', () => ({
   }),
 }))
 
-import RegisterCreateSitePage
-  from '@/app/auth/register/create-site/page'
+import RegisterCreateSitePage from '@/app/auth/register/create-site/page'
 
 describe('/auth/register/create-site page', () => {
-  beforeEach(() =>
-    renderWithStore(<RegisterCreateSitePage />),
-  )
+  beforeEach(() => renderWithStore(<RegisterCreateSitePage />))
 
   it('renders the auth page shell (role=main)', () => {
     expect(screen.getByRole('main')).toBeInTheDocument()
   })
 
   it('renders the register form', () => {
-    expect(
-      screen.getByTestId('register-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-form')).toBeInTheDocument()
   })
 
   it('register form has accessible label', () => {
@@ -55,9 +50,7 @@ describe('/auth/register/create-site page', () => {
   })
 
   it('renders the register submit button', () => {
-    expect(
-      screen.getByTestId('register-submit'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-submit')).toBeInTheDocument()
   })
 
   it('renders the "Register" heading', () => {

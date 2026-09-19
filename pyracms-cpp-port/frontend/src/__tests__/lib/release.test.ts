@@ -1,6 +1,4 @@
-import {
-  pickRelease, pickAsset, formatSize,
-} from '@/lib/release'
+import { pickRelease, pickAsset, formatSize } from '@/lib/release'
 import { RAW_RELEASES } from '../helpers/releaseFixture'
 
 describe('pickRelease', () => {
@@ -12,16 +10,23 @@ describe('pickRelease', () => {
   })
 
   it('keeps only hypernucleus assets and reads digests', () => {
-    expect(rel?.assets.map((a) => `${a.os}-${a.arch}`))
-      .toEqual(['win-x86_64', 'mac-arm64', 'lin-x86_64'])
+    expect(rel?.assets.map((a) => `${a.os}-${a.arch}`)).toEqual([
+      'win-x86_64',
+      'mac-arm64',
+      'lin-x86_64',
+    ])
     expect(rel?.assets[0]?.sha256).toBe('a'.repeat(64))
     expect(rel?.assets[1]?.sha256).toBeUndefined()
     expect(rel?.sumsUrl).toMatch(/SHA256SUMS$/)
   })
 
   it('prefers stable over a newer pre-release', () => {
-    const rc = { tag_name: 'v3.0.0-rc1', prerelease: true,
-      published_at: '2026-01-01', assets: [] }
+    const rc = {
+      tag_name: 'v3.0.0-rc1',
+      prerelease: true,
+      published_at: '2026-01-01',
+      assets: [],
+    }
     expect(pickRelease([...RAW_RELEASES, rc])?.tag).toBe('launcher-v1.2.0')
     expect(pickRelease([rc])?.prerelease).toBe(true)
   })
@@ -33,8 +38,17 @@ describe('pickRelease', () => {
   })
 
   it('rejects non-https assets', () => {
-    const r = pickRelease([{ tag_name: 'v1', assets: [{
-      name: 'hypernucleus-lin-arm64', browser_download_url: 'http://x' }] }])
+    const r = pickRelease([
+      {
+        tag_name: 'v1',
+        assets: [
+          {
+            name: 'hypernucleus-lin-arm64',
+            browser_download_url: 'http://x',
+          },
+        ],
+      },
+    ])
     expect(r?.assets).toEqual([])
     expect(r?.name).toBe('v1')
   })

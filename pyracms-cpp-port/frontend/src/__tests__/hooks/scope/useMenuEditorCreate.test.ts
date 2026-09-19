@@ -15,8 +15,13 @@ beforeEach(() => {
   m.get.mockImplementation((url: string) =>
     url.includes('items')
       ? Promise.resolve({ data: [{ id: 10, name: 'H', route: '/' }] })
-      : Promise.resolve({ data: [{ id: 1, name: 'main' },
-        { id: 2, name: 'foot' }] }))
+      : Promise.resolve({
+          data: [
+            { id: 1, name: 'main' },
+            { id: 2, name: 'foot' },
+          ],
+        }),
+  )
   m.post.mockResolvedValue({ data: { id: 50 } })
   m.put.mockResolvedValue({})
   m.delete.mockResolvedValue({})
@@ -32,8 +37,7 @@ it('creates groups', async () => {
   expect(m.post).not.toHaveBeenCalled()
   act(() => result.current.setNewGroupName(' New Grp '))
   act(() => result.current.handleCreateGroup())
-  await waitFor(() => expect(result.current.selectedGroup)
-    .toBe('new_grp'))
+  await waitFor(() => expect(result.current.selectedGroup).toBe('new_grp'))
   expect(result.current.groupDialogOpen).toBe(false)
   act(() => result.current.handleCloseGroupDialog())
 })
@@ -53,9 +57,11 @@ it('tolerates api failures', async () => {
   act(() => result.current.handleStartEdit(result.current.currentItems[0]!))
   act(() => result.current.handleSaveEdit())
   act(() => result.current.handleDelete(10))
-  m.get.mockImplementation((url: string) => url.includes('items')
-    ? Promise.reject(new Error('x'))
-    : Promise.resolve({ data: null }))
+  m.get.mockImplementation((url: string) =>
+    url.includes('items')
+      ? Promise.reject(new Error('x'))
+      : Promise.resolve({ data: null }),
+  )
   await setup()
   m.get.mockRejectedValue(new Error('x'))
   await setup()

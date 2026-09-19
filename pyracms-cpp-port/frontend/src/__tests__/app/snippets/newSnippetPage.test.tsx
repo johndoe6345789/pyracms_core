@@ -11,10 +11,12 @@ jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 1, loading: false }),
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { post: jest.fn() },
+  __esModule: true,
+  default: { post: jest.fn() },
 }))
 jest.mock('@monaco-editor/react', () => ({
-  __esModule: true, default: () => null,
+  __esModule: true,
+  default: () => null,
 }))
 
 it('renders the new snippet page and navigates on cancel', () => {
@@ -25,11 +27,12 @@ it('renders the new snippet page and navigates on cancel', () => {
 })
 
 it('opens the saved snippet after saving', async () => {
-  (api.post as jest.Mock).mockResolvedValue({ data: { id: 7 } })
+  ;(api.post as jest.Mock).mockResolvedValue({ data: { id: 7 } })
   render(<NewSnippetPage />)
-  fireEvent.change(screen.getByTestId('snippet-title-input')
-    .querySelector('input')!, { target: { value: 'Hi' } })
+  fireEvent.change(
+    screen.getByTestId('snippet-title-input').querySelector('input')!,
+    { target: { value: 'Hi' } },
+  )
   fireEvent.click(screen.getByTestId('save-btn'))
-  await waitFor(() => expect(push).toHaveBeenCalledWith(
-    '/site/s/snippets/7'))
+  await waitFor(() => expect(push).toHaveBeenCalledWith('/site/s/snippets/7'))
 })

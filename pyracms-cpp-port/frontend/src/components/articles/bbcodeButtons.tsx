@@ -1,9 +1,14 @@
 import {
-  FormatBold, FormatItalic,
-  FormatUnderlined, Link as LinkIcon,
-  Image as ImageIcon, Code,
-  FormatQuote, FormatListBulleted,
-  Palette, FormatSize,
+  FormatBold,
+  FormatItalic,
+  FormatUnderlined,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Code,
+  FormatQuote,
+  FormatListBulleted,
+  Palette,
+  FormatSize,
 } from '@mui/icons-material'
 
 export interface BBCodeBtn {

@@ -15,8 +15,13 @@ export default function TenantSiteLayout({
   children: React.ReactNode
 }) {
   const {
-    slug, siteName, tenant, canAdmin,
-    drawerOpen, toggleDrawer, closeDrawer,
+    slug,
+    siteName,
+    tenant,
+    canAdmin,
+    drawerOpen,
+    toggleDrawer,
+    closeDrawer,
   } = useTenantNav()
 
   return (

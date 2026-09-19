@@ -6,7 +6,9 @@ import { useSelector } from 'react-redux'
 import { Container, Box } from '@mui/material'
 import { BackButton } from '@/components/common/BackButton'
 import {
-  SnippetLoading, SnippetNotFound, SnippetActionError,
+  SnippetLoading,
+  SnippetNotFound,
+  SnippetActionError,
 } from '@/components/code/SnippetStatus'
 import { SnippetHeader } from '@/components/code/SnippetHeader'
 import CommentSection from '@/components/common/CommentSection'
@@ -41,8 +43,10 @@ export default function ViewSnippetPage() {
         <BackButton href={base} label="Back to Snippets" />
       </Box>
       <SnippetHeader s={snippet} />
-      <SnippetActionError message={act.error}
-        onClose={() => act.setError('')} />
+      <SnippetActionError
+        message={act.error}
+        onClose={() => act.setError('')}
+      />
       {editing ? (
         <SnippetEditView
           snippet={snippet}

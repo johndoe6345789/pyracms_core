@@ -1,6 +1,11 @@
 import {
-  detectOs, pickBinary, deepLink, installedStore, favouriteStore,
-  initialOf, gradientFor,
+  detectOs,
+  pickBinary,
+  deepLink,
+  installedStore,
+  favouriteStore,
+  initialOf,
+  gradientFor,
 } from '@/lib/launcher'
 
 const bin = (os: string, arch: string, url = 'http://x/' + arch) =>
@@ -41,8 +46,11 @@ describe('launcher helpers', () => {
     expect(favouriteStore.toggle('g')).toEqual({})
     localStorage.setItem('pyracms.launcher.favourites', '{bad')
     expect(favouriteStore.get()).toEqual({})
-    const s = jest.spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => { throw new Error('x') })
+    const s = jest
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('x')
+      })
     expect(() => installedStore.set('a', '1')).not.toThrow()
     s.mockRestore()
   })

@@ -16,9 +16,7 @@ describe('SuperAdminBreadcrumbs', () => {
   describe('container', () => {
     it('renders the breadcrumbs container', () => {
       renderCrumbs('/super-admin')
-      expect(
-        screen.getByTestId('super-admin-breadcrumbs'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('super-admin-breadcrumbs')).toBeInTheDocument()
     })
 
     it('breadcrumb nav has aria-label', () => {
@@ -34,16 +32,17 @@ describe('SuperAdminBreadcrumbs', () => {
   describe('root route (/super-admin)', () => {
     it('shows "Super Admin" as the current page crumb', () => {
       renderCrumbs('/super-admin')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveTextContent('Super Admin')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveTextContent(
+        'Super Admin',
+      )
     })
 
     it('marks the single crumb as aria-current="page"', () => {
       renderCrumbs('/super-admin')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveAttribute(
+        'aria-current',
+        'page',
+      )
     })
 
     it('renders no clickable links at the root', () => {

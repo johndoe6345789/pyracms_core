@@ -1,5 +1,11 @@
 import {
-  render, screen, fireEvent, within, renderHook, act, waitFor,
+  render,
+  screen,
+  fireEvent,
+  within,
+  renderHook,
+  act,
+  waitFor,
 } from '@testing-library/react'
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog'
 import { useCreateUser } from '@/components/admin/users/useCreateUser'
@@ -7,14 +13,24 @@ import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 
-const box = (id: string) =>
-  within(screen.getByTestId(id)).getByRole('textbox')
+const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
 
 const userState = (over = {}) => ({
-  open: true, setOpen: jest.fn(), username: 'u', setUsername: jest.fn(),
-  email: 'e', setEmail: jest.fn(), fullName: 'f', setFullName: jest.fn(),
-  password: 'p', setPassword: jest.fn(), error: '', creating: false,
-  canSubmit: true, submit: jest.fn(), ...over,
+  open: true,
+  setOpen: jest.fn(),
+  username: 'u',
+  setUsername: jest.fn(),
+  email: 'e',
+  setEmail: jest.fn(),
+  fullName: 'f',
+  setFullName: jest.fn(),
+  password: 'p',
+  setPassword: jest.fn(),
+  error: '',
+  creating: false,
+  canSubmit: true,
+  submit: jest.fn(),
+  ...over,
 })
 
 it('CreateUserDialog wires inputs', () => {
@@ -26,7 +42,8 @@ it('CreateUserDialog wires inputs', () => {
   fireEvent.change(box('new-fullname-input'), { target: { value: 'c' } })
   fireEvent.change(
     screen.getByTestId('new-password-input').querySelector('input')!,
-    { target: { value: 'd' } })
+    { target: { value: 'd' } },
+  )
   fireEvent.click(screen.getByTestId('submit-create-btn'))
   fireEvent.click(screen.getByTestId('cancel-create-btn'))
   expect(s.setUsername).toHaveBeenCalledWith('a')
@@ -56,8 +73,10 @@ describe('useCreateUser', () => {
     })
     act(() => result.current.submit())
     await waitFor(() => expect(onCreated).toHaveBeenCalled())
-    expect(m.post.mock.calls[0][1]).toMatchObject(
-      { username: 'u', fullName: 'F' })
+    expect(m.post.mock.calls[0][1]).toMatchObject({
+      username: 'u',
+      fullName: 'F',
+    })
     expect(result.current.username).toBe('')
   })
 
@@ -74,6 +93,7 @@ describe('useCreateUser', () => {
     m.post.mockRejectedValueOnce(new Error('x'))
     act(() => result.current.submit())
     await waitFor(() =>
-      expect(result.current.error).toBe('Failed to create user'))
+      expect(result.current.error).toBe('Failed to create user'),
+    )
   })
 })

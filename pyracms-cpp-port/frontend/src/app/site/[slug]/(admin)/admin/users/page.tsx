@@ -4,13 +4,10 @@ import { Alert, Box } from '@mui/material'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
 import UserTable from '@/components/admin/UserTable'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
-import CreateUserDialog from
-  '@/components/admin/users/CreateUserDialog'
-import EditUserDialog from
-  '@/components/admin/users/EditUserDialog'
+import CreateUserDialog from '@/components/admin/users/CreateUserDialog'
+import EditUserDialog from '@/components/admin/users/EditUserDialog'
 import UsersHeader from '@/components/admin/users/UsersHeader'
-import { useCreateUser } from
-  '@/components/admin/users/useCreateUser'
+import { useCreateUser } from '@/components/admin/users/useCreateUser'
 
 export default function AdminUsersPage() {
   const u = useAdminUsers()
@@ -20,8 +17,7 @@ export default function AdminUsersPage() {
     <Box data-testid="admin-users-page">
       <UsersHeader onCreate={() => create.setOpen(true)} />
       {u.actionError && (
-        <Alert severity="error" sx={{ mb: 2 }}
-          data-testid="users-action-error">
+        <Alert severity="error" sx={{ mb: 2 }} data-testid="users-action-error">
           {u.actionError}
         </Alert>
       )}

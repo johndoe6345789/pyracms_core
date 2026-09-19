@@ -3,7 +3,8 @@ import { useMention } from '@/components/common/useMention'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
@@ -30,8 +31,8 @@ describe('useMention edge cases', () => {
     el.dispatchEvent(new Event('keyup'))
     el.value = '@a'
     get.mockResolvedValue({ data: [{ id: 1, username: 'ann' }] })
-    const sel = (value: number | null) => Object.defineProperty(
-      el, 'selectionStart', { value, configurable: true })
+    const sel = (value: number | null) =>
+      Object.defineProperty(el, 'selectionStart', { value, configurable: true })
     sel(null)
     el.dispatchEvent(new Event('input'))
     sel(2)

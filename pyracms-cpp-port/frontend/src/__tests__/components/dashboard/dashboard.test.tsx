@@ -6,15 +6,19 @@ import { renderHook } from '@testing-library/react'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
 
 describe('useDashboardStats', () => {
   it('counts users, articles and settings for the tenant', async () => {
-    get.mockImplementation((u: string) => Promise.resolve({
-      data: u.startsWith('/api/users') ? [1, 2, 3] : [1] }))
+    get.mockImplementation((u: string) =>
+      Promise.resolve({
+        data: u.startsWith('/api/users') ? [1, 2, 3] : [1],
+      }),
+    )
     const { result } = renderHook(() => useDashboardStats(4))
     expect(result.current[0]!.value).toBe('...')
     await waitFor(() => expect(result.current[0]!.value).toBe('3'))
@@ -53,9 +57,12 @@ describe('dashboard components', () => {
 
   it('QuickActions lists the shortcuts', () => {
     render(<QuickActions slug="s" />)
-    expect(screen.getByTestId('quick-action-Manage Users'))
-      .toHaveAttribute('href', '/site/s/admin/users')
-    expect(screen.getByTestId('quick-action-Create New Content'))
-      .toHaveAttribute('href', '/site/s/articles/create')
+    expect(screen.getByTestId('quick-action-Manage Users')).toHaveAttribute(
+      'href',
+      '/site/s/admin/users',
+    )
+    expect(
+      screen.getByTestId('quick-action-Create New Content'),
+    ).toHaveAttribute('href', '/site/s/articles/create')
   })
 })

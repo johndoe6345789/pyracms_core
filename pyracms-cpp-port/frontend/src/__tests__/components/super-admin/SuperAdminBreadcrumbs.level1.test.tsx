@@ -23,39 +23,41 @@ describe('SuperAdminBreadcrumbs', () => {
 
     it('"Super Admin" link href is /super-admin', () => {
       renderCrumbs('/super-admin/tenants')
-      expect(
-        screen.getByTestId('breadcrumb-link-super-admin'),
-      ).toHaveAttribute('href', '/super-admin')
+      expect(screen.getByTestId('breadcrumb-link-super-admin')).toHaveAttribute(
+        'href',
+        '/super-admin',
+      )
     })
 
     it('renders "Tenants" as the current page crumb', () => {
       renderCrumbs('/super-admin/tenants')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveTextContent('Tenants')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveTextContent(
+        'Tenants',
+      )
     })
 
     it('"Tenants" crumb has aria-current="page"', () => {
       renderCrumbs('/super-admin/tenants')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveAttribute(
+        'aria-current',
+        'page',
+      )
     })
   })
 
   describe('known segment labels', () => {
     it('/super-admin/users → current = "Users"', () => {
       renderCrumbs('/super-admin/users')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveTextContent('Users')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveTextContent(
+        'Users',
+      )
     })
 
     it('/super-admin/settings → current = "Settings"', () => {
       renderCrumbs('/super-admin/settings')
-      expect(
-        screen.getByTestId('breadcrumb-current'),
-      ).toHaveTextContent('Settings')
+      expect(screen.getByTestId('breadcrumb-current')).toHaveTextContent(
+        'Settings',
+      )
     })
   })
 })

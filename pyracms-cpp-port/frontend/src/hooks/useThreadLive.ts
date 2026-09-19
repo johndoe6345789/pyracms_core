@@ -17,26 +17,32 @@ interface UseThreadLiveOptions {
 export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
 
-  const handleMessage = useCallback((data: unknown) => {
-    const msg = data as Record<string, unknown>
-    if (msg.type === 'typing_start') {
-      setTypingUsers(prev => {
-        const filtered = prev.filter(u => u.userId !== (msg.userId as number))
-        return [
-          ...filtered,
-          {
-            userId: msg.userId as number,
-            timestamp: Date.now(),
-          },
-        ]
-      })
-    } else if (msg.type === 'typing_stop') {
-      setTypingUsers(prev =>
-        prev.filter(u => u.userId !== (msg.userId as number)))
-    } else if (msg.type === 'new_post') {
-      onNewPost?.(msg)
-    }
-  }, [onNewPost])
+  const handleMessage = useCallback(
+    (data: unknown) => {
+      const msg = data as Record<string, unknown>
+      if (msg.type === 'typing_start') {
+        setTypingUsers((prev) => {
+          const filtered = prev.filter(
+            (u) => u.userId !== (msg.userId as number),
+          )
+          return [
+            ...filtered,
+            {
+              userId: msg.userId as number,
+              timestamp: Date.now(),
+            },
+          ]
+        })
+      } else if (msg.type === 'typing_stop') {
+        setTypingUsers((prev) =>
+          prev.filter((u) => u.userId !== (msg.userId as number)),
+        )
+      } else if (msg.type === 'new_post') {
+        onNewPost?.(msg)
+      }
+    },
+    [onNewPost],
+  )
 
   const { connected, send } = useWebSocket({
     url: apiOrigin() + '/api/ws/notifications',
@@ -57,7 +63,9 @@ export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
   // Clean up stale typing indicators (older than 5 seconds)
   useEffect(() => {
     const interval = setInterval(() => {
-      setTypingUsers(prev => prev.filter(u => Date.now() - u.timestamp < 5000))
+      setTypingUsers((prev) =>
+        prev.filter((u) => Date.now() - u.timestamp < 5000),
+      )
     }, 2000)
     return () => clearInterval(interval)
   }, [])

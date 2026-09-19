@@ -11,32 +11,46 @@ jest.mock('@/hooks/useWebSocket', () => ({
   },
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn(), put: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn(), put: jest.fn() },
 }))
 const m = api as unknown as Record<string, jest.Mock>
 beforeEach(() => Object.values(m).forEach((f) => f.mockReset()))
 
-const n = (id: number, read = false, type = 'reply') => ({ id, type,
-  title: `t${id}`, message: 'm', link: null, is_read: read,
-  created_at: '' })
+const n = (id: number, read = false, type = 'reply') => ({
+  id,
+  type,
+  title: `t${id}`,
+  message: 'm',
+  link: null,
+  is_read: read,
+  created_at: '',
+})
 
 describe('NotificationBell', () => {
   it('loads the list, marks one and all read', async () => {
-    m.get!.mockImplementation((u: string) => Promise.resolve(
-      u.includes('unread') ? { data: { count: 2 } }
-        : { data: { notifications: [n(1), n(2)] } }))
+    m.get!.mockImplementation((u: string) =>
+      Promise.resolve(
+        u.includes('unread')
+          ? { data: { count: 2 } }
+          : { data: { notifications: [n(1), n(2)] } },
+      ),
+    )
     m.put!.mockResolvedValue({})
     renderWithStore(<NotificationBell />, makeUser())
     await waitFor(() => expect(m.get).toHaveBeenCalled())
     fireEvent.click(screen.getByTestId('notification-bell-btn'))
     fireEvent.click(await screen.findByTestId('notification-item-1'))
-    await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/notifications/1/read'))
+    await waitFor(() =>
+      expect(m.put).toHaveBeenCalledWith('/api/notifications/1/read'),
+    )
     fireEvent.click(screen.getByTestId('mark-all-read-btn'))
-    await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/notifications/read-all'))
-    await waitFor(() => expect(screen.queryByTestId('mark-all-read-btn'))
-      .toBeNull())
+    await waitFor(() =>
+      expect(m.put).toHaveBeenCalledWith('/api/notifications/read-all'),
+    )
+    await waitFor(() =>
+      expect(screen.queryByTestId('mark-all-read-btn')).toBeNull(),
+    )
   })
 
   it('ingests websocket notifications and survives errors', async () => {

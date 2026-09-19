@@ -1,5 +1,9 @@
 import {
-  List, ListItemButton, ListItemText, ListItemIcon, Typography,
+  List,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  Typography,
 } from '@mui/material'
 import { FavoriteOutlined } from '@mui/icons-material'
 import type { GameDepItem } from '@/hooks/useGameDepList'
@@ -18,13 +22,17 @@ export default function SidebarList(p: Props) {
     <List dense sx={{ overflowY: 'auto', flex: 1 }}>
       {p.games.map((g) => (
         <ListItemButton
-          key={g.name} selected={p.selected === g.name}
+          key={g.name}
+          selected={p.selected === g.name}
           onClick={() => p.onSelect(g.name)}
         >
           <ListItemText
             primary={g.displayName}
-            secondary={p.installed[g.name]
-              ? `Marked installed v${p.installed[g.name]}` : undefined}
+            secondary={
+              p.installed[g.name]
+                ? `Marked installed v${p.installed[g.name]}`
+                : undefined
+            }
           />
           {p.favs[g.name] && (
             <ListItemIcon sx={{ minWidth: 0 }}>

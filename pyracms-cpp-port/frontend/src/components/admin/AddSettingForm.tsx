@@ -1,5 +1,10 @@
 import {
-  Box, Button, Card, CardContent, TextField, Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
 } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 
@@ -28,10 +33,14 @@ export default function AddSettingForm({
         <Typography variant="h5" sx={{ mb: 2 }}>
           Add New Setting
         </Typography>
-        <Box sx={{
-          display: 'flex', gap: 2,
-          alignItems: 'flex-start', flexWrap: 'wrap',
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+          }}
+        >
           <TextField
             label="Key"
             size="small"

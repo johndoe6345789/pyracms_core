@@ -4,7 +4,8 @@ import { useTenantList } from '@/hooks/useTenantList'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { get: jest.fn() },
+  __esModule: true,
+  default: { get: jest.fn() },
 }))
 jest.mock('next/navigation', () => ({
   useParams: () => ({ slug: 'demo' }),
@@ -24,8 +25,9 @@ describe('tenant hooks', () => {
 
   it('useTenantId re-reads cache on slug change', async () => {
     get.mockResolvedValue({ data: { id: 3 } })
-    const { result, rerender } = renderHook(
-      ({ s }) => useTenantId(s), { initialProps: { s: 'one' } })
+    const { result, rerender } = renderHook(({ s }) => useTenantId(s), {
+      initialProps: { s: 'one' },
+    })
     await waitFor(() => expect(result.current.tenantId).toBe(3))
     rerender({ s: '' })
     rerender({ s: 'one' })
@@ -40,13 +42,16 @@ describe('tenant hooks', () => {
   })
 
   it('useTenantList maps sites', async () => {
-    get.mockResolvedValue({ data: [{ slug: 'a', displayName: 'A',
-      description: 'd', ownerUsername: 'bob' }, {}] })
+    get.mockResolvedValue({
+      data: [
+        { slug: 'a', displayName: 'A', description: 'd', ownerUsername: 'bob' },
+        {},
+      ],
+    })
     const { result } = renderHook(() => useTenantList())
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.sites[0]).toMatchObject({ owner: 'bob' })
-    expect(result.current.sites[1]).toMatchObject(
-      { slug: '', owner: 'admin' })
+    expect(result.current.sites[1]).toMatchObject({ slug: '', owner: 'admin' })
   })
 
   it('useTenantList tolerates errors', async () => {

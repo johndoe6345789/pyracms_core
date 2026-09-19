@@ -14,27 +14,19 @@ interface Props {
 
 /** Registration form. Pass redirectTo to override post-register destination. */
 export default function RegisterForm({ redirectTo, tenant }: Props) {
-  const {
-    formData, updateField,
-    error, loading, handleSubmit,
-  } = useRegister(redirectTo, tenant)
+  const { formData, updateField, error, loading, handleSubmit } = useRegister(
+    redirectTo,
+    tenant,
+  )
 
   return (
     <>
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        align="center"
-      >
+      <Typography variant="h4" component="h1" gutterBottom align="center">
         Register
       </Typography>
 
       {tenant && (
-        <AuthScopeNotice
-          tenant={tenant}
-          platformHref="/auth/register"
-        />
+        <AuthScopeNotice tenant={tenant} platformHref="/auth/register" />
       )}
 
       {error && (
@@ -66,9 +58,7 @@ export default function RegisterForm({ redirectTo, tenant }: Props) {
           type="submit"
           disabled={loading}
           data-testid="register-submit"
-          aria-label={
-            loading ? 'Registering' : 'Register'
-          }
+          aria-label={loading ? 'Registering' : 'Register'}
           sx={{ mt: 3, mb: 2 }}
         >
           {loading ? 'Registering...' : 'Register'}

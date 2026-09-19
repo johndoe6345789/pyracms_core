@@ -9,16 +9,22 @@ const box = (id: string, role = 'textbox') =>
 
 it('AddMenuItemCard edits fields and adds', () => {
   const e = {
-    newName: 'n', newRoute: '/r', newPosition: '1', newPermissions: 'admin',
-    setNewName: jest.fn(), setNewRoute: jest.fn(),
-    setNewPosition: jest.fn(), setNewPermissions: jest.fn(),
+    newName: 'n',
+    newRoute: '/r',
+    newPosition: '1',
+    newPermissions: 'admin',
+    setNewName: jest.fn(),
+    setNewRoute: jest.fn(),
+    setNewPosition: jest.fn(),
+    setNewPermissions: jest.fn(),
     handleAddItem: jest.fn(),
   }
   render(<AddMenuItemCard editor={e as never} />)
   fireEvent.change(box('menu-name-input'), { target: { value: 'a' } })
   fireEvent.change(box('menu-route-input'), { target: { value: '/a' } })
-  fireEvent.change(box('menu-position-input', 'spinbutton'),
-    { target: { value: '3' } })
+  fireEvent.change(box('menu-position-input', 'spinbutton'), {
+    target: { value: '3' },
+  })
   fireEvent.mouseDown(box('menu-permissions-select', 'combobox'))
   fireEvent.click(screen.getByRole('option', { name: 'public' }))
   fireEvent.click(screen.getByTestId('add-menu-item-btn'))
@@ -31,8 +37,11 @@ it('AddMenuItemCard edits fields and adds', () => {
 
 it('CreateGroupDialog wires handlers', () => {
   const e = {
-    groupDialogOpen: true, newGroupName: 'g', setNewGroupName: jest.fn(),
-    handleCreateGroup: jest.fn(), handleCloseGroupDialog: jest.fn(),
+    groupDialogOpen: true,
+    newGroupName: 'g',
+    setNewGroupName: jest.fn(),
+    handleCreateGroup: jest.fn(),
+    handleCloseGroupDialog: jest.fn(),
   }
   render(<CreateGroupDialog editor={e as never} />)
   const input = box('group-name-input')

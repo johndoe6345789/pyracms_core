@@ -21,10 +21,16 @@ export default function SnippetsPage() {
       <Box sx={{ mb: 2 }}>
         <BackButton href={`/site/${slug}`} label="Back to Site" />
       </Box>
-      <Box sx={{
-        display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2,
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
         <Typography variant="h3" component="h1">
           Code Snippets
         </Typography>

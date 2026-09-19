@@ -16,24 +16,49 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, userId: 1, username: 'bob',
-  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
-  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
+const c: Comment = {
+  id: 5,
+  userId: 1,
+  username: 'bob',
+  contentType: 'a',
+  contentId: 2,
+  body: 'hello',
+  parentId: null,
+  likes: 0,
+  dislikes: 0,
+  createdAt: 'x',
+  updatedAt: 'x',
+  children: [],
+}
 type U = ReturnType<typeof makeUser> | null
-const show = (u: U = makeUser(), depth = 1) => renderWithStore(
-  <CommentItem comment={c} contentType="a" contentId={2} depth={depth}
-    onRefresh={refresh} />, u ?? undefined)
+const show = (u: U = makeUser(), depth = 1) =>
+  renderWithStore(
+    <CommentItem
+      comment={c}
+      contentType="a"
+      contentId={2}
+      depth={depth}
+      onRefresh={refresh}
+    />,
+    u ?? undefined,
+  )
 
 describe('CommentItem', () => {
   it('votes like and dislike', async () => {
     show()
     fireEvent.click(screen.getByTestId('comment-upvote-btn'))
-    await waitFor(() => expect(m.post).toHaveBeenCalledWith(
-      '/api/comments/5/vote', { isLike: true }))
+    await waitFor(() =>
+      expect(m.post).toHaveBeenCalledWith('/api/comments/5/vote', {
+        isLike: true,
+      }),
+    )
     expect(refresh).toHaveBeenCalled()
     fireEvent.click(screen.getByTestId('comment-downvote-btn'))
-    await waitFor(() => expect(m.post).toHaveBeenLastCalledWith(
-      '/api/comments/5/vote', { isLike: false }))
+    await waitFor(() =>
+      expect(m.post).toHaveBeenLastCalledWith('/api/comments/5/vote', {
+        isLike: false,
+      }),
+    )
   })
 
   it('ignores votes from guests', () => {
@@ -45,8 +70,7 @@ describe('CommentItem', () => {
   it('opens and closes the reply form', () => {
     show(makeUser(), 0)
     fireEvent.click(screen.getByTestId('comment-reply-btn'))
-    expect(screen.getByPlaceholderText('Write a reply...'))
-      .toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Write a reply...')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('comment-cancel-btn'))
     expect(screen.queryByPlaceholderText('Write a reply...')).toBeNull()
   })

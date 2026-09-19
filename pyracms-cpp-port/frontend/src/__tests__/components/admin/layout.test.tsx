@@ -24,11 +24,15 @@ it('sidebar renders desktop and mobile variants', () => {
   const { rerender } = render(
     <AdminSidebar isMobile={false} open={false} onClose={jest.fn()}>
       <p>kid</p>
-    </AdminSidebar>)
+    </AdminSidebar>,
+  )
   expect(screen.getByTestId('admin-sidebar')).toHaveTextContent('kid')
   const onClose = jest.fn()
   rerender(
-    <AdminSidebar isMobile open onClose={onClose}><p>kid</p></AdminSidebar>)
+    <AdminSidebar isMobile open onClose={onClose}>
+      <p>kid</p>
+    </AdminSidebar>,
+  )
   expect(screen.getByTestId('admin-drawer-mobile')).toBeInTheDocument()
   fireEvent.keyDown(screen.getByText('kid'), { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
@@ -37,14 +41,17 @@ it('sidebar renders desktop and mobile variants', () => {
 it('top bar shows the menu toggle on mobile only', () => {
   const onMenu = jest.fn()
   const { rerender } = render(
-    <AdminTopBar slug="s" isMobile={false} onMenu={onMenu} />)
+    <AdminTopBar slug="s" isMobile={false} onMenu={onMenu} />,
+  )
   expect(screen.queryByTestId('admin-menu-toggle')).toBeNull()
   expect(screen.getByText('s Admin')).toBeInTheDocument()
   rerender(<AdminTopBar slug="s" isMobile onMenu={onMenu} />)
   fireEvent.click(screen.getByTestId('admin-menu-toggle'))
   expect(onMenu).toHaveBeenCalled()
   expect(screen.getByTestId('admin-site-link')).toHaveAttribute(
-    'href', '/site/s')
+    'href',
+    '/site/s',
+  )
 })
 
 it('skip link reveals on focus and hides on blur', () => {

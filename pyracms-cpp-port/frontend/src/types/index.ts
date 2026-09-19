@@ -47,10 +47,7 @@ export function getUserRole(user: User | null): UserRole {
  * @example
  * hasMinRole(user, UserRole.Moderator) // Moderator or above
  */
-export function hasMinRole(
-  user: User | null,
-  minRole: UserRole,
-): boolean {
+export function hasMinRole(user: User | null, minRole: UserRole): boolean {
   return getUserRole(user) >= minRole
 }
 

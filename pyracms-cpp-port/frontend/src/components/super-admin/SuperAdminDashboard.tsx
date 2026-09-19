@@ -2,8 +2,10 @@
 
 import { Grid, Typography, Box } from '@mui/material'
 import {
-  DnsOutlined, PeopleOutlined,
-  AddCircleOutline, TuneOutlined,
+  DnsOutlined,
+  PeopleOutlined,
+  AddCircleOutline,
+  TuneOutlined,
 } from '@mui/icons-material'
 import SuperAdminQuickCard from './SuperAdminQuickCard'
 
@@ -50,13 +52,8 @@ export default function SuperAdminDashboard() {
       >
         Platform Overview
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
-        Manage all PyraCMS tenants, users, and
-        platform-wide settings from here.
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Manage all PyraCMS tenants, users, and platform-wide settings from here.
       </Typography>
       <Grid container spacing={3}>
         {QUICK_LINKS.map((link) => (

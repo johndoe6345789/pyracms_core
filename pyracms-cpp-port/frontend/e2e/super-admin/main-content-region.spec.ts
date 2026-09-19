@@ -8,41 +8,20 @@ test.describe('Main content region', () => {
     await goToSuperAdmin(page)
   })
 
-  test(
-    'main content area has correct data-testid',
-    async ({ page }) => {
-      await expect(
-        page.getByTestId('super-admin-main-content'),
-      ).toBeVisible()
-    },
-  )
+  test('main content area has correct data-testid', async ({ page }) => {
+    await expect(page.getByTestId('super-admin-main-content')).toBeVisible()
+  })
 
-  test(
-    'each page renders inside the main content area',
-    async ({ page }) => {
-      for (const [path, testId] of [
-        [
-          '/super-admin/tenants',
-          'super-admin-tenants-page',
-        ],
-        [
-          '/super-admin/users',
-          'super-admin-users-page',
-        ],
-        [
-          '/super-admin/settings',
-          'super-admin-settings-page',
-        ],
-      ] as [string, string][]) {
-        await page.goto(path)
-        const main = page.getByTestId(
-          'super-admin-main-content',
-        )
-        await expect(main).toBeVisible()
-        await expect(
-          main.getByTestId(testId),
-        ).toBeVisible()
-      }
-    },
-  )
+  test('each page renders inside the main content area', async ({ page }) => {
+    for (const [path, testId] of [
+      ['/super-admin/tenants', 'super-admin-tenants-page'],
+      ['/super-admin/users', 'super-admin-users-page'],
+      ['/super-admin/settings', 'super-admin-settings-page'],
+    ] as [string, string][]) {
+      await page.goto(path)
+      const main = page.getByTestId('super-admin-main-content')
+      await expect(main).toBeVisible()
+      await expect(main.getByTestId(testId)).toBeVisible()
+    }
+  })
 })

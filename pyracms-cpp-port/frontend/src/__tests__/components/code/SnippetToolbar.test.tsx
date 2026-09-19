@@ -1,14 +1,19 @@
-import {
-  render, screen, fireEvent, waitFor,
-} from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { SnippetToolbar } from '@/components/code/SnippetToolbar'
 
 const fns = {
-  onRun: jest.fn(), onFork: jest.fn(), onEdit: jest.fn(),
+  onRun: jest.fn(),
+  onFork: jest.fn(),
+  onEdit: jest.fn(),
   onDelete: jest.fn(),
 }
-const base = { runnable: true, running: false, isOwner: false,
-  code: 'print(1)', ...fns }
+const base = {
+  runnable: true,
+  running: false,
+  isOwner: false,
+  code: 'print(1)',
+  ...fns,
+}
 
 beforeEach(() => {
   Object.values(fns).forEach((f) => f.mockClear())

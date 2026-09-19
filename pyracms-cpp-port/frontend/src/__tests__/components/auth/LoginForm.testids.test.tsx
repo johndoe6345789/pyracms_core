@@ -1,15 +1,14 @@
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import {
-  renderLoginForm,
-  resetMockState,
-} from '../../helpers/loginFormMock'
+import { renderLoginForm, resetMockState } from '../../helpers/loginFormMock'
 
 jest.mock('next/navigation', () =>
-  require('../../helpers/loginFormMock').navigationModule())
+  require('../../helpers/loginFormMock').navigationModule(),
+)
 jest.mock('@/hooks/useLogin', () =>
-  require('../../helpers/loginFormMock').loginHookModule())
+  require('../../helpers/loginFormMock').loginHookModule(),
+)
 
 beforeEach(() => {
   resetMockState()
@@ -18,43 +17,31 @@ beforeEach(() => {
 describe('LoginForm – data-testid attributes', () => {
   it('has data-testid="login-form" on the <form>', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('login-form'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('login-form')).toBeInTheDocument()
   })
 
   it('has data-testid="username-input"', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('username-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('username-input')).toBeInTheDocument()
   })
 
   it('has data-testid="password-input"', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('password-input'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('password-input')).toBeInTheDocument()
   })
 
   it('has data-testid="login-submit"', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('login-submit'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('login-submit')).toBeInTheDocument()
   })
 
   it('has data-testid="register-link"', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('register-link'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('register-link')).toBeInTheDocument()
   })
 
   it('has data-testid="forgot-password-link"', () => {
     renderLoginForm()
-    expect(
-      screen.getByTestId('forgot-password-link'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('forgot-password-link')).toBeInTheDocument()
   })
 })

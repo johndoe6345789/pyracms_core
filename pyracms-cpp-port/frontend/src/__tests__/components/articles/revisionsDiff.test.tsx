@@ -5,14 +5,19 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('react-diff-viewer-continued', () => ({
   __esModule: true,
   DiffMethod: { WORDS: 'words' },
-  default: (p: { oldValue: string; newValue: string; splitView: boolean }) =>
+  default: (p: { oldValue: string; newValue: string; splitView: boolean }) => (
     <div data-testid="diff">
       {p.oldValue}|{p.newValue}|{String(p.splitView)}
-    </div>,
+    </div>
+  ),
 }))
 
 const diffRevs = ['a', 'b', 'c'].map((id) => ({
-  id, label: `L${id}`, date: 'd', author: 'x', content: `c-${id}`,
+  id,
+  label: `L${id}`,
+  date: 'd',
+  author: 'x',
+  content: `c-${id}`,
 }))
 
 beforeEach(() => jest.resetAllMocks())

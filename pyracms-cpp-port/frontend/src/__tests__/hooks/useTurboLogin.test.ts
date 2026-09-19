@@ -14,18 +14,23 @@ describe('parseTurbologin', () => {
     expect(parseTurbologin(' ').ok).toBe(false)
     expect(parseTurbologin('{bad').ok).toBe(false)
     expect(parseTurbologin('{"user":"a"}').ok).toBe(false)
-    expect(parseTurbologin('{"user":"a","pass":"b"}'))
-      .toEqual({ ok: true, user: 'a', pass: 'b' })
+    expect(parseTurbologin('{"user":"a","pass":"b"}')).toEqual({
+      ok: true,
+      user: 'a',
+      pass: 'b',
+    })
   })
 })
 
 describe('apiErrorMessage', () => {
   it('picks the best message', () => {
-    expect(apiErrorMessage({ response: { data: { error: 'no' } } }, 'f'))
-      .toBe('no')
+    expect(apiErrorMessage({ response: { data: { error: 'no' } } }, 'f')).toBe(
+      'no',
+    )
     expect(apiErrorMessage({ response: {} }, 'f')).toBe('f')
-    expect(apiErrorMessage(new Error('x'), 'f'))
-      .toBe('Unable to connect to server')
+    expect(apiErrorMessage(new Error('x'), 'f')).toBe(
+      'Unable to connect to server',
+    )
   })
 })
 
@@ -43,7 +48,9 @@ describe('useTurboLogin', () => {
 
   it('defaults the redirect and skips it on failure', async () => {
     clip(async () => '{"user":"a","pass":"b"}')
-    const login = jest.fn().mockResolvedValueOnce(true)
+    const login = jest
+      .fn()
+      .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(false)
     const { result } = renderHook(() => useTurboLogin(login))
     await act(() => result.current.handleTurboLogin())
@@ -60,7 +67,9 @@ describe('useTurboLogin', () => {
     expect(result.current.turboError).toMatch(/empty/)
     act(() => result.current.clearTurboError())
     expect(result.current.turboError).toBeNull()
-    clip(async () => { throw new Error('denied') })
+    clip(async () => {
+      throw new Error('denied')
+    })
     await act(() => result.current.handleTurboLogin())
     expect(result.current.turboError).toMatch(/allow clipboard/)
   })

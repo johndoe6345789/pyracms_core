@@ -4,8 +4,10 @@ import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 
-const raw = [{ id: 1, filename: 'a.txt', uuid: 'u1',
-  createdAt: '2024-01-01T00:00' }, { id: 2 }]
+const raw = [
+  { id: 1, filename: 'a.txt', uuid: 'u1', createdAt: '2024-01-01T00:00' },
+  { id: 2 },
+]
 beforeEach(() => {
   jest.resetAllMocks()
   m.get.mockResolvedValue({ data: raw })
@@ -41,9 +43,17 @@ it('tolerates errors and null data', async () => {
   m.get.mockRejectedValue(new Error('x'))
   const { result } = await setup()
   m.delete.mockRejectedValue(new Error('x'))
-  act(() => result.current.handleDeleteClick(
-    { id: 1, uuid: 'u', name: '', size: 0, type: '',
-      downloads: 0, uploadedAt: '' }))
+  act(() =>
+    result.current.handleDeleteClick({
+      id: 1,
+      uuid: 'u',
+      name: '',
+      size: 0,
+      type: '',
+      downloads: 0,
+      uploadedAt: '',
+    }),
+  )
   act(() => result.current.handleDeleteConfirm())
   await setup(null)
 })
@@ -62,14 +72,20 @@ it('uploads and handles drag events', async () => {
   act(() => result.current.handleDragLeave())
   expect(result.current.dragOver).toBe(false)
   m.post.mockResolvedValueOnce({ data: { id: 6 } })
-  act(() => result.current.handleDrop({
-    preventDefault: jest.fn(), dataTransfer: { files: [file] },
-  } as never))
+  act(() =>
+    result.current.handleDrop({
+      preventDefault: jest.fn(),
+      dataTransfer: { files: [file] },
+    } as never),
+  )
   await waitFor(() => expect(result.current.files).toHaveLength(4))
   expect(result.current.files[3]!.name).toBe('up.txt')
-  act(() => result.current.handleDrop({
-    preventDefault: jest.fn(), dataTransfer: { files: [] },
-  } as never))
+  act(() =>
+    result.current.handleDrop({
+      preventDefault: jest.fn(),
+      dataTransfer: { files: [] },
+    } as never),
+  )
 })
 
 it('ignores uploads without tenant', async () => {

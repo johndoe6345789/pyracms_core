@@ -1,8 +1,12 @@
 'use client'
 
 import {
-  Button, Dialog, DialogActions,
-  DialogContent, DialogTitle, Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
 } from '@mui/material'
 
 interface Props {
@@ -23,20 +27,15 @@ export default function TenantDeleteDialog({
       aria-labelledby="confirm-delete-title"
       data-testid="tenant-delete-dialog"
     >
-      <DialogTitle id="confirm-delete-title">
-        Delete Tenant?
-      </DialogTitle>
+      <DialogTitle id="confirm-delete-title">Delete Tenant?</DialogTitle>
       <DialogContent>
         <Typography>
-          This will permanently delete the tenant and
-          all its data. This cannot be undone.
+          This will permanently delete the tenant and all its data. This cannot
+          be undone.
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onCancel}
-          data-testid="cancel-delete-tenant"
-        >
+        <Button onClick={onCancel} data-testid="cancel-delete-tenant">
           Cancel
         </Button>
         <Button

@@ -1,7 +1,6 @@
 'use client'
 
-import AuthPageShell
-  from '@/components/auth/AuthPageShell'
+import AuthPageShell from '@/components/auth/AuthPageShell'
 import LoginForm from '@/components/auth/LoginForm'
 
 /** Login page that redirects to /create-site on success. */

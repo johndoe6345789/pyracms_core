@@ -1,5 +1,9 @@
 import {
-  locales, defaultLocale, localeNames, isLocale, resolveLocale,
+  locales,
+  defaultLocale,
+  localeNames,
+  isLocale,
+  resolveLocale,
 } from '@/i18n/config'
 
 let cookie: string | undefined
@@ -36,8 +40,11 @@ describe('i18n config', () => {
 })
 
 describe('i18n request config', () => {
-  const load = () => jest.requireActual('@/i18n/request').default as
-    () => Promise<{ locale: string; messages: Record<string, unknown> }>
+  const load = () =>
+    jest.requireActual('@/i18n/request').default as () => Promise<{
+      locale: string
+      messages: Record<string, unknown>
+    }>
 
   it('reads the locale from the cookie', async () => {
     cookie = 'de'

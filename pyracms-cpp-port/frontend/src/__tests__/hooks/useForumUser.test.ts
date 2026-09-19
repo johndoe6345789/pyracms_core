@@ -15,7 +15,9 @@ describe('useForumUser', () => {
     mockState = state(null, false)
     const { result } = renderHook(() => useForumUser())
     expect(result.current).toEqual({
-      userId: null, isAuthenticated: false, isModerator: false,
+      userId: null,
+      isAuthenticated: false,
+      isModerator: false,
     })
   })
   it('flags moderators by role', () => {

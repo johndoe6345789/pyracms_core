@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
-import TenantBreadcrumbs
-  from '@/components/common/TenantBreadcrumbs'
+import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
 import SkipLink from './SkipLink'
 import AdminTopBar from './AdminTopBar'
 import AdminSidebar from './AdminSidebar'
@@ -34,10 +33,7 @@ export default function AdminShell({
         open={open}
         onClose={() => setOpen(false)}
       >
-        <AdminDrawerContent
-          slug={slug}
-          onNavigate={() => setOpen(false)}
-        />
+        <AdminDrawerContent slug={slug} onNavigate={() => setOpen(false)} />
       </AdminSidebar>
       <Box
         sx={{

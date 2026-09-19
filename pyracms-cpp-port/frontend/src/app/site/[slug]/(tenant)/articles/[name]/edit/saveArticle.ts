@@ -19,9 +19,7 @@ async function step(what: string, p: Promise<unknown>) {
     await p
   } catch (e) {
     const why = apiErrorMessage(e, `could not save ${what}`)
-    throw new PartialSaveError(
-      `Article saved, but ${what} failed: ${why}`,
-    )
+    throw new PartialSaveError(`Article saved, but ${what} failed: ${why}`)
   }
 }
 
@@ -32,14 +30,20 @@ export async function saveArticle(a: SaveArgs) {
     summary: a.summary || 'Updated article',
     tenant_id: a.tenantId,
   })
-  await step('tags', api.put(`/api/articles/${a.name}/tags`, {
-    tags: a.tags,
-    tenant_id: a.tenantId,
-  }))
-  if (a.renderer !== a.origRenderer) {
-    await step('renderer', api.put(`/api/articles/${a.name}/renderer`, {
-      renderer: a.renderer.toLowerCase(),
+  await step(
+    'tags',
+    api.put(`/api/articles/${a.name}/tags`, {
+      tags: a.tags,
       tenant_id: a.tenantId,
-    }))
+    }),
+  )
+  if (a.renderer !== a.origRenderer) {
+    await step(
+      'renderer',
+      api.put(`/api/articles/${a.name}/renderer`, {
+        renderer: a.renderer.toLowerCase(),
+        tenant_id: a.tenantId,
+      }),
+    )
   }
 }

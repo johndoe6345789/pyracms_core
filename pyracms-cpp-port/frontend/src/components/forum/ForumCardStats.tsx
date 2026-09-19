@@ -1,9 +1,7 @@
 'use client'
 
 import { Box, Chip } from '@mui/material'
-import {
-  TopicOutlined, ChatBubbleOutlineOutlined,
-} from '@mui/icons-material'
+import { TopicOutlined, ChatBubbleOutlineOutlined } from '@mui/icons-material'
 import type { Forum } from '@/hooks/useForumCategories'
 
 export function ForumCardStats({ forum }: { forum: Forum }) {

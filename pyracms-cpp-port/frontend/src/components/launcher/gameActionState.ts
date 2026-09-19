@@ -12,7 +12,8 @@ export interface ActionState {
 
 /** Which action to offer, given the revisions and what is marked. */
 export function actionState(
-  revisions: Revision[], installedVersion: string | undefined,
+  revisions: Revision[],
+  installedVersion: string | undefined,
 ): ActionState {
   const published = revisions.filter((r) => r.published)
   const versions = published.length ? published : revisions
