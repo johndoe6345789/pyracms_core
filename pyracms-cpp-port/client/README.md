@@ -152,6 +152,30 @@ not return all of them yet): `tags`, `screenshots` / `pictures`,
 revision `binaries: [{os, arch, fileId|url, size, sha256, executable}]`,
 `sha256` and `size` on revisions.
 
+## Releases and download URLs
+
+The workflow `.github/workflows/launcher-build.yml` builds the launcher and
+the Python games on GitHub Actions (Windows, macOS, Linux; x86_64 and arm64)
+and attaches them to a GitHub Release when a `launcher-v*` or `v*` tag is
+pushed (`launcher-v0.x` are marked pre-release). Assets have stable names:
+
+| Asset | Contents |
+| --- | --- |
+| `hypernucleus-<os>-<arch>.zip` | Windows (`win`) and macOS (`mac`) archive |
+| `hypernucleus-<os>-<arch>.dmg` | macOS disk image |
+| `hypernucleus-<os>-<arch>.AppImage` / `.tar.gz` | Linux (`lin`) |
+| `<game>-<os>-<arch>[.exe|.zip]` | standalone Python game |
+| `*.manifest.json`, `catalog.json` | per-file manifests and merged catalogue |
+| `SHA256SUMS` | checksums of all binaries |
+
+`<os>` is `win`, `mac` or `lin`; `<arch>` is `x86_64` or `arm64`. Latest
+launcher: `GET https://api.github.com/repos/johndoe6345789/pyracms_core/releases`
+(pick the newest `launcher-v*` release) and match asset names above; direct
+link: `https://github.com/johndoe6345789/pyracms_core/releases/download/<tag>/hypernucleus-lin-x86_64.AppImage`.
+Builds are unsigned (SmartScreen / Gatekeeper warn). Windows arm64 is
+experimental. Set `HYPERNUCLEUS_HOME` to keep all launcher data in one folder
+(portable mode; the test suites use it too).
+
 ## Known gaps
 
 * The backend's page/catalog responses do not yet include binaries,
