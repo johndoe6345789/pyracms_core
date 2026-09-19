@@ -212,6 +212,11 @@ jobs:
             head -c 1500 run.log; grep -hE "^FAIL|Loc:|Actual|Expected|QFATAL|QWARN" out.txt | head -20 || true
           done
 
+      - name: Show leaked test state (macOS)
+        if: failure() && runner.os == 'macOS' && matrix.arch == 'arm64'
+        shell: bash
+        run: find "$HOME" -maxdepth 6 \( -name installed.json -o -name .qttest \) -not -path '*/Library/Caches/*' 2>/dev/null | head
+
       - name: Compute version and asset name
         id: meta
         shell: bash
