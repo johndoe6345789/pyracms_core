@@ -43,7 +43,7 @@ jest.mock('@/hooks/useSnippetActions', () => ({
 }))
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../../helpers/commentMock').commentSectionMock(),
 )
 
 beforeEach(() => {

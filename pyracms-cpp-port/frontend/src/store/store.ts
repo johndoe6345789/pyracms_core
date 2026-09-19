@@ -9,6 +9,7 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist'
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage'
 import authReducer from './slices/authSlice'
 import uiReducer from './slices/uiSlice'
 import { api } from './api'
@@ -22,21 +23,20 @@ const rootReducer = combineReducers({
 // redux-persist needs localStorage which is only available client-side.
 // During SSR we use a noop storage so the store can still be created.
 const createNoopStorage = () => ({
-  getItem(_key: string) {
+  getItem() {
     return Promise.resolve(null)
   },
-  setItem(_key: string, _value: string) {
+  setItem() {
     return Promise.resolve()
   },
-  removeItem(_key: string) {
+  removeItem() {
     return Promise.resolve()
   },
 })
 
 const storage =
   typeof window !== 'undefined'
-    ? // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('redux-persist/lib/storage').default
+    ? createWebStorage('local')
     : createNoopStorage()
 
 const persistConfig = {

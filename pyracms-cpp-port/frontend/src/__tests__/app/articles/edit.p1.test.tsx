@@ -1,3 +1,4 @@
+import '../../helpers/scopeEditorMocks'
 import {
   render,
   screen,
@@ -8,27 +9,6 @@ import {
 import { EditArticlePage } from '../../helpers/pages/EditArticlePage'
 import { m } from '../../helpers/scopeApi'
 import { push, routeGet } from '../../helpers/scopeMocks'
-
-jest.mock(
-  'react-markdown',
-  () => require('../../helpers/scopeMocks').markdownMock,
-)
-
-jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
-
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
-
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-
-jest.mock(
-  '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
-)
-
-jest.mock(
-  '@monaco-editor/react',
-  () => require('../../helpers/scopeMocks').monacoMock,
-)
 
 const article = {
   displayName: 'Old',

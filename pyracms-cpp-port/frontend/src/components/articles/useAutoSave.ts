@@ -1,10 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function useAutoSave(
   value: string,
   onChange: (v: string) => void,
   autoSaveKey?: string,
 ) {
+  const latest = useRef({ value, onChange })
+  useEffect(() => {
+    latest.current = { value, onChange }
+  })
+
   useEffect(() => {
     if (!autoSaveKey) return
     const t = setTimeout(() => {
@@ -16,7 +21,6 @@ export function useAutoSave(
   useEffect(() => {
     if (!autoSaveKey) return
     const s = localStorage.getItem(`autosave-${autoSaveKey}`)
-    if (s && !value) onChange(s)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (s && !latest.current.value) latest.current.onChange(s)
   }, [autoSaveKey])
 }

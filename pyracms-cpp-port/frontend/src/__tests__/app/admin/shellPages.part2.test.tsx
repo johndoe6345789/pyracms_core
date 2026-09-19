@@ -1,10 +1,17 @@
+import '../../helpers/adminShellMocks'
 import { render, screen } from '@testing-library/react'
 import DashboardPage from '@/app/site/[slug]/(admin)/admin/page'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock(
+  'next/navigation',
+  () => jest.requireActual('../../helpers/scopeMocks').navMock,
+)
 
 jest.mock('@/hooks/useAdminGate', () => ({
   useAdminGate: () => ({ slug: 's', allowed: true, checking: false }),
@@ -13,20 +20,6 @@ jest.mock('@/hooks/useAdminGate', () => ({
 jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 3, loading: false }),
 }))
-
-jest.mock('@/components/common/TenantBreadcrumbs', () => () => <i />)
-
-jest.mock('@/components/common/NotificationBell', () => () => <i />)
-
-jest.mock('@/components/common/ThemeToggle', () => () => <i />)
-
-jest.mock('@/components/common/LanguageSelect', () => () => <i />)
-
-jest.mock('@/components/common/UserBubble', () => () => <i />)
-
-jest.mock('@/components/dashboard/DashboardStats', () => () => (
-  <i data-testid="stats" />
-))
 
 beforeEach(() => jest.resetAllMocks())
 

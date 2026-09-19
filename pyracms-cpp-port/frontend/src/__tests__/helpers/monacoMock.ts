@@ -1,5 +1,5 @@
 export const monacoMock = () => {
-  const React = require('react')
+  const React = jest.requireActual('react')
   return {
     __esModule: true,
     default: (p: {

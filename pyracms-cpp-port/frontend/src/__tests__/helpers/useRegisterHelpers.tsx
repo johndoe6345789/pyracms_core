@@ -1,7 +1,5 @@
-import React from 'react'
 import { renderHook, act } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { makeStore } from '@/store/store'
+import { makeWrapper } from './storeWrapper'
 import { useRegister } from '@/hooks/useRegister'
 import type { RegisterRequest } from '@/types'
 import api from '@/lib/api'
@@ -34,13 +32,7 @@ export const VALID_FORM: Required<RegisterRequest> = {
 
 type HookResult = { current: ReturnType<typeof useRegister> }
 
-/** Fresh store + renderHook wrapper (no state leakage). */
-export function makeWrapper() {
-  const { store } = makeStore()
-  const Wrapper = ({ children }: { children: React.ReactNode }) =>
-    React.createElement(Provider, { store, children })
-  return { store, Wrapper }
-}
+export { makeWrapper }
 
 /** Renders useRegister in a fresh Redux Provider. */
 export function renderRegister(redirectTo?: string) {

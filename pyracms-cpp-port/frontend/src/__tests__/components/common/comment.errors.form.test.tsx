@@ -4,7 +4,10 @@ import CommentSection from '@/components/common/comment/CommentSection'
 import { renderPlain } from '../../helpers/plainStore'
 import { m, boom, refresh, resetApi } from '../../helpers/commentItemHelpers'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 beforeEach(resetApi)
 
 it('shows a post failure', async () => {

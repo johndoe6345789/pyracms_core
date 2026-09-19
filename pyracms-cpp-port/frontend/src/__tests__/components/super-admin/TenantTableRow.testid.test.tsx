@@ -9,7 +9,7 @@ import { TENANT_A } from '../../helpers/tenantTableHelpers'
 
 jest.mock(
   'next/link',
-  () => require('@/__tests__/helpers/tenantTableHelpers').MockLink,
+  () => jest.requireActual('@/__tests__/helpers/tenantTableHelpers').MockLink,
 )
 
 describe('TenantTableRow', () => {

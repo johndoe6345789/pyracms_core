@@ -9,7 +9,10 @@ import {
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 beforeAll(stubResizeObserver)
 

@@ -5,7 +5,7 @@ import { useArticle } from '@/hooks/useArticle'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import { m } from '../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
+jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
 const boom = { response: { data: { error: 'boom' } } }
 beforeEach(() => {
   jest.resetAllMocks()

@@ -3,16 +3,16 @@ import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
 import { editor } from '../../helpers/articleEditorMocks'
 
 jest.mock('@/components/articles/MonacoEditor', () => {
-  return require('../../helpers/articleEditorMocks').monaco
+  return jest.requireActual('../../helpers/articleEditorMocks').monaco
 })
 jest.mock('@/components/articles/RichTextEditor', () => {
-  return require('../../helpers/articleEditorMocks').rich
+  return jest.requireActual('../../helpers/articleEditorMocks').rich
 })
 jest.mock('@/components/articles/BBCodeEditor', () => {
-  return require('../../helpers/articleEditorMocks').bb
+  return jest.requireActual('../../helpers/articleEditorMocks').bb
 })
 jest.mock('@/components/articles/MarkdownEditor', () => {
-  return require('../../helpers/articleEditorMocks').md
+  return jest.requireActual('../../helpers/articleEditorMocks').md
 })
 
 it('ArticleEditorForm edits fields', () => {

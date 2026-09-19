@@ -2,7 +2,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const setup = async () => {
   const h = renderHook(() => useMenuEditor(1))

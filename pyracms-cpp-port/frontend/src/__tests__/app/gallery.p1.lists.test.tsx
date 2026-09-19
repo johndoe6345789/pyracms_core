@@ -3,39 +3,39 @@ import GalleryPage from '@/app/site/[slug]/(tenant)/gallery/page'
 import AlbumPage from '@/app/site/[slug]/(tenant)/gallery/[albumId]/page'
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../helpers/commentMock').commentSectionMock(),
 )
 jest.mock(
   'next/navigation',
-  () => require('../helpers/galleryPagesMocks').navMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').navMock,
 )
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../helpers/galleryPagesMocks').tenantMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').tenantMock,
 )
 jest.mock(
   '@/hooks/useCanManage',
-  () => require('../helpers/galleryPagesMocks').manageMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').manageMock,
 )
 jest.mock(
   '@/hooks/useSiteSession',
-  () => require('../helpers/galleryPagesMocks').sessionMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').sessionMock,
 )
 jest.mock(
   '@/hooks/useGalleryAlbums',
-  () => require('../helpers/galleryPagesMocks').albumsMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').albumsMock,
 )
 jest.mock(
   '@/hooks/useGalleryAlbum',
-  () => require('../helpers/galleryPagesMocks').albumMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').albumMock,
 )
 jest.mock(
   '@/hooks/useGalleryPicture',
-  () => require('../helpers/galleryPagesMocks').pictureMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').pictureMock,
 )
 jest.mock(
   '@/hooks/useTagCloudPage',
-  () => require('../helpers/galleryPagesMocks').tagsMock,
+  () => jest.requireActual('../helpers/galleryPagesMocks').tagsMock,
 )
 
 describe('gallery pages', () => {

@@ -2,7 +2,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useArticles, mapSummary } from '@/hooks/useArticles'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 beforeEach(() => jest.resetAllMocks())
 

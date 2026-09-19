@@ -1,3 +1,4 @@
+import '../../helpers/scopeModuleMocks'
 import {
   render,
   screen,
@@ -12,13 +13,6 @@ import AdminBackupPage from '@/app/site/[slug]/(admin)/admin/backup/page'
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
 import { renderWithStore } from '../../helpers/renderWithStore'
-
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-jest.mock(
-  '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
-)
 
 beforeEach(() => {
   jest.resetAllMocks()

@@ -3,7 +3,7 @@ import { renderWithStore, makeUser } from '../helpers/renderWithStore'
 import NotificationsPage from '@/app/site/[slug]/(tenant)/notifications/page'
 import { m } from '../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
+jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
 
 const row = (id: number, isRead: boolean, link = '/site/s/forum') => ({
   id,

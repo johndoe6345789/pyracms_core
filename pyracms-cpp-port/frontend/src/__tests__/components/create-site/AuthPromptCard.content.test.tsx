@@ -8,7 +8,7 @@ import AuthPromptCard from '@/components/create-site/AuthPromptCard'
 // next/link renders a plain <a> in the jest/jsdom environment.
 jest.mock(
   'next/link',
-  () => require('../../helpers/createSiteMockLink').MockLink,
+  () => jest.requireActual('../../helpers/createSiteMockLink').MockLink,
 )
 
 describe('AuthPromptCard', () => {

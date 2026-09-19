@@ -1,7 +1,10 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { m, resetApi, show } from '../../helpers/commentItemHelpers'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 beforeEach(resetApi)
 
 describe('CommentItem editing', () => {

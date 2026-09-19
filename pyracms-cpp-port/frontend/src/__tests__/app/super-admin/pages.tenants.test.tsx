@@ -3,11 +3,15 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 jest.mock(
   '@/components/super-admin/SuperAdminDashboard',
-  () => require('@/__tests__/helpers/superAdminPagesMocks').dashboardMock,
+  () =>
+    jest.requireActual('@/__tests__/helpers/superAdminPagesMocks')
+      .dashboardMock,
 )
 jest.mock(
   '@/components/super-admin/TenantManagementTable',
-  () => require('@/__tests__/helpers/superAdminPagesMocks').tenantTableMock,
+  () =>
+    jest.requireActual('@/__tests__/helpers/superAdminPagesMocks')
+      .tenantTableMock,
 )
 
 import SuperAdminPage from '@/app/super-admin/page'

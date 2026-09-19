@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '@/lib/api'
 import { useFormSubmit } from '@/hooks/useFormSubmit'
 
@@ -25,6 +25,10 @@ export function useProfileEdit(userId: number | undefined) {
   const [fields, setFields] = useState<ProfileFields>(EMPTY)
   const [loading, setLoading] = useState(Boolean(userId))
   const f = useFormSubmit('Could not save your profile')
+  const failRef = useRef(f.fail)
+  useEffect(() => {
+    failRef.current = f.fail
+  })
 
   useEffect(() => {
     if (!userId) return
@@ -39,9 +43,8 @@ export function useProfileEdit(userId: number | undefined) {
           timezone: r.data.timezone ?? '',
         }),
       )
-      .catch(() => f.fail('Could not load your profile'))
+      .catch(() => failRef.current('Could not load your profile'))
       .finally(() => setLoading(false))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   const set = (k: keyof ProfileFields, v: string) =>

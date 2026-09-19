@@ -7,7 +7,7 @@ import { nav, resetNav } from '../../helpers/userBubbleNav'
 
 jest.mock(
   'next/navigation',
-  () => require('../../helpers/userBubbleNav').navMock,
+  () => jest.requireActual('../../helpers/userBubbleNav').navMock,
 )
 
 describe('UserBubble', () => {

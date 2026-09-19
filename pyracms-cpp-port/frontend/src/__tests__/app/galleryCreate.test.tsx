@@ -13,11 +13,14 @@ import { m } from '../helpers/scopeApi'
 import { routeGet } from '../helpers/scopeMocks'
 
 let signedIn = true
-jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
-jest.mock('next/navigation', () => require('../helpers/scopeMocks').navMock)
+jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
+jest.mock(
+  'next/navigation',
+  () => jest.requireActual('../helpers/scopeMocks').navMock,
+)
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../helpers/scopeMocks').tenantMock,
+  () => jest.requireActual('../helpers/scopeMocks').tenantMock,
 )
 jest.mock('@/hooks/useSiteSession', () => ({
   useSiteSession: () => signedIn,

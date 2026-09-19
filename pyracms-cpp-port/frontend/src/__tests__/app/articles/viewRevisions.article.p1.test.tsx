@@ -4,23 +4,32 @@ import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../../helpers/commentMock').commentSectionMock(),
 )
 
 jest.mock(
   'react-markdown',
-  () => require('../../helpers/scopeMocks').markdownMock,
+  () => jest.requireActual('../../helpers/scopeMocks').markdownMock,
 )
 
-jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
+jest.mock(
+  'remark-gfm',
+  () => jest.requireActual('../../helpers/scopeMocks').gfmMock,
+)
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock(
+  'next/navigation',
+  () => jest.requireActual('../../helpers/scopeMocks').navMock,
+)
 
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
+  () => jest.requireActual('../../helpers/scopeMocks').tenantMock,
 )
 
 const signedIn = false
@@ -31,8 +40,7 @@ jest.mock('@/hooks/useSiteSession', () => ({
 
 jest.mock(
   '@/components/common/PageTransition',
-  () =>
-    ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  () => jest.requireActual('../../helpers/stubs').Passthrough,
 )
 
 beforeEach(() => {

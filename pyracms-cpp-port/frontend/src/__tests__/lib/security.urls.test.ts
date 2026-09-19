@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import { safeHref, safeSrc } from '@/lib/safeUrl'
 import { sanitizeHtml } from '@/lib/sanitize'
 
@@ -49,7 +50,7 @@ describe('sanitizeHtml', () => {
     expect(sanitizeHtml('<b style="color:red">x</b>', true)).toContain('style')
   })
   it('returns empty when no DOM available', () => {
-    const DP = jest.requireActual('dompurify')
+    const DP = DOMPurify
     const orig = Object.getOwnPropertyDescriptor(DP, 'isSupported')
     Object.defineProperty(DP, 'isSupported', {
       value: false,
@@ -57,6 +58,6 @@ describe('sanitizeHtml', () => {
     })
     expect(sanitizeHtml('<b>x</b>')).toBe('')
     if (orig) Object.defineProperty(DP, 'isSupported', orig)
-    else delete DP.isSupported
+    else Reflect.deleteProperty(DP, 'isSupported')
   })
 })

@@ -18,7 +18,7 @@ jest.mock('@/hooks/useCreateSite', () => ({
 // Stub CreateSiteFields to keep these tests on the form shell.
 jest.mock(
   '@/components/create-site/CreateSiteFields',
-  () => require('../../helpers/createSiteForm').MockFields,
+  () => jest.requireActual('../../helpers/createSiteForm').MockFields,
 )
 
 describe('CreateSiteForm', () => {

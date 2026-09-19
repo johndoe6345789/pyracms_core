@@ -4,7 +4,9 @@ import '@testing-library/jest-dom'
 
 jest.mock(
   '@/components/super-admin/GlobalUsersTable',
-  () => require('@/__tests__/helpers/superAdminPagesMocks').usersTableMock,
+  () =>
+    jest.requireActual('@/__tests__/helpers/superAdminPagesMocks')
+      .usersTableMock,
 )
 
 import SuperAdminUsersPage from '@/app/super-admin/users/page'

@@ -1,4 +1,5 @@
 import { Box, Typography, Paper } from '@mui/material'
+import Image from 'next/image'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
 
 export function Section({
@@ -36,14 +37,24 @@ export function Screenshots({
         }}
       >
         {shots.map((s) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Box
             key={s.id}
-            src={s.src}
-            alt={s.title}
-            height={180}
-            style={{ borderRadius: 4, scrollSnapAlign: 'start' }}
-          />
+            sx={{
+              position: 'relative',
+              flexShrink: 0,
+              height: 180,
+              aspectRatio: '16/9',
+              scrollSnapAlign: 'start',
+            }}
+          >
+            <Image
+              src={s.src}
+              alt={s.title}
+              fill
+              unoptimized
+              style={{ objectFit: 'cover', borderRadius: 4 }}
+            />
+          </Box>
         ))}
       </Box>
     </Section>

@@ -5,7 +5,7 @@ import { renderAppBar } from '../../helpers/superAdminAppBar'
 
 // UserBubble needs the Next.js router context; stub it.
 jest.mock('next/navigation', () =>
-  require('../../helpers/routerStub').navigationMock(),
+  jest.requireActual('../../helpers/routerStub').navigationMock(),
 )
 
 describe('SuperAdminAppBar', () => {

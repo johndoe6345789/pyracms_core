@@ -24,8 +24,7 @@ export function PostReactions({
   const [anchor, setAnchor] = useState<null | HTMLElement>(null)
   // Re-sync only when the server data changes, not on every re-render.
   const key = JSON.stringify(reactions ?? [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setList(reactions ?? []), [key])
+  useEffect(() => setList(JSON.parse(key) as Reaction[]), [key])
 
   const toggle = (em: string, lb: string) => {
     setAnchor(null)

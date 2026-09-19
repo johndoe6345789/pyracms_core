@@ -7,12 +7,6 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],
   },

@@ -8,10 +8,10 @@ import {
 } from '../../helpers/loginFormMock'
 
 jest.mock('next/navigation', () =>
-  require('../../helpers/loginFormMock').navigationModule(),
+  jest.requireActual('../../helpers/loginFormMock').navigationModule(),
 )
 jest.mock('@/hooks/useLogin', () =>
-  require('../../helpers/loginFormMock').loginHookModule(),
+  jest.requireActual('../../helpers/loginFormMock').loginHookModule(),
 )
 
 beforeEach(() => {

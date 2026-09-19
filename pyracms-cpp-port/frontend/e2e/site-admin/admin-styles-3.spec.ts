@@ -13,13 +13,7 @@ test.describe('Admin Styles', () => {
   })
 
   test('color swatch boxes are rendered (at least one)', async ({ page }) => {
-    // Each ColorPickerField renders a swatch box
-    // that opens the picker on click
-    const swatches = page.locator(
-      '[style*="background-color"], ' + '[style*="bgcolor"]',
-    )
-    // More lenient: just confirm the primary swatch
-    // sits beside a hex text input
+    // Each ColorPickerField renders a swatch beside a hex text input
     const hexInputs = page.locator('input[value^="#"]')
     expect(await hexInputs.count()).toBeGreaterThan(0)
   })

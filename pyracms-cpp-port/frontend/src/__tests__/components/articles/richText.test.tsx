@@ -4,7 +4,7 @@ import { chain, editor, state } from '../../helpers/tiptapMock'
 
 jest.mock(
   '@tiptap/react',
-  () => require('../../helpers/tiptapMock').tiptapReact,
+  () => jest.requireActual('../../helpers/tiptapMock').tiptapReact,
 )
 jest.mock('@tiptap/starter-kit', () => ({ __esModule: true, default: {} }))
 jest.mock('@tiptap/extension-link', () => ({

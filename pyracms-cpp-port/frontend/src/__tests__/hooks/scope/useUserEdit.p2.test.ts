@@ -2,7 +2,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const edit = { fullName: 'a', email: 'b', role: 1 }
 

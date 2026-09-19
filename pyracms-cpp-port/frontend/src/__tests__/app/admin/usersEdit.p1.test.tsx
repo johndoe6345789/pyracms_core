@@ -5,7 +5,10 @@ import { routeGet } from '../../helpers/scopeMocks'
 import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
 import { UserRole } from '@/types'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const admin = makeUser({ id: 9, role: UserRole.SiteAdmin })
 

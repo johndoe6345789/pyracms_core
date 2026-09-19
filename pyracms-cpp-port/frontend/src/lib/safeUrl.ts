@@ -4,12 +4,18 @@ const LINK_SCHEMES = ['http:', 'https:', 'mailto:']
 const IMG_SCHEMES = ['http:', 'https:', 'blob:']
 const BASE = 'http://safe.invalid'
 // Browsers ignore whitespace/controls inside a scheme ("java\tscript:")
-// eslint-disable-next-line no-control-regex
-const JUNK = /[\u0000-\u0020\u007f-\u009f]/g
+const isJunk = (ch: string) => {
+  const c = ch.charCodeAt(0)
+  return c <= 0x20 || (c >= 0x7f && c <= 0x9f)
+}
+const stripJunk = (s: string) =>
+  Array.from(s)
+    .filter((c) => !isJunk(c))
+    .join('')
 
 function allowed(url: unknown, schemes: string[]): string | undefined {
   if (typeof url !== 'string') return undefined
-  const stripped = url.replace(JUNK, '')
+  const stripped = stripJunk(url)
   if (!stripped) return undefined
   if (stripped.startsWith('\\') || stripped.startsWith('//')) return undefined
   try {

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 
 // next-intl is ESM and needs a provider: tests get the English messages.
 jest.mock('next-intl', () => {
-  const en = require('./src/i18n/messages/en.json')
+  const en = jest.requireActual('./src/i18n/messages/en.json')
   const lookup = (ns, key) =>
     [ns, key]
       .filter(Boolean)

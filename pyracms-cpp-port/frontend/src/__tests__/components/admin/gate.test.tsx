@@ -6,10 +6,7 @@ let gate = { slug: 'my site', allowed: false, checking: false }
 jest.mock('@/hooks/useAdminGate', () => ({ useAdminGate: () => gate }))
 jest.mock(
   '@/components/admin/layout/AdminShell',
-  () =>
-    ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="shell">{children}</div>
-    ),
+  () => jest.requireActual('../../helpers/stubs').ShellStub,
 )
 
 beforeEach(() => {

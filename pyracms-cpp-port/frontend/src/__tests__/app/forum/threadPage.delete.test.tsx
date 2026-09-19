@@ -4,23 +4,23 @@ import { tp, resetThreadPage } from '../../helpers/threadPageState'
 
 jest.mock(
   'next/navigation',
-  () => require('../../helpers/threadPageState').navMock,
+  () => jest.requireActual('../../helpers/threadPageState').navMock,
 )
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../../helpers/threadPageState').tenantMock,
+  () => jest.requireActual('../../helpers/threadPageState').tenantMock,
 )
 jest.mock(
   '@/hooks/useForumUser',
-  () => require('../../helpers/threadPageState').userMock,
+  () => jest.requireActual('../../helpers/threadPageState').userMock,
 )
 jest.mock(
   '@/hooks/useThread',
-  () => require('../../helpers/threadPageState').threadMock,
+  () => jest.requireActual('../../helpers/threadPageState').threadMock,
 )
 jest.mock(
   '@/hooks/useThreadLive',
-  () => require('../../helpers/threadPageState').liveMock,
+  () => jest.requireActual('../../helpers/threadPageState').liveMock,
 )
 
 beforeEach(resetThreadPage)

@@ -6,7 +6,7 @@ import { PicturePage } from '../helpers/pages/PicturePage'
 const push = jest.fn()
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../helpers/commentMock').commentSectionMock(),
 )
 
 jest.mock('next/navigation', () => ({
@@ -40,7 +40,7 @@ jest.mock('@/hooks/useGalleryAlbum', () => ({
 }))
 
 jest.mock('@/hooks/useGalleryPicture', () =>
-  require('../helpers/galleryPictureMock').galleryPictureMock(),
+  jest.requireActual('../helpers/galleryPictureMock').galleryPictureMock(),
 )
 
 describe('gallery owner controls', () => {

@@ -4,7 +4,10 @@ import { renderPlain as renderWithStore } from '../../helpers/plainStore'
 import { m } from '../../helpers/scopeApi'
 import { mk } from '../../helpers/commentTreeFixture'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 beforeEach(() => Object.values(m).forEach((f) => f.mockReset()))
 
 describe('CommentList', () => {

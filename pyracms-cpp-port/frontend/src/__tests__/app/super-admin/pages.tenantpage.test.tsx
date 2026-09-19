@@ -4,7 +4,9 @@ import '@testing-library/jest-dom'
 
 jest.mock(
   '@/components/super-admin/TenantManagementTable',
-  () => require('@/__tests__/helpers/superAdminPagesMocks').tenantTableMock,
+  () =>
+    jest.requireActual('@/__tests__/helpers/superAdminPagesMocks')
+      .tenantTableMock,
 )
 
 import SuperAdminTenantsPage from '@/app/super-admin/tenants/page'

@@ -8,11 +8,11 @@ import { resetHook, TENANT_A, TENANT_B } from '../../helpers/tenantTableHelpers'
 
 jest.mock('@/hooks/useSuperAdminTenants', () => ({
   useSuperAdminTenants: () =>
-    require('@/__tests__/helpers/tenantTableHelpers').mockHookState,
+    jest.requireActual('@/__tests__/helpers/tenantTableHelpers').mockHookState,
 }))
 jest.mock(
   'next/link',
-  () => require('@/__tests__/helpers/tenantTableHelpers').MockLink,
+  () => jest.requireActual('@/__tests__/helpers/tenantTableHelpers').MockLink,
 )
 
 describe('TenantManagementTable', () => {

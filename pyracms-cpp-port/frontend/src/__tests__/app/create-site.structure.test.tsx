@@ -5,14 +5,17 @@ import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderPage } from '../helpers/createSitePage'
 
-jest.mock('next/link', () => require('../helpers/createSitePageMocks').MockLink)
+jest.mock(
+  'next/link',
+  () => jest.requireActual('../helpers/createSitePageMocks').MockLink,
+)
 jest.mock(
   '@/components/create-site/AuthPromptCard',
-  () => require('../helpers/createSitePageMocks').MockAuthPromptCard,
+  () => jest.requireActual('../helpers/createSitePageMocks').MockAuthPromptCard,
 )
 jest.mock(
   '@/components/create-site/CreateSiteForm',
-  () => require('../helpers/createSitePageMocks').MockCreateSiteForm,
+  () => jest.requireActual('../helpers/createSitePageMocks').MockCreateSiteForm,
 )
 
 describe('CreateSitePage', () => {

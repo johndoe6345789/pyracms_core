@@ -1,3 +1,4 @@
+import '../../helpers/adminBarMocks'
 import { render, screen, fireEvent } from '@testing-library/react'
 import AdminDrawerContent from '@/components/admin/layout/AdminDrawerContent'
 import AdminSidebar from '@/components/admin/layout/AdminSidebar'
@@ -5,10 +6,6 @@ import AdminTopBar from '@/components/admin/layout/AdminTopBar'
 import SkipLink from '@/components/admin/layout/SkipLink'
 import { buildQuickLinks } from '@/components/admin/dashboard/quickLinks'
 
-jest.mock('@/components/common/NotificationBell', () => () => <i />)
-jest.mock('@/components/common/ThemeToggle', () => () => <i />)
-jest.mock('@/components/common/LanguageSelect', () => () => <i />)
-jest.mock('@/components/common/UserBubble', () => () => <i />)
 
 it('drawer content links navigate', () => {
   const onNavigate = jest.fn()

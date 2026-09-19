@@ -6,7 +6,7 @@ import { useSettingAdd } from '@/hooks/admin/useSettingAdd'
 import { useFileUpload } from '@/hooks/admin/useFileUpload'
 import { m } from '../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
+jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
 const boom = { response: { data: { error: 'boom' } } }
 const set = jest.fn()
 const item = {

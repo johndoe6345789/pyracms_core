@@ -2,9 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { RevisionTable } from '@/components/articles/RevisionTable'
 import { revs } from '../../helpers/revisionsFixture'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 jest.mock('react-diff-viewer-continued', () => {
-  return require('../../helpers/revisionsFixture').diffViewerMock
+  return jest.requireActual('../../helpers/revisionsFixture').diffViewerMock
 })
 
 beforeEach(() => jest.resetAllMocks())

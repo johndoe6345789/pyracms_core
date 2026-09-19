@@ -4,7 +4,7 @@ import api from '@/lib/api'
 import { depRow as row } from '../helpers/depsPage'
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../helpers/commentMock').commentSectionMock(),
 )
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),

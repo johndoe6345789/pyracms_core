@@ -1,4 +1,5 @@
 /** validateRegisterForm: password and optional-field rules. */
+import { omit } from '@/lib/omit'
 import { validateRegisterForm } from '@/hooks/useRegister'
 import { VALID_FORM } from '../helpers/useRegisterHelpers'
 
@@ -48,12 +49,12 @@ describe('validateRegisterForm', () => {
   })
 
   it('does not error when confirmPassword is undefined', () => {
-    const { confirmPassword: _cp, ...noConfirm } = VALID_FORM
+    const noConfirm = omit(VALID_FORM, 'confirmPassword')
     expect(validateRegisterForm(noConfirm)).toBe('')
   })
 
   it('accepts optional firstName / lastName being absent', () => {
-    const { firstName: _f, lastName: _l, ...minimal } = VALID_FORM
+    const minimal = omit(omit(VALID_FORM, 'firstName'), 'lastName')
     expect(validateRegisterForm(minimal)).toBe('')
   })
 })

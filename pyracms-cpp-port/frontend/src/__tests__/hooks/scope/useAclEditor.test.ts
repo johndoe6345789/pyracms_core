@@ -2,7 +2,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useAclEditor } from '@/hooks/useAclEditor'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const rules = [{ id: 2, action: 'Deny', principal: 'a', permission: 'b' }]
 

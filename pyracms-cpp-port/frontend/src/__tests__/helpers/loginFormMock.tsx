@@ -40,7 +40,7 @@ export function setMockState(o: Partial<MockLoginState>) {
 /** Module factory for jest.mock('@/hooks/useLogin'). */
 export function loginHookModule() {
   return {
-    useLogin: (_redirectTo?: string) => ({
+    useLogin: () => ({
       formData: {
         username: current.username,
         password: current.password,

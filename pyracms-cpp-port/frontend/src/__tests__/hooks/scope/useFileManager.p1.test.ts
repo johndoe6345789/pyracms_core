@@ -2,7 +2,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useFileManager, formatFileSize } from '@/hooks/useFileManager'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const raw = [
   { id: 1, filename: 'a.txt', uuid: 'u1', createdAt: '2024-01-01T00:00' },

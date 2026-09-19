@@ -1,18 +1,13 @@
+import '../../helpers/scopeModuleMocks'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import StyleEditorPage from '@/app/site/[slug]/(admin)/admin/styles/page'
 import TemplateEditorPage from '@/app/site/[slug]/(admin)/admin/templates/page'
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
-jest.mock(
-  '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
-)
 jest.mock(
   '@monaco-editor/react',
-  () => require('../../helpers/scopeMocks').monacoMock,
+  () => jest.requireActual('../../helpers/scopeMocks').monacoMock,
 )
 jest.mock('react-colorful', () => ({
   HexColorPicker: () => <i />,

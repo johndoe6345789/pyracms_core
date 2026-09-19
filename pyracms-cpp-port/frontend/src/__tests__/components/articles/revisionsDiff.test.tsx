@@ -1,7 +1,10 @@
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { RevisionDiffViewer } from '@/components/articles/RevisionDiffViewer'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 jest.mock('react-diff-viewer-continued', () => ({
   __esModule: true,
   DiffMethod: { WORDS: 'words' },

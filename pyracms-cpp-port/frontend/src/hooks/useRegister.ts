@@ -7,6 +7,7 @@ import { setCredentials } from '@/store/slices/authSlice'
 import api from '@/lib/api'
 import { setToken } from '@/lib/session'
 import { validateRegisterForm } from '@/hooks/registerValidation'
+import { omit } from '@/lib/omit'
 import { apiErrorMessage } from '@/lib/apiError'
 import type { RegisterRequest } from '@/types'
 
@@ -50,8 +51,7 @@ export function useRegister(redirectTo = '/', tenant?: string) {
     setLoading(true)
 
     // Strip confirmPassword — the API does not expect it.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword: _cp, ...rest } = formData
+    const rest = omit(formData, 'confirmPassword')
     const payload = {
       ...rest,
       username: rest.username.trim(),

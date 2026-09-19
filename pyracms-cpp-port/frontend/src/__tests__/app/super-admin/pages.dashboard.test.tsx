@@ -4,7 +4,9 @@ import '@testing-library/jest-dom'
 
 jest.mock(
   '@/components/super-admin/SuperAdminDashboard',
-  () => require('@/__tests__/helpers/superAdminPagesMocks').dashboardMock,
+  () =>
+    jest.requireActual('@/__tests__/helpers/superAdminPagesMocks')
+      .dashboardMock,
 )
 
 import SuperAdminPage from '@/app/super-admin/page'

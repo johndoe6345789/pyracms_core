@@ -2,7 +2,10 @@ import { render, screen } from '@testing-library/react'
 import RecentActivity from '@/components/activity/RecentActivity'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 beforeEach(() => jest.resetAllMocks())
 

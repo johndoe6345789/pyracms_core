@@ -8,7 +8,7 @@ import { USER_ALICE, USER_BOB, resetHook } from '../../helpers/globalUsersHook'
 
 jest.mock('@/hooks/useSuperAdminUsers', () => ({
   useSuperAdminUsers: () =>
-    require('../../helpers/globalUsersHook').mockHookState,
+    jest.requireActual('../../helpers/globalUsersHook').mockHookState,
 }))
 
 describe('GlobalUsersTable', () => {

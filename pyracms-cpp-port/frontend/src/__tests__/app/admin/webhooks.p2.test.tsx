@@ -2,13 +2,19 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import WebhooksPage from '@/app/site/[slug]/(admin)/admin/webhooks/page'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock(
+  'next/navigation',
+  () => jest.requireActual('../../helpers/scopeMocks').navMock,
+)
 
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
+  () => jest.requireActual('../../helpers/scopeMocks').tenantMock,
 )
 
 const hook = {

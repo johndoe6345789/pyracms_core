@@ -4,7 +4,10 @@ import {
 } from '@/app/site/[slug]/(tenant)/articles/[name]/edit/saveArticle'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const args = {
   name: 'n',

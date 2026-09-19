@@ -19,7 +19,7 @@ jest.mock('@/hooks/useCreateSite', () => ({
 
 jest.mock(
   '@/components/create-site/CreateSiteFields',
-  () => require('../../helpers/createSiteForm').MockFields,
+  () => jest.requireActual('../../helpers/createSiteForm').MockFields,
 )
 
 describe('CreateSiteForm', () => {

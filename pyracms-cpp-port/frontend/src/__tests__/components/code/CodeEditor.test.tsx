@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { CodeEditor } from '@/components/code/CodeEditor'
 
 jest.mock('@monaco-editor/react', () =>
-  require('../../helpers/monacoMock').monacoMock(),
+  jest.requireActual('../../helpers/monacoMock').monacoMock(),
 )
 
 describe('CodeEditor', () => {

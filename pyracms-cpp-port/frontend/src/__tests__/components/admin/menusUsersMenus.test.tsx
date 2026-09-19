@@ -2,7 +2,10 @@ import { render, screen, fireEvent, within } from '@testing-library/react'
 import AddMenuItemCard from '@/components/admin/menus/AddMenuItemCard'
 import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 const box = (id: string, role = 'textbox') =>
   within(screen.getByTestId(id)).getByRole(role)

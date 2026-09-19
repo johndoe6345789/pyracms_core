@@ -5,14 +5,23 @@ import { routeGet } from '../../helpers/scopeMocks'
 
 jest.mock(
   'react-markdown',
-  () => require('../../helpers/scopeMocks').markdownMock,
+  () => jest.requireActual('../../helpers/scopeMocks').markdownMock,
 )
-jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
-jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock(
+  'remark-gfm',
+  () => jest.requireActual('../../helpers/scopeMocks').gfmMock,
+)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
+jest.mock(
+  'next/navigation',
+  () => jest.requireActual('../../helpers/scopeMocks').navMock,
+)
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
+  () => jest.requireActual('../../helpers/scopeMocks').tenantMock,
 )
 jest.mock('react-diff-viewer-continued', () => ({
   __esModule: true,

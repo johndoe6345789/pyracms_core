@@ -2,7 +2,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import TemplatePreview from '@/components/admin/templates/TemplatePreview'
 import TemplateToolbar from '@/components/admin/templates/TemplateToolbar'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 it('TemplatePreview sanitizes html', () => {
   render(

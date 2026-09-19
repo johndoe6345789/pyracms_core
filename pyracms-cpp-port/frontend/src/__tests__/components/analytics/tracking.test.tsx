@@ -6,14 +6,17 @@ import SummaryCards, {
 import { m } from '../../helpers/scopeApi'
 
 let path = '/site/s/articles'
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 jest.mock('next/navigation', () => ({
   useParams: () => ({ slug: 's' }),
   usePathname: () => path,
 }))
 jest.mock(
   '@/hooks/useTenantId',
-  () => require('../../helpers/scopeMocks').tenantMock,
+  () => jest.requireActual('../../helpers/scopeMocks').tenantMock,
 )
 
 const dnt = (v: string | null) =>

@@ -4,10 +4,10 @@ import '@testing-library/jest-dom'
 import { renderLoginForm, resetMockState } from '../../helpers/loginFormMock'
 
 jest.mock('next/navigation', () =>
-  require('../../helpers/loginFormMock').navigationModule(),
+  jest.requireActual('../../helpers/loginFormMock').navigationModule(),
 )
 jest.mock('@/hooks/useLogin', () =>
-  require('../../helpers/loginFormMock').loginHookModule(),
+  jest.requireActual('../../helpers/loginFormMock').loginHookModule(),
 )
 
 beforeEach(() => {
@@ -21,32 +21,22 @@ describe('LoginForm – tab order', () => {
    * than simulating Tab key presses (which jsdom does not
    * fully support without user-event).
    */
+  const domIndex = (id: string) =>
+    Array.from(document.querySelectorAll('*')).indexOf(screen.getByTestId(id))
+
   it('username input appears before password input in DOM', () => {
     renderLoginForm()
-    const username = screen.getByTestId('username-input')
-    const password = screen.getByTestId('password-input')
-    expect(
-      // eslint-disable-next-line no-bitwise
-      username.compareDocumentPosition(password) &
-        // Node.DOCUMENT_POSITION_FOLLOWING === 4
-        4,
-    ).toBeTruthy()
+    expect(domIndex('username-input')).toBeLessThan(domIndex('password-input'))
   })
 
   it('password input appears before submit button in DOM', () => {
     renderLoginForm()
-    const password = screen.getByTestId('password-input')
-    const submit = screen.getByTestId('login-submit')
-    // eslint-disable-next-line no-bitwise
-    expect(password.compareDocumentPosition(submit) & 4).toBeTruthy()
+    expect(domIndex('password-input')).toBeLessThan(domIndex('login-submit'))
   })
 
   it('submit button appears before register link in DOM', () => {
     renderLoginForm()
-    const submit = screen.getByTestId('login-submit')
-    const register = screen.getByTestId('register-link')
-    // eslint-disable-next-line no-bitwise
-    expect(submit.compareDocumentPosition(register) & 4).toBeTruthy()
+    expect(domIndex('login-submit')).toBeLessThan(domIndex('register-link'))
   })
 
   it('none of the interactive elements have tabIndex < 0', () => {

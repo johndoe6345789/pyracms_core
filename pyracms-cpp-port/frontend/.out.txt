@@ -1,0 +1,45 @@
+npm notice
+npm notice New major version of npm available! 10.9.8 -> 12.0.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+npm notice To update run: npm install -g npm@12.0.2
+npm notice
+   5:67  warning  Delete `␍`  prettier/prettier
+   6:1   warning  Delete `␍`  prettier/prettier
+   7:33  warning  Delete `␍`  prettier/prettier
+   8:25  warning  Delete `␍`  prettier/prettier
+   9:24  warning  Delete `␍`  prettier/prettier
+  10:17  warning  Delete `␍`  prettier/prettier
+  11:44  warning  Delete `␍`  prettier/prettier
+  12:5   warning  Delete `␍`  prettier/prettier
+  13:78  warning  Delete `␍`  prettier/prettier
+  14:70  warning  Delete `␍`  prettier/prettier
+  15:26  warning  Delete `␍`  prettier/prettier
+  16:20  warning  Delete `␍`  prettier/prettier
+  17:71  warning  Delete `␍`  prettier/prettier
+  18:66  warning  Delete `␍`  prettier/prettier
+  19:5   warning  Delete `␍`  prettier/prettier
+  20:22  warning  Delete `␍`  prettier/prettier
+  21:13  warning  Delete `␍`  prettier/prettier
+  22:72  warning  Delete `␍`  prettier/prettier
+  23:50  warning  Delete `␍`  prettier/prettier
+  24:8   warning  Delete `␍`  prettier/prettier
+  25:35  warning  Delete `␍`  prettier/prettier
+  26:45  warning  Delete `␍`  prettier/prettier
+  27:26  warning  Delete `␍`  prettier/prettier
+  28:9   warning  Delete `␍`  prettier/prettier
+  29:8   warning  Delete `␍`  prettier/prettier
+  30:33  warning  Delete `␍`  prettier/prettier
+  31:43  warning  Delete `␍`  prettier/prettier
+  32:26  warning  Delete `␍`  prettier/prettier
+  33:9   warning  Delete `␍`  prettier/prettier
+  34:6   warning  Delete `␍`  prettier/prettier
+  35:5   warning  Delete `␍`  prettier/prettier
+  36:2   warning  Delete `␍`  prettier/prettier
+  37:1   warning  Delete `␍`  prettier/prettier
+  38:40  warning  Delete `␍`  prettier/prettier
+
+✖ 39 problems (1 error, 38 warnings)
+  0 errors and 38 warnings potentially fixable with the `--fix` option.
+
+(node:65) ESLintRCWarning: You are using an eslintrc configuration file, which is deprecated and support will be removed in v10.0.0. Please migrate to an eslint.config.js file. See https://eslint.org/docs/latest/use/configure/migration-guide for details. An eslintrc configuration file is used because you have the ESLINT_USE_FLAT_CONFIG environment variable set to false. If you want to use an eslint.config.js file, remove the environment variable. If you want to find the location of the eslintrc configuration file, use the --debug flag.
+(Use `node --trace-warnings ...` to show where the warning was created)

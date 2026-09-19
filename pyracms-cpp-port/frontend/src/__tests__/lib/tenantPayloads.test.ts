@@ -6,7 +6,7 @@ import { useMenuGroupCreate } from '@/hooks/admin/useMenuGroupCreate'
 import { useArticle } from '@/hooks/useArticle'
 import { m } from '../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../helpers/apiMock').apiMock)
+jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
 
 // The backend reads the tenant from the JSON body on these routes (camel
 // case for settings/menus, snake case for article votes), so a query-only

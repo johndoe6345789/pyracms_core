@@ -7,17 +7,19 @@ import SiteHomePage from '@/app/site/[slug]/(tenant)/page'
 import { st } from '../helpers/tenantPagesMocks'
 
 jest.mock('next/navigation', () =>
-  require('../helpers/tenantPagesMocks').navMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').navMock(),
 )
-jest.mock('@/lib/api', () => require('../helpers/tenantPagesMocks').apiMock())
+jest.mock('@/lib/api', () =>
+  jest.requireActual('../helpers/tenantPagesMocks').apiMock(),
+)
 jest.mock('@/components/common/TenantBreadcrumbs', () =>
-  require('../helpers/tenantPagesMocks').crumbsMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').crumbsMock(),
 )
 jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 1, loading: false }),
 }))
 jest.mock('@/hooks/useTenant', () =>
-  require('../helpers/tenantPagesMocks').tenantMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').tenantMock(),
 )
 
 describe('auth pages', () => {

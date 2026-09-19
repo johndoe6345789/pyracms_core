@@ -6,25 +6,27 @@ import api from '@/lib/api'
 import { st } from '../helpers/tenantPagesMocks'
 
 jest.mock('next/navigation', () =>
-  require('../helpers/tenantPagesMocks').navMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').navMock(),
 )
 
-jest.mock('@/lib/api', () => require('../helpers/tenantPagesMocks').apiMock())
+jest.mock('@/lib/api', () =>
+  jest.requireActual('../helpers/tenantPagesMocks').apiMock(),
+)
 
 jest.mock('@/components/common/CommentSection', () =>
-  require('../helpers/commentMock').commentSectionMock(),
+  jest.requireActual('../helpers/commentMock').commentSectionMock(),
 )
 
 jest.mock('@/components/launcher/GameLibrary', () =>
-  require('../helpers/tenantPagesMocks').libMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').libMock(),
 )
 
 jest.mock('@/components/common/TenantBreadcrumbs', () =>
-  require('../helpers/tenantPagesMocks').crumbsMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').crumbsMock(),
 )
 
 jest.mock('@/hooks/useTenant', () =>
-  require('../helpers/tenantPagesMocks').tenantMock(),
+  jest.requireActual('../helpers/tenantPagesMocks').tenantMock(),
 )
 
 const put = api.put as jest.Mock

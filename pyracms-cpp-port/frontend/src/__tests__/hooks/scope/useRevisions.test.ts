@@ -6,7 +6,10 @@ import {
 } from '@/hooks/useRevisions'
 import { m } from '../../helpers/scopeApi'
 
-jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock(
+  '@/lib/api',
+  () => jest.requireActual('../../helpers/apiMock').apiMock,
+)
 
 beforeEach(() => jest.resetAllMocks())
 
