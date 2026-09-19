@@ -19,6 +19,8 @@ set(TEST_SOURCES
 
     http_accounts.cpp
 
+    http_calls.cpp
+
     http_harness.cpp
 
     test_admin_filter.cpp
@@ -27,7 +29,11 @@ set(TEST_SOURCES
 
     test_article_http_2.cpp
 
+    test_article_http_3.cpp
+
     test_auth_http.cpp
+
+    test_auth_reset_http.cpp
 
     test_auth_service.cpp
 
@@ -87,6 +93,10 @@ set(TEST_SOURCES
 
     test_social_http.cpp
 
+    test_social_service_http.cpp
+
+    test_tenant_http.cpp
+
     test_tenant_rules.cpp
 
     test_tenant_service.cpp
@@ -102,6 +112,8 @@ set(TEST_SOURCES
     test_user_visibility.cpp
 
     test_webhook_http.cpp
+
+    test_webhook_service_http.cpp
 
 )
 

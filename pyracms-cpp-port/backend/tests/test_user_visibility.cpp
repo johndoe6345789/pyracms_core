@@ -35,10 +35,11 @@ TEST(UserVisibilityTest, PlatformOwnerSeesAnyEmail) {
 }
 
 TEST(UserVisibilityTest, ViewingIsConfinedToOwnTenant) {
-    EXPECT_TRUE(canViewUser(kUser, 2, 2));
-    EXPECT_FALSE(canViewUser(kUser, 2, 3));
-    EXPECT_FALSE(canViewUser(kUser, 0, 3));
-    EXPECT_TRUE(canViewUser(kOwner, 0, 3));
+    // (viewerTenant, viewerRole, targetTenant)
+    EXPECT_TRUE(canViewUser(2, kUser, 2));
+    EXPECT_FALSE(canViewUser(2, kUser, 3));
+    EXPECT_FALSE(canViewUser(0, kUser, 3));
+    EXPECT_TRUE(canViewUser(0, kOwner, 3));
 }
 
 TEST(UserVisibilityTest, LimitDefaultsAndClamps) {

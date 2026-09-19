@@ -2,6 +2,7 @@
 
 #include "filters/RoleRules.h"
 #include "filters/TenantGuard.h"
+#include "filters/TenantRules.h"
 
 #include <drogon/drogon.h>
 

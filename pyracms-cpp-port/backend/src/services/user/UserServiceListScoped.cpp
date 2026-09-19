@@ -8,10 +8,10 @@ void UserService::listUsersScoped(const DbClientPtr &db, int scope,
                                   int offset, ListCallback cb) {
     db->execSqlAsync(
         "SELECT * FROM users WHERE ($1::int < 0 OR COALESCE(tenant_id, 0) = $1::int) "
-        "AND ($2::text = '' OR username ILIKE '%' || $2::text || '%' "
+        "AND (COALESCE($2::text, '') = '' OR username ILIKE '%' || $2::text || '%' "
         "OR full_name ILIKE '%' || $2 || '%') "
-        "AND ($3::text = '' OR username = $3::text) "
-        "ORDER BY created_at DESC LIMIT $4 OFFSET $5",
+        "AND (COALESCE($3::text, '') = '' OR username = $3::text) "
+        "ORDER BY created_at DESC LIMIT $4::int OFFSET $5::int",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<UserDto> users;
             users.reserve(result.size());
@@ -19,7 +19,11 @@ void UserService::listUsersScoped(const DbClientPtr &db, int scope,
                 users.push_back(rowToDto(row));
             cb(users);
         },
-        [cb](const drogon::orm::DrogonDbException &) { cb({}); }, scope,
+        [cb](const drogon::orm::DrogonDbException &e) {
+            LOG_ERROR << "listUsersScoped: " << e.base().what();
+            cb({});
+        },
+        scope,
         search, username, limit, offset);
 }
 
