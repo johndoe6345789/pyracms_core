@@ -441,7 +441,9 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: release/*
+          body_path: .github/release-notes/launcher.md
           generate_release_notes: true
+          prerelease: ${{ startsWith(github.ref_name, 'launcher-v0.') || startsWith(github.ref_name, 'v0.') }}
 
       - name: Publish manifests to the GameDep API
         if: env.HN_API_URL != '' && env.HN_API_TOKEN != ''
