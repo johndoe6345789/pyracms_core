@@ -96,6 +96,7 @@ set(QT_TEST_SOURCES
     qt/qtst_SiteDirectory.cpp
     qt/qtst_SiteDirectory_2.cpp
     qt/qtst_TenantInfo.cpp
+    qt/qtst_TimedSecretStore.cpp
     qt/qtst_TranslationFiles.cpp
     qt/qtst_UiBackendData.cpp
     qt/qtst_UiBackendData_2.cpp
@@ -226,7 +227,10 @@ foreach(test_src ${QT_TEST_SOURCES})
     endif()
     add_test(NAME ${test_name} COMMAND ${test_name})
     # The suites use their own QSettings / data folders, never the user's.
-    set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+    # A hung call (keychain, process) fails the function after 150 s and the
+    # whole test after 200 s instead of blocking CI for the default 300 s.
+    set_tests_properties(${test_name} PROPERTIES TIMEOUT 200
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTEST_FUNCTION_TIMEOUT=150000")
 endforeach()
 
 # --- GoogleTest suites (original tests, one executable) ---------------------

@@ -2,6 +2,7 @@
 
 #ifdef Q_OS_MACOS
 #include "services/SecretStore_macCf.h"
+#include "services/TimedSecretStore.h"
 
 namespace Hypernucleus {
 namespace {
@@ -56,7 +57,9 @@ public:
 
 std::unique_ptr<SecretStore> createNativeSecretStore()
 {
-    return std::make_unique<KeychainStore>();
+    // A locked keychain must never hang the launcher: 5 s at most per call.
+    return std::make_unique<TimedSecretStore>(
+        std::make_shared<KeychainStore>(), 5000);
 }
 
 } // namespace Hypernucleus

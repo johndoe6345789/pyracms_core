@@ -38,6 +38,9 @@ CFMutableDictionaryRef query(CFStringRef service, CFStringRef account)
     CFDictionarySetValue(q, kSecClass, kSecClassGenericPassword);
     CFDictionarySetValue(q, kSecAttrService, service);
     CFDictionarySetValue(q, kSecAttrAccount, account);
+    // Fail at once instead of showing an unlock / permission prompt.
+    CFDictionarySetValue(q, kSecUseAuthenticationUI,
+                         kSecUseAuthenticationUIFail);
     return q;
 }
 

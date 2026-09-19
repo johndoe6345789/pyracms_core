@@ -207,6 +207,18 @@ jobs:
         shell: bash
         run: cmake --build "$CLIENT/build" --parallel
 
+      - name: Unlocked default keychain (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          # A headless runner has no unlocked login keychain; the real
+          # SecItem round trip of qtst_SecretStore_3 needs one.
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security list-keychains -d user -s build.keychain
+
       - name: Test
         shell: bash
         env:

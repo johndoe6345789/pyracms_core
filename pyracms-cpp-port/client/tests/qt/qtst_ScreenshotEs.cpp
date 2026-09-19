@@ -19,7 +19,7 @@ class TstScreenshotEs : public QObject {
         app.setProcessEnvironment(env);
         app.start(QStringLiteral(APP_PATH),
                   {"--lang", lang, "--screenshot", png});
-        if (!app.waitForFinished(60000)) app.kill();
+        if (!app.waitForFinished(40000)) app.kill();
         return QImage(png);
     }
 

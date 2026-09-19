@@ -112,6 +112,8 @@
     "src/services/SingleInstance.cpp",
     "src/services/SingleInstance_onNewConnection.cpp",
     "src/services/SiteDirectory.cpp",
+    "src/services/TimedSecretStore.cpp",
+    "src/services/TimedSecretStore_calls.cpp",
     "src/services/TokenVault.cpp",
     "src/services/UrlSchemeRegistrar.cpp",
     "src/services/UrlSchemeRegistrar_registerForCurrentUser.cpp"
@@ -163,6 +165,7 @@
     "src/services/SettingsManager.h",
     "src/services/SingleInstance.h",
     "src/services/SiteDirectory.h",
+    "src/services/TimedSecretStore.h",
     "src/services/TokenVault.h",
     "src/services/UrlSchemeRegistrar.h"
   ],
@@ -419,6 +422,7 @@
     "qt/qtst_SiteDirectory.cpp",
     "qt/qtst_SiteDirectory_2.cpp",
     "qt/qtst_TenantInfo.cpp",
+    "qt/qtst_TimedSecretStore.cpp",
     "qt/qtst_TranslationFiles.cpp",
     "qt/qtst_UiBackendData.cpp",
     "qt/qtst_UiBackendData_2.cpp",

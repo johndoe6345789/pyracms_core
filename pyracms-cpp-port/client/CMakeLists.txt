@@ -140,6 +140,8 @@ set(LIB_SOURCES
     src/services/SingleInstance.cpp
     src/services/SingleInstance_onNewConnection.cpp
     src/services/SiteDirectory.cpp
+    src/services/TimedSecretStore.cpp
+    src/services/TimedSecretStore_calls.cpp
     src/services/TokenVault.cpp
     src/services/UrlSchemeRegistrar.cpp
     src/services/UrlSchemeRegistrar_registerForCurrentUser.cpp
@@ -192,6 +194,7 @@ set(LIB_HEADERS
     src/services/SettingsManager.h
     src/services/SingleInstance.h
     src/services/SiteDirectory.h
+    src/services/TimedSecretStore.h
     src/services/TokenVault.h
     src/services/UrlSchemeRegistrar.h
 )
