@@ -9,7 +9,7 @@ void ForumController::deleteForum(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback, int id) {
 
     auto db = drogon::app().getDbClient();
-    forumService_.deleteForum(db, id, tokenTenantOf(req), boolReply(callback));
+    forumService_.deleteForum(db, id, scopeTenantOf(req), boolReply(callback));
 }
 
 } // namespace pyracms

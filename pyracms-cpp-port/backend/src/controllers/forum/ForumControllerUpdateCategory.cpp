@@ -20,7 +20,7 @@ void ForumController::updateCategory(
     auto name = (*json)["name"].asString();
     auto db = drogon::app().getDbClient();
 
-    forumService_.updateCategory(db, id, name, tokenTenantOf(req),
+    forumService_.updateCategory(db, id, name, scopeTenantOf(req),
                                  boolReply(callback));
 }
 

@@ -32,6 +32,7 @@ TEST(OwnerRulesTest, WebhooksNeedAdminsAndFilesTheUploader) {
     EXPECT_TRUE(writeAllowed(Resource::File, 1, 7, 3, file));
     EXPECT_FALSE(writeAllowed(Resource::File, 2, 8, 3, file));
     EXPECT_TRUE(writeAllowed(Resource::File, 3, 8, 3, file));
+    EXPECT_TRUE(writeAllowed(Resource::File, 1, 8, 0, {7, 3, true}));
 }
 
 TEST(FileRulesTest, FilenamesAreReducedToASafeBasename) {

@@ -25,7 +25,7 @@ void ForumController::createForum(
     auto db = drogon::app().getDbClient();
 
     forumService_.createForum(db, categoryId, name, description,
-                              tokenTenantOf(req), boolReply(callback));
+                              scopeTenantOf(req), boolReply(callback));
 }
 
 } // namespace pyracms

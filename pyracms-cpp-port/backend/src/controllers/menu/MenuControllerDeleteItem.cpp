@@ -9,7 +9,7 @@ void MenuController::deleteItem(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback, int id) {
 
     auto db = drogon::app().getDbClient();
-    menuService_.deleteMenuItem(db, id, tokenTenantOf(req),
+    menuService_.deleteMenuItem(db, id, scopeTenantOf(req),
                                 boolReply(callback));
 }
 

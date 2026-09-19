@@ -33,7 +33,7 @@ void MenuController::createItem(
 
     auto db = drogon::app().getDbClient();
     menuService_.createMenuItem(db, name, routePath, url, type, id, position,
-                                permissions, tokenTenantOf(req),
+                                permissions, scopeTenantOf(req),
                                 boolReply(callback));
 }
 

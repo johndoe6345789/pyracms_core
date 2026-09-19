@@ -21,6 +21,12 @@ class AdminFilter : public drogon::HttpFilter<AdminFilter> {
         int userId, int tenantId, std::function<void(bool)>)>;
     static OwnerLookup &ownerLookup();
 
+    // Owner fallback: resolves the target row's own site (or the named
+    // one for creates) and passes only when userId owns it.
+    static void ownerFallback(const drogon::HttpRequestPtr &req, int userId,
+                              drogon::FilterCallback &&fcb,
+                              drogon::FilterChainCallback &&fccb);
+
     void doFilter(const drogon::HttpRequestPtr &req,
                   drogon::FilterCallback &&fcb,
                   drogon::FilterChainCallback &&fccb) override;

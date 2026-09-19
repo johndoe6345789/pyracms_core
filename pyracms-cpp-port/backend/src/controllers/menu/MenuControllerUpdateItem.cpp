@@ -28,10 +28,10 @@ void MenuController::updateItem(
     }
     Json::Value upd = *json;
     // Scoped accounts may not move an item into another group
-    if (tokenTenantOf(req) != 0)
+    if (scopeTenantOf(req) != 0)
         upd.removeMember("groupId");
     auto db = drogon::app().getDbClient();
-    menuService_.updateMenuItem(db, id, upd, tokenTenantOf(req),
+    menuService_.updateMenuItem(db, id, upd, scopeTenantOf(req),
                                 boolReply(callback));
 }
 

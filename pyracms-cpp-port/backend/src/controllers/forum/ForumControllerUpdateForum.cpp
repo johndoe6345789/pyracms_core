@@ -23,7 +23,7 @@ void ForumController::updateForum(
                            : "";
     auto db = drogon::app().getDbClient();
 
-    forumService_.updateForum(db, id, name, description, tokenTenantOf(req),
+    forumService_.updateForum(db, id, name, description, scopeTenantOf(req),
                               boolReply(callback));
 }
 

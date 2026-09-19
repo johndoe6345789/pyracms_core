@@ -35,9 +35,10 @@ static const char *sqlFor(Resource kind) {
                "WHERE w.id = $1::int AND $2::int >= 0";
     default:
         return "SELECT COALESCE(f.user_id, 0) AS owner_id, "
-               "COALESCE(f.tenant_id, 0) AS tenant_id, false AS site_owner "
-               "FROM files f WHERE f.uuid = $1::text AND $2::int >= 0 "
-               "AND $3::int >= 0";
+               "COALESCE(f.tenant_id, 0) AS tenant_id, EXISTS (SELECT 1 FROM "
+               "tenants t WHERE t.id = f.tenant_id AND t.owner_id = "
+               "$3::int) AS site_owner FROM files f "
+               "WHERE f.uuid = $1::text AND $2::int >= 0";
     }
 }
 

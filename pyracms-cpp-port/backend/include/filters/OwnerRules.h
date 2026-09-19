@@ -28,7 +28,7 @@ struct OwnedRow {
 
 // Articles, albums, pictures: the author, a moderator or a site owner.
 // Webhooks: site administrators and site owners only.
-// Files: the uploader or an administrator of that site.
+// Files: the uploader, an administrator or the owner of that site.
 inline bool writeAllowed(Resource kind, int role, int actorId,
                          int actorTenant, const OwnedRow &row) {
     if (!tenantMatches(actorTenant, row.tenantId))
@@ -38,7 +38,7 @@ inline bool writeAllowed(Resource kind, int role, int actorId,
         return roleAllows(role, UserRole::SiteAdmin) || row.siteOwner;
     case Resource::File:
         return (row.ownerId != 0 && row.ownerId == actorId) ||
-               roleAllows(role, UserRole::SiteAdmin);
+               roleAllows(role, UserRole::SiteAdmin) || row.siteOwner;
     default:
         return (row.ownerId != 0 && row.ownerId == actorId) ||
                roleAllows(role, UserRole::Moderator) || row.siteOwner;

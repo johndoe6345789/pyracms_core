@@ -24,6 +24,12 @@ int tokenTenantOf(const drogon::HttpRequestPtr &req) {
     return attrs->find("tenantId") ? attrs->get<int>("tenantId") : 0;
 }
 
+int scopeTenantOf(const drogon::HttpRequestPtr &req) {
+    auto attrs = req->attributes();
+    return attrs->find("scopeTenant") ? attrs->get<int>("scopeTenant")
+                                      : tokenTenantOf(req);
+}
+
 drogon::HttpResponsePtr filterError(const std::string &message,
                                     drogon::HttpStatusCode code) {
     auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});

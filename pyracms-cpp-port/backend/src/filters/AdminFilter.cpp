@@ -2,7 +2,6 @@
 
 #include "filters/RoleRules.h"
 #include "filters/TenantGuard.h"
-#include "filters/TenantRules.h"
 
 #include <drogon/drogon.h>
 
@@ -44,31 +43,15 @@ void AdminFilter::doFilter(const drogon::HttpRequestPtr &req,
         return;
     }
     int userId = attrs->get<int>("userId");
-    std::vector<std::string> named{req->getParameter("tenant_id"),
-                                   req->getParameter("tenantId")};
-    if (auto body = req->getJsonObject()) {
-        for (const char *k : {"tenant_id", "tenantId"}) {
-            if (body->isMember(k))
-                named.push_back((*body)[k].asString());
-        }
-    }
-    int tenant = firstNamedTenant(named);
-    roleLookup()(userId, [=](std::optional<int> r) {
+    roleLookup()(userId, [=, fcb = std::move(fcb), fccb = std::move(fccb)](
+                             std::optional<int> r) mutable {
         if (!r) {
             fcb(filterError("Role lookup failed",
                             drogon::k500InternalServerError));
         } else if (roleAllows(*r, UserRole::SiteAdmin)) {
             fccb();
-        } else if (tenant == 0) {
-            fcb(filterError("Site admin role required", drogon::k403Forbidden));
         } else {
-            ownerLookup()(userId, tenant, [=](bool owner) {
-                if (owner)
-                    fccb();
-                else
-                    fcb(filterError("Site admin role required",
-                                    drogon::k403Forbidden));
-            });
+            ownerFallback(req, userId, std::move(fcb), std::move(fccb));
         }
     });
 }

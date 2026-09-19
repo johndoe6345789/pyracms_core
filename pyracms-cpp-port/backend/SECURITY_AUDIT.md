@@ -315,3 +315,32 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 
 Migration `sql/050_security_hardening.sql` (idempotent): `users.token_valid_after`, `users.is_first` + unique index, `files.user_id/tenant_id`, purge of spent tokens.
 
+
+## Site-owner recognition (owner vs administrator)
+
+A site owner (`tenants.owner_id`) keeps the stored role `User`, so every
+admin-level check must recognise ownership of the row's own site.
+
+Fixed: `AdminFilter` derived the owner's site only from a tenant named in the
+request, so by-id routes without `tenantId` answered 403 to owners. It now
+resolves the site from the target row (`filters/TenantOfTarget`: forum
+category/forum, menu group/item; forum creation via the body `categoryId`).
+A named tenant may only agree with the row's site (mismatch -> 404); a site
+the caller does not own -> 403; unknown row -> 404. The resolved site is
+stored as request attribute `scopeTenant` and the write is confined to it
+(`scopeTenantOf`), so a platform-token owner cannot reach other sites.
+Creates without a row (categories, menu groups, settings, webhooks,
+analytics) still name their tenant, which is inherent. Also fixed: owners can
+now delete any file on their own site (`OwnerFilter`, files).
+
+Remaining owner/admin mismatches (frontend `canAdmin` = role >= Administrator
+OR owner; API answers 403 to an owner with stored role User):
+
+| Area | API check | Effect for an owner |
+|---|---|---|
+| `PUT/DELETE /api/users/{id}[/ban,/role]` | actor role (UserAdminRules) | cannot manage members |
+| `GET /api/files` list | role >= 3 sees the site | owner sees only own files |
+| Forum threads/posts, thread flags | author or `users.role >= 2` | owner cannot moderate |
+| Gamedep pages/revisions (GdWithPage) | page owner or role >= 3 | owner cannot edit others' pages |
+| `GET /api/settings` credential-like names | role >= 3 | owner writes but cannot read secrets |
+| Articles (OwnerFilter) | needs `tenant_id` (by-name) | inherent; client must name it |

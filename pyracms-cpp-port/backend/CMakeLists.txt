@@ -363,6 +363,8 @@ set(LIB_SOURCES
 
     src/filters/AdminFilter.cpp
 
+    src/filters/AdminOwner.cpp
+
     src/filters/JwtAccountState.cpp
 
     src/filters/JwtAuthFilter.cpp
@@ -376,6 +378,8 @@ set(LIB_SOURCES
     src/filters/RateLimitFilter.cpp
 
     src/filters/TenantGuard.cpp
+
+    src/filters/TenantOfTarget.cpp
 
     src/filters/Viewer.cpp
 

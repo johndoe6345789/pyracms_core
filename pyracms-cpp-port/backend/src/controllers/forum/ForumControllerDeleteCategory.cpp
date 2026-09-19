@@ -9,7 +9,7 @@ void ForumController::deleteCategory(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback, int id) {
 
     auto db = drogon::app().getDbClient();
-    forumService_.deleteCategory(db, id, tokenTenantOf(req),
+    forumService_.deleteCategory(db, id, scopeTenantOf(req),
                                  boolReply(callback));
 }
 

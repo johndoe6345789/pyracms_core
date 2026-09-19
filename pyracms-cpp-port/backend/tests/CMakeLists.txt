@@ -25,6 +25,8 @@ set(TEST_SOURCES
 
     test_admin_filter.cpp
 
+    test_admin_target.cpp
+
     test_article_http_1.cpp
 
     test_article_http_2.cpp
@@ -74,6 +76,10 @@ set(TEST_SOURCES
     test_menu_tenant_db_1.cpp
 
     test_menu_tenant_db_2.cpp
+
+    test_owner_scope_forum_http.cpp
+
+    test_owner_scope_menu_http.cpp
 
     test_public_reads_http.cpp
 
