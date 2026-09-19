@@ -1,0 +1,10 @@
+# Extend the default rules; only allow the C++ unit tests, which set a
+# throwaway JWT_SECRET to exercise the "weak secret" checks.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "fake secrets used by unit tests"
+paths = [
+  '''pyracms-cpp-port/backend/tests/.*''',
+]

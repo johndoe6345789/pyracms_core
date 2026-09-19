@@ -2,7 +2,7 @@
 FROM ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3 AS deps
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     ninja-build \
@@ -46,7 +46,7 @@ RUN cd build && cmake .. \
 # Builds pyracms_tests with gcov instrumentation. Running the image needs
 # PostgreSQL (compose profile "tests" wires it up).
 FROM deps AS tests
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libgtest-dev libgmock-dev gcovr postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 RUN cd build && cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release \
