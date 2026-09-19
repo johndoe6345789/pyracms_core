@@ -10,15 +10,18 @@ export function buildCsp(apiUrl?: string, dev = false): string {
   const api = origin(apiUrl)
   const ws = api.replace(/^http/, 'ws')
   const cdn = 'https://cdn.jsdelivr.net' // Monaco editor loader
+  // Cloudflare injects its web-analytics beacon on proxied sites
+  const cfScript = 'https://static.cloudflareinsights.com'
+  const cfConnect = 'https://cloudflareinsights.com'
   const d = [
     ["default-src", "'self'"],
     // Next.js emits inline bootstrap scripts; nonces would need middleware
-    ['script-src', `'self' 'unsafe-inline' ${cdn}${dev ? " 'unsafe-eval'" : ''}`],
+    ['script-src', `'self' 'unsafe-inline' ${cdn} ${cfScript}${dev ? " 'unsafe-eval'" : ''}`],
     ['style-src', `'self' 'unsafe-inline' ${cdn} https://fonts.googleapis.com`],
     ['font-src', `'self' data: ${cdn} https://fonts.gstatic.com`],
     ['img-src', "'self' data: blob: https:"],
     ['media-src', "'self' blob: https:"],
-    ['connect-src', `'self' ${api} ${ws} ${cdn}${dev ? ' ws:' : ''}`.trim()],
+    ['connect-src', `'self' ${api} ${ws} ${cdn} ${cfConnect}${dev ? ' ws:' : ''}`.trim()],
     ['worker-src', "'self' blob:"],
     ['frame-src', "'none'"],
     ['object-src', "'none'"],

@@ -1,5 +1,6 @@
 'use client'
 
+import { apiOrigin } from '@/lib/apiOrigin'
 import { useEffect, useState, useCallback } from 'react'
 import { useWebSocket } from './useWebSocket'
 
@@ -12,8 +13,6 @@ interface UseThreadLiveOptions {
   threadId: number
   onNewPost?: (post: unknown) => void
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
 export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
@@ -40,7 +39,7 @@ export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
   }, [onNewPost])
 
   const { connected, send } = useWebSocket({
-    url: `${API_URL}/api/ws/notifications`,
+    url: apiOrigin() + '/api/ws/notifications',
     onMessage: handleMessage,
   })
 

@@ -1,3 +1,4 @@
+import { apiOrigin } from '@/lib/apiOrigin'
 import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
@@ -13,8 +14,6 @@ export function useNotifications() {
   const [loading, setLoading] = useState(false)
   const isAuth = useSelector(
     (s: RootState) => s.auth.isAuthenticated)
-  const API = process.env.NEXT_PUBLIC_API_URL
-    || 'http://localhost:8080'
   const onWs = useCallback(
     (data: unknown) => {
       const m = data as Record<string, unknown>
@@ -33,7 +32,7 @@ export function useNotifications() {
     }, [])
   useWebSocket({
     url: isAuth
-      ? `${API}/api/ws/notifications` : '',
+      ? apiOrigin() + '/api/ws/notifications' : '',
     onMessage: onWs, autoReconnect: isAuth })
   useEffect(() => {
     if (!isAuth) return

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useMemo } from 'react'
 import * as Y from 'yjs'
 import { currentToken } from '@/lib/session'
+import { wsUrl as apiWsUrl } from '@/lib/apiOrigin'
 import { WebsocketProvider } from 'y-websocket'
 
 interface UseCollabEditorOptions {
@@ -17,8 +18,7 @@ export function useCollabEditor(
   const providerRef = useRef<WebsocketProvider | null>(null)
 
   const wsUrl = useMemo(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-    return apiUrl.replace(/^http/, 'ws') + '/api/ws/collab'
+    return apiWsUrl('/api/ws/collab')
   }, [])
 
   useEffect(() => {

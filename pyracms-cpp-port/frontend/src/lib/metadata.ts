@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
+  || 'http://localhost:8080'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 function articleUrl(
