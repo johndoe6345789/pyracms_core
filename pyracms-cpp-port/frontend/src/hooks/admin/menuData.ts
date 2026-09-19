@@ -15,7 +15,7 @@ export interface MenuGroup {
 }
 
 /** Maps raw API item data to a MenuItemRow. */
-export function mapMenuItem(
+function mapMenuItem(
   i: Record<string, unknown>,
 ): MenuItemRow {
   return {

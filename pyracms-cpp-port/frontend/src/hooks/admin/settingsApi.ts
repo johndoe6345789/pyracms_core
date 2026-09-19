@@ -7,7 +7,7 @@ export interface Setting {
 }
 
 /** Maps a raw API record to a Setting. */
-export function mapSetting(s: Record<string, unknown>): Setting {
+function mapSetting(s: Record<string, unknown>): Setting {
   return {
     id: s.id as number,
     key: (s.name as string) || '',

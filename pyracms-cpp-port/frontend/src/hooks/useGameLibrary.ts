@@ -8,7 +8,6 @@ import { mapListItem } from '@/hooks/data/gameMappers'
 import { installedStore, favouriteStore } from '@/lib/launcher'
 
 export { mapListItem, mapDetail } from '@/hooks/data/gameMappers'
-export { useGameDetail } from '@/hooks/useGameDetail'
 
 export type LibraryFilter = 'all' | 'installed' | 'favourites'
 

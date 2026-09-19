@@ -64,7 +64,8 @@ export function buildMenusPayload() {
 /** Parses an import file, returning a success message. */
 export function parseImport(text: string): string {
   const parsed = JSON.parse(text)
-  if (!parsed || typeof parsed !== 'object' || !parsed.exportType || !parsed.data) {
+  if (!parsed || typeof parsed !== 'object'
+    || !parsed.exportType || !parsed.data) {
     throw new Error('Invalid format')
   }
   return `Successfully imported ${parsed.exportType} data.`

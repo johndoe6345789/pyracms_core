@@ -8,7 +8,7 @@ export interface ContentItem {
 type Obj = Record<string, unknown>
 
 /** Maps analytics top-content records. */
-export function mapTopContent(rows: Obj[]): ContentItem[] {
+function mapTopContent(rows: Obj[]): ContentItem[] {
   return rows.map((item) => ({
     name: String(item.title || item.name || ''),
     views: Number(item.views || item.viewCount || 0),

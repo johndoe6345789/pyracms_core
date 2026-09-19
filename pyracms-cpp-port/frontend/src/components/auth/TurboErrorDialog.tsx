@@ -35,7 +35,8 @@ export default function TurboErrorDialog(
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
-        <Button onClick={() => window.open(VAULT, '_blank', 'noopener,noreferrer')}>
+        <Button onClick={() =>
+          window.open(VAULT, '_blank', 'noopener,noreferrer')}>
           Open Vault
         </Button>
       </DialogActions>

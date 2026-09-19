@@ -6,9 +6,7 @@ import type { ToolbarAction } from './EditorToolbar'
 import { MARKDOWN_ACTIONS } from './markdownActions'
 import { HTML_ACTIONS } from './htmlActions'
 
-export { MARKDOWN_ACTIONS, HTML_ACTIONS }
-
-export const BBCODE_ACTIONS: ToolbarAction[] = [
+const BBCODE_ACTIONS: ToolbarAction[] = [
   { icon: <FormatBold />, label: 'Bold',
     prefix: '[b]', suffix: '[/b]' },
   { icon: <FormatItalic />, label: 'Italic',

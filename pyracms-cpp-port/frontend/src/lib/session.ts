@@ -29,7 +29,7 @@ function read(key: string): string | null {
 }
 
 /** Where this scope's token actually lives, if anywhere. */
-export function activeKey(scope: string | null): string | null {
+function activeKey(scope: string | null): string | null {
   const own = keyFor(scope)
   if (read(own)) return own
   // A platform account (e.g. the site's owner) is valid on any site

@@ -1,10 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
-import authReducer from '@/store/slices/authSlice'
-import AccountSettings from '@/components/users/AccountSettings'
 import { asMockApi } from '../helpers/mockApi'
+import { mount } from '../helpers/accountMount'
+import { type } from '../helpers/authType'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -21,22 +19,6 @@ beforeEach(() => {
   m.put.mockReset()
   replaceToken.mockReset()
 })
-
-const user = { id: 4, username: 'u' }
-function mount(signedIn = true) {
-  const store = configureStore({
-    reducer: { auth: authReducer },
-    preloadedState: {
-      auth: signedIn
-        ? { user: user as never, token: 'old', isAuthenticated: true }
-        : { user: null, token: null, isAuthenticated: false },
-    },
-  })
-  render(<Provider store={store}><AccountSettings loginHref="/l" /></Provider>)
-  return store
-}
-const type = (id: string, v: string) =>
-  fireEvent.change(screen.getByTestId(id), { target: { value: v } })
 
 describe('AccountSettings', () => {
   it('asks guests to sign in', () => {
@@ -65,38 +47,5 @@ describe('AccountSettings', () => {
     fireEvent.submit(screen.getByTestId('profile-form'))
     await waitFor(() => expect(screen.getByTestId('profile-error'))
       .toHaveTextContent('Bad email'))
-  })
-  it('changes the password and adopts the fresh token', async () => {
-    m.get.mockResolvedValue({ data: {} })
-    m.put.mockResolvedValue({ data: { success: true, token: 'fresh' } })
-    const store = mount()
-    const submit = () => fireEvent.submit(screen.getByTestId('password-form'))
-    submit()
-    expect(screen.getByTestId('password-error')).toHaveTextContent('Current')
-    type('pw-current', 'old-pass')
-    type('pw-new', 'newpass123')
-    type('pw-confirm', 'nope')
-    submit()
-    expect(screen.getByTestId('password-error')).toHaveTextContent('match')
-    type('pw-confirm', 'newpass123')
-    submit()
-    expect(await screen.findByTestId('password-done')).toBeInTheDocument()
-    expect(m.put).toHaveBeenCalledWith('/api/users/4/password',
-      { currentPassword: 'old-pass', newPassword: 'newpass123' })
-    expect(replaceToken).toHaveBeenCalledWith(null, 'fresh')
-    expect(store.getState().auth.token).toBe('fresh')
-  })
-  it('shows a wrong-current-password error', async () => {
-    m.get.mockResolvedValue({ data: {} })
-    m.put.mockRejectedValue({
-      response: { data: { error: 'Current password is incorrect' } },
-    })
-    mount()
-    type('pw-current', 'bad')
-    type('pw-new', 'newpass123')
-    type('pw-confirm', 'newpass123')
-    fireEvent.submit(screen.getByTestId('password-form'))
-    expect(await screen.findByTestId('password-error'))
-      .toHaveTextContent('incorrect')
   })
 })

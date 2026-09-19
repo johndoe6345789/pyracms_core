@@ -18,7 +18,7 @@ export interface RunResult {
   executionTime?: number
 }
 
-export const RUNNABLE = [
+const RUNNABLE = [
   'python', 'javascript', 'cpp', 'rust', 'go',
   'java', 'ruby',
 ]
@@ -26,7 +26,7 @@ export const RUNNABLE = [
 export const isRunnable = (language: string) =>
   RUNNABLE.includes(language)
 
-export const LANGUAGE_COLORS: Record<string, string> = {
+const LANGUAGE_COLORS: Record<string, string> = {
   python: '#3572A5',
   javascript: '#f1e05a',
   typescript: '#2b7489',

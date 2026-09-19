@@ -1,7 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-
 jest.mock('@/components/super-admin/SuperAdminDashboard', () =>
   require('@/__tests__/helpers/superAdminPagesMocks')
     .dashboardMock)

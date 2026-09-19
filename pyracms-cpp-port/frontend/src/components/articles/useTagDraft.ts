@@ -4,7 +4,7 @@ export function normaliseTag(value: string) {
   return value.trim().replace(/\s+/g, ' ')
 }
 
-export function tagsToInput(tags: string[]) {
+function tagsToInput(tags: string[]) {
   return tags.join(', ')
 }
 

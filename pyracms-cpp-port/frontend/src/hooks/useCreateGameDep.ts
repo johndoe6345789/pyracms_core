@@ -7,7 +7,7 @@ import { apiErrorMessage } from '@/lib/apiError'
 import { GAMEDEP_SECTION } from '@/hooks/useSaveGameDep'
 import type { GameDepType } from '@/hooks/useGameDepItem'
 
-export const GAMEDEP_NAME = /^[A-Za-z0-9._-]{1,128}$/
+const GAMEDEP_NAME = /^[A-Za-z0-9._-]{1,128}$/
 
 /** Create form state for a new game or dependency page. */
 export function useCreateGameDep(type: GameDepType, slug: string) {

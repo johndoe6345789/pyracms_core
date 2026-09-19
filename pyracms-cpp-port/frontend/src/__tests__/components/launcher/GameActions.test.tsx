@@ -16,7 +16,10 @@ const realLocation = window.location
 beforeAll(() => {
   Object.defineProperty(window, 'location', {
     configurable: true,
-    value: { set href(v: string) { hrefSet.push(v) }, get href() { return '' } },
+    value: {
+      set href(v: string) { hrefSet.push(v) },
+      get href() { return '' },
+    },
   })
 })
 afterAll(() => {

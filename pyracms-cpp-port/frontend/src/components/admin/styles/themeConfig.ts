@@ -42,7 +42,7 @@ export function exportTheme(theme: ThemeConfig) {
   URL.revokeObjectURL(url)
 }
 
-export const MAX_IMPORT_BYTES = 1024 * 1024
+const MAX_IMPORT_BYTES = 1024 * 1024
 
 /** Keeps only known theme keys with string values (no proto keys). */
 export function pickTheme(imported: unknown): ThemeConfig {

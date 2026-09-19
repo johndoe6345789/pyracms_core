@@ -14,7 +14,6 @@ import BrowseGrid from './BrowseGrid'
 import GameDetailView from './GameDetailView'
 
 interface Props { slug: string; initialName?: string | undefined }
-
 const shellSx = {
   display: 'flex', minHeight: '70vh', bgcolor: '#171d25',
   color: '#c7d5e0', borderRadius: 1, overflow: 'hidden',
@@ -27,8 +26,7 @@ export default function GameLibrary({ slug, initialName }: Props) {
   const mobile = useMediaQuery(theme.breakpoints.down('md'))
   const [view, setView] = useState<LibraryView>(
     initialName ? 'library' : 'browse')
-  const [selected, setSelected] = useState<string | null>(
-    initialName ?? null)
+  const [selected, setSelected] = useState(initialName ?? null)
   const [drawer, setDrawer] = useState(false)
   const detail = useGameDetail(selected, lib.sample)
 
@@ -47,7 +45,6 @@ export default function GameLibrary({ slug, initialName }: Props) {
       tag={lib.tag} onTag={lib.setTag} installed={lib.installed}
       favs={lib.favs} />
   )
-
   return (
     <Box data-testid="game-library" sx={shellSx}>
       {!mobile && (

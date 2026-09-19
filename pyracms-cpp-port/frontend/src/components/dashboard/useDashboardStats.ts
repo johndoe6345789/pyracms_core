@@ -13,7 +13,7 @@ export interface Stat {
   color: string
 }
 
-export function buildStats(
+function buildStats(
   users: string, items: string, tenants: string, settings: string,
 ): Stat[] {
   return [

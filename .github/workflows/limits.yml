@@ -1,0 +1,30 @@
+name: Code limits
+
+# Enforces the repo rule: at most 80 lines per file and 80 columns per
+# line in the live code (pyracms-cpp-port). The legacy Pyramid app is
+# excluded. Run locally: python pyracms-cpp-port/scripts/check_limits.py
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: limits-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  limits:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Check file and line limits
+        run: python3 pyracms-cpp-port/scripts/check_limits.py --strict --list

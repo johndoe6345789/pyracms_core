@@ -31,10 +31,8 @@ export function useBackupRestore() {
   ) => setSnackbar({ open: true, message, severity })
 
   const handleExportSettings = () => {
-    downloadJson(
-      buildSettingsPayload(),
-      'pyracms-settings-export.json',
-    )
+    downloadJson(buildSettingsPayload(),
+      'pyracms-settings-export.json')
     notify('Settings exported successfully.')
   }
 
@@ -62,11 +60,8 @@ export function useBackupRestore() {
       try {
         notify(parseImport(event.target?.result as string))
       } catch {
-        notify(
-          'Invalid JSON file. ' +
-            'Please use a PyraCMS export file.',
-          'warning',
-        )
+        notify('Invalid JSON file. ' +
+          'Please use a PyraCMS export file.', 'warning')
       }
     }
     reader.readAsText(file)

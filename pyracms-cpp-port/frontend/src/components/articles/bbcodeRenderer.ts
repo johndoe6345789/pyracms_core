@@ -54,19 +54,11 @@ export function renderBBCode(bbcode: string): string {
   html = html.replace(
     /\[list\]([\s\S]*?)\[\/list\]/gi,
     (_match, content: string) => {
-      const items = content
-        .split(/\[\*\]/)
+      const items = content.split(/\[\*\]/)
         .filter((s: string) => s.trim())
-      return (
-        '<ul>'
-        + items
-          .map(
-            (item: string) =>
-              `<li>${item.trim()}</li>`,
-          )
-          .join('')
-        + '</ul>'
-      )
+      return '<ul>' + items
+        .map((item: string) => `<li>${item.trim()}</li>`)
+        .join('') + '</ul>'
     },
   )
   html = html.replace(

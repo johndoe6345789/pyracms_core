@@ -3,7 +3,7 @@
 import { Box } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import Editor from '@monaco-editor/react'
-import { detectLanguage, LANGUAGES } from './languages'
+import { detectLanguage } from './languages'
 import { LanguageSelect } from './LanguageSelect'
 
 interface CodeEditorProps {
@@ -64,5 +64,3 @@ export function CodeEditor({
     </Box>
   )
 }
-
-export { LANGUAGES, detectLanguage }

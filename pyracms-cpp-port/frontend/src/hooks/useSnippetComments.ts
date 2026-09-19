@@ -12,7 +12,7 @@ export interface SnippetComment {
 
 type Raw = Record<string, unknown>
 
-export function mapComment(c: Raw): SnippetComment {
+function mapComment(c: Raw): SnippetComment {
   return {
     id: String(c.id),
     author: String(c.username || 'Unknown'),

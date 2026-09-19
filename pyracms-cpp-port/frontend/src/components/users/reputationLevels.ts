@@ -5,7 +5,7 @@ export interface Level {
   color: string
 }
 
-export const LEVELS: Level[] = [
+const LEVELS: Level[] = [
   { name: 'Newcomer', min: 0, max: 50, color: '#9e9e9e' },
   { name: 'Member', min: 50, max: 200, color: '#8d6e63' },
   { name: 'Active', min: 200, max: 500, color: '#43a047' },

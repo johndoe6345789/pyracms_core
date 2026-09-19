@@ -1,14 +1,5 @@
 import type { GameDepItem } from '../useGameDepList'
 
-export const DEP_TAGS = [
-  'graphics',
-  'audio',
-  'networking',
-  'physics',
-  'math',
-  'utility',
-]
-
 type Stats = [likes: number, dislikes: number, views: number]
 
 const dep = (

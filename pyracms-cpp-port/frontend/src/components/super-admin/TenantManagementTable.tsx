@@ -6,9 +6,7 @@ import {
   TableContainer, TableHead, TableRow,
   Paper, Typography, Box, CircularProgress,
 } from '@mui/material'
-import {
-  useSuperAdminTenants,
-} from '@/hooks/useSuperAdminTenants'
+import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import TenantTableRow from './TenantTableRow'
 import TenantDeleteDialog from './TenantDeleteDialog'
 import TenantFilter from './TenantFilter'
@@ -24,18 +22,14 @@ export default function TenantManagementTable() {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', pt: 4 }}>
-        <CircularProgress
-          aria-label="Loading tenants"
-        />
+        <CircularProgress aria-label="Loading tenants" />
       </Box>
     )
   }
 
   const lc = filter.toLowerCase()
   const visible = filter
-    ? tenants.filter((t) =>
-        t.name.toLowerCase().includes(lc),
-      )
+    ? tenants.filter((t) => t.name.toLowerCase().includes(lc))
     : tenants
 
   return (
@@ -54,9 +48,7 @@ export default function TenantManagementTable() {
               <TableCell>Owner</TableCell>
               <TableCell>Created</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell align="right">
-                Actions
-              </TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,11 +62,8 @@ export default function TenantManagementTable() {
               </TableRow>
             )}
             {visible.map((t) => (
-              <TenantTableRow
-                key={t.id}
-                tenant={t}
-                onDelete={handleDelete}
-              />
+              <TenantTableRow key={t.id} tenant={t}
+                onDelete={handleDelete} />
             ))}
           </TableBody>
         </Table>

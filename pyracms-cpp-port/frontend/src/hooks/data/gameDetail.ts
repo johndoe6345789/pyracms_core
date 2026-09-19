@@ -1,6 +1,6 @@
 import type { GameDepDetailData, Revision } from '../useGameDepDetail'
 
-export const GAME_EDIT_REVISIONS: Revision[] = [
+const GAME_EDIT_REVISIONS: Revision[] = [
   { version: '1.0.0', published: true, date: '2024-06-15' },
   { version: '1.1.0', published: true, date: '2024-07-20' },
   { version: '1.2.0-beta', published: false, date: '2024-08-10' },

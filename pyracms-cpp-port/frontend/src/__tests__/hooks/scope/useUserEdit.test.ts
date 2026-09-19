@@ -4,6 +4,7 @@ import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 
+const edit = { fullName: 'a', email: 'b', role: 1 }
 const setup = async () => {
   const h = renderHook(() => useAdminUsers())
   await waitFor(() => expect(h.result.current.loading).toBe(false))
@@ -54,10 +55,10 @@ it('reports server and generic errors', async () => {
   const { result } = await setup()
   act(() => result.current.handleEditClick(result.current.users[0]!))
   m.put.mockRejectedValueOnce({ response: { data: { error: 'Forbidden' } } })
-  act(() => result.current.handleEditSave({ fullName: 'a', email: 'b', role: 1 }))
+  act(() => result.current.handleEditSave(edit))
   await waitFor(() => expect(result.current.editError).toBe('Forbidden'))
   m.put.mockRejectedValueOnce(new Error('x'))
-  act(() => result.current.handleEditSave({ fullName: 'a', email: 'b', role: 1 }))
+  act(() => result.current.handleEditSave(edit))
   await waitFor(() =>
     expect(result.current.editError).toBe('Failed to update user'))
   expect(result.current.editUser).not.toBeNull()
@@ -65,6 +66,6 @@ it('reports server and generic errors', async () => {
 
 it('ignores save without a selected user', async () => {
   const { result } = await setup()
-  act(() => result.current.handleEditSave({ fullName: 'a', email: 'b', role: 1 }))
+  act(() => result.current.handleEditSave(edit))
   expect(m.put).not.toHaveBeenCalled()
 })

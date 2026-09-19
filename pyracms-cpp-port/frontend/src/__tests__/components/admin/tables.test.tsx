@@ -38,7 +38,8 @@ it('SettingsTable edit actions and keys', () => {
 })
 
 const user = (id: number, banned: boolean) => ({
-  id, username: `u${id}`, fullName: 'f', email: 'e', created: 'c', banned, role: 1,
+  id, username: `u${id}`, fullName: 'f', email: 'e', created: 'c',
+  banned, role: 1,
 })
 
 it('UserTable renders rows and actions', () => {

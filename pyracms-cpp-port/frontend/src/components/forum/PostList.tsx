@@ -4,7 +4,7 @@ import { Box, Pagination } from '@mui/material'
 import { PostCard } from './PostCard'
 import type { Post } from '@/hooks/useThread'
 
-export const PAGE_SIZE = 20
+const PAGE_SIZE = 20
 
 interface Props {
   posts: Post[]
