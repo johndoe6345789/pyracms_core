@@ -181,7 +181,8 @@ def analyze_job(job_id: str, job: Mapping[str, object]) -> JobSummary:
 def analyze_workflow(path: Path) -> WorkflowSummary:
     data = load_yaml(path)
     name = str(data.get("name", path.stem))
-    raw_triggers = data.get("on")
+    # PyYAML (YAML 1.1) reads the key `on` as the boolean True
+    raw_triggers = data.get("on", data.get(True))
     triggers = normalize_triggers(raw_triggers)
     permissions = data.get("permissions") if isinstance(data, Mapping) else None
     jobs_raw = data.get("jobs") if isinstance(data, Mapping) else {}
