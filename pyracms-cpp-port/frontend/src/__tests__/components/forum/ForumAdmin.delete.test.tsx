@@ -23,7 +23,7 @@ describe('forum admin UI', () => {
     click('delete-category-1')
     click('forum-admin-submit')
     await waitFor(() => expect(m.delete).toHaveBeenCalledWith(
-      '/api/forum/categories/1'))
+      '/api/forum/categories/1?tenant_id=7'))
   })
   it('shows API errors', async () => {
     m.delete.mockRejectedValue({ response: { data: { error: 'Not empty' } } })

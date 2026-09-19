@@ -25,7 +25,7 @@ describe('forum admin UI', () => {
     click('forum-admin-submit')
     await waitFor(() => expect(refresh).toHaveBeenCalled())
     expect(m.post).toHaveBeenCalledWith('/api/forum/forums',
-      { name: 'News', description: 'stuff', categoryId: 1 })
+      { name: 'News', description: 'stuff', categoryId: 1, tenantId: 7 })
   })
   it('renames a category, prefilled', async () => {
     render(<Harness />)
@@ -34,7 +34,7 @@ describe('forum admin UI', () => {
     type('forum-admin-name', 'General')
     click('forum-admin-submit')
     await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/forum/categories/1', { name: 'General' }))
+      '/api/forum/categories/1', { name: 'General', tenantId: 7 }))
   })
   it('edits a forum', async () => {
     render(<Harness />)
@@ -42,6 +42,7 @@ describe('forum admin UI', () => {
     expect(screen.getByTestId('forum-admin-desc')).toHaveValue('talk')
     click('forum-admin-submit')
     await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/forum/forums/2', { name: 'Chat', description: 'talk' }))
+      '/api/forum/forums/2',
+      { name: 'Chat', description: 'talk', tenantId: 7 }))
   })
 })
