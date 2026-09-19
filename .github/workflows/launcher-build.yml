@@ -47,7 +47,7 @@ env:
   # native Windows-ARM64 and Linux-ARM64 binaries (6.8 LTS); find_package(Qt6) in client/CMakeLists.txt accepts any 6.x.
   QT_VERSION: '6.8.3'
   QUAZIP_TAG: 'v1.4'
-  CONAN_VERSION: '2.11.0'
+  CONAN_VERSION: '2.24.0'
   CONAN_HOME: ${{ github.workspace }}/.conan2
 
 jobs:
@@ -128,6 +128,7 @@ jobs:
           arch: ${{ matrix.qt_arch }}
           modules: qt5compat
           cache: true
+          setup-python: false
 
       - name: Decide Qt source
         shell: bash
@@ -141,7 +142,7 @@ jobs:
 
       - name: Regenerate CMakeLists.txt from template
         shell: bash
-        run: cd "$CLIENT" && python generate_cmake.py
+        run: python -m pip install jinja2 && cd "$CLIENT" && python generate_cmake.py
 
       - name: Conan install (aqt mode - only the non-Qt dependency zlib)
         if: env.QT_MODE == 'aqt'
