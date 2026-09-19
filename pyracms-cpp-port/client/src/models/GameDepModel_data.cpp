@@ -59,6 +59,10 @@ QVariant GameDepModel::data(const QModelIndex& index, int role) const
             QString());
         return role == PrimaryKindRole ? p.kind : p.label;
     }
+    case SizeRole:
+        return row.size;
+    case ScreenshotCountRole:
+        return row.shots;
     case GroupRole:
         return m_installer && m_installer->isInstalled(row.name)
                    ? tr("Installed")

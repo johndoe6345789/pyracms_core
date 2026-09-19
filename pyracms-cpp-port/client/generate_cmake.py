@@ -31,6 +31,8 @@ def build_config():
         "module_sources": collect(MODULE_DIRS, ".cpp"),
         "module_headers": collect(MODULE_DIRS, ".h"),
         "qml_sources": qml,
+        "ts_files": [f"translations/{t}" for t in
+                     find_files(CLIENT_DIR / "translations", "*.ts")],
         "singleton_qml": ["qml/theme/Theme.qml"],
         # GoogleTest suites are in tests/, QtTest suites in tests/qt/
         "test_sources": find_files(tests, "*.cpp"),

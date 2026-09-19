@@ -18,6 +18,8 @@ struct Input {
     QString statusText;
     QString selectedVersion; // version chosen in the selector
     QColor accent;
+    QString os;   // platform used to pick the build, e.g. "windows"
+    QString arch; // e.g. "arm64"
     std::function<QString(const QString&)> mediaUrl; // ref -> absolute URL
 };
 
@@ -25,6 +27,10 @@ struct Input {
 // (kind / label / enabled) is derived here so QML stays declarative.
 //   primaryKind: install | update | play | stop | cancel | none
 QVariantMap build(const Input& in);
+
+// likes, views, owner, download count and the size of the build that would
+// be downloaded on this platform (downloadSize / downloadNote).
+void addStats(QVariantMap& m, const Input& in, const QString& version);
 
 struct Primary {
     QString kind;

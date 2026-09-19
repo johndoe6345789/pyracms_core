@@ -26,6 +26,22 @@ ColumnLayout {
             value: root.hasGame ? root.g.latestVersion : ""
         }
         DetailRow {
+            label: qsTr("Download size")
+            value: !root.hasGame || !root.g.downloadSize ? ""
+                : root.g.downloadNote
+                  ? root.g.downloadSize + " (" + root.g.downloadNote + ")"
+                  : root.g.downloadSize
+        }
+        DetailRow {
+            label: qsTr("Publisher")
+            value: root.hasGame ? root.g.owner : ""
+        }
+        DetailRow {
+            label: qsTr("Downloads")
+            value: root.hasGame && root.g.downloads > 0
+                   ? String(root.g.downloads) : ""
+        }
+        DetailRow {
             label: qsTr("Installed version")
             value: root.hasGame ? root.g.installedVersion : ""
         }

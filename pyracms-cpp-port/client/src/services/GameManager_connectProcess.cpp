@@ -39,7 +39,7 @@ void GameManager::connectProcess(const QString& name)
                     return; // Crashed is reported by finished()
                 m_errorReported = true;
                 const QString msg =
-                    "Could not start the game: " + m_process->errorString();
+                    tr("Could not start the game: %1").arg(m_process->errorString());
                 append(msg + "\n");
                 finishRun();
                 emit gameError(name, msg);
@@ -56,12 +56,11 @@ void GameManager::connectProcess(const QString& name)
                     emit gameStopped(name);
                 } else if (status == QProcess::CrashExit) {
                     emit gameError(
-                        name, "The game crashed (see the log for details)");
+                        name, tr("The game crashed (see the log for details)"));
                 } else if (exitCode != 0 && ranMs < kEarlyExitMs) {
                     emit gameError(
-                        name, QStringLiteral(
-                                  "The game exited immediately with code %1 "
-                                  "(see the log for details)")
+                        name, tr("The game exited immediately with code %1 "
+                             "(see the log for details)")
                                   .arg(exitCode));
                 } else {
                     emit gameStopped(name);

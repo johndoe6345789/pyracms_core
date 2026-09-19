@@ -5,9 +5,11 @@ namespace Hypernucleus {
 
 QString pipSpecFor(const DepRef& d)
 {
-    if (d.source == "pip" && !d.version.isEmpty())
-        return d.name + "==" + d.version;
-    return d.name;
+    if (d.source != "pip" || d.version.isEmpty()) return d.name;
+    // The backend stores pip versions with their operator ("==2.6.1").
+    const QChar c = d.version.at(0);
+    const bool hasOp = c == '=' || c == '<' || c == '>' || c == '~' || c == '!';
+    return d.name + (hasOp ? QString() : QStringLiteral("==")) + d.version;
 }
 
 bool isPipDep(const DepRef& d, const QMap<QString, bool>& resolved, bool* known)

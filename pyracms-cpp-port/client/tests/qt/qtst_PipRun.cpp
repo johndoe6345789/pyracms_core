@@ -19,11 +19,11 @@ class TstPipRun : public QObject {
     Q_OBJECT
 
 private slots:
-    void runsPipWithTargetAndRequirements();
+    void runsPipInAPerGameVenv();
     void nonZeroExitIsReportedWithLastLine();
 };
 
-void TstPipRun::runsPipWithTargetAndRequirements()
+void TstPipRun::runsPipInAPerGameVenv()
 {
     QTemporaryDir d;
     PathManager paths(d.filePath("data"));
@@ -43,8 +43,10 @@ void TstPipRun::runsPipWithTargetAndRequirements()
     QString text;
     for (const auto& o : out)
         text += o.at(1).toString();
+    QVERIFY(text.contains("-m venv " + paths.venvDir("g")));
     QVERIFY(text.contains("-m pip install"));
-    QVERIFY(text.contains("--target " + paths.pipTargetDir("g")));
+    QVERIFY(!text.contains("--target"));
+    QVERIFY(QFileInfo::exists(paths.venvPython("g")));
     QVERIFY(text.contains("-r " + d.filePath("game/requirements.txt")));
     QVERIFY(text.contains("requests>=2 numpy"));
     QVERIFY(QDir(paths.pipTargetDir("g")).exists());

@@ -47,7 +47,7 @@ signals:
     void windowGeometryChanged();
 
 protected:
-    static constexpr const char* DEFAULT_REPO_URL = "http://localhost:8080";
+    static constexpr const char* DEFAULT_REPO_URL = "http://localhost:3199";
     static constexpr int DEFAULT_CHUNK_SIZE = 8192;
 
     QString m_repoUrl;

@@ -2,13 +2,15 @@
 # Registers the ../games catalog for one tenant (mirrors
 # scripts/seed_games.py). Sourced by seed.sh, which supplies API, AUTH and
 # TENANT_ID. Idempotent: POSTs of existing rows answer 409 and are ignored.
-# Binaries are attached later by CI (scripts/publish_manifest.py).
+# Source archives (zips of games/<name>) are attached by
+# scripts/seed_games.py when python3 and the mounted /app/games + /app/scripts
+# exist (docker-compose.yml mounts them). Native binaries come from CI.
 
 # name|display|description|version|tags|pip requirements
-GAMES='asteroids|Asteroids|Vector-style space shooter: rotate, thrust, shoot rocks that split, survive waves.|1.0.0|arcade,shooter,pygame|pygame==2.6.1
-breakout|Breakout|Bounce the ball off your paddle and clear every brick. Pure shapes, no assets.|1.0.0|arcade,classic,pygame|pygame==2.6.1
+GAMES='asteroids|Asteroids|Vector-style space shooter: rotate, thrust, shoot rocks that split, survive waves.|1.0.0|arcade,shooter,pygame|pygame-ce==2.5.8
+breakout|Breakout|Bounce the ball off your paddle and clear every brick. Pure shapes, no assets.|1.0.0|arcade,classic,pygame|pygame-ce==2.5.8
 pong|Pong|Pong against a CPU paddle (or a friend with --two-player).|1.0.0|arcade,classic,pyglet|pyglet==2.1.16
-snake|Snake|Classic Snake with speed ramp, pause and restart. Pure shapes, no assets.|1.0.0|arcade,classic,pygame|pygame==2.6.1
+snake|Snake|Classic Snake with speed ramp, pause and restart. Pure shapes, no assets.|1.0.0|arcade,classic,pygame|pygame-ce==2.5.8
 tetris|Tetris|Falling blocks with 7-bag randomiser, ghost piece and levels.|1.0.0|puzzle,classic,pyglet|pyglet==2.1.16
 twenty48|2048|Slide and merge numbered tiles to reach 2048. Pure shapes, no assets.|1.0.0|arcade,puzzle,pyglet|pyglet==2.1.16'
 
@@ -21,6 +23,15 @@ gd_call() { # method path json
 # server log.
 gd_page() { # path
   curl -sf "$API$1?tenant_id=$TENANT_ID" -H "$AUTH" 2>/dev/null
+}
+
+# Zips + uploads every game, publishes the revision. Idempotent (sha256).
+seed_game_archives() {
+  if ! command -v python3 > /dev/null || [ ! -f /app/scripts/seed_games.py ]      || [ ! -d /app/games ]; then
+    echo "    (no python3 or /app/games: game archives skipped)"
+    return 0
+  fi
+  HN_API_URL="$API" HN_API_TOKEN="${AUTH#Authorization: Bearer }"     HN_API_TENANT_ID="$TENANT_ID" HN_GAMES_DIR=/app/games     python3 /app/scripts/seed_games.py --archives-only     | sed 's/^/    /' || echo "    game archives failed (see above)"
 }
 
 seed_games() {
@@ -42,4 +53,5 @@ seed_games() {
     gd_call POST "$base/revisions/$ver/publish" "{}"
   done <<< "$GAMES"
   echo "    games registered for tenant $TENANT_ID"
+  seed_game_archives
 }

@@ -3,17 +3,18 @@
 #include <QObject>
 #include <QStringList>
 
+#include "services/ProcessRunner.h"
 #include "services/PythonLocator.h"
-
-class QProcess;
 
 namespace Hypernucleus {
 
 class PathManager;
 
-// `python -m pip install --target <data>/pylibs/<game>` for one game.
-// Requirements come from the manifest, from pip-first dependency names and
-// from a requirements.txt shipped inside the game archive.
+// Gives each game its own virtual environment,
+// `python -m venv <data>/pylibs/<game>/venv`, and runs `pip install` with
+// that environment's interpreter. Requirements come from the manifest, from
+// pip-first dependency names and from a requirements.txt inside the game
+// archive. An old `pip --target` folder is cleaned up when the venv is made.
 class PipInstaller : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
@@ -24,6 +25,8 @@ public:
     bool isBusy() const;
     void setPythonPath(const QString& path) { m_pythonPath = path; }
     QString pythonPath() const { return m_pythonPath; }
+    // Replaces the process launcher (tests); not owned.
+    void setRunner(ProcessRunner* runner);
 
     // `gameDir` is scanned for requirements.txt. Emits finished() right away
     // when there is nothing to install.
@@ -35,10 +38,10 @@ public:
     // or options can be smuggled in through a manifest.
     static bool isValidSpec(const QString& spec);
 
-    // Arguments after the interpreter, exposed for tests.
-    static QStringList buildArguments(const QString& targetDir,
-                                      const QString& requirementsFile,
+    // Arguments after the venv interpreter / after the base interpreter.
+    static QStringList buildArguments(const QString& requirementsFile,
                                       const QStringList& specs);
+    static QStringList venvArguments(const QString& venvDir);
 
 signals:
     void busyChanged();
@@ -47,20 +50,26 @@ signals:
     void finished(const QString& name);
     void failed(const QString& name, const QString& error);
     void cancelled(const QString& name);
+    // No interpreter found: the UI can offer the managed Python download.
+    void pythonMissing(const QString& name);
 
 private:
+    enum class Stage { Idle, Venv, Pip };
+
     void setBusy(bool busy);
-    void startProcess(const PythonInfo& py, const QStringList& args,
-                      const QString& workDir);
-    void connectProcess();
+    void createVenv(const PythonInfo& py);
+    void runPip();
+    void onResult(const ProcessResult& result);
+    void end();
 
     PathManager* m_paths;
+    ProcessRunner* m_runner = nullptr;
     QString m_pythonPath;
-    QProcess* m_process = nullptr;
     QString m_name;
-    QString m_tail;
+    QString m_workDir;
+    QStringList m_pipArgs;
+    Stage m_stage = Stage::Idle;
     bool m_busy = false;
-    bool m_cancelled = false;
 };
 
 } // namespace Hypernucleus

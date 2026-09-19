@@ -1,4 +1,5 @@
 #include "domain/BinarySelector.h"
+#include "domain/HnText.h"
 
 
 namespace Hypernucleus {
@@ -31,15 +32,15 @@ DownloadTarget resolveTarget(const RevisionInfo& rev, const QString& type,
         t.sha256 = rev.sha256;
         t.executable = rev.executable;
     } else if (!rev.binaries.isEmpty()) {
-        t.error = QStringLiteral("No build of version %1 for %2 / %3")
+        t.error = HnText::tr("No build of version %1 for %2 / %3")
                       .arg(rev.version, normalizeOs(os), normalizeArch(arch));
         return t;
     } else {
-        t.error = QStringLiteral("No file UUID in revision data");
+        t.error = HnText::tr("No file UUID in revision data");
         return t;
     }
     t.ok = !t.fileRef.isEmpty() || !t.url.isEmpty();
-    if (!t.ok) t.error = QStringLiteral("No file UUID in revision data");
+    if (!t.ok) t.error = HnText::tr("No file UUID in revision data");
     return t;
 }
 

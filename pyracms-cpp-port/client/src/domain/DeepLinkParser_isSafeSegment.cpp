@@ -1,4 +1,5 @@
 #include "domain/DeepLinkParser.h"
+#include "domain/HnText.h"
 
 #include <QStringList>
 #include <QUrl>
@@ -31,9 +32,9 @@ DeepLink fail(const QString& why)
 DeepLink parse(const QString& url)
 {
     const QUrl u(url.trimmed(), QUrl::StrictMode);
-    if (!u.isValid()) return fail(QStringLiteral("Malformed URL"));
+    if (!u.isValid()) return fail(HnText::tr("Malformed URL"));
     if (u.scheme().toLower() != "pyracms")
-        return fail(QStringLiteral("Unsupported scheme"));
+        return fail(HnText::tr("Unsupported scheme"));
 
     DeepLink link;
     const QString host = u.host().toLower();
@@ -42,7 +43,7 @@ DeepLink parse(const QString& url)
     else if (host == "install")
         link.action = DeepLink::Action::Install;
     else
-        return fail(QStringLiteral("Unknown action '%1'").arg(host));
+        return fail(HnText::tr("Unknown action '%1'").arg(host));
 
     // Split the still-encoded path so an encoded slash cannot smuggle in
     // an extra segment: each part is decoded on its own afterwards.
@@ -51,13 +52,13 @@ DeepLink parse(const QString& url)
     const QStringList parts = path.split('/', Qt::SkipEmptyParts);
     if (parts.size() != 2)
         return fail(
-            QStringLiteral("Expected pyracms://%1/<slug>/<name>").arg(host));
+            HnText::tr("Expected pyracms://%1/<slug>/<name>").arg(host));
 
     link.slug = QUrl::fromPercentEncoding(parts.at(0).toUtf8());
     link.name = QUrl::fromPercentEncoding(parts.at(1).toUtf8());
     if (!isSafeSegment(link.slug) || !isSafeSegment(link.name)) {
         link.action = DeepLink::Action::None;
-        return fail(QStringLiteral("Invalid site or game name"));
+        return fail(HnText::tr("Invalid site or game name"));
     }
     return link;
 }

@@ -5,12 +5,21 @@ namespace Hypernucleus {
 
 void MainViewModel::wireSettings()
 {
-    connect(m_settings, &SettingsManager::repoUrlChanged, this, [this]() {
+    // A token belongs to one server + site: never send it to another.
+    const auto signOutOfOldSite = [this]() {
+        if (m_auth->isAuthenticated()) m_auth->logout();
+    };
+    connect(m_settings, &SettingsManager::repoUrlChanged, this, [=]() {
         m_api->setBaseUrl(m_settings->repoUrl());
+        signOutOfOldSite(); // the token belongs to the previous server
         refresh();
     });
     connect(m_settings, &SettingsManager::tenantSlugChanged, this,
-            [this]() { m_api->setTenant(m_settings->tenantSlug()); });
+            [=]() {
+                m_api->setTenant(m_settings->tenantSlug());
+                signOutOfOldSite();
+                refresh(); // another site = another catalog
+            });
     connect(m_settings, &SettingsManager::installDirChanged, this,
             [this]() { m_paths->setDataDir(m_settings->installDir()); });
     auto* self = this;
@@ -28,6 +37,9 @@ void MainViewModel::wireAuth()
         refresh();
     });
     connect(m_auth, &AuthService::loggedOut, this, &MainViewModel::refresh);
+    connect(m_python, &PythonSetup::notice, this, &MainViewModel::notify);
+    connect(m_auth, &AuthService::secureStorageUnavailable, this,
+            [this](const QString& text) { emit notify(text, true); });
     connect(m_deepLinks, &DeepLinkController::rejected, this,
             [this](const QString& error) {
                 emit notify(tr("Ignored link: %1").arg(error), true);

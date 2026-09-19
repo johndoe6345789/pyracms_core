@@ -3,7 +3,7 @@
 // --- URL Construction Tests ---
 
 TEST_F(ApiClientTest, DefaultBaseUrl) {
-    EXPECT_EQ(m_client->baseUrl(), QString("http://localhost:8080"));
+    EXPECT_EQ(m_client->baseUrl(), QString("http://localhost:3199"));
 }
 
 TEST_F(ApiClientTest, SetBaseUrl) {
@@ -18,9 +18,9 @@ TEST_F(ApiClientTest, SetBaseUrlEmitsSignal) {
 }
 
 TEST_F(ApiClientTest, SetSameBaseUrlDoesNotEmit) {
-    m_client->setBaseUrl("http://localhost:8080");
+    m_client->setBaseUrl("http://localhost:3199");
     QSignalSpy spy(m_client, &ApiClient::baseUrlChanged);
-    m_client->setBaseUrl("http://localhost:8080");
+    m_client->setBaseUrl("http://localhost:3199");
     EXPECT_EQ(spy.count(), 0);
 }
 

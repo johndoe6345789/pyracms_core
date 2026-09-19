@@ -12,10 +12,13 @@ def register_game(c, g):
                             g.get("moduleType", "python"))
     c.request("PUT", f"/api/gamedep/game/{name}/tags",
               {"tags": g.get("tags", [])})
+    pip = g.get("pipRequirements", [])
+    if pip:
+        c.request("PUT", f"/api/gamedep/game/{name}/pip",
+                  {"pipRequirements": pip})
     for d in g.get("dependencies", []):
         drev = ensure_dep(c, d)
         c.ensure_published("dep", d["name"], drev)
         link_dep(c, "game", name, drev)
     c.ensure_published("game", name, rev)
-    pip = ", ".join(g.get("pipRequirements", [])) or "-"
-    return f"registered {name} {g['version']} (pip: {pip})"
+    return f"registered {name} {g['version']} (pip: {', '.join(pip) or '-'})"

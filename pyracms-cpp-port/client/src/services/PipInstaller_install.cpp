@@ -4,6 +4,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QProcessEnvironment>
 #include <QTimer>
 
 namespace Hypernucleus {
@@ -12,7 +13,7 @@ void PipInstaller::install(const QString& gameName, const QString& gameDir,
                            const QStringList& specs)
 {
     if (m_busy) {
-        emit failed(gameName, "pip is already running");
+        emit failed(gameName, tr("pip is already running"));
         return;
     }
     QString requirements = gameDir + "/requirements.txt";
@@ -26,24 +27,41 @@ void PipInstaller::install(const QString& gameName, const QString& gameDir,
                            [this, gameName]() { emit finished(gameName); });
         return;
     }
-
     const PythonInfo py = PythonLocator::find(m_pythonPath, m_paths->dataDir());
     if (!py.found()) {
+        emit pythonMissing(gameName);
         emit failed(gameName,
-                    "Python was not found. Install Python 3 or set its "
-                    "location in Settings to install pip packages.");
+                    tr("Python was not found. Install Python 3 or set its "
+                       "location in Settings to install pip packages."));
         return;
     }
-
-    const QString target = m_paths->pipTargetDir(gameName);
-    QDir().mkpath(target);
     m_name = gameName;
-    m_tail.clear();
-    m_cancelled = false;
+    m_workDir = gameDir;
+    m_pipArgs = buildArguments(requirements, cleanSpecs);
     setBusy(true);
     emit started(gameName);
-    startProcess(py, buildArguments(target, requirements, cleanSpecs),
-                 gameDir);
+    if (QFileInfo::exists(m_paths->venvPython(gameName)))
+        runPip();
+    else
+        createVenv(py);
+}
+
+void PipInstaller::createVenv(const PythonInfo& py)
+{
+    m_paths->cleanLegacyTarget(m_name); // old `pip --target` content
+    QDir().mkpath(m_paths->pipTargetDir(m_name));
+    m_stage = Stage::Venv;
+    m_runner->start(py.exe, py.prefix + venvArguments(m_paths->venvDir(m_name)),
+                    m_workDir, QProcessEnvironment::systemEnvironment());
+}
+
+void PipInstaller::runPip()
+{
+    m_stage = Stage::Pip;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("PIP_DISABLE_PIP_VERSION_CHECK", "1");
+    env.insert("PYTHONUNBUFFERED", "1");
+    m_runner->start(m_paths->venvPython(m_name), m_pipArgs, m_workDir, env);
 }
 
 } // namespace Hypernucleus

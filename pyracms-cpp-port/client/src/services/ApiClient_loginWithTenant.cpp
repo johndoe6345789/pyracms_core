@@ -40,7 +40,7 @@ void ApiClient::loginWithTenant(const QString& username,
                                           .value("error")
                                           .toString();
             if (statusCode == 401) {
-                emit loginResponse(false, "Invalid username, password or site");
+                emit loginResponse(false, tr("Invalid username, password or site"));
             } else if (!serverMsg.isEmpty()) {
                 emit loginResponse(false, serverMsg);
             } else {
@@ -54,7 +54,7 @@ void ApiClient::loginWithTenant(const QString& username,
         QString token = obj.value("token").toString();
 
         if (token.isEmpty()) {
-            emit loginResponse(false, "No token received from server");
+            emit loginResponse(false, tr("No token received from server"));
             return;
         }
 

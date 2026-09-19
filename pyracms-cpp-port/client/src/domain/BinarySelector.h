@@ -30,6 +30,9 @@ QString normalizeArch(const QString& arch);
 // "pi", "any", "all", "*" and empty mean platform independent.
 bool isPlatformIndependent(const QString& value);
 
+// Windows / macOS on arm64 can run x86_64 builds (emulation, Rosetta 2).
+bool emulatesX64(const QString& os, const QString& arch);
+
 // Best matching binary, or nullptr. Exact OS/arch beat platform-independent.
 const BinaryInfo* pickBinary(const QList<BinaryInfo>& binaries,
                              const QString& os, const QString& arch);

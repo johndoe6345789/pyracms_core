@@ -1,37 +1,46 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Hypernucleus
 
-// Button row of the sign-in / register dialogs.
-RowLayout {
+// Footer of the sign-in / register dialogs: [back] ... [cancel] [submit].
+Item {
     id: root
 
     property string backText
-    property string skipText
     property string submitText
     property bool busy: false
+    property bool canSubmit: true
     signal backClicked()
-    signal skipClicked()
+    signal cancelClicked()
     signal submitClicked()
 
-    Layout.fillWidth: true
+    implicitHeight: row.implicitHeight + Theme.spaceM + Theme.spaceL
 
-    Button {
-        text: root.backText
-        flat: true
-        onClicked: root.backClicked()
-    }
-    Item { Layout.fillWidth: true }
-    Button {
-        visible: root.skipText !== ""
-        text: root.skipText
-        flat: true
-        onClicked: root.skipClicked()
-    }
-    Button {
-        text: root.submitText
-        highlighted: true
-        enabled: !root.busy
-        onClicked: root.submitClicked()
+    RowLayout {
+        id: row
+        anchors.fill: parent
+        anchors.leftMargin: Theme.spaceM
+        anchors.rightMargin: Theme.spaceL
+        anchors.topMargin: Theme.spaceM
+        anchors.bottomMargin: Theme.spaceL
+        spacing: Theme.spaceM
+
+        Button {
+            text: root.backText
+            flat: true
+            onClicked: root.backClicked()
+        }
+        Item { Layout.fillWidth: true }
+        Button {
+            text: qsTr("Cancel")
+            onClicked: root.cancelClicked()
+        }
+        Button {
+            text: root.submitText
+            highlighted: true
+            enabled: !root.busy && root.canSubmit
+            onClicked: root.submitClicked()
+        }
     }
 }

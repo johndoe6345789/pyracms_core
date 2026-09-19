@@ -44,6 +44,15 @@ public:
     Q_INVOKABLE void removeQueued(const QString& name);
     Q_INVOKABLE bool isQueued(const QString& name) const;
 
+    // A transfer that is not a game install (the managed Python) shown in
+    // the same progress bar. Cancelling asks the owner through the signal.
+    void beginExternal(const QString& label);
+    void endExternal();
+    bool isExternal() const { return m_external; }
+public slots:
+    void externalProgress(qint64 received, qint64 total);
+public:
+
 signals:
     void changed();
     void queueChanged();
@@ -53,6 +62,7 @@ signals:
     void gameFinished(const QString& name, const QString& version);
     void gameFailed(const QString& name, const QString& error);
     void gameCancelled(const QString& name);
+    void externalCancelRequested();
 
 private:
     struct Job {
@@ -70,6 +80,7 @@ private:
     QString m_label, m_stepText, m_speed, m_size, m_log;
     double m_progress = 0.0;
     bool m_cancelled = false;
+    bool m_external = false;
     QElapsedTimer m_clock;
     qint64 m_lastBytes = 0;
     qint64 m_lastMs = 0;

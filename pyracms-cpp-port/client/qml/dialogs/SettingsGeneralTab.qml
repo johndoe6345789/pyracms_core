@@ -16,35 +16,12 @@ ScrollView {
         width: general.availableWidth
         spacing: Theme.spaceL
 
-        SettingsBlock {
-            FieldLabel { text: qsTr("Server URL") }
-            TextField {
-                Layout.fillWidth: true
-                text: general.ed.repoUrl
-                onTextEdited: general.ed.repoUrl = text
-                color: general.ed.urlError !== ""
-                       ? Theme.danger : Theme.text
-                inputMethodHints: Qt.ImhUrlCharactersOnly
-                                  | Qt.ImhNoAutoUppercase
-            }
-            FieldHint {
-                text: general.ed.urlError !== "" ? general.ed.urlError
-                      : qsTr("Address of the PyraCMS backend.")
-            }
-        }
-        SettingsBlock {
-            FieldLabel { text: qsTr("Site (tenant slug)") }
-            TextField {
-                Layout.fillWidth: true
-                text: general.ed.tenantSlug
-                onTextEdited: general.ed.tenantSlug = text
-                inputMethodHints: Qt.ImhNoAutoUppercase
-                                  | Qt.ImhNoPredictiveText
-            }
-            FieldHint {
-                text: qsTr("Games, dependencies and accounts are "
-                           + "scoped to this site.")
-            }
+        ConnectFields {
+            Layout.topMargin: Theme.spaceM
+            server: general.ed.repoUrl
+            site: general.ed.tenantSlug
+            onServerEdited: (t) => general.ed.repoUrl = t
+            onSiteEdited: (t) => general.ed.tenantSlug = t
         }
         SettingsBlock {
             FieldLabel { text: qsTr("Install folder") }

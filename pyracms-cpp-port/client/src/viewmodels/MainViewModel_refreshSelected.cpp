@@ -27,6 +27,8 @@ void MainViewModel::refreshSelected()
     in.statusText = m_model->statusTextOf(e->name);
     in.selectedVersion = m_selectedVersion;
     in.accent = m_model->accentOf(e->name);
+    in.os = m_settings->osName();
+    in.arch = m_settings->archName();
     in.mediaUrl = [this](const QString& path) {
         return m_api->resolveUrl(path).toString();
     };
@@ -34,6 +36,12 @@ void MainViewModel::refreshSelected()
     m_selected["favourite"] = m_model->isFavourite(e->name);
     m_deps->populate(e->dependencies, m_installer->installedVersions());
     emit selectedChanged();
+}
+
+void MainViewModel::retranslate()
+{
+    m_model->refreshAll();
+    refreshSelected();
 }
 
 void MainViewModel::primaryAction()

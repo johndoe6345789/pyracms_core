@@ -15,15 +15,18 @@ Dialog {
     modal: true
     parent: Overlay.overlay
     anchors.centerIn: parent
-    width: 420
+    width: Math.min(Theme.dialogWidth, parent.width - 2 * Theme.spaceL)
+    height: Math.min(implicitHeight, parent.height - 2 * Theme.spaceL)
+    padding: Theme.spaceL
     closePolicy: Popup.CloseOnEscape
 
     function submit() {
         const f = fields
-        const site = f.site.text.trim()
+        const site = f.site.trim()
         const user = f.user.text.trim()
         const email = f.email.text.trim()
-        if (site === "" || user === "" || email === ""
+        if (MainViewModel.connection.serverError(f.server) !== ""
+                || site === "" || user === "" || email === ""
                 || f.pass.text === "") {
             errorMessage = qsTr("All fields are required.")
             return
@@ -34,12 +37,13 @@ Dialog {
         }
         errorMessage = ""
         busy = true
-        MainViewModel.settings.tenantSlug = site
+        MainViewModel.connection.connectTo(f.server, site)
         MainViewModel.auth.registerUser(user, email, f.pass.text)
     }
 
     onAboutToShow: {
-        fields.site.text = MainViewModel.settings.tenantSlug
+        fields.server = MainViewModel.settings.repoUrl
+        fields.site = MainViewModel.settings.tenantSlug
         errorMessage = ""
         busy = false
         fields.user.forceActiveFocus()
@@ -58,20 +62,18 @@ Dialog {
         }
     }
 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: Theme.spaceM
-
+    contentItem: FormScroll {
         RegisterFields { id: fields; onSubmitted: root.submit() }
         ErrorLabel { text: root.errorMessage }
+    }
 
-        AuthButtons {
-            backText: qsTr("Back to sign in")
-            submitText: root.busy ? qsTr("Creating...")
-                                  : qsTr("Create account")
-            busy: root.busy
-            onBackClicked: { root.close(); root.backToLogin() }
-            onSubmitClicked: root.submit()
-        }
+    footer: AuthButtons {
+        backText: qsTr("Back to sign in")
+        submitText: root.busy ? qsTr("Creating...")
+                              : qsTr("Create account")
+        busy: root.busy
+        onBackClicked: { root.close(); root.backToLogin() }
+        onCancelClicked: root.close()
+        onSubmitClicked: root.submit()
     }
 }

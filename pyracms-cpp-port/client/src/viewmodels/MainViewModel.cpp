@@ -56,6 +56,7 @@ void MainViewModel::applyPlatformSettings()
     m_planner->setPlatform(m_settings->osName(), m_settings->archName());
     m_planner->setPreferPip(m_settings->preferPip());
     m_games->setPlatform(m_settings->osName());
+    m_model->setPlatform(m_settings->osName(), m_settings->archName());
     m_games->setPythonPath(m_settings->pythonPath());
     m_pip->setPythonPath(m_settings->pythonPath());
 }

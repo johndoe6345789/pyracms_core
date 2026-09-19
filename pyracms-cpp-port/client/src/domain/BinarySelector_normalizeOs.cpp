@@ -4,18 +4,6 @@
 namespace Hypernucleus {
 namespace BinarySelector {
 
-namespace {
-
-// 2 exact, 1 platform independent, -1 mismatch
-int score(const QString& have, const QString& want, bool isOs)
-{
-    if (isPlatformIndependent(have)) return 1;
-    const QString a = isOs ? normalizeOs(have) : normalizeArch(have);
-    const QString b = isOs ? normalizeOs(want) : normalizeArch(want);
-    return a == b ? 2 : -1;
-}
-
-} // namespace
 
 QString normalizeOs(const QString& os)
 {
@@ -45,24 +33,6 @@ bool isPlatformIndependent(const QString& value)
 {
     const QString s = value.trimmed().toLower();
     return s.isEmpty() || s == "pi" || s == "any" || s == "all" || s == "*";
-}
-
-const BinaryInfo* pickBinary(const QList<BinaryInfo>& binaries,
-                             const QString& os, const QString& arch)
-{
-    const BinaryInfo* best = nullptr;
-    int bestScore = -1;
-    for (const BinaryInfo& b : binaries) {
-        const int so = score(b.os, os, true);
-        const int sa = score(b.arch, arch, false);
-        if (so < 1 || sa < 1) continue;
-        const int total = so * 10 + sa;
-        if (total > bestScore) {
-            bestScore = total;
-            best = &b;
-        }
-    }
-    return best;
 }
 
 } // namespace BinarySelector

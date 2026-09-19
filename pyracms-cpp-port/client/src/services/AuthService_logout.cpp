@@ -19,8 +19,9 @@ void AuthService::logout()
 void AuthService::restoreSession()
 {
     QSettings qsettings;
-    QString savedToken = qsettings.value("auth/token").toString();
-    QString savedUsername = qsettings.value("auth/username").toString();
+    m_vault.migrateFromSettings(qsettings);
+    const QString savedToken = m_vault.load();
+    const QString savedUsername = qsettings.value("auth/username").toString();
 
     m_apiClient->setTenant(m_settings->tenantSlug());
     if (!savedToken.isEmpty() && !savedUsername.isEmpty()) {
@@ -29,6 +30,7 @@ void AuthService::restoreSession()
         m_apiClient->setToken(savedToken);
         setAuthenticated(true);
     }
+    warnIfSessionOnly();
 }
 
 void AuthService::setAuthenticated(bool auth)
@@ -55,17 +57,28 @@ void AuthService::setToken(const QString& token)
 void AuthService::saveSession()
 {
     QSettings qsettings;
-    qsettings.setValue("auth/token", m_token);
     qsettings.setValue("auth/username", m_username);
+    qsettings.remove("auth/token"); // never in plain text
     qsettings.sync();
+    m_vault.save(m_token);
+    warnIfSessionOnly();
 }
 
 void AuthService::clearSession()
 {
+    m_vault.clear();
     QSettings qsettings;
     qsettings.remove("auth/token");
     qsettings.remove("auth/username");
     qsettings.sync();
+}
+
+void AuthService::warnIfSessionOnly()
+{
+    if (!m_vault.sessionOnly()) return;
+    emit secureStorageUnavailable(
+        tr("No secure keychain is available: you stay signed in until "
+           "the launcher closes, the login is not saved."));
 }
 
 } // namespace Hypernucleus

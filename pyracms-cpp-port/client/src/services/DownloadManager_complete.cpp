@@ -29,7 +29,7 @@ void DownloadManager::complete(Job* job)
     }
     QFile::remove(req.destPath);
     if (!QFile::rename(partPath, req.destPath)) {
-        emit failed(req.id, "Could not finalize " + req.destPath);
+        emit failed(req.id, tr("Could not finalize %1").arg(req.destPath));
         return;
     }
     emit finished(req.id, req.destPath);

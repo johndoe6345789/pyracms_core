@@ -19,9 +19,9 @@ bool GameManager::prepareNative(const InstallRecord& rec, QString& program)
     emit gameError(
         rec.name,
         rec.executable.isEmpty()
-            ? QStringLiteral("No executable for %1 found in the game folder")
+            ? tr("No executable for %1 found in the game folder")
                   .arg(m_os)
-            : QStringLiteral("Executable '%1' not found in the game folder")
+            : tr("Executable '%1' not found in the game folder")
                   .arg(rec.executable));
     return false;
 }
@@ -29,21 +29,24 @@ bool GameManager::prepareNative(const InstallRecord& rec, QString& program)
 bool GameManager::preparePython(const InstallRecord& rec, QString& program,
                                 QStringList& args, QProcessEnvironment& env)
 {
+    // A game with pip packages runs inside its own venv.
+    const bool hasVenv = QFileInfo::exists(m_pathManager->venvPython(rec.name));
     const PythonInfo py =
         PythonLocator::find(m_pythonPath, m_pathManager->dataDir());
-    if (!py.found()) {
+    if (!hasVenv && !py.found()) {
+        emit pythonMissing(rec.name);
         emit gameError(rec.name,
-                       "Python was not found. Install Python 3 or set its "
-                       "location in Settings.");
+                       tr("Python was not found. Install Python 3 or set its "
+                          "location in Settings."));
         return false;
     }
-    program = py.exe;
-    args = py.prefix;
+    program = hasVenv ? m_pathManager->venvPython(rec.name) : py.exe;
+    if (!hasVenv) args = py.prefix;
     args << "-u" << "-c" << LaunchResolver::pythonBootstrapScript()
          << rec.name << rec.path;
     QStringList entries = LaunchResolver::pythonPathEntries(
         rec, m_installer->installedRecords(),
-        m_pathManager->pipTargetDir(rec.name));
+        hasVenv ? QString() : m_pathManager->pipTargetDir(rec.name));
     const QString existing = env.value("PYTHONPATH");
     if (!existing.isEmpty()) entries << existing;
     env.insert("PYTHONPATH", entries.join(QDir::listSeparator()));

@@ -1,19 +1,24 @@
 #include "services/PipInstaller.h"
 #include "services/PathManager.h"
-#include "services/PythonLocator.h"
 
-#include <QDir>
-#include <QFileInfo>
-#include <QProcess>
-#include <QProcessEnvironment>
 #include <QRegularExpression>
-#include <QTimer>
 
 namespace Hypernucleus {
 
 PipInstaller::PipInstaller(PathManager* paths, QObject* parent)
     : QObject(parent), m_paths(paths)
 {
+    setRunner(new QProcessRunner(this));
+}
+
+void PipInstaller::setRunner(ProcessRunner* runner)
+{
+    if (m_runner) m_runner->disconnect(this);
+    m_runner = runner;
+    connect(m_runner, &ProcessRunner::output, this,
+            [this](const QString& text) { emit output(m_name, text); });
+    connect(m_runner, &ProcessRunner::finished, this,
+            [this](const ProcessResult& r) { onResult(r); });
 }
 
 bool PipInstaller::isBusy() const { return m_busy; }
@@ -34,16 +39,19 @@ bool PipInstaller::isValidSpec(const QString& spec)
     return re.match(spec.trimmed()).hasMatch();
 }
 
-QStringList PipInstaller::buildArguments(const QString& targetDir,
-                                         const QString& requirementsFile,
+QStringList PipInstaller::buildArguments(const QString& requirementsFile,
                                          const QStringList& specs)
 {
-    QStringList args{
-        "-m",         "pip",       "install",  "--disable-pip-version-check",
-        "--no-input", "--upgrade", "--target", targetDir};
+    QStringList args{"-m", "pip", "install", "--disable-pip-version-check",
+                     "--no-input", "--upgrade"};
     if (!requirementsFile.isEmpty()) args << "-r" << requirementsFile;
     args << specs;
     return args;
+}
+
+QStringList PipInstaller::venvArguments(const QString& venvDir)
+{
+    return {"-m", "venv", venvDir};
 }
 
 } // namespace Hypernucleus

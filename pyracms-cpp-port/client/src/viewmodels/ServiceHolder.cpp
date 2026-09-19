@@ -23,6 +23,10 @@ void ServiceHolder::createServices(QObject* o)
     m_deps = new DependencyModel(o);
     m_deepLinks = new DeepLinkController(o);
     m_settingsEditor = new SettingsViewModel(m_settings, m_api, o);
+    m_python = new PythonSetup(m_paths, m_api, m_settings, m_pip, m_games,
+                               m_downloads, o);
+    auto* sites = new SiteDirectory(m_api, o);
+    m_connect = new ConnectController(m_settings, sites, o);
 }
 
 } // namespace Hypernucleus

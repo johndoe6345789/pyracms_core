@@ -21,7 +21,8 @@ if(ENABLE_COVERAGE)
 endif()
 
 # Find dependencies
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2
+    LinguistTools)
 find_package(QuaZip-Qt6 REQUIRED)
 
 # Include directories
@@ -50,6 +51,15 @@ target_link_libraries(hypernucleus_lib
     QuaZip::QuaZip
 )
 target_include_directories(hypernucleus_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# OS keychain for the login token (services/SecretStore_*.cpp).
+if(WIN32)
+    target_link_libraries(hypernucleus_lib PUBLIC advapi32)
+elseif(APPLE)
+    find_library(HN_SECURITY Security REQUIRED)
+    find_library(HN_COREFOUNDATION CoreFoundation REQUIRED)
+    target_link_libraries(hypernucleus_lib PUBLIC
+        ${HN_SECURITY} ${HN_COREFOUNDATION})
+endif()
 # Lets the QML module (and qmllint) see the services used from QML.
 qt_extract_metatypes(hypernucleus_lib)
 
@@ -104,6 +114,37 @@ qt_add_qml_module({{ project_name }}
         {{ hdr }}
 {% endfor %}
 )
+
+# Translations: translations/*.ts are compiled to .qm (lrelease) and embedded
+# under :/translations. `ninja update_translations` re-runs lupdate.
+set(HN_TS_FILES
+{% for ts in ts_files %}
+    {{ ts }}
+{% endfor %}
+)
+# lupdate reads the library (services, domain), the UI types and the QML.
+set(HN_TR_SOURCES ${LIB_SOURCES}
+    {{ main_source }}
+{% for src in module_sources %}
+    {{ src }}
+{% endfor %}
+{% for qml in qml_sources %}
+    {{ qml }}
+{% endfor %}
+)
+list(TRANSFORM HN_TR_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+qt_add_lupdate({{ project_name }} TS_FILES ${HN_TS_FILES}
+    SOURCES ${HN_TR_SOURCES}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src
+    OPTIONS -no-obsolete)
+qt_add_lrelease({{ project_name }} TS_FILES ${HN_TS_FILES}
+    QM_FILES_OUTPUT_VARIABLE HN_QM_FILES)
+qt_add_resources({{ project_name }} hn_translations
+    PREFIX /translations
+    BASE ${CMAKE_CURRENT_BINARY_DIR}
+    FILES ${HN_QM_FILES})
+# Folder of the compiled .qm files, for the translation tests.
+set(HN_QM_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # Testing
 if(BUILD_TESTS)

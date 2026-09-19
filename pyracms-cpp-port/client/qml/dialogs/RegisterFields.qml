@@ -3,45 +3,36 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Hypernucleus
 
-// Site / username / email / password / repeat inputs.
+// Server / site dropdowns, username, email, password and repeat.
 ColumnLayout {
     id: root
 
-    property alias site: siteField
+    property alias server: connect.server
+    property alias site: connect.site
     property alias user: userField
     property alias email: emailField
     property alias pass: passField
     property alias confirm: confirmField
     signal submitted()
 
-    Layout.fillWidth: true
-    spacing: Theme.spaceM
+    function refreshSites() { connect.refreshSites() }
 
-    AuthField {
-        id: siteField
-        placeholderText: qsTr("Site (tenant slug)")
-        KeyNavigation.tab: userField
-    }
-    AuthField {
-        id: userField
-        placeholderText: qsTr("Username")
-        KeyNavigation.tab: emailField
-    }
+    Layout.fillWidth: true
+    spacing: Theme.spaceS
+
+    ConnectFields { id: connect }
+    FieldLabel { text: qsTr("Username"); Layout.topMargin: Theme.spaceM }
+    AuthField { id: userField }
+    FieldLabel { text: qsTr("Email") }
     AuthField {
         id: emailField
-        placeholderText: qsTr("Email")
         inputMethodHints: Qt.ImhEmailCharactersOnly
-        KeyNavigation.tab: passField
     }
-    AuthField {
-        id: passField
-        placeholderText: qsTr("Password")
-        echoMode: TextInput.Password
-        KeyNavigation.tab: confirmField
-    }
+    FieldLabel { text: qsTr("Password") }
+    AuthField { id: passField; echoMode: TextInput.Password }
+    FieldLabel { text: qsTr("Repeat password") }
     AuthField {
         id: confirmField
-        placeholderText: qsTr("Repeat password")
         echoMode: TextInput.Password
         onAccepted: root.submitted()
     }

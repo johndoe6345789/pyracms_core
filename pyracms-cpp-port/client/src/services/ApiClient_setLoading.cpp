@@ -52,7 +52,7 @@ void ApiClient::fetchCatalog()
         QByteArray responseData = reply->readAll();
         QJsonDocument doc = QJsonDocument::fromJson(responseData);
         if (doc.isNull() || !doc.isObject()) {
-            setError("Invalid JSON response from catalog endpoint");
+            setError(tr("Invalid JSON response from catalog endpoint"));
             emit networkError(m_error);
             return;
         }

@@ -1,4 +1,5 @@
 #include "viewmodels/SettingsViewModel.h"
+#include "domain/ServerUrl.h"
 #include "services/SettingsManager.h"
 #include "services/ApiClient.h"
 
@@ -46,7 +47,9 @@ void SettingsViewModel::save()
 
     // The tenant slug applies to the API client through MainViewModel, which
     // listens to SettingsManager changes.
-    m_settings->setRepoUrl(m_repoUrl);
+    const QString server = ServerUrl::normalize(m_repoUrl);
+    m_settings->rememberServer(server);
+    m_settings->setRepoUrl(server);
     m_settings->setTenantSlug(m_tenantSlug);
     m_settings->setInstallDir(m_installDir);
     m_settings->setPythonPath(m_pythonPath);

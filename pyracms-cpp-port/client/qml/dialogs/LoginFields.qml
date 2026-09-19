@@ -3,49 +3,39 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Hypernucleus
 
-// Intro text plus server / site / username / password inputs.
+// Intro text, server / site dropdowns, username and password.
 ColumnLayout {
     id: root
 
-    property alias server: serverField
-    property alias site: siteField
+    property alias server: connect.server
+    property alias site: connect.site
     property alias user: userField
     property alias pass: passField
     signal submitted()
+
+    function refreshSites() { connect.refreshSites() }
 
     Layout.fillWidth: true
     spacing: Theme.spaceM
 
     Label {
         Layout.fillWidth: true
+        Layout.preferredWidth: 0
         wrapMode: Text.WordWrap
         color: Theme.textDim
-        text: qsTr("Your account belongs to one site. Enter its slug "
-                   + "(the name in the site address) together with "
-                   + "your username.")
+        text: qsTr("Signing in is optional: public games install and "
+                   + "play without an account. Sign in for private "
+                   + "games and account features.")
     }
-    AuthField {
-        id: serverField
-        placeholderText: qsTr("Server URL, e.g. https://games.example.com")
-        inputMethodHints: Qt.ImhUrlCharactersOnly | Qt.ImhNoAutoUppercase
-        KeyNavigation.tab: siteField
-        Accessible.name: qsTr("Server URL")
-    }
-    AuthField {
-        id: siteField
-        placeholderText: qsTr("Site (tenant slug)")
-        KeyNavigation.tab: userField
-        Accessible.name: qsTr("Site slug")
-    }
+    ConnectFields { id: connect }
+    FieldLabel { text: qsTr("Username"); Layout.topMargin: Theme.spaceS }
     AuthField {
         id: userField
-        placeholderText: qsTr("Username")
-        KeyNavigation.tab: passField
         Accessible.name: qsTr("Username")
     }
+    FieldLabel { text: qsTr("Password") }
     AuthField {
         id: passField
-        placeholderText: qsTr("Password")
         echoMode: TextInput.Password
         onAccepted: root.submitted()
         Accessible.name: qsTr("Password")

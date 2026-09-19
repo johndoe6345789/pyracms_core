@@ -33,7 +33,7 @@ void EntryRepository::ensureDetail(const QString& type, const QString& name)
         self->m_inFlight.remove(key);
         if (!ok || !doc.isObject()) {
             emit self->detailFailed(type, name,
-                                    err.isEmpty() ? "Not found" : err);
+                                    err.isEmpty() ? tr("Not found") : err);
             return;
         }
         auto found = self->m_entries.find(key);

@@ -1,4 +1,5 @@
 #include "services/ArchiveExtractor.h"
+#include "domain/HnText.h"
 #include "domain/LaunchResolver.h"
 
 #include <QDir>
@@ -18,7 +19,8 @@ ExtractResult installLayout(const QString& stagingDir, const QString& finalDir,
     ExtractResult res;
     QDir final(finalDir);
     if (final.exists() && !final.removeRecursively()) {
-        res.error = "Could not replace existing installation: " + finalDir;
+        res.error = HnText::tr("Could not replace existing installation: %1")
+                        .arg(finalDir);
         return res;
     }
     QDir().mkpath(QFileInfo(finalDir).absolutePath());
@@ -33,7 +35,7 @@ ExtractResult installLayout(const QString& stagingDir, const QString& finalDir,
     }
 
     if (!QDir().rename(source, finalDir)) {
-        res.error = "Could not move files into place: " + finalDir;
+        res.error = HnText::tr("Could not move files into place: %1").arg(finalDir);
         return res;
     }
     if (source != stagingDir) QDir(stagingDir).removeRecursively();

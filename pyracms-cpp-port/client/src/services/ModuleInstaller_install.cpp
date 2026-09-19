@@ -30,7 +30,7 @@ void ModuleInstaller::install(const QString& name, const QString& version,
                               const QString& type)
 {
     if (m_busy) {
-        emit installFailed(name, "Another installation is in progress");
+        emit installFailed(name, tr("Another installation is in progress"));
         return;
     }
     const InstallRecord existing = m_store.get(name);
@@ -43,7 +43,7 @@ void ModuleInstaller::install(const QString& name, const QString& version,
     setBusy(true);
     const DownloadTarget target = DownloadTarget::fromJson(revisionData);
     if (!target.ok) {
-        fail(name, "No file UUID in revision data");
+        fail(name, tr("No file UUID in revision data"));
         return;
     }
 

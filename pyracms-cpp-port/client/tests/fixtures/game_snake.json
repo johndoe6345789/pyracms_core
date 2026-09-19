@@ -1,0 +1,54 @@
+{
+ "createdAt": "2026-09-19T02:17:06.067906+00:00",
+ "dependencies": [
+  {
+   "depRevisionId": null,
+   "id": 4,
+   "kind": "pip",
+   "name": "pygame",
+   "source": "pip",
+   "version": "==2.6.1"
+  }
+ ],
+ "description": "Classic Snake with speed ramp, pause and restart. Pure shapes, no assets.",
+ "dislikes": 0,
+ "displayName": "Snake",
+ "downloadCount": 0,
+ "id": 4,
+ "likes": 0,
+ "name": "snake",
+ "owner": "admin",
+ "ownerId": 1,
+ "ownerUsername": "admin",
+ "pipRequirements": [
+  "pygame==2.6.1"
+ ],
+ "revisions": [
+  {
+   "binaries": [],
+   "createdAt": "2026-09-19T02:17:06.074563+00:00",
+   "downloadCount": 0,
+   "executable": "",
+   "fileId": null,
+   "fileUuid": null,
+   "id": 4,
+   "moduleType": "python",
+   "pageId": 4,
+   "published": true,
+   "sha256": "",
+   "size": 0,
+   "url": null,
+   "uuid": null,
+   "version": "1.0.0"
+  }
+ ],
+ "screenshots": [],
+ "tags": [
+  "arcade",
+  "classic",
+  "pygame"
+ ],
+ "tenantId": 1,
+ "type": "game",
+ "viewCount": 0
+}

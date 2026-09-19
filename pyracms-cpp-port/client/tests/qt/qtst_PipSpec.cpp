@@ -44,11 +44,13 @@ void TstPipSpec::acceptsPlainSpecs()
 void TstPipSpec::buildsArguments()
 {
     const QStringList a =
-        PipInstaller::buildArguments("/t", "/r.txt", {"a", "b"});
+        PipInstaller::buildArguments("/r.txt", {"a", "b"});
     QCOMPARE(a.mid(0, 3), (QStringList{"-m", "pip", "install"}));
-    QCOMPARE(a.at(a.indexOf("--target") + 1), QString("/t"));
+    QVERIFY(!a.contains("--target")); // packages go into the venv
+    QCOMPARE(PipInstaller::venvArguments("/v"),
+             (QStringList{"-m", "venv", "/v"}));
     QCOMPARE(a.mid(a.size() - 4), (QStringList{"-r", "/r.txt", "a", "b"}));
-    QVERIFY(!PipInstaller::buildArguments("/t", "", {}).contains("-r"));
+    QVERIFY(!PipInstaller::buildArguments("", {}).contains("-r"));
 }
 
 void TstPipSpec::normalizesPackageNames()

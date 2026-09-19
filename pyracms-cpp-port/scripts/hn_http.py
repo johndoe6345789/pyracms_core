@@ -10,17 +10,24 @@ from hn_multipart import encode_file
 
 
 class HttpClient:
-    def __init__(self, base_url, token=None, timeout=300):
+    def __init__(self, base_url, token=None, timeout=300, tenant_id=None):
         self.base = base_url.rstrip("/")
         self.token = token
         self.timeout = timeout
+        self.tenant_id = tenant_id  # scopes /api/gamedep calls to a site
+
+    def _scoped(self, path):
+        if not self.tenant_id or not path.startswith("/api/gamedep"):
+            return path
+        sep = "&" if "?" in path else "?"
+        return f"{path}{sep}tenant_id={self.tenant_id}"
 
     def _open(self, method, path, data=None, headers=None):
         h = {"Accept": "application/json"}
         if self.token:
             h["Authorization"] = f"Bearer {self.token}"
         h.update(headers or {})
-        req = urllib.request.Request(self.base + path, data=data,
+        req = urllib.request.Request(self.base + self._scoped(path), data=data,
                                      method=method, headers=h)
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:

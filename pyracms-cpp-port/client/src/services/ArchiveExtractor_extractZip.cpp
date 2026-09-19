@@ -1,4 +1,5 @@
 #include "services/ArchiveExtractor.h"
+#include "domain/HnText.h"
 #include "services/ArchiveEntry.h"
 #include "domain/LaunchResolver.h"
 
@@ -13,14 +14,14 @@ ExtractResult extractZip(const QString& zipPath, const QString& stagingDir)
     QDir staging(stagingDir);
     if (staging.exists()) staging.removeRecursively();
     if (!QDir().mkpath(stagingDir)) {
-        res.error = "Failed to create directory: " + stagingDir;
+        res.error = HnText::tr("Failed to create directory: %1").arg(stagingDir);
         return res;
     }
 
     QuaZip zip(zipPath);
     if (!zip.open(QuaZip::mdUnzip)) {
-        res.error = "Failed to open archive (error " +
-                    QString::number(zip.getZipError()) + ")";
+        res.error = HnText::tr("Failed to open archive (error %1)")
+                        .arg(zip.getZipError());
         return res;
     }
 
@@ -30,7 +31,7 @@ ExtractResult extractZip(const QString& zipPath, const QString& stagingDir)
         const QString outputPath =
             QDir::cleanPath(stagingDir + "/" + entryName);
         if (!LaunchResolver::isInside(stagingDir, outputPath)) {
-            res.error = "Unsafe path in archive: " + entryName;
+            res.error = HnText::tr("Unsafe path in archive: %1").arg(entryName);
             break;
         }
         if (entryName.endsWith('/')) {

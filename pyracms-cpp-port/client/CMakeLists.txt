@@ -21,7 +21,8 @@ if(ENABLE_COVERAGE)
 endif()
 
 # Find dependencies
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2
+    LinguistTools)
 find_package(QuaZip-Qt6 REQUIRED)
 
 # Include directories
@@ -33,6 +34,7 @@ set(LIB_SOURCES
     src/domain/BinarySelector.cpp
     src/domain/BinarySelector_normalizeOs.cpp
     src/domain/BinarySelector_normalizeOs_resolveTarget.cpp
+    src/domain/BinarySelector_pick.cpp
     src/domain/CatalogDeps.cpp
     src/domain/CatalogFields.cpp
     src/domain/CatalogParser.cpp
@@ -44,6 +46,7 @@ set(LIB_SOURCES
     src/domain/DeepLinkParser_isSafeSegment.cpp
     src/domain/DeepLinkParser_isSafeSegment_findInArguments.cpp
     src/domain/DependencyResolver.cpp
+    src/domain/DownloadError.cpp
     src/domain/DownloadVerifier.cpp
     src/domain/GameEntry.cpp
     src/domain/InstallRecordJson.cpp
@@ -54,6 +57,9 @@ set(LIB_SOURCES
     src/domain/InstallStateStore_set.cpp
     src/domain/LaunchResolver.cpp
     src/domain/LaunchResolver_pythonPathEntries.cpp
+    src/domain/PythonAssets.cpp
+    src/domain/ServerUrl.cpp
+    src/domain/TenantInfo.cpp
     src/domain/VersionCompare.cpp
     src/services/ApiClient.cpp
     src/services/ApiClient_fetchFile.cpp
@@ -76,6 +82,7 @@ set(LIB_SOURCES
     src/services/EntryRepository_applyCatalog.cpp
     src/services/EntryRepository_ensureDetail.cpp
     src/services/EntryRepository_refreshFallback.cpp
+    src/services/EntryRepository_tenantCatalog.cpp
     src/services/GameManager.cpp
     src/services/GameManager_connectProcess.cpp
     src/services/GameManager_connectProcess_finishRun.cpp
@@ -89,16 +96,21 @@ set(LIB_SOURCES
     src/services/InstallPlanner_steps.cpp
     src/services/InstallRunner.cpp
     src/services/InstallRunner_concerns.cpp
+    src/services/LanguageManager.cpp
+    src/services/MemorySecretStore.cpp
     src/services/ModuleInstaller.cpp
     src/services/ModuleInstaller_annotate.cpp
     src/services/ModuleInstaller_fail.cpp
     src/services/ModuleInstaller_install.cpp
+    src/services/ModuleInstaller_orphans.cpp
     src/services/ModuleInstaller_performInstall.cpp
     src/services/ModuleInstaller_removeDirectory.cpp
     src/services/ModuleInstaller_uninstall.cpp
+    src/services/NetworkFetcher.cpp
     src/services/PathManager.cpp
     src/services/PathManager_depDir.cpp
     src/services/PathManager_gameDir.cpp
+    src/services/PathManager_venv.cpp
     src/services/PipInstaller.cpp
     src/services/PipInstaller_cancel.cpp
     src/services/PipInstaller_install.cpp
@@ -107,13 +119,25 @@ set(LIB_SOURCES
     src/services/PipResolver_check.cpp
     src/services/PlanWalk.cpp
     src/services/PythonLocator.cpp
+    src/services/PythonProvisioner.cpp
+    src/services/PythonProvisioner_install.cpp
+    src/services/PythonProvisioner_resolve.cpp
+    src/services/QProcessRunner.cpp
+    src/services/RequestAuth.cpp
+    src/services/SecretStore_factory.cpp
+    src/services/SecretStore_linux.cpp
+    src/services/SecretStore_mac.cpp
+    src/services/SecretStore_win.cpp
     src/services/SettingsBase.cpp
     src/services/SettingsManager.cpp
     src/services/SettingsManager_detectArch.cpp
     src/services/SettingsManager_load.cpp
+    src/services/SettingsManager_servers.cpp
     src/services/SettingsManager_tenantSlug.cpp
     src/services/SingleInstance.cpp
     src/services/SingleInstance_onNewConnection.cpp
+    src/services/SiteDirectory.cpp
+    src/services/TokenVault.cpp
     src/services/UrlSchemeRegistrar.cpp
     src/services/UrlSchemeRegistrar_registerForCurrentUser.cpp
 )
@@ -124,15 +148,20 @@ set(LIB_HEADERS
     src/domain/CatalogParser.h
     src/domain/DeepLinkParser.h
     src/domain/DependencyResolver.h
+    src/domain/DownloadError.h
     src/domain/DownloadVerifier.h
     src/domain/Format.h
     src/domain/GameEntry.h
+    src/domain/HnText.h
     src/domain/InstallJob.h
     src/domain/InstallPlan.h
     src/domain/InstallRecordJson.h
     src/domain/InstallStateStore.h
     src/domain/LaunchResolver.h
     src/domain/MediaRef.h
+    src/domain/PythonAssets.h
+    src/domain/ServerUrl.h
+    src/domain/TenantInfo.h
     src/domain/VersionCompare.h
     src/services/ApiClient.h
     src/services/ArchiveEntry.h
@@ -141,17 +170,25 @@ set(LIB_HEADERS
     src/services/DownloadManager.h
     src/services/EntryRepository.h
     src/services/GameManager.h
+    src/services/HttpFetcher.h
     src/services/InstallPlanner.h
     src/services/InstallRunner.h
+    src/services/LanguageManager.h
     src/services/ModuleInstaller.h
     src/services/PathManager.h
     src/services/PipInstaller.h
     src/services/PipResolver.h
     src/services/PlanWalk.h
+    src/services/ProcessRunner.h
     src/services/PythonLocator.h
+    src/services/PythonProvisioner.h
+    src/services/RequestAuth.h
+    src/services/SecretStore.h
     src/services/SettingsBase.h
     src/services/SettingsManager.h
     src/services/SingleInstance.h
+    src/services/SiteDirectory.h
+    src/services/TokenVault.h
     src/services/UrlSchemeRegistrar.h
 )
 
@@ -164,6 +201,15 @@ target_link_libraries(hypernucleus_lib
     QuaZip::QuaZip
 )
 target_include_directories(hypernucleus_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# OS keychain for the login token (services/SecretStore_*.cpp).
+if(WIN32)
+    target_link_libraries(hypernucleus_lib PUBLIC advapi32)
+elseif(APPLE)
+    find_library(HN_SECURITY Security REQUIRED)
+    find_library(HN_COREFOUNDATION CoreFoundation REQUIRED)
+    target_link_libraries(hypernucleus_lib PUBLIC
+        ${HN_SECURITY} ${HN_COREFOUNDATION})
+endif()
 # Lets the QML module (and qmllint) see the services used from QML.
 qt_extract_metatypes(hypernucleus_lib)
 
@@ -247,6 +293,8 @@ qt_add_qml_module(hypernucleus
         qml/components/StoreGridPage.qml
         qml/components/StoreHeader.qml
         qml/components/StoreView.qml
+        qml/components/SuggestBox.qml
+        qml/components/SuggestPopup.qml
         qml/components/TagChip.qml
         qml/components/ThemeToggle.qml
         qml/components/Toast.qml
@@ -257,16 +305,21 @@ qt_add_qml_module(hypernucleus
         qml/dialogs/AuthButtons.qml
         qml/dialogs/AuthField.qml
         qml/dialogs/ConfirmLinkDialog.qml
+        qml/dialogs/ConnectFields.qml
+        qml/dialogs/ConnectPanel.qml
         qml/dialogs/ErrorLabel.qml
         qml/dialogs/FieldHint.qml
         qml/dialogs/FieldLabel.qml
+        qml/dialogs/FormScroll.qml
         qml/dialogs/LoginDialog.qml
         qml/dialogs/LoginFields.qml
+        qml/dialogs/PythonPromptDialog.qml
         qml/dialogs/RegisterDialog.qml
         qml/dialogs/RegisterFields.qml
         qml/dialogs/SettingsBlock.qml
         qml/dialogs/SettingsDialog.qml
         qml/dialogs/SettingsGeneralTab.qml
+        qml/dialogs/SettingsLanguage.qml
         qml/dialogs/SettingsLinksTab.qml
         qml/dialogs/SettingsPythonTab.qml
         qml/theme/Theme.qml
@@ -275,14 +328,17 @@ qt_add_qml_module(hypernucleus
         src/models/GameDepModel.cpp
         src/models/GameDepModel_data.cpp
         src/models/GameDepModel_fillRow.cpp
+        src/models/GameDepModel_rebuild.cpp
         src/models/GameDepModel_refreshAll.cpp
         src/models/GameDepModel_statusTextOf.cpp
         src/models/GameFilterModel.cpp
         src/models/GameFilterModel_filterAcceptsRow.cpp
+        src/viewmodels/ConnectController.cpp
         src/viewmodels/DeepLinkController.cpp
         src/viewmodels/DownloadCenter.cpp
         src/viewmodels/DownloadCenter_cancelActive.cpp
         src/viewmodels/DownloadCenter_enqueue.cpp
+        src/viewmodels/DownloadCenter_external.cpp
         src/viewmodels/DownloadCenter_onProgress.cpp
         src/viewmodels/MainViewModel.cpp
         src/viewmodels/MainViewModelBase.cpp
@@ -295,9 +351,12 @@ qt_add_qml_module(hypernucleus
         src/viewmodels/MainViewModel_wireGameSignals.cpp
         src/viewmodels/MainViewModel_wireInstallSignals.cpp
         src/viewmodels/MainViewModel_wireSettings.cpp
+        src/viewmodels/PythonSetup.cpp
+        src/viewmodels/PythonSetup_wire.cpp
         src/viewmodels/SelectedGameView.cpp
         src/viewmodels/SelectedGameView_build.cpp
         src/viewmodels/SelectedGameView_primaryFor.cpp
+        src/viewmodels/SelectedGameView_stats.cpp
         src/viewmodels/ServiceHolder.cpp
         src/viewmodels/SettingsEditBase.cpp
         src/viewmodels/SettingsViewModel.cpp
@@ -309,17 +368,155 @@ qt_add_qml_module(hypernucleus
         src/models/GameDepModel.h
         src/models/GameDepRows.h
         src/models/GameFilterModel.h
+        src/viewmodels/ConnectController.h
         src/viewmodels/DeepLinkController.h
         src/viewmodels/DownloadCenter.h
         src/viewmodels/MainViewModel.h
         src/viewmodels/MainViewModelBase.h
         src/viewmodels/MainViewModelDeps.h
+        src/viewmodels/PythonSetup.h
         src/viewmodels/SelectedGameView.h
         src/viewmodels/ServiceHolder.h
         src/viewmodels/SettingsEditBase.h
         src/viewmodels/SettingsViewModel.h
         src/viewmodels/UrlEventFilter.h
 )
+
+# Translations: translations/*.ts are compiled to .qm (lrelease) and embedded
+# under :/translations. `ninja update_translations` re-runs lupdate.
+set(HN_TS_FILES
+    translations/hypernucleus_en.ts
+    translations/hypernucleus_es.ts
+    translations/hypernucleus_fr.ts
+)
+# lupdate reads the library (services, domain), the UI types and the QML.
+set(HN_TR_SOURCES ${LIB_SOURCES}
+    src/main.cpp
+    src/models/DependencyModel.cpp
+    src/models/GameDepModel.cpp
+    src/models/GameDepModel_data.cpp
+    src/models/GameDepModel_fillRow.cpp
+    src/models/GameDepModel_rebuild.cpp
+    src/models/GameDepModel_refreshAll.cpp
+    src/models/GameDepModel_statusTextOf.cpp
+    src/models/GameFilterModel.cpp
+    src/models/GameFilterModel_filterAcceptsRow.cpp
+    src/viewmodels/ConnectController.cpp
+    src/viewmodels/DeepLinkController.cpp
+    src/viewmodels/DownloadCenter.cpp
+    src/viewmodels/DownloadCenter_cancelActive.cpp
+    src/viewmodels/DownloadCenter_enqueue.cpp
+    src/viewmodels/DownloadCenter_external.cpp
+    src/viewmodels/DownloadCenter_onProgress.cpp
+    src/viewmodels/MainViewModel.cpp
+    src/viewmodels/MainViewModelBase.cpp
+    src/viewmodels/MainViewModel_cancelDownload.cpp
+    src/viewmodels/MainViewModel_dispatch.cpp
+    src/viewmodels/MainViewModel_handleUrl.cpp
+    src/viewmodels/MainViewModel_refreshSelected.cpp
+    src/viewmodels/MainViewModel_runLinkAction.cpp
+    src/viewmodels/MainViewModel_wireCatalog.cpp
+    src/viewmodels/MainViewModel_wireGameSignals.cpp
+    src/viewmodels/MainViewModel_wireInstallSignals.cpp
+    src/viewmodels/MainViewModel_wireSettings.cpp
+    src/viewmodels/PythonSetup.cpp
+    src/viewmodels/PythonSetup_wire.cpp
+    src/viewmodels/SelectedGameView.cpp
+    src/viewmodels/SelectedGameView_build.cpp
+    src/viewmodels/SelectedGameView_primaryFor.cpp
+    src/viewmodels/SelectedGameView_stats.cpp
+    src/viewmodels/ServiceHolder.cpp
+    src/viewmodels/SettingsEditBase.cpp
+    src/viewmodels/SettingsViewModel.cpp
+    src/viewmodels/SettingsViewModel_cancel.cpp
+    src/viewmodels/SettingsViewModel_checkDirty.cpp
+    src/viewmodels/SettingsViewModel_preferPip.cpp
+    qml/Main.qml
+    qml/components/AccountButton.qml
+    qml/components/AppShortcuts.qml
+    qml/components/CardInfo.qml
+    qml/components/CoverArt.qml
+    qml/components/DependencyRow.qml
+    qml/components/DetailRow.qml
+    qml/components/DownloadBar.qml
+    qml/components/DownloadInfo.qml
+    qml/components/GameCard.qml
+    qml/components/GameDepTab.qml
+    qml/components/GameListItem.qml
+    qml/components/GroupHeader.qml
+    qml/components/HeroBanner.qml
+    qml/components/InfoAbout.qml
+    qml/components/InfoActionBar.qml
+    qml/components/InfoBody.qml
+    qml/components/InfoDetails.qml
+    qml/components/InfoEmpty.qml
+    qml/components/InfoLog.qml
+    qml/components/InfoMoreMenu.qml
+    qml/components/InfoPanel.qml
+    qml/components/InfoRequirements.qml
+    qml/components/InfoStatus.qml
+    qml/components/LibraryFilters.qml
+    qml/components/LibraryList.qml
+    qml/components/LibrarySidebar.qml
+    qml/components/ListEmpty.qml
+    qml/components/ListThumb.qml
+    qml/components/ListTitles.qml
+    qml/components/MainContent.qml
+    qml/components/PicturesPanel.qml
+    qml/components/PrimaryButton.qml
+    qml/components/ProgressOverlay.qml
+    qml/components/ScreenshotViewer.qml
+    qml/components/SectionTitle.qml
+    qml/components/StoreCategories.qml
+    qml/components/StoreCell.qml
+    qml/components/StoreGrid.qml
+    qml/components/StoreGridPage.qml
+    qml/components/StoreHeader.qml
+    qml/components/StoreView.qml
+    qml/components/SuggestBox.qml
+    qml/components/SuggestPopup.qml
+    qml/components/TagChip.qml
+    qml/components/ThemeToggle.qml
+    qml/components/Toast.qml
+    qml/components/ToolBar.qml
+    qml/components/TopTab.qml
+    qml/components/VersionPicker.qml
+    qml/dialogs/AppDialogs.qml
+    qml/dialogs/AuthButtons.qml
+    qml/dialogs/AuthField.qml
+    qml/dialogs/ConfirmLinkDialog.qml
+    qml/dialogs/ConnectFields.qml
+    qml/dialogs/ConnectPanel.qml
+    qml/dialogs/ErrorLabel.qml
+    qml/dialogs/FieldHint.qml
+    qml/dialogs/FieldLabel.qml
+    qml/dialogs/FormScroll.qml
+    qml/dialogs/LoginDialog.qml
+    qml/dialogs/LoginFields.qml
+    qml/dialogs/PythonPromptDialog.qml
+    qml/dialogs/RegisterDialog.qml
+    qml/dialogs/RegisterFields.qml
+    qml/dialogs/SettingsBlock.qml
+    qml/dialogs/SettingsDialog.qml
+    qml/dialogs/SettingsGeneralTab.qml
+    qml/dialogs/SettingsLanguage.qml
+    qml/dialogs/SettingsLinksTab.qml
+    qml/dialogs/SettingsPythonTab.qml
+    qml/theme/Theme.qml
+)
+list(TRANSFORM HN_TR_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+qt_add_lupdate(hypernucleus TS_FILES ${HN_TS_FILES}
+    SOURCES ${HN_TR_SOURCES}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src
+    OPTIONS -no-obsolete)
+qt_add_lrelease(hypernucleus TS_FILES ${HN_TS_FILES}
+    QM_FILES_OUTPUT_VARIABLE HN_QM_FILES)
+qt_add_resources(hypernucleus hn_translations
+    PREFIX /translations
+    BASE ${CMAKE_CURRENT_BINARY_DIR}
+    FILES ${HN_QM_FILES})
+# Folder of the compiled .qm files, for the translation tests.
+set(HN_QM_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # Testing
 if(BUILD_TESTS)

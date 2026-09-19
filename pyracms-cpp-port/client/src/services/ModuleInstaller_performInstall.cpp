@@ -44,7 +44,7 @@ void ModuleInstaller::performInstall(const QString& archivePath)
             result =
                 ArchiveExtractor::installLayout(staging, targetDir, job.name);
         } else {
-            result.error = "Could not copy downloaded file";
+            result.error = tr("Could not copy downloaded file");
         }
     }
     if (!result.ok) {

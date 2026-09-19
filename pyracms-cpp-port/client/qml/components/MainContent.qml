@@ -11,6 +11,7 @@ ColumnLayout {
     signal tabRequested(int index)
     signal settingsRequested()
     signal loginRequested()
+    signal connectRequested()
     signal showGameRequested(string name)
 
     function focusSearch() {
@@ -28,6 +29,7 @@ ColumnLayout {
         onTabRequested: (index) => root.tabRequested(index)
         onSettingsRequested: root.settingsRequested()
         onLoginRequested: root.loginRequested()
+        onConnectRequested: root.connectRequested()
     }
 
     StackLayout {

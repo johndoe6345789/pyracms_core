@@ -13,6 +13,7 @@ Rectangle {
     signal tabRequested(int index)
     signal settingsRequested()
     signal loginRequested()
+    signal connectRequested()
 
     implicitHeight: 52
     color: Theme.topBar
@@ -50,6 +51,12 @@ Rectangle {
             visible: running
             Layout.preferredWidth: 32
             Layout.preferredHeight: 32
+        }
+        ToolButton {
+            visible: MainViewModel.connection.needsConnect
+            text: qsTr("Connect")
+            font.bold: true
+            onClicked: root.connectRequested()
         }
         ToolButton {
             text: qsTr("Refresh")

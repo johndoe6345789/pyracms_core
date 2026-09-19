@@ -23,3 +23,9 @@ def test_login_with_username_password(monkeypatch):
            "HN_API_PASSWORD": "p", "HN_API_TENANT": "t"}
     assert hn_env.env_client(env) is not None
     assert seen["args"] == ("u", "p", "t")
+
+
+def test_tenant_id_from_env():
+    c = hn_env.env_client({"HN_API_URL": "http://h", "HN_API_TOKEN": "t",
+                           "HN_API_TENANT_ID": "1"})
+    assert c.tenant_id == "1"

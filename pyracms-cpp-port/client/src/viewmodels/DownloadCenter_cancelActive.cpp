@@ -11,6 +11,10 @@ namespace Hypernucleus {
 void DownloadCenter::cancelActive()
 {
     if (!busy()) return;
+    if (m_external) {
+        emit externalCancelRequested();
+        return;
+    }
     m_cancelled = true;
     if (m_planner->isPlanning()) {
         const QString name = m_active;

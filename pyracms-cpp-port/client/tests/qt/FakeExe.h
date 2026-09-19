@@ -34,6 +34,7 @@ inline void configure(const QString& echo = QString(), int exitCode = 0,
     qputenv("FAKEEXE_ECHO", echo.toUtf8());
     qputenv("FAKEEXE_EXIT", QByteArray::number(exitCode));
     qputenv("FAKEEXE_SLEEP", QByteArray::number(sleepSeconds));
+    qputenv("FAKEEXE_SELF", path().toUtf8()); // for `-m venv`
 }
 
 // Copies the helper to `target` (made executable) and returns `target`.

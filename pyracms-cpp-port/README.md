@@ -134,6 +134,8 @@ cd backend/build
   UI at http://localhost:3199, every port bound to `127.0.0.1`, throwaway
   credentials, demo data (`SEED_DEV=1`, admin/password123) and the host
   `docker.sock` mounted for the code runner. Do not expose it to a network.
+  The six demo games get downloadable archives via
+  `scripts/seed_games.py` ([`docs/GAME_ARCHIVES.md`](docs/GAME_ARCHIVES.md)).
 * **Production** = base file + `docker-compose.prod.yml`, with secrets in an
   untracked env file (see `.env.prod.example`, `./scripts/gen-env.sh`):
 

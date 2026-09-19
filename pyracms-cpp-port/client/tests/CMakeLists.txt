@@ -5,9 +5,12 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 # --- QtTest suites: one executable per file in tests/qt ---------------------
 # Auto-generated -- run `python generate_cmake.py` to update
 set(QT_TEST_SOURCES
+    qt/qtst_AnonymousDownload.cpp
     qt/qtst_ApiClient.cpp
     qt/qtst_ApiLogin.cpp
     qt/qtst_ApiLogin_2.cpp
+    qt/qtst_BackendBinaries.cpp
+    qt/qtst_BackendCatalog.cpp
     qt/qtst_BinarySelector.cpp
     qt/qtst_BinarySelector_2.cpp
     qt/qtst_BinarySelector_3.cpp
@@ -21,6 +24,7 @@ set(QT_TEST_SOURCES
     qt/qtst_DeepLinkParser_2.cpp
     qt/qtst_DeepLinkParser_3.cpp
     qt/qtst_DependencyResolver.cpp
+    qt/qtst_DownloadError.cpp
     qt/qtst_DownloadManager.cpp
     qt/qtst_DownloadManager_2.cpp
     qt/qtst_DownloadManager_3.cpp
@@ -32,6 +36,8 @@ set(QT_TEST_SOURCES
     qt/qtst_EntryRepository.cpp
     qt/qtst_EntryRepository_2.cpp
     qt/qtst_EntryRepository_3.cpp
+    qt/qtst_EntryRepository_4.cpp
+    qt/qtst_EntryRepository_5.cpp
     qt/qtst_InstallFlow.cpp
     qt/qtst_InstallFlow_2.cpp
     qt/qtst_InstallFlow_3.cpp
@@ -54,14 +60,32 @@ set(QT_TEST_SOURCES
     qt/qtst_LaunchFlow_6.cpp
     qt/qtst_LaunchNative.cpp
     qt/qtst_LaunchPython.cpp
+    qt/qtst_LaunchVenv.cpp
+    qt/qtst_Orphans.cpp
     qt/qtst_PipInstaller.cpp
     qt/qtst_PipResolver.cpp
     qt/qtst_PipRun.cpp
     qt/qtst_PipRun_2.cpp
     qt/qtst_PipSpec.cpp
+    qt/qtst_PipVenv.cpp
     qt/qtst_PlannerErrors.cpp
     qt/qtst_PlannerErrors_2.cpp
+    qt/qtst_PrivateDownload.cpp
+    qt/qtst_PythonAssets.cpp
+    qt/qtst_PythonProvision.cpp
+    qt/qtst_PythonProvision_2.cpp
+    qt/qtst_RequestAuth.cpp
+    qt/qtst_SecretStore.cpp
+    qt/qtst_ServerSettings.cpp
+    qt/qtst_ServerSettings_2.cpp
+    qt/qtst_ServerUrl.cpp
+    qt/qtst_ServerUrl_2.cpp
     qt/qtst_SingleInstance.cpp
+    qt/qtst_SiteDirectory.cpp
+    qt/qtst_SiteDirectory_2.cpp
+    qt/qtst_TenantInfo.cpp
+    qt/qtst_UiConnect.cpp
+    qt/qtst_UiConnect_2.cpp
     qt/qtst_UiDeepLinkAndSettings.cpp
     qt/qtst_UiDeepLinkAndSettings_2.cpp
     qt/qtst_UiDeepLinkAndSettings_3.cpp
@@ -79,6 +103,7 @@ set(QT_TEST_SOURCES
     qt/qtst_UiMainViewModel.cpp
     qt/qtst_UiMainViewModel_2.cpp
     qt/qtst_UiMainViewModel_3.cpp
+    qt/qtst_UiPythonSetup.cpp
     qt/qtst_UiSelectedView.cpp
     qt/qtst_UiSelectedView_2.cpp
 )
@@ -91,14 +116,17 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_data.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_fillRow.cpp
+    ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_rebuild.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_refreshAll.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_statusTextOf.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel_filterAcceptsRow.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/ConnectController.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DeepLinkController.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_cancelActive.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_enqueue.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_external.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_onProgress.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelBase.cpp
@@ -111,9 +139,12 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_wireGameSignals.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_wireInstallSignals.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_wireSettings.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup_wire.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView_build.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView_primaryFor.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView_stats.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/ServiceHolder.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SettingsEditBase.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SettingsViewModel.cpp
@@ -125,11 +156,13 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel.h
     ${CMAKE_SOURCE_DIR}/src/models/GameDepRows.h
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel.h
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/ConnectController.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DeepLinkController.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelBase.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelDeps.h
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/ServiceHolder.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SettingsEditBase.h
@@ -155,7 +188,10 @@ foreach(test_src ${QT_TEST_SOURCES})
     endif()
     add_dependencies(${test_name} fakeexe)
     target_compile_definitions(${test_name} PRIVATE
-        FAKEEXE_PATH="$<TARGET_FILE:fakeexe>")
+        FAKEEXE_PATH="$<TARGET_FILE:fakeexe>"
+        FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
+        QM_DIR="${HN_QM_DIR}")
+    add_dependencies(${test_name} hypernucleus_lrelease)
     add_test(NAME ${test_name} COMMAND ${test_name})
     # The suites use their own QSettings / data folders, never the user's.
     set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

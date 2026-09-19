@@ -18,9 +18,9 @@ InstallPlan InstallPlanner::build(QString* error) const
     const RevisionInfo* rev = root->revision(version);
     if (version.isEmpty() || !rev || !rev->published) {
         *error = version.isEmpty()
-                     ? QStringLiteral("%1 has no published version")
+                     ? tr("%1 has no published version")
                            .arg(root->title())
-                     : QStringLiteral("Version %1 of %2 is not available")
+                     : tr("Version %1 of %2 is not available")
                            .arg(version, root->title());
         return plan;
     }

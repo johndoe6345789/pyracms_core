@@ -1,4 +1,5 @@
 #include "services/UrlSchemeRegistrar.h"
+#include "domain/HnText.h"
 
 #include <QDir>
 #include <QFile>
@@ -40,8 +41,8 @@ bool registerForCurrentUser(const QString& exePath, QString* error)
     Q_UNUSED(exePath)
     if (error)
         *error =
-            "On macOS the pyracms:// scheme is declared in the app bundle's "
-            "Info.plist (see client/README.md).";
+            HnText::tr("On macOS the pyracms:// scheme is declared in the app "
+                       "bundle's Info.plist (see client/README.md).");
     return false;
 #else
     const QString dir =
@@ -50,7 +51,7 @@ bool registerForCurrentUser(const QString& exePath, QString* error)
     QDir().mkpath(dir);
     QFile f(dir + "/hypernucleus-url.desktop");
     if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if (error) *error = "Cannot write " + f.fileName();
+        if (error) *error = HnText::tr("Cannot write %1").arg(f.fileName());
         return false;
     }
     f.write(desktopEntry(exePath).toUtf8());

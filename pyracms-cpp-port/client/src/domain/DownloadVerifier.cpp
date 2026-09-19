@@ -1,4 +1,5 @@
 #include "domain/DownloadVerifier.h"
+#include "domain/HnText.h"
 
 #include <QCryptographicHash>
 #include <QFile>
@@ -29,11 +30,11 @@ VerifyResult verify(const QString& path, qint64 expectedSize,
     VerifyResult r;
     const QFileInfo fi(path);
     if (!fi.exists() || !fi.isFile()) {
-        r.error = QStringLiteral("Downloaded file is missing");
+        r.error = HnText::tr("Downloaded file is missing");
         return r;
     }
     if (expectedSize > 0 && fi.size() != expectedSize) {
-        r.error = QStringLiteral("Size mismatch: expected %1 bytes, got %2")
+        r.error = HnText::tr("Size mismatch: expected %1 bytes, got %2")
                       .arg(expectedSize)
                       .arg(fi.size());
         return r;
@@ -42,11 +43,11 @@ VerifyResult verify(const QString& path, qint64 expectedSize,
     if (!want.isEmpty()) {
         const QString got = sha256File(path);
         if (got.isEmpty()) {
-            r.error = QStringLiteral("Could not read downloaded file");
+            r.error = HnText::tr("Could not read downloaded file");
             return r;
         }
         if (got != want) {
-            r.error = QStringLiteral("Checksum mismatch (sha256)");
+            r.error = HnText::tr("Checksum mismatch (sha256)");
             return r;
         }
     }

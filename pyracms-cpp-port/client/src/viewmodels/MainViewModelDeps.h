@@ -4,6 +4,7 @@
 #include "viewmodels/MainViewModel.h"
 #include "viewmodels/DeepLinkController.h"
 #include "viewmodels/DownloadCenter.h"
+#include "viewmodels/PythonSetup.h"
 #include "viewmodels/SelectedGameView.h"
 #include "viewmodels/SettingsViewModel.h"
 #include "models/Constants.h"

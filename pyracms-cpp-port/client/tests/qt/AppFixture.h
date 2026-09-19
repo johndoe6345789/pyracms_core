@@ -14,7 +14,8 @@ struct AppFixture {
             "tetris", "1.0",
             {{"tetris/__init__.py", "def main():\n    print('tetris-ran')\n"}});
         addGame("racer", "0.5", {{"racer/__init__.py", "def main(): pass"}});
-        http.routes["/api/outputs/json"] = catalog();
+        http.routes["/api/tenants/acme"] = R"({"id":7,"slug":"acme"})";
+        http.routes["/api/gamedep/catalog?tenant_id=7"] = catalog();
         Hypernucleus::SettingsManager s;
         s.setRepoUrl(http.baseUrl());
         s.setTenantSlug("acme");

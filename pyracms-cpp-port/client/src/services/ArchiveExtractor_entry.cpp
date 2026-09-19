@@ -1,4 +1,5 @@
 #include "services/ArchiveEntry.h"
+#include "domain/HnText.h"
 
 #include <QDir>
 #include <QFile>
@@ -13,13 +14,13 @@ bool copyCurrentEntry(QuaZip& zip, QuaZipFile& zipFile,
 {
     QDir().mkpath(QFileInfo(outputPath).absolutePath());
     if (!zipFile.open(QIODevice::ReadOnly)) {
-        res.error = "Failed to read archive entry: " + entryName;
+        res.error = HnText::tr("Failed to read archive entry: %1").arg(entryName);
         return false;
     }
     QFile out(outputPath);
     if (!out.open(QIODevice::WriteOnly)) {
         zipFile.close();
-        res.error = "Failed to write file: " + outputPath;
+        res.error = HnText::tr("Failed to write file: %1").arg(outputPath);
         return false;
     }
     constexpr qint64 kChunk = 65536;

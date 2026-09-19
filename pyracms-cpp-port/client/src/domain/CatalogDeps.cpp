@@ -15,7 +15,7 @@ QList<DepRef> parseDeps(const QJsonArray& arr)
             const QJsonObject o = v.toObject();
             d.name = firstString(o, {"dependency", "name", "depName"});
             d.version = firstString(o, {"version", "depVersion"});
-            d.source = o.value("source").toString().toLower();
+            d.source = firstString(o, {"source", "kind"}).toLower();
             if (d.source != "pip" && d.source != "pyracms") d.source.clear();
         } else {
             d.name = v.toString();

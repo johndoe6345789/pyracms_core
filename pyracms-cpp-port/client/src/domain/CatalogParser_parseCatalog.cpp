@@ -56,6 +56,8 @@ void mergeDetail(GameEntry& into, const QJsonObject& detail)
         into.dislikes = d.dislikes;
     }
     if (d.views) into.views = d.views;
+    if (d.downloads) into.downloads = d.downloads;
+    if (!d.owner.isEmpty()) into.owner = d.owner;
     into.detailLoaded = true;
 }
 

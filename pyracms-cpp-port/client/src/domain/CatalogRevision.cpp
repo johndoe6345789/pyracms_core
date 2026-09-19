@@ -17,6 +17,7 @@ BinaryInfo parseBinary(const QJsonObject& o)
     b.size = firstNumber(o, {"size", "sizeBytes", "fileSize", "file_size"});
     b.sha256 = cleanSha(firstString(o, {"sha256", "checksum", "sha256sum"}));
     b.executable = firstString(o, {"executable", "entryPoint", "entry_point"});
+    b.downloads = firstNumber(o, {"downloadCount", "downloads"});
     return b;
 }
 
@@ -33,6 +34,7 @@ RevisionInfo parseRevision(const QJsonObject& o)
     r.size = firstNumber(o, {"size", "sizeBytes", "fileSize", "file_size"});
     r.sha256 = cleanSha(firstString(o, {"sha256", "checksum", "sha256sum"}));
     r.executable = firstString(o, {"executable", "entryPoint", "entry_point"});
+    r.downloads = firstNumber(o, {"downloadCount", "downloads"});
     const QJsonArray bins = o.value("binaries").toArray();
     for (const QJsonValue& bv : bins) {
         if (bv.isObject()) r.binaries.append(parseBinary(bv.toObject()));

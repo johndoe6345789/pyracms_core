@@ -13,7 +13,7 @@ bool InstallRunner::concerns(const QString& name) const
 void InstallRunner::run(const InstallPlan& plan)
 {
     if (m_running) {
-        emit failed(plan.rootName, "Another installation is already running");
+        emit failed(plan.rootName, tr("Another installation is already running"));
         return;
     }
     m_plan = plan;

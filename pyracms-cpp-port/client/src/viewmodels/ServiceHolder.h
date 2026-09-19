@@ -1,5 +1,7 @@
 #pragma once
 
+#include "viewmodels/ConnectController.h"
+
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 
@@ -22,14 +24,18 @@ class PipInstaller;
 class PipResolver;
 class SettingsManager;
 class SettingsViewModel;
+class PythonSetup;
 
 // Owns nothing itself: createServices() builds every service and model as a
 // child of `owner`, in dependency order.
 class ServiceHolder : public QObject {
     Q_OBJECT
     QML_ANONYMOUS
+    Q_PROPERTY(Hypernucleus::ConnectController* connection READ connection
+                   CONSTANT)
 
 public:
+    ConnectController* connection() const { return m_connect; }
     using QObject::QObject;
 
 protected:
@@ -53,6 +59,8 @@ protected:
     DependencyModel* m_deps = nullptr;
     DeepLinkController* m_deepLinks = nullptr;
     SettingsViewModel* m_settingsEditor = nullptr;
+    PythonSetup* m_python = nullptr;
+    ConnectController* m_connect = nullptr;
 };
 
 } // namespace Hypernucleus

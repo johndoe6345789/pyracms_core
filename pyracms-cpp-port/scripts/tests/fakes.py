@@ -47,6 +47,9 @@ class FakeClient:
             raise self.fail[(method, path)]
         return {}
 
+    def get_page(self, type_, name):
+        return {"revisions": []}
+
     def ensure_page(self, type_, name, display, description):
         self.calls.append(("page", type_, name))
 

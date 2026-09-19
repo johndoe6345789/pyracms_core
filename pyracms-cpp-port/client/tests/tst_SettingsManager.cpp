@@ -3,7 +3,7 @@
 // --- Default Values Tests ---
 
 TEST_F(SettingsManagerTest, DefaultRepoUrl) {
-    EXPECT_EQ(m_manager->repoUrl(), QString("http://localhost:8080"));
+    EXPECT_EQ(m_manager->repoUrl(), QString("http://localhost:3199"));
 }
 
 TEST_F(SettingsManagerTest, DefaultChunkSize) {

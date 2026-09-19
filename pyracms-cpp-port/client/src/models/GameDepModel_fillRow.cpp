@@ -3,6 +3,8 @@
 #include "services/ApiClient.h"
 #include "services/EntryRepository.h"
 #include "services/ModuleInstaller.h"
+#include "domain/BinarySelector.h"
+#include "domain/Format.h"
 #include "domain/MediaRef.h"
 #include "domain/VersionCompare.h"
 #include "viewmodels/SelectedGameView.h"
@@ -37,39 +39,12 @@ void GameDepModel::fillRow(Row& row) const
             ? e->hero
             : (!e->screenshots.isEmpty() ? e->screenshots.first() : QString());
     row.accent = accentFor(e->name);
-}
-
-void GameDepModel::rebuild()
-{
-    if (!m_repo) return;
-    beginResetModel();
-    m_rows.clear();
-    const QList<GameEntry> games = m_repo->entries("game");
-    for (const GameEntry& g : games) {
-        Row r;
-        r.name = g.name;
-        fillRow(r);
-        m_rows.append(r);
-    }
-    std::sort(m_rows.begin(), m_rows.end(), [](const Row& a, const Row& b) {
-        return a.title.compare(b.title, Qt::CaseInsensitive) < 0;
-    });
-    endResetModel();
-    emit countChanged();
-    emit categoriesChanged();
-}
-
-int GameDepModel::rowOf(const QString& name) const
-{
-    for (int i = 0; i < m_rows.size(); ++i)
-        if (m_rows.at(i).name == name) return i;
-    return -1;
-}
-
-void GameDepModel::emitRow(int row, const QList<int>& roles)
-{
-    if (row < 0 || row >= m_rows.size()) return;
-    emit dataChanged(index(row), index(row), roles);
+    row.shots = e->screenshots.size();
+    const RevisionInfo* rev = e->revision(row.latest);
+    const DownloadTarget t =
+        rev ? BinarySelector::resolveTarget(*rev, "game", m_os, m_arch)
+            : DownloadTarget();
+    row.size = t.ok && t.size > 0 ? Format::bytes(t.size) : QString();
 }
 
 } // namespace Hypernucleus

@@ -59,3 +59,15 @@ def test_encode_file_guesses_type(tmp_path):
     f.write_text("{}")
     body, ctype = encode_file(str(f))
     assert b"application/json" in body and "boundary=" in ctype
+
+
+def test_gamedep_calls_are_scoped_to_the_tenant_id(monkeypatch):
+    c, fake = client(monkeypatch, [{}, {}, {}])
+    c.tenant_id = "1"
+    c.request("GET", "/api/gamedep/game/x")
+    c.request("GET", "/api/gamedep/catalog?limit=5")
+    c.request("GET", "/api/files")
+    urls = [r.full_url for r in fake.requests]
+    assert urls == ["http://host/api/gamedep/game/x?tenant_id=1",
+                    "http://host/api/gamedep/catalog?limit=5&tenant_id=1",
+                    "http://host/api/files"]

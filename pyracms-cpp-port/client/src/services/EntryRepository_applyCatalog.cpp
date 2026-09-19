@@ -38,19 +38,11 @@ void EntryRepository::refresh()
     // A newer refresh (e.g. after switching site) supersedes older ones.
     const int gen = ++m_generation;
     setRefreshing(true);
-    QPointer<EntryRepository> self(this);
-    m_api->getJson("/api/outputs/json", [self, gen](bool ok,
-                                                    const QJsonDocument& doc,
-                                                    int, const QString& err) {
-        if (!self || gen != self->m_generation) return;
-        if (!ok || !doc.isObject()) {
-            self->refreshFallback(err, gen);
-            return;
-        }
-        self->applyCatalog(CatalogParser::parseCatalog(doc.object()));
-        self->setRefreshing(false);
-        emit self->refreshed();
-    });
+    const QString slug = m_api->tenant();
+    if (slug.isEmpty())
+        fetchCatalog({"/api/outputs/json"}, gen);
+    else
+        resolveTenant(slug, gen);
 }
 
 } // namespace Hypernucleus

@@ -15,7 +15,7 @@ namespace Hypernucleus {
 void DownloadManager::start(const Request& req)
 {
     if (m_jobs.contains(req.id)) {
-        emit failed(req.id, QStringLiteral("Already downloading"));
+        emit failed(req.id, tr("Already downloading"));
         return;
     }
     QDir().mkpath(QFileInfo(req.destPath).absolutePath());
@@ -52,7 +52,7 @@ void DownloadManager::start(const Request& req)
         job->offset > 0 ? (QIODevice::WriteOnly | QIODevice::Append)
                         : (QIODevice::WriteOnly | QIODevice::Truncate);
     if (!job->part.open(mode)) {
-        const QString err = "Cannot write " + partPath;
+        const QString err = tr("Cannot write %1").arg(partPath);
         delete job;
         emit failed(req.id, err);
         return;

@@ -4,10 +4,10 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QTimer>
-#include <QTranslator>
 #include <QUrl>
 
 #include "domain/DeepLinkParser.h"
+#include "services/LanguageManager.h"
 #include "services/SettingsManager.h"
 #include "services/SingleInstance.h"
 #include "viewmodels/MainViewModel.h"
@@ -32,14 +32,11 @@ int main(int argc, char* argv[])
 
     QQuickStyle::setStyle("Material");
 
-    QTranslator translator;
+    // Saved language, or the system's; changed live from Settings.
+    LanguageManager languages;
     {
         SettingsManager tempSettings;
-        const QString lang = tempSettings.language();
-        if (!lang.isEmpty() && lang != "en" &&
-            translator.load("hypernucleus_" + lang, ":/translations")) {
-            app.installTranslator(&translator);
-        }
+        languages.apply(tempSettings.language());
     }
 
     auto* viewModel = new MainViewModel(&app);
@@ -56,6 +53,13 @@ int main(int argc, char* argv[])
 
     QQmlApplicationEngine engine;
     engine.addImportPath(QStringLiteral("qrc:/qt/qml"));
+    QObject::connect(
+        viewModel->settings(), &SettingsManager::languageChanged, viewModel,
+        [&languages, &engine, viewModel]() {
+            languages.apply(viewModel->settings()->language());
+            engine.retranslate();
+            viewModel->retranslate();
+        });
 
     const QUrl mainQml(QStringLiteral("qrc:/qt/qml/Hypernucleus/qml/Main.qml"));
     QObject::connect(

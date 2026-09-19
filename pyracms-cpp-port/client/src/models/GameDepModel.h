@@ -41,6 +41,8 @@ public:
     Q_INVOKABLE bool isFavourite(const QString& name) const;
     Q_INVOKABLE void toggleFavourite(const QString& name);
     QStringList favourites() const { return m_favourites; }
+    // Platform used to pick the build whose size the rows show.
+    void setPlatform(const QString& os, const QString& arch);
     void rebuild();
     void refreshAll();
     void refreshRow(const QString& name);
@@ -59,6 +61,7 @@ private:
     ModuleInstaller* m_installer = nullptr;
     ApiClient* m_api = nullptr;
     QStringList m_favourites;
+    QString m_os, m_arch;
 };
 
 } // namespace Hypernucleus

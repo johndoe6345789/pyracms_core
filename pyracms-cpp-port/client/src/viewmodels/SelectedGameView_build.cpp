@@ -69,10 +69,7 @@ QVariantMap build(const Input& in)
         installed ? Format::bytes(in.record.sizeBytes) : QString();
     m["kind"] = in.record.kind;
     m["depCount"] = e.dependencies.size();
-    m["likes"] = e.likes;
-    m["dislikes"] = e.dislikes;
-    m["views"] = e.views;
-    m["createdAt"] = e.createdAt.left(10);
+    addStats(m, in, selected);
     return m;
 }
 

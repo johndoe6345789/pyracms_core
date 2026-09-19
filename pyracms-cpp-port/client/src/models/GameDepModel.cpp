@@ -59,6 +59,8 @@ QHash<int, QByteArray> GameDepModel::roleNames() const
         {GroupRole, "group"},
         {PrimaryKindRole, "primaryKind"},
         {PrimaryLabelRole, "primaryLabel"},
+        {SizeRole, "downloadSize"},
+        {ScreenshotCountRole, "screenshotCount"},
     };
 }
 

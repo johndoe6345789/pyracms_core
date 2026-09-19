@@ -1,4 +1,5 @@
 #include "viewmodels/SettingsViewModel.h"
+#include "domain/ServerUrl.h"
 #include "services/SettingsManager.h"
 #include "services/ApiClient.h"
 
@@ -24,9 +25,7 @@ SettingsViewModel::SettingsViewModel(SettingsManager* settings,
 
 void SettingsViewModel::onEdited()
 {
-    const QString error = validateUrl(m_repoUrl)
-                              ? QString()
-                              : tr("Invalid URL. Use http:// or https://");
+    const QString error = ServerUrl::error(m_repoUrl);
     if (m_urlError != error) {
         m_urlError = error;
         emit urlErrorChanged();

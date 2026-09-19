@@ -14,14 +14,14 @@ Dialog {
     modal: true
     parent: Overlay.overlay
     anchors.centerIn: parent
-    width: 560
-    height: Math.min(560, parent.height - 60)
+    width: Math.min(Theme.dialogWidthWide, parent.width - 2 * Theme.spaceL)
+    height: Math.min(600, parent.height - 2 * Theme.spaceL)
+    padding: Theme.spaceL
     closePolicy: Popup.CloseOnEscape
 
     onAboutToShow: ed.cancel()   // discard stale edits, reload from disk
 
-    ColumnLayout {
-        anchors.fill: parent
+    contentItem: ColumnLayout {
         spacing: Theme.spaceM
 
         TabBar {
@@ -41,9 +41,19 @@ Dialog {
             SettingsPythonTab { ed: root.ed }
             SettingsLinksTab {}
         }
+    }
 
+    footer: Item {
+        implicitHeight: buttons.implicitHeight + Theme.spaceM + Theme.spaceL
         RowLayout {
-            Layout.fillWidth: true
+            id: buttons
+            anchors.fill: parent
+            anchors.leftMargin: Theme.spaceM
+            anchors.rightMargin: Theme.spaceL
+            anchors.topMargin: Theme.spaceM
+            anchors.bottomMargin: Theme.spaceL
+            spacing: Theme.spaceM
+            SettingsLanguage {}
             Button {
                 text: qsTr("Reset to defaults")
                 flat: true

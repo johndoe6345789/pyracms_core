@@ -20,6 +20,8 @@ GameEntry parseEntry(const QJsonObject& o, const QString& type)
     e.likes = static_cast<int>(firstNumber(o, {"likes"}));
     e.dislikes = static_cast<int>(firstNumber(o, {"dislikes"}));
     e.views = static_cast<int>(firstNumber(o, {"viewCount", "views"}));
+    e.downloads = firstNumber(o, {"downloadCount", "downloads"});
+    e.owner = firstString(o, {"ownerUsername", "owner"});
     e.dependencies = parseDeps(o.value("dependencies").toArray());
     e.pipRequirements = parsePip(o);
     const QJsonArray revs = o.value("revisions").toArray();

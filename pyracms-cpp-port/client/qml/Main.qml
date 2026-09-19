@@ -38,8 +38,9 @@ ApplicationWindow {
             x = geom.x; y = geom.y
             width = geom.width; height = geom.height
         }
-        if (!MainViewModel.auth.authenticated)
-            Qt.callLater(dialogs.openLogin)
+        // No sign-in wall: public games work anonymously.
+        if (MainViewModel.connection.needsConnect)
+            Qt.callLater(dialogs.openConnect)
     }
 
     onClosing: {
@@ -69,6 +70,7 @@ ApplicationWindow {
         onTabRequested: (index) => root.tab = index
         onSettingsRequested: dialogs.openSettings()
         onLoginRequested: dialogs.openLogin()
+        onConnectRequested: dialogs.openConnect()
         onShowGameRequested: (name) => root.showGame(name)
     }
 

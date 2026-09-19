@@ -30,14 +30,6 @@ void SettingsViewModel::fetchOsArchLists()
     emit archListChanged();
 }
 
-bool SettingsViewModel::validateUrl(const QString& url) const
-{
-    const QUrl parsed(url);
-    return parsed.isValid() &&
-           (parsed.scheme() == "http" || parsed.scheme() == "https") &&
-           !parsed.host().isEmpty();
-}
-
 void SettingsViewModel::loadFromSettings()
 {
     m_repoUrl = m_settings->repoUrl();

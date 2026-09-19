@@ -46,6 +46,8 @@ private:
     static QString keyOf(const QString& type, const QString& name);
     void applyCatalog(const QList<GameEntry>& fresh);
     void refreshFallback(const QString& firstError, int generation);
+    void resolveTenant(const QString& slug, int generation);
+    void fetchCatalog(const QStringList& paths, int generation);
     void setRefreshing(bool on);
 
     ApiClient* m_api;

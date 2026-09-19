@@ -6,7 +6,7 @@
 namespace Hypernucleus {
 
 SettingsManager::SettingsManager(QObject* parent)
-    : SettingsBase(parent), m_darkMode(true), m_language("en")
+    : SettingsBase(parent), m_darkMode(true), m_language("system")
 {
     load();
 }

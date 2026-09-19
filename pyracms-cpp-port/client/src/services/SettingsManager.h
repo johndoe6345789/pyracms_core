@@ -2,6 +2,8 @@
 
 #include "services/SettingsBase.h"
 
+#include <QStringList>
+
 namespace Hypernucleus {
 
 class SettingsManager : public Hypernucleus::SettingsBase {
@@ -19,6 +21,8 @@ class SettingsManager : public Hypernucleus::SettingsBase {
                    pythonPathChanged)
     Q_PROPERTY(bool preferPip READ preferPip WRITE setPreferPip NOTIFY
                    preferPipChanged)
+    Q_PROPERTY(QStringList serverChoices READ serverChoices NOTIFY
+                   recentServersChanged)
 
 public:
     explicit SettingsManager(QObject* parent = nullptr);
@@ -40,6 +44,12 @@ public:
     bool preferPip() const;
     void setPreferPip(bool on);
 
+    // Presets + servers used before (persisted, newest first, deduped)
+    QStringList serverChoices() const;
+    QStringList recentServers() const { return m_recentServers; }
+    void setRecentServers(const QStringList& urls);
+    Q_INVOKABLE void rememberServer(const QString& url);
+
     Q_INVOKABLE void save();
     Q_INVOKABLE void load();
     Q_INVOKABLE void reset();
@@ -51,6 +61,7 @@ signals:
     void installDirChanged();
     void pythonPathChanged();
     void preferPipChanged();
+    void recentServersChanged();
 
 private:
     bool m_darkMode;
@@ -59,6 +70,7 @@ private:
     QString m_installDir;
     QString m_pythonPath;
     bool m_preferPip = true;
+    QStringList m_recentServers;
 };
 
 } // namespace Hypernucleus

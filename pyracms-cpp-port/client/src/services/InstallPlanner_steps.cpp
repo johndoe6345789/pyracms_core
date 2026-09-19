@@ -33,22 +33,22 @@ bool InstallPlanner::addDepStep(const DepRef& dep, InstallPlan& plan,
     const GameEntry* entry = m_repo->find(dep.name, "dep");
     if (!entry) {
         *error =
-            QStringLiteral("Dependency '%1' is not available").arg(dep.name);
+            tr("Dependency '%1' is not available").arg(dep.name);
         return false;
     }
     const QString want =
         dep.version.isEmpty() ? entry->latestVersion() : dep.version;
     const RevisionInfo* rev = entry->revision(want);
     if (want.isEmpty() || !rev || !rev->published) {
-        *error = QStringLiteral("Dependency %1 version %2 is not published")
+        *error = tr("Dependency %1 version %2 is not published")
                      .arg(entry->title(),
-                          want.isEmpty() ? QStringLiteral("(any)") : want);
+                          want.isEmpty() ? tr("(any)") : want);
         return false;
     }
     const DownloadTarget target =
         BinarySelector::resolveTarget(*rev, "dep", m_os, m_arch);
     if (!target.ok) {
-        *error = QStringLiteral("Dependency %1: %2")
+        *error = tr("Dependency %1: %2")
                      .arg(entry->title(), target.error);
         return false;
     }

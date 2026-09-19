@@ -68,6 +68,7 @@ void SettingsManager::save()
     settings.setValue("installDir", m_installDir);
     settings.setValue("pythonPath", m_pythonPath);
     settings.setValue("preferPip", m_preferPip);
+    settings.setValue("recentServers", m_recentServers);
     settings.endGroup();
     settings.sync();
 }

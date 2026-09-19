@@ -17,7 +17,7 @@ void ModuleInstaller::uninstall(const QString& name, const QString& version,
                                 const QString& type)
 {
     if (!m_store.contains(name)) {
-        emit uninstallFailed(name, "Module is not installed");
+        emit uninstallFailed(name, tr("Module is not installed"));
         return;
     }
     const InstallRecord rec = m_store.get(name);
@@ -27,12 +27,13 @@ void ModuleInstaller::uninstall(const QString& name, const QString& version,
     Q_UNUSED(version)
 
     if (!removeDirectory(dir)) {
-        emit uninstallFailed(name, "Failed to remove installation directory");
+        emit uninstallFailed(name, tr("Failed to remove installation directory"));
         return;
     }
     if (rec.type == "game") removeDirectory(m_pathManager->pipTargetDir(name));
 
     m_store.remove(name);
+    removeOrphans(rec);
     saveState();
     emit uninstallComplete(name);
     emit installStateChanged();

@@ -12,6 +12,7 @@
 #include "services/SettingsManager.h"
 #include "viewmodels/DeepLinkController.h"
 #include "viewmodels/DownloadCenter.h"
+#include "viewmodels/PythonSetup.h"
 #include "viewmodels/ServiceHolder.h"
 #include "viewmodels/SettingsViewModel.h"
 
@@ -28,6 +29,8 @@ class MainViewModelBase : public Hypernucleus::ServiceHolder {
     Q_PROPERTY(Hypernucleus::DownloadCenter* downloads READ downloads CONSTANT)
     Q_PROPERTY(Hypernucleus::DeepLinkController* deepLinks READ
                    deepLinks CONSTANT)
+    Q_PROPERTY(Hypernucleus::PythonSetup* pythonSetup READ pythonSetup
+                   CONSTANT)
     Q_PROPERTY(Hypernucleus::SettingsViewModel* settingsEditor
                    READ settingsEditor CONSTANT)
     Q_PROPERTY(Hypernucleus::SettingsManager* settings READ settings CONSTANT)
@@ -51,6 +54,7 @@ public:
     DependencyModel* dependencies() const { return m_deps; }
     DownloadCenter* downloads() const { return m_downloads; }
     DeepLinkController* deepLinks() const { return m_deepLinks; }
+    PythonSetup* pythonSetup() const { return m_python; }
     SettingsViewModel* settingsEditor() const { return m_settingsEditor; }
     SettingsManager* settings() const { return m_settings; }
     AuthService* auth() const { return m_auth; }

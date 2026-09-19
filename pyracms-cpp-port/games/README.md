@@ -70,8 +70,9 @@ HN_API_URL=https://cms.example.com HN_API_USERNAME=owner HN_API_PASSWORD=... pyt
 ```
 
 Accounts are per tenant: set `HN_API_TENANT=<slug>` to log in as a tenant user; site owners are platform accounts
-with no tenant (leave it unset). `HN_API_TOKEN` skips login. This creates the page, revision, tags and custom
-deps. Binaries and hashes are attached by `scripts/publish_manifest.py` (run by CI when the `HN_API_URL` and
+with no tenant (leave it unset). `HN_API_TOKEN` skips login. This creates the page, revision, tags, pip requirements, custom
+deps and uploads a source zip of the game as the revision's downloadable archive
+(`--archives-only` skips registration; see `../docs/GAME_ARCHIVES.md`). Binaries and hashes are attached by `scripts/publish_manifest.py` (run by CI when the `HN_API_URL` and
 `HN_API_TOKEN` secrets exist, otherwise skipped):
 
 ```

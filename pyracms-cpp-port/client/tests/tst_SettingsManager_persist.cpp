@@ -24,6 +24,6 @@ TEST_F(SettingsManagerTest, Reset) {
 
     m_manager->reset();
 
-    EXPECT_EQ(m_manager->repoUrl(), QString("http://localhost:8080"));
+    EXPECT_EQ(m_manager->repoUrl(), QString("http://localhost:3199"));
     EXPECT_EQ(m_manager->chunkSize(), 8192);
 }

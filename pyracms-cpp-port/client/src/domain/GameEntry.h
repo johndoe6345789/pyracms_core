@@ -18,6 +18,7 @@ struct BinaryInfo {
     qint64 size = 0;    // bytes, 0 = unknown
     QString sha256;     // lowercase hex, empty = unknown
     QString executable; // optional entry point relative to install dir
+    qint64 downloads = 0;
 };
 
 struct RevisionInfo {
@@ -30,6 +31,7 @@ struct RevisionInfo {
     qint64 size = 0;
     QString sha256;
     QString executable;
+    qint64 downloads = 0;
     QList<BinaryInfo> binaries;
 };
 
@@ -53,6 +55,8 @@ struct GameEntry {
     int likes = 0;
     int dislikes = 0;
     int views = 0;
+    qint64 downloads = 0;
+    QString owner; // username of the page owner
     QString createdAt;
     bool detailLoaded = false;
 

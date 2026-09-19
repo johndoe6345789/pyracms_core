@@ -49,8 +49,8 @@ void InstallPlanner::advance()
     }
 
     if (!walk.missing.isEmpty()) {
-        fail(QStringLiteral(
-                 "Dependency '%1' is neither on pip nor on this PyraCMS site")
+        fail(tr("Dependency '%1' is neither on pip nor on this PyraCMS "
+                "site")
                  .arg(walk.missing.first()));
         return;
     }

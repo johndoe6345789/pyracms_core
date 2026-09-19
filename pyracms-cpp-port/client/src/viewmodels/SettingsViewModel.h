@@ -55,7 +55,6 @@ signals:
     void cancelled();
 
 private:
-    bool validateUrl(const QString& url) const;
     void loadFromSettings();
     void checkDirty();
     void onEdited();

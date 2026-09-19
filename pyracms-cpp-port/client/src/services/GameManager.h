@@ -52,6 +52,8 @@ signals:
     void gameStopped(const QString& name);
     void gameError(const QString& name, const QString& error);
     void gameOutput(const QString& text);
+    // No interpreter found: the UI can offer the managed Python download.
+    void pythonMissing(const QString& name);
 
 private:
     bool prepareNative(const InstallRecord& rec, QString& program);

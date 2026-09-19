@@ -10,12 +10,14 @@ def env_client(env=os.environ):
     """Return a Client, or None when the environment is not configured.
 
     HN_API_URL plus HN_API_TOKEN or HN_API_USERNAME/HN_API_PASSWORD
-    (+ optional HN_API_TENANT; site owners have no tenant).
+    (+ optional HN_API_TENANT; site owners have no tenant) and optional
+    HN_API_TENANT_ID (site id that /api/gamedep calls are scoped to).
     """
     url = env.get("HN_API_URL", "").strip()
     if not url:
         return None
-    c = Client(url, env.get("HN_API_TOKEN") or None)
+    c = Client(url, env.get("HN_API_TOKEN") or None,
+               tenant_id=env.get("HN_API_TENANT_ID") or None)
     if not c.token:
         if not (env.get("HN_API_USERNAME") and env.get("HN_API_PASSWORD")):
             return None

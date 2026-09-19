@@ -8,7 +8,19 @@ namespace Hypernucleus {
 
 AuthService::AuthService(ApiClient* apiClient, SettingsManager* settings,
                          QObject* parent)
-    : QObject(parent), m_apiClient(apiClient), m_settings(settings)
+    : AuthService(apiClient, settings, createPlatformSecretStore(), parent)
+{
+}
+
+AuthService::AuthService(ApiClient* apiClient, SettingsManager* settings,
+                         std::unique_ptr<SecretStore> store, QObject* parent)
+    : QObject(parent), m_apiClient(apiClient), m_settings(settings),
+      m_vault(std::move(store))
+{
+    connectApi();
+}
+
+void AuthService::connectApi()
 {
     connect(m_apiClient, &ApiClient::loginResponse, this,
             [this](bool success, const QString& tokenOrError) {

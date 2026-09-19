@@ -56,3 +56,4 @@ def test_main_without_credentials(monkeypatch, capsys):
     monkeypatch.setattr(hn_env, "env_client", lambda env: None)
     assert seed_games.main() == 1
     assert "no credentials" in capsys.readouterr().err
+

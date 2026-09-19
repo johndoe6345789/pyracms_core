@@ -48,4 +48,6 @@ QtObject {
     readonly property int spaceXL: 24
     readonly property int radius: 3
     readonly property int sidebarWidth: 300
+    readonly property int dialogWidth: 440
+    readonly property int dialogWidthWide: 560
 }

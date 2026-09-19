@@ -1,4 +1,5 @@
 #include "services/ApiClient.h"
+#include "services/RequestAuth.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -9,7 +10,7 @@ namespace Hypernucleus {
 
 ApiClient::ApiClient(QObject* parent)
     : QObject(parent), m_nam(new QNetworkAccessManager(this)),
-      m_baseUrl("http://localhost:8080")
+      m_baseUrl("http://localhost:3199")
 {
 }
 
@@ -46,8 +47,7 @@ QNetworkRequest ApiClient::authorizedRequest(const QUrl& url) const
 {
     QNetworkRequest request(url);
     request.setRawHeader("Accept", "application/json, */*");
-    if (!m_token.isEmpty())
-        request.setRawHeader("Authorization", ("Bearer " + m_token).toUtf8());
+    RequestAuth::apply(request, m_token);
     return request;
 }
 

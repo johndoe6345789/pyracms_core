@@ -3,6 +3,9 @@
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 #include <QString>
+#include <memory>
+
+#include "services/TokenVault.h"
 
 namespace Hypernucleus {
 
@@ -18,8 +21,12 @@ class AuthService : public QObject {
     Q_PROPERTY(QString token READ token NOTIFY tokenChanged)
 
 public:
+    // The token goes to the OS keychain (see TokenVault / SecretStore).
     explicit AuthService(ApiClient* apiClient, SettingsManager* settings,
                          QObject* parent = nullptr);
+    AuthService(ApiClient* apiClient, SettingsManager* settings,
+                std::unique_ptr<SecretStore> store, QObject* parent = nullptr);
+    const TokenVault& vault() const { return m_vault; }
 
     bool isAuthenticated() const;
     QString username() const;
@@ -42,6 +49,8 @@ signals:
     void registerSuccess();
     void registerFailed(const QString& error);
     void loggedOut();
+    // No keychain available: the token is kept for this session only.
+    void secureStorageUnavailable(const QString& message);
 
 private:
     void setAuthenticated(bool auth);
@@ -50,8 +59,12 @@ private:
     void saveSession();
     void clearSession();
 
+    void connectApi();
+    void warnIfSessionOnly();
+
     ApiClient* m_apiClient;
     SettingsManager* m_settings;
+    TokenVault m_vault;
     bool m_authenticated = false;
     QString m_username;
     QString m_token;

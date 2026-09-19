@@ -27,7 +27,9 @@ public:
         CoverRole,
         GroupRole,
         PrimaryKindRole,
-        PrimaryLabelRole
+        PrimaryLabelRole,
+        SizeRole,
+        ScreenshotCountRole
     };
     using QAbstractListModel::QAbstractListModel;
 
@@ -40,6 +42,8 @@ protected:
         QString latest;
         QString coverRef;
         QColor accent;
+        QString size; // download size for this platform, "" = unknown
+        int shots = 0;
     };
     struct Transient {
         int state = 0;

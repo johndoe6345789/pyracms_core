@@ -1,4 +1,5 @@
 #include "services/ApiClient.h"
+#include "services/RequestAuth.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -26,7 +27,7 @@ void ApiClient::getJson(const QString& path, JsonHandler handler)
                 }
                 if (doc.isNull()) {
                     handler(false, doc, status,
-                            QStringLiteral("Invalid JSON response"));
+                            tr("Invalid JSON response"));
                     return;
                 }
                 handler(true, doc, status, QString());
@@ -48,10 +49,7 @@ QNetworkRequest ApiClient::createRequest(const QString& path) const
     QNetworkRequest request(resolveUrl(path));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
-
-    if (!m_token.isEmpty()) {
-        request.setRawHeader("Authorization", ("Bearer " + m_token).toUtf8());
-    }
+    RequestAuth::apply(request, m_token);
 
     return request;
 }

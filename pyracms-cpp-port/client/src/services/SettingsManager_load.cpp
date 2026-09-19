@@ -32,6 +32,11 @@ void SettingsManager::load()
         setPythonPath(settings.value("pythonPath").toString());
     if (settings.contains("preferPip"))
         setPreferPip(settings.value("preferPip").toBool());
+    if (settings.contains("recentServers"))
+        setRecentServers(settings.value("recentServers").toStringList());
+    // 8080 is the raw backend port; the launcher talks to the proxy.
+    if (m_repoUrl == QLatin1String("http://localhost:8080"))
+        setRepoUrl(DEFAULT_REPO_URL);
 
     settings.endGroup();
 }
@@ -49,6 +54,7 @@ void SettingsManager::reset()
     setInstallDir(QString());
     setPythonPath(QString());
     setPreferPip(true);
+    setRecentServers(QStringList());
     save();
 }
 

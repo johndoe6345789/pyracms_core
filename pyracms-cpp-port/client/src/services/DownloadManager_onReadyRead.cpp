@@ -1,5 +1,6 @@
 #include "services/DownloadManager.h"
 #include "services/ApiClient.h"
+#include "domain/DownloadError.h"
 #include "domain/DownloadVerifier.h"
 
 #include <QDir>
@@ -26,6 +27,10 @@ void DownloadManager::onReadyRead(Job* job)
             job->offset = 0;
         }
     }
+    // Error pages (401/403/...) are not archive data: never store them.
+    if (job->reply->attribute(QNetworkRequest::HttpStatusCodeAttribute)
+            .toInt() >= 400)
+        return;
     job->part.write(job->reply->readAll());
 }
 
@@ -52,10 +57,8 @@ void DownloadManager::onFinished(Job* job)
     }
     if (err != QNetworkReply::NoError) {
         removeJob(id); // keeps <dest>.part for the next resume attempt
-        emit failed(id,
-                    status > 0
-                        ? QStringLiteral("HTTP %1: %2").arg(status).arg(errText)
-                        : errText);
+        emit failed(id, DownloadError::describe(status, errText,
+                                                m_api->hasToken()));
         return;
     }
     complete(job);

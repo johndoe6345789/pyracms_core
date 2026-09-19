@@ -8,10 +8,9 @@ namespace Hypernucleus {
 namespace SelectedGameView {
 
 namespace {
-QString T(const char* text)
-{
-    return QCoreApplication::translate("SelectedGameView", text);
-}
+struct PrimaryText {
+    Q_DECLARE_TR_FUNCTIONS(PrimaryText)
+};
 
 Primary make(const char* kind, const QString& label, bool enabled = true)
 {
@@ -30,31 +29,31 @@ Primary primaryFor(int state, double progress, const QString& installedVersion,
     case GameStates::Installed:
         if (!selectedVersion.isEmpty() && !installedVersion.isEmpty() &&
             VersionCompare::compare(selectedVersion, installedVersion) != 0)
-            return make("install", T("Install v%1").arg(selectedVersion));
-        return make("play", T("Play"));
+            return make("install", PrimaryText::tr("Install v%1").arg(selectedVersion));
+        return make("play", PrimaryText::tr("Play"));
     case GameStates::UpdateAvailable:
-        return make("update", T("Update"));
+        return make("update", PrimaryText::tr("Update"));
     case GameStates::Queued:
-        return make("cancel", T("Queued"));
+        return make("cancel", PrimaryText::tr("Queued"));
     case GameStates::Downloading:
         return make("cancel",
-                    progress >= 0 ? T("Installing %1%")
+                    progress >= 0 ? PrimaryText::tr("Installing %1%")
                                         .arg(static_cast<int>(progress * 100))
-                                  : T("Installing..."));
+                                  : PrimaryText::tr("Installing..."));
     case GameStates::Verifying:
-        return make("cancel", T("Verifying..."));
+        return make("cancel", PrimaryText::tr("Verifying..."));
     case GameStates::Installing:
-        return make("cancel", T("Installing..."));
+        return make("cancel", PrimaryText::tr("Installing..."));
     case GameStates::Launching:
-        return make("none", T("Launching..."), false);
+        return make("none", PrimaryText::tr("Launching..."), false);
     case GameStates::Running:
-        return make("stop", T("Stop"));
+        return make("stop", PrimaryText::tr("Stop"));
     case GameStates::LaunchFailed:
-        return make("play", T("Launch failed - Retry"));
+        return make("play", PrimaryText::tr("Launch failed - Retry"));
     case GameStates::InstallFailed:
-        return make("install", T("Install failed - Retry"));
+        return make("install", PrimaryText::tr("Install failed - Retry"));
     default:
-        return make("install", T("Install"));
+        return make("install", PrimaryText::tr("Install"));
     }
 }
 
