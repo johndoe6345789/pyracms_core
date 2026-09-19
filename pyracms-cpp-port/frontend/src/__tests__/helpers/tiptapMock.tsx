@@ -24,10 +24,14 @@ export const editor = {
 export const state = {
   mockEditor: editor as unknown,
   onUpdate: (() => {}) as (a: { editor: typeof editor }) => void,
+  options: {} as Record<string, unknown>,
 }
 
 export const tiptapReact = {
-  useEditor: (o: { onUpdate: typeof state.onUpdate }) => {
+  useEditor: (
+    o: { onUpdate: typeof state.onUpdate } & Record<string, unknown>,
+  ) => {
+    state.options = o
     state.onUpdate = o.onUpdate
     return state.mockEditor
   },
