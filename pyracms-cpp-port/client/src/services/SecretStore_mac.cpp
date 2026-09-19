@@ -25,13 +25,16 @@ public:
         Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref)));
         CFDictionarySetValue(CFMutableDictionaryRef(q.ref), kSecValueData,
                              data.ref);
-        return SecItemAdd(CFDictionaryRef(q.ref), nullptr) == errSecSuccess;
+        const OSStatus st = SecItemAdd(CFDictionaryRef(q.ref), nullptr);
+        if (st != errSecSuccess)
+            qWarning("Keychain add failed: OSStatus %d", int(st));
+        return st == errSecSuccess;
     }
 
     QString read(const QString& service, const QString& account) override
     {
         Cf s(str(service)), a(str(account));
-        Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref)));
+        Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref), true));
         CFMutableDictionaryRef m = CFMutableDictionaryRef(q.ref);
         CFDictionarySetValue(m, kSecReturnData, kCFBooleanTrue);
         CFDictionarySetValue(m, kSecMatchLimit, kSecMatchLimitOne);
@@ -48,7 +51,7 @@ public:
     bool remove(const QString& service, const QString& account) override
     {
         Cf s(str(service)), a(str(account));
-        Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref)));
+        Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref), true));
         return SecItemDelete(CFDictionaryRef(q.ref)) == errSecSuccess;
     }
 };

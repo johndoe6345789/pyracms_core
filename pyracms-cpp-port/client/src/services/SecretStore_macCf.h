@@ -29,8 +29,11 @@ CFStringRef str(const QString& s)
         u.size(), kCFStringEncodingUTF8, false);
 }
 
-// Generic-password query for one (service, account) item.
-CFMutableDictionaryRef query(CFStringRef service, CFStringRef account)
+// Generic-password query for one (service, account) item. `noUi` is for
+// reads and deletes; it is not valid on SecItemAdd, where it can make the
+// call fail outright.
+CFMutableDictionaryRef query(CFStringRef service, CFStringRef account,
+                             bool noUi = false)
 {
     CFMutableDictionaryRef q = CFDictionaryCreateMutable(
         kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks,
@@ -38,9 +41,11 @@ CFMutableDictionaryRef query(CFStringRef service, CFStringRef account)
     CFDictionarySetValue(q, kSecClass, kSecClassGenericPassword);
     CFDictionarySetValue(q, kSecAttrService, service);
     CFDictionarySetValue(q, kSecAttrAccount, account);
-    // Fail at once instead of showing an unlock / permission prompt.
-    CFDictionarySetValue(q, kSecUseAuthenticationUI,
-                         kSecUseAuthenticationUIFail);
+    if (noUi) {
+        // Fail at once instead of showing an unlock / permission prompt.
+        CFDictionarySetValue(q, kSecUseAuthenticationUI,
+                             kSecUseAuthenticationUIFail);
+    }
     return q;
 }
 
