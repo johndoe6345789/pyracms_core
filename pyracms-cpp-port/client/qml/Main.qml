@@ -28,8 +28,9 @@ ApplicationWindow {
         value: MainViewModel.settings.darkMode
     }
 
+    function openConnect() { dialogs.openConnect() }
+    function openSettings() { dialogs.openSettings() }
     function focusSearch() { content.focusSearch() }
-
     function showGame(name) { tab = 0; MainViewModel.select(name) }
 
     Component.onCompleted: {

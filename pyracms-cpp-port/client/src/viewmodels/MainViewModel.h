@@ -42,8 +42,6 @@ public:
     // pyracms://launch/<slug>/<name>, pyracms://install/<slug>/<name>
     Q_INVOKABLE void handleUrl(const QString& url);
     Q_INVOKABLE void registerUrlScheme();
-    // After a language change: re-evaluate the texts made in C++.
-    void retranslate();
 
 signals:
     void notify(const QString& message, bool isError);

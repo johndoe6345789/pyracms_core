@@ -39,10 +39,13 @@ void EntryRepository::refresh()
     const int gen = ++m_generation;
     setRefreshing(true);
     const QString slug = m_api->tenant();
-    if (slug.isEmpty())
-        fetchCatalog({"/api/outputs/json"}, gen);
-    else
-        resolveTenant(slug, gen);
+    if (slug.isEmpty()) { // no site chosen: nothing to ask the server
+        applyCatalog({});
+        setRefreshing(false);
+        emit refreshed();
+        return;
+    }
+    resolveTenant(slug, gen);
 }
 
 } // namespace Hypernucleus

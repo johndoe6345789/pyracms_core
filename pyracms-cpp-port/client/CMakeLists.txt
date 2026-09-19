@@ -73,6 +73,7 @@ set(LIB_SOURCES
     src/services/ArchiveExtractor_installLayout.cpp
     src/services/AuthService.cpp
     src/services/AuthService_logout.cpp
+    src/services/AuthService_state.cpp
     src/services/DownloadManager.cpp
     src/services/DownloadManager_complete.cpp
     src/services/DownloadManager_onReadyRead.cpp
@@ -120,8 +121,10 @@ set(LIB_SOURCES
     src/services/PlanWalk.cpp
     src/services/PythonLocator.cpp
     src/services/PythonProvisioner.cpp
+    src/services/PythonProvisioner_extract.cpp
     src/services/PythonProvisioner_install.cpp
     src/services/PythonProvisioner_resolve.cpp
+    src/services/PythonProvisioner_state.cpp
     src/services/QProcessRunner.cpp
     src/services/RequestAuth.cpp
     src/services/SecretStore_factory.cpp
@@ -184,6 +187,7 @@ set(LIB_HEADERS
     src/services/PythonProvisioner.h
     src/services/RequestAuth.h
     src/services/SecretStore.h
+    src/services/SecretStore_macCf.h
     src/services/SettingsBase.h
     src/services/SettingsManager.h
     src/services/SingleInstance.h
@@ -333,6 +337,7 @@ qt_add_qml_module(hypernucleus
         src/models/GameDepModel_statusTextOf.cpp
         src/models/GameFilterModel.cpp
         src/models/GameFilterModel_filterAcceptsRow.cpp
+        src/viewmodels/AppOptions.cpp
         src/viewmodels/ConnectController.cpp
         src/viewmodels/DeepLinkController.cpp
         src/viewmodels/DownloadCenter.cpp
@@ -340,6 +345,7 @@ qt_add_qml_module(hypernucleus
         src/viewmodels/DownloadCenter_enqueue.cpp
         src/viewmodels/DownloadCenter_external.cpp
         src/viewmodels/DownloadCenter_onProgress.cpp
+        src/viewmodels/LanguageWiring.cpp
         src/viewmodels/MainViewModel.cpp
         src/viewmodels/MainViewModelBase.cpp
         src/viewmodels/MainViewModel_cancelDownload.cpp
@@ -352,6 +358,7 @@ qt_add_qml_module(hypernucleus
         src/viewmodels/MainViewModel_wireInstallSignals.cpp
         src/viewmodels/MainViewModel_wireSettings.cpp
         src/viewmodels/PythonSetup.cpp
+        src/viewmodels/PythonSetup_actions.cpp
         src/viewmodels/PythonSetup_wire.cpp
         src/viewmodels/SelectedGameView.cpp
         src/viewmodels/SelectedGameView_build.cpp
@@ -368,9 +375,12 @@ qt_add_qml_module(hypernucleus
         src/models/GameDepModel.h
         src/models/GameDepRows.h
         src/models/GameFilterModel.h
+        src/viewmodels/AppOptions.h
         src/viewmodels/ConnectController.h
         src/viewmodels/DeepLinkController.h
         src/viewmodels/DownloadCenter.h
+        src/viewmodels/DownloadCenterBase.h
+        src/viewmodels/LanguageWiring.h
         src/viewmodels/MainViewModel.h
         src/viewmodels/MainViewModelBase.h
         src/viewmodels/MainViewModelDeps.h
@@ -401,6 +411,7 @@ set(HN_TR_SOURCES ${LIB_SOURCES}
     src/models/GameDepModel_statusTextOf.cpp
     src/models/GameFilterModel.cpp
     src/models/GameFilterModel_filterAcceptsRow.cpp
+    src/viewmodels/AppOptions.cpp
     src/viewmodels/ConnectController.cpp
     src/viewmodels/DeepLinkController.cpp
     src/viewmodels/DownloadCenter.cpp
@@ -408,6 +419,7 @@ set(HN_TR_SOURCES ${LIB_SOURCES}
     src/viewmodels/DownloadCenter_enqueue.cpp
     src/viewmodels/DownloadCenter_external.cpp
     src/viewmodels/DownloadCenter_onProgress.cpp
+    src/viewmodels/LanguageWiring.cpp
     src/viewmodels/MainViewModel.cpp
     src/viewmodels/MainViewModelBase.cpp
     src/viewmodels/MainViewModel_cancelDownload.cpp
@@ -420,6 +432,7 @@ set(HN_TR_SOURCES ${LIB_SOURCES}
     src/viewmodels/MainViewModel_wireInstallSignals.cpp
     src/viewmodels/MainViewModel_wireSettings.cpp
     src/viewmodels/PythonSetup.cpp
+    src/viewmodels/PythonSetup_actions.cpp
     src/viewmodels/PythonSetup_wire.cpp
     src/viewmodels/SelectedGameView.cpp
     src/viewmodels/SelectedGameView_build.cpp

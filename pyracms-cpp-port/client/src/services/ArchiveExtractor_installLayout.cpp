@@ -35,7 +35,8 @@ ExtractResult installLayout(const QString& stagingDir, const QString& finalDir,
     }
 
     if (!QDir().rename(source, finalDir)) {
-        res.error = HnText::tr("Could not move files into place: %1").arg(finalDir);
+        res.error =
+            HnText::tr("Could not move files into place: %1").arg(finalDir);
         return res;
     }
     if (source != stagingDir) QDir(stagingDir).removeRecursively();

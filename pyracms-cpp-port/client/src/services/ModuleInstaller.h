@@ -57,8 +57,7 @@ signals:
     void installCancelled(const QString& name);
     void uninstallComplete(const QString& name);
     void uninstallFailed(const QString& name, const QString& error);
-    // A dependency module nobody needs any more was removed with its game.
-    void orphanRemoved(const QString& name);
+    void orphanRemoved(const QString& name); // dep nobody needs any more
     void installStateChanged();
 
 private:
@@ -68,16 +67,13 @@ private:
     QString targetDirFor(const QString& name, const QString& type) const;
     bool removeDirectory(const QString& path);
     void saveState();
-    // Dependency modules of `gone` that no installed module needs any more.
-    QStringList orphansOf(const InstallRecord& gone) const;
-    void removeOrphans(const InstallRecord& gone);
+    void removeOrphans(const InstallRecord& gone); // unneeded deps
     void connectDownloads();
     ApiClient* m_apiClient;
     PathManager* m_pathManager;
     DownloadManager* m_downloads;
     InstallStateStore m_store;
-    bool m_busy = false;
-    bool m_hasJob = false;
+    bool m_busy = false, m_hasJob = false;
     InstallJob m_job;
 };
 

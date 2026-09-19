@@ -57,13 +57,11 @@ public:
                                 const QString& version = QString()) const;
     Q_INVOKABLE QString depDir(const QString& name,
                                const QString& version = QString()) const;
-    // Legacy `pip --target` folder of a game; the venv lives below it.
+    // pylibs/<game>: old `pip --target` files, with the venv/ below it.
     QString pipTargetDir(const QString& gameName) const;
-    // pylibs/<game>/venv and the interpreter inside it (exists = built).
     QString venvDir(const QString& gameName) const;
-    QString venvPython(const QString& gameName) const;
-    // Old --target content (everything except venv/) still on disk?
-    bool hasLegacyTarget(const QString& gameName) const;
+    QString venvPython(const QString& gameName) const; // exists = built
+    bool hasLegacyTarget(const QString& gameName) const; // beside venv/
     void cleanLegacyTarget(const QString& gameName) const;
     Q_INVOKABLE QString archivePath(const QString& filename) const;
 

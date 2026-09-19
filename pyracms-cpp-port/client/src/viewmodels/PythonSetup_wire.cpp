@@ -9,7 +9,7 @@ void PythonSetup::wire()
     connect(m_prov, &PythonProvisioner::offerReady, this,
             &PythonSetup::onOffer);
     connect(m_prov, &PythonProvisioner::progress, m_dl,
-            &DownloadCenter::externalProgress);
+            [this](qint64 r, qint64 t) { m_dl->externalProgress(r, t); });
     connect(m_prov, &PythonProvisioner::installed, this,
             &PythonSetup::onInstalled);
     connect(m_prov, &PythonProvisioner::failed, this,

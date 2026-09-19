@@ -10,6 +10,8 @@
 #include "services/LanguageManager.h"
 #include "services/SettingsManager.h"
 #include "services/SingleInstance.h"
+#include "viewmodels/AppOptions.h"
+#include "viewmodels/LanguageWiring.h"
 #include "viewmodels/MainViewModel.h"
 #include "viewmodels/UrlEventFilter.h"
 
@@ -34,9 +36,11 @@ int main(int argc, char* argv[])
 
     // Saved language, or the system's; changed live from Settings.
     LanguageManager languages;
+    const AppOptions options = AppOptions::parse(app.arguments());
     {
         SettingsManager tempSettings;
-        languages.apply(tempSettings.language());
+        languages.apply(options.language.isEmpty() ? tempSettings.language()
+                                                   : options.language);
     }
 
     auto* viewModel = new MainViewModel(&app);
@@ -53,13 +57,7 @@ int main(int argc, char* argv[])
 
     QQmlApplicationEngine engine;
     engine.addImportPath(QStringLiteral("qrc:/qt/qml"));
-    QObject::connect(
-        viewModel->settings(), &SettingsManager::languageChanged, viewModel,
-        [&languages, &engine, viewModel]() {
-            languages.apply(viewModel->settings()->language());
-            engine.retranslate();
-            viewModel->retranslate();
-        });
+    bindLanguage(&languages, &engine, viewModel);
 
     const QUrl mainQml(QStringLiteral("qrc:/qt/qml/Hypernucleus/qml/Main.qml"));
     QObject::connect(
@@ -69,6 +67,7 @@ int main(int argc, char* argv[])
         },
         Qt::QueuedConnection);
     engine.load(mainQml);
+    screenshotAndQuit(engine, options);
 
     if (!link.isEmpty())
         QTimer::singleShot(0, viewModel,

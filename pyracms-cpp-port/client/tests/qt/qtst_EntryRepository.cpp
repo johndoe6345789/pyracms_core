@@ -22,9 +22,11 @@ static const char* kCatalog = R"({
 void TstEntryRepository::refreshLoadsApiCatalog()
 {
     MiniHttp http;
-    http.routes["/api/outputs/json"] = kCatalog;
+    http.routes["/api/tenants/acme"] = R"({"id":7})";
+    http.routes["/api/gamedep/catalog?tenant_id=7"] = kCatalog;
     ApiClient api;
     api.setBaseUrl(http.baseUrl());
+    api.setTenant("acme");
     EntryRepository repo(&api);
     QSignalSpy done(&repo, &EntryRepository::refreshed);
     QVERIFY(!repo.isLoaded());
@@ -41,11 +43,13 @@ void TstEntryRepository::refreshLoadsApiCatalog()
 void TstEntryRepository::refreshKeepsDetailsOfKnownEntries()
 {
     MiniHttp http;
-    http.routes["/api/outputs/json"] = kCatalog;
+    http.routes["/api/tenants/acme"] = R"({"id":7})";
+    http.routes["/api/gamedep/catalog?tenant_id=7"] = kCatalog;
     http.routes["/api/gamedep/game/g1"] =
         R"({"name":"g1","tags":["a"],"dependencies":[{"name":"d1"}]})";
     ApiClient api;
     api.setBaseUrl(http.baseUrl());
+    api.setTenant("acme");
     EntryRepository repo(&api);
     QSignalSpy done(&repo, &EntryRepository::refreshed);
     QSignalSpy detail(&repo, &EntryRepository::entryChanged);

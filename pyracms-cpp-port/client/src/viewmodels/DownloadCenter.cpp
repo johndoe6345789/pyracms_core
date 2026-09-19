@@ -10,7 +10,7 @@ namespace Hypernucleus {
 
 DownloadCenter::DownloadCenter(InstallPlanner* planner, InstallRunner* runner,
                                QObject* parent)
-    : QObject(parent), m_planner(planner), m_runner(runner)
+    : DownloadCenterBase(parent), m_planner(planner), m_runner(runner)
 {
     connect(m_planner, &InstallPlanner::planReady, this,
             [this](const InstallPlan& plan) {

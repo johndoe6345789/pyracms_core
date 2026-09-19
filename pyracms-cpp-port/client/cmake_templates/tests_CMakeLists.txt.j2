@@ -12,7 +12,7 @@ set(QT_TEST_SOURCES
 
 # QML-facing C++ types (models, view-models) compiled without the QML
 # module so QtTest can exercise them: suites named qtst_Ui*.cpp use it.
-find_package(Qt6 REQUIRED COMPONENTS Gui Qml)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick)
 set(UI_SOURCES
 {% for src in module_sources %}
     ${CMAKE_SOURCE_DIR}/{{ src }}
@@ -23,7 +23,7 @@ set(UI_SOURCES
 )
 add_library(hypernucleus_ui_test STATIC ${UI_SOURCES})
 target_link_libraries(hypernucleus_ui_test PUBLIC
-    hypernucleus_lib Qt6::Gui Qt6::Qml)
+    hypernucleus_lib Qt6::Gui Qt6::Qml Qt6::Quick)
 target_include_directories(hypernucleus_ui_test PUBLIC
     ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/models
     ${CMAKE_SOURCE_DIR}/src/viewmodels)
@@ -42,8 +42,16 @@ foreach(test_src ${QT_TEST_SOURCES})
     target_compile_definitions(${test_name} PRIVATE
         FAKEEXE_PATH="$<TARGET_FILE:fakeexe>"
         FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
-        QM_DIR="${HN_QM_DIR}")
+        QM_DIR="${HN_QM_DIR}"
+        TS_DIR="${CMAKE_SOURCE_DIR}/translations")
     add_dependencies(${test_name} hypernucleus_lrelease)
+    if(test_name MATCHES "Screenshot")
+        # runs the real launcher (offscreen) and looks at its window
+        add_dependencies(${test_name} hypernucleus)
+        target_link_libraries(${test_name} PRIVATE Qt6::Gui)
+        target_compile_definitions(${test_name} PRIVATE
+            APP_PATH="$<TARGET_FILE:hypernucleus>")
+    endif()
     add_test(NAME ${test_name} COMMAND ${test_name})
     # The suites use their own QSettings / data folders, never the user's.
     set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

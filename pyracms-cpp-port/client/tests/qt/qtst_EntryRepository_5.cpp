@@ -11,7 +11,8 @@ class TstEntryRepositoryTenant : public QObject {
 
 private slots:
     void unknownSiteIsReportedAndEmptiesTheList();
-    void serverWithoutTenantsApiStillLoads();
+    void tenantLookupFails();
+    void noSiteMeansNoRequestAndNoError();
 };
 
 static const char* kCat =
@@ -36,7 +37,7 @@ void TstEntryRepositoryTenant::unknownSiteIsReportedAndEmptiesTheList()
     QVERIFY(repo.entries().isEmpty());
 }
 
-void TstEntryRepositoryTenant::serverWithoutTenantsApiStillLoads()
+void TstEntryRepositoryTenant::tenantLookupFails()
 {
     MiniHttp http;
     http.routes["/api/tenants/acme"] = "oops";
@@ -46,10 +47,27 @@ void TstEntryRepositoryTenant::serverWithoutTenantsApiStillLoads()
     api.setBaseUrl(http.baseUrl());
     api.setTenant("acme");
     EntryRepository repo(&api);
-    QSignalSpy done(&repo, &EntryRepository::refreshed);
+    QSignalSpy failed(&repo, &EntryRepository::refreshFailed);
     repo.refresh();
-    QTRY_COMPARE_WITH_TIMEOUT(done.count(), 1, 5000);
-    QVERIFY(repo.find("g1", "game"));
+    QTRY_COMPARE_WITH_TIMEOUT(failed.count(), 1, 5000);
+    QCOMPARE(http.paths, (QList<QString>{"/api/tenants/acme"}));
+    QVERIFY(repo.entries().isEmpty());
+}
+
+void TstEntryRepositoryTenant::noSiteMeansNoRequestAndNoError()
+{
+    MiniHttp http;
+    ApiClient api;
+    api.setBaseUrl(http.baseUrl());
+    EntryRepository repo(&api);
+    QSignalSpy done(&repo, &EntryRepository::refreshed);
+    QSignalSpy failed(&repo, &EntryRepository::refreshFailed);
+    repo.refresh();
+    QCOMPARE(done.count(), 1);
+    QCOMPARE(failed.count(), 0);
+    QVERIFY(!repo.isRefreshing());
+    QTest::qWait(100);
+    QVERIFY(http.paths.isEmpty());
 }
 
 QTEST_MAIN(TstEntryRepositoryTenant)

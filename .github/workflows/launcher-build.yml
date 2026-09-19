@@ -142,6 +142,16 @@ jobs:
             echo "QT_MODE=aqt" >> "$GITHUB_ENV"
           fi
 
+      - name: Check Qt Linguist tools (lrelease builds the translations)
+        if: env.QT_MODE == 'aqt'
+        shell: bash
+        run: |
+          root="$(cygpath -u "$QT_ROOT_DIR" 2>/dev/null || echo "$QT_ROOT_DIR")"
+          if ! find "$root" -name 'Qt6LinguistToolsConfig.cmake' | grep -q .; then
+            echo "::error::Qt6LinguistTools is missing: add the qttools archive to the aqt install"
+            exit 1
+          fi
+
       - name: Regenerate CMakeLists.txt from template
         shell: bash
         run: python -m pip install jinja2 && cd "$CLIENT" && python generate_cmake.py

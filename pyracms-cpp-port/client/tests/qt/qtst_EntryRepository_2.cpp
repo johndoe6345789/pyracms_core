@@ -23,11 +23,13 @@ static const char* kCatalog = R"({
 void TstEntryRepository::fallsBackToListEndpoints()
 {
     MiniHttp http;
+    http.routes["/api/tenants/acme"] = R"({"id":7})";
     http.routes["/api/gamedep/game?limit=200"] =
         R"([{"name":"old","displayName":"Old"}])";
     http.routes["/api/gamedep/dep?limit=200"] = R"([{"name":"dd"}])";
     ApiClient api;
     api.setBaseUrl(http.baseUrl());
+    api.setTenant("acme");
     EntryRepository repo(&api);
     QSignalSpy done(&repo, &EntryRepository::refreshed);
     repo.refresh();
@@ -38,9 +40,12 @@ void TstEntryRepository::fallsBackToListEndpoints()
 
 void TstEntryRepository::refreshFailureIsReported()
 {
-    MiniHttp http; // knows no routes: everything is 404
+    MiniHttp http; // tenant lookup fails
+    http.statuses["/api/tenants/acme"] = 500;
+    http.routes["/api/tenants/acme"] = "x";
     ApiClient api;
     api.setBaseUrl(http.baseUrl());
+    api.setTenant("acme");
     EntryRepository repo(&api);
     QSignalSpy bad(&repo, &EntryRepository::refreshFailed);
     repo.refresh();
@@ -52,10 +57,12 @@ void TstEntryRepository::refreshFailureIsReported()
 void TstEntryRepository::ensureDetailMergesAndNotifies()
 {
     MiniHttp http;
-    http.routes["/api/outputs/json"] = kCatalog;
+    http.routes["/api/tenants/acme"] = R"({"id":7})";
+    http.routes["/api/gamedep/catalog?tenant_id=7"] = kCatalog;
     http.routes["/api/gamedep/dep/d%201"] = R"({"name":"d 1","tags":["x"]})";
     ApiClient api;
     api.setBaseUrl(http.baseUrl());
+    api.setTenant("acme");
     EntryRepository repo(&api);
     QSignalSpy changed(&repo, &EntryRepository::entryChanged);
     repo.ensureDetail("dep", "d 1"); // not in catalog yet: inserted

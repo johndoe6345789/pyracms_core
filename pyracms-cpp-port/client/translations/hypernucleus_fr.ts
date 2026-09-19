@@ -273,27 +273,27 @@
         <translation>La somme de contrôle ne correspond pas (sha256)</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_entry.cpp" line="17"/>
+        <location filename="../src/services/ArchiveExtractor_entry.cpp" line="18"/>
         <source>Failed to read archive entry: %1</source>
         <translation>Impossible de lire l’entrée de l’archive : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_entry.cpp" line="23"/>
+        <location filename="../src/services/ArchiveExtractor_entry.cpp" line="24"/>
         <source>Failed to write file: %1</source>
         <translation>Impossible d’écrire le fichier : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="17"/>
+        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="18"/>
         <source>Failed to create directory: %1</source>
         <translation>Impossible de créer le dossier : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="23"/>
+        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="24"/>
         <source>Failed to open archive (error %1)</source>
         <translation>Impossible d’ouvrir l’archive (erreur %1)</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="34"/>
+        <location filename="../src/services/ArchiveExtractor_extractZip.cpp" line="35"/>
         <source>Unsafe path in archive: %1</source>
         <translation>Chemin dangereux dans l’archive : %1</translation>
     </message>
@@ -303,7 +303,7 @@
         <translation>Impossible de remplacer l’installation existante : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/ArchiveExtractor_installLayout.cpp" line="38"/>
+        <location filename="../src/services/ArchiveExtractor_installLayout.cpp" line="39"/>
         <source>Could not move files into place: %1</source>
         <translation>Impossible de déplacer les fichiers à leur emplacement : %1</translation>
     </message>
@@ -331,12 +331,12 @@
         <translation>Réponse JSON non valide</translation>
     </message>
     <message>
-        <location filename="../src/services/ApiClient_loginWithTenant.cpp" line="43"/>
+        <location filename="../src/services/ApiClient_loginWithTenant.cpp" line="44"/>
         <source>Invalid username, password or site</source>
         <translation>Nom d’utilisateur, mot de passe ou site non valide</translation>
     </message>
     <message>
-        <location filename="../src/services/ApiClient_loginWithTenant.cpp" line="57"/>
+        <location filename="../src/services/ApiClient_loginWithTenant.cpp" line="58"/>
         <source>No token received from server</source>
         <translation>Aucun jeton reçu du serveur</translation>
     </message>
@@ -354,9 +354,17 @@
 <context>
     <name>Hypernucleus::AuthService</name>
     <message>
-        <location filename="../src/services/AuthService_logout.cpp" line="80"/>
+        <location filename="../src/services/AuthService_state.cpp" line="32"/>
         <source>No secure keychain is available: you stay signed in until the launcher closes, the login is not saved.</source>
         <translation>Aucun trousseau sécurisé n’est disponible : vous restez connecté jusqu’à la fermeture du lanceur, la connexion n’est pas enregistrée.</translation>
+    </message>
+</context>
+<context>
+    <name>Hypernucleus::ConnectController</name>
+    <message>
+        <location filename="../src/viewmodels/ConnectController.cpp" line="35"/>
+        <source>Connect to a site to browse games.</source>
+        <translation>Connectez-vous à un site pour parcourir les jeux.</translation>
     </message>
 </context>
 <context>
@@ -470,9 +478,14 @@
         <translation>Introuvable</translation>
     </message>
     <message>
-        <location filename="../src/services/EntryRepository_tenantCatalog.cpp" line="31"/>
+        <location filename="../src/services/EntryRepository_tenantCatalog.cpp" line="32"/>
         <source>Site &quot;%1&quot; was not found on this server.</source>
         <translation>Le site « %1 » est introuvable sur ce serveur.</translation>
+    </message>
+    <message>
+        <location filename="../src/services/EntryRepository_tenantCatalog.cpp" line="36"/>
+        <source>Could not reach the server: %1</source>
+        <translation>Impossible de joindre le serveur : %1</translation>
     </message>
 </context>
 <context>
@@ -491,7 +504,7 @@
 <context>
     <name>Hypernucleus::GameManager</name>
     <message>
-        <location filename="../src/services/GameManager_connectProcess.cpp" line="42"/>
+        <location filename="../src/services/GameManager_connectProcess.cpp" line="41"/>
         <source>Could not start the game: %1</source>
         <translation>Impossible de lancer le jeu : %1</translation>
     </message>
@@ -506,12 +519,12 @@
         <translation>Le jeu s’est arrêté immédiatement avec le code %1 (voir le journal)</translation>
     </message>
     <message>
-        <location filename="../src/services/GameManager_launchGame.cpp" line="14"/>
+        <location filename="../src/services/GameManager_launchGame.cpp" line="13"/>
         <source>Another game is already running: %1</source>
         <translation>Un autre jeu est déjà en cours : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/GameManager_launchGame.cpp" line="19"/>
+        <location filename="../src/services/GameManager_launchGame.cpp" line="20"/>
         <source>The game is not installed. Install it first.</source>
         <translation>Le jeu n’est pas installé. Installez-le d’abord.</translation>
     </message>
@@ -572,7 +585,7 @@
 <context>
     <name>Hypernucleus::InstallRunner</name>
     <message>
-        <location filename="../src/services/InstallRunner_concerns.cpp" line="16"/>
+        <location filename="../src/services/InstallRunner_concerns.cpp" line="17"/>
         <source>Another installation is already running</source>
         <translation>Une autre installation est déjà en cours</translation>
     </message>
@@ -678,7 +691,7 @@
         <translation>Le module n’est pas installé</translation>
     </message>
     <message>
-        <location filename="../src/services/ModuleInstaller_uninstall.cpp" line="30"/>
+        <location filename="../src/services/ModuleInstaller_uninstall.cpp" line="31"/>
         <source>Failed to remove installation directory</source>
         <translation>Impossible de supprimer le dossier d’installation</translation>
     </message>
@@ -724,12 +737,12 @@
 <context>
     <name>Hypernucleus::PythonProvisioner</name>
     <message>
-        <location filename="../src/services/PythonProvisioner_install.cpp" line="73"/>
+        <location filename="../src/services/PythonProvisioner_extract.cpp" line="48"/>
         <source>Could not unpack Python: %1</source>
         <translation>Impossible de décompresser Python : %1</translation>
     </message>
     <message>
-        <location filename="../src/services/PythonProvisioner_install.cpp" line="82"/>
+        <location filename="../src/services/PythonProvisioner_extract.cpp" line="57"/>
         <source>The Python archive did not contain an interpreter.</source>
         <translation>L’archive Python ne contenait pas d’interpréteur.</translation>
     </message>
@@ -767,12 +780,12 @@
         <translation>%1 a besoin de Python, qui n’est pas installé sur cet ordinateur. Télécharger Python %2 (%3) depuis python-build-standalone ? Il est conservé dans Hypernucleus et vérifié à l’aide de sa somme de contrôle publiée.</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/PythonSetup.cpp" line="64"/>
+        <location filename="../src/viewmodels/PythonSetup_actions.cpp" line="13"/>
         <source>Downloading Python %1</source>
         <translation>Téléchargement de Python %1</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/PythonSetup.cpp" line="79"/>
+        <location filename="../src/viewmodels/PythonSetup_actions.cpp" line="28"/>
         <source>Python is ready.</source>
         <translation>Python est prêt.</translation>
     </message>
@@ -1057,16 +1070,14 @@
 <context>
     <name>ListEmpty</name>
     <message>
-        <location filename="../qml/components/ListEmpty.qml" line="14"/>
+        <location filename="../qml/components/ListEmpty.qml" line="23"/>
         <source>Loading games...</source>
         <translation>Chargement des jeux...</translation>
     </message>
     <message>
-        <location filename="../qml/components/ListEmpty.qml" line="16"/>
-        <source>Could not reach the server.
-%1</source>
-        <translation>Impossible de joindre le serveur.
-%1</translation>
+        <location filename="../qml/components/ListEmpty.qml" line="31"/>
+        <source>Connect</source>
+        <translation>Se connecter</translation>
     </message>
 </context>
 <context>
@@ -1124,63 +1135,63 @@
 <context>
     <name>PrimaryText</name>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="32"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="33"/>
         <source>Install v%1</source>
         <translation>Installer v%1</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="33"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="34"/>
         <source>Play</source>
         <translation>Jouer</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="35"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="36"/>
         <source>Update</source>
         <translation>Mettre à jour</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="37"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="38"/>
         <source>Queued</source>
         <translation>En attente</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="40"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="41"/>
         <source>Installing %1%</source>
         <translation>Installation %1 %</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="42"/>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="46"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="43"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="47"/>
         <source>Installing...</source>
         <translation>Installation...</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="44"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="45"/>
         <source>Verifying...</source>
         <translation>Vérification...</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="48"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="49"/>
         <source>Launching...</source>
         <translation>Lancement...</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="50"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="51"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="52"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="53"/>
         <source>Launch failed - Retry</source>
         <translation>Échec du lancement - Réessayer</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="54"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="55"/>
         <source>Install failed - Retry</source>
         <translation>Échec de l’installation - Réessayer</translation>
     </message>
     <message>
-        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="56"/>
+        <location filename="../src/viewmodels/SelectedGameView_primaryFor.cpp" line="57"/>
         <source>Install</source>
         <translation>Installer</translation>
     </message>

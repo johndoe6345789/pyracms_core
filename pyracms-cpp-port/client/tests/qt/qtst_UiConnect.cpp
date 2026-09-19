@@ -21,9 +21,17 @@ void TstUiConnect::needsConnectUntilASiteIsChosen()
     TestEnv env;
     MainViewModel vm(nullptr);
     QVERIFY(vm.connection()->needsConnect());
+    QCOMPARE(vm.connection()->emptyText(),
+             QString("Connect to a site to browse games."));
+    QSignalSpy note(&vm, &MainViewModel::notify);
+    vm.refresh();
+    QTest::qWait(100);
+    QVERIFY(vm.catalogError().isEmpty());
+    QCOMPARE(note.count(), 0);
     QCOMPARE(vm.connection()->servers().size(), 2); // presets only
     vm.settings()->setTenantSlug("acme");
     QVERIFY(!vm.connection()->needsConnect());
+    QVERIFY(vm.connection()->emptyText().isEmpty());
 }
 
 void TstUiConnect::connectRejectsBadServerOrEmptySite()

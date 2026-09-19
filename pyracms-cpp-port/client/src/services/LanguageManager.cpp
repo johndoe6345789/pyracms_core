@@ -9,6 +9,11 @@ LanguageManager::LanguageManager(const QString& dir, QObject* parent)
 {
 }
 
+LanguageManager::~LanguageManager()
+{
+    if (m_installed) QCoreApplication::removeTranslator(&m_translator);
+}
+
 QStringList LanguageManager::supported()
 {
     return {QStringLiteral("en"), QStringLiteral("es"), QStringLiteral("fr")};

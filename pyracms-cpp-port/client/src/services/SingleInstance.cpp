@@ -1,5 +1,6 @@
 #include "services/SingleInstance.h"
 
+#include <QCryptographicHash>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QPointer>
@@ -17,6 +18,13 @@ QString SingleInstance::defaultKey()
     QString user = qEnvironmentVariable("USERNAME");
     if (user.isEmpty()) user = qEnvironmentVariable("USER");
     if (user.isEmpty()) user = QStringLiteral("default");
+    // A portable / test copy (own data folder) is a launcher of its own.
+    const QByteArray home = qgetenv("HYPERNUCLEUS_HOME");
+    if (!home.isEmpty())
+        user += "-" + QString::fromLatin1(QCryptographicHash::hash(
+                                             home, QCryptographicHash::Md5)
+                                             .toHex()
+                                             .left(8));
     return QStringLiteral("pyracms-hypernucleus-") + user;
 }
 

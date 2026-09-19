@@ -38,8 +38,8 @@ void GameManager::connectProcess(const QString& name)
                 if (error != QProcess::FailedToStart)
                     return; // Crashed is reported by finished()
                 m_errorReported = true;
-                const QString msg =
-                    tr("Could not start the game: %1").arg(m_process->errorString());
+                const QString msg = tr("Could not start the game: %1")
+                                        .arg(m_process->errorString());
                 append(msg + "\n");
                 finishRun();
                 emit gameError(name, msg);

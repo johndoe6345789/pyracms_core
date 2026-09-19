@@ -10,13 +10,14 @@ namespace Hypernucleus {
 void GameManager::launchGame(const QString& name)
 {
     if (m_running) {
-        emit gameError(name,
-                       tr("Another game is already running: %1").arg(m_currentGame));
+        emit gameError(name, tr("Another game is already running: %1")
+                                 .arg(m_currentGame));
         return;
     }
     const InstallRecord rec = m_installer->record(name);
     if (!rec.isValid() || !QDir(rec.path).exists()) {
-        emit gameError(name, tr("The game is not installed. Install it first."));
+        emit gameError(
+            name, tr("The game is not installed. Install it first."));
         return;
     }
 

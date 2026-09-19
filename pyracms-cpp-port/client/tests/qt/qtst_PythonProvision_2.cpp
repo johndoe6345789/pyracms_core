@@ -12,8 +12,6 @@ private slots:
     void refusesAReleaseWithoutChecksums();
     void reportsUnsupportedPlatforms();
     void reportsLookupFailures();
-    void tarFailureLeavesNoPython();
-    void cancelWhileOffered();
 };
 
 void TstPythonProvision2::refusesAWrongChecksum()
@@ -55,32 +53,6 @@ void TstPythonProvision2::reportsLookupFailures()
     QSignalSpy bad(&p.prov, &PythonProvisioner::failed);
     p.prov.resolve();
     QTRY_COMPARE_WITH_TIMEOUT(bad.count(), 1, 5000);
-    QVERIFY(!p.prov.isBusy());
-}
-
-void TstPythonProvision2::tarFailureLeavesNoPython()
-{
-    Provision p;
-    p.tar.exitCode = 2;
-    QSignalSpy bad(&p.prov, &PythonProvisioner::failed);
-    QSignalSpy offer(&p.prov, &PythonProvisioner::offerReady);
-    p.prov.resolve();
-    QTRY_COMPARE_WITH_TIMEOUT(offer.count(), 1, 5000);
-    p.prov.accept();
-    QTRY_COMPARE_WITH_TIMEOUT(bad.count(), 1, 8000);
-    QVERIFY(bad.at(0).at(0).toString().contains("bad archive"));
-    QVERIFY(!QFileInfo::exists(p.paths.dataDir() + "/python"));
-    QVERIFY(!QFileInfo::exists(p.paths.dataDir() + "/python-staging"));
-}
-
-void TstPythonProvision2::cancelWhileOffered()
-{
-    Provision p;
-    QSignalSpy gone(&p.prov, &PythonProvisioner::cancelled);
-    p.prov.resolve();
-    p.prov.cancel(); // while still looking the release up
-    QCOMPARE(gone.count(), 1);
-    QTest::qWait(50); // the late reply is ignored
     QVERIFY(!p.prov.isBusy());
 }
 

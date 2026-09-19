@@ -19,7 +19,7 @@ RowLayout {
     }
     ComboBox {
         id: box
-        implicitWidth: 170
+        implicitWidth: 240
         Accessible.name: qsTr("Language")
         // Language names stay in their own language.
         model: [qsTr("System default"), "English", "Español", "Français"]

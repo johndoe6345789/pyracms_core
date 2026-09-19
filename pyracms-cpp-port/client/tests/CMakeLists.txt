@@ -10,7 +10,9 @@ set(QT_TEST_SOURCES
     qt/qtst_ApiLogin.cpp
     qt/qtst_ApiLogin_2.cpp
     qt/qtst_BackendBinaries.cpp
+    qt/qtst_BackendBinaries_2.cpp
     qt/qtst_BackendCatalog.cpp
+    qt/qtst_BackendCatalog_2.cpp
     qt/qtst_BinarySelector.cpp
     qt/qtst_BinarySelector_2.cpp
     qt/qtst_BinarySelector_3.cpp
@@ -52,6 +54,7 @@ set(QT_TEST_SOURCES
     qt/qtst_InstallStateStore_3.cpp
     qt/qtst_InstallStateStore_4.cpp
     qt/qtst_InstallStateStore_5.cpp
+    qt/qtst_LanguageManager.cpp
     qt/qtst_LaunchFlow.cpp
     qt/qtst_LaunchFlow_2.cpp
     qt/qtst_LaunchFlow_3.cpp
@@ -61,21 +64,30 @@ set(QT_TEST_SOURCES
     qt/qtst_LaunchNative.cpp
     qt/qtst_LaunchPython.cpp
     qt/qtst_LaunchVenv.cpp
+    qt/qtst_LaunchVenv_2.cpp
     qt/qtst_Orphans.cpp
+    qt/qtst_Orphans_2.cpp
     qt/qtst_PipInstaller.cpp
     qt/qtst_PipResolver.cpp
     qt/qtst_PipRun.cpp
     qt/qtst_PipRun_2.cpp
     qt/qtst_PipSpec.cpp
     qt/qtst_PipVenv.cpp
+    qt/qtst_PipVenv_2.cpp
+    qt/qtst_PipVenv_3.cpp
     qt/qtst_PlannerErrors.cpp
     qt/qtst_PlannerErrors_2.cpp
     qt/qtst_PrivateDownload.cpp
     qt/qtst_PythonAssets.cpp
+    qt/qtst_PythonAssets_2.cpp
     qt/qtst_PythonProvision.cpp
     qt/qtst_PythonProvision_2.cpp
+    qt/qtst_PythonProvision_3.cpp
     qt/qtst_RequestAuth.cpp
+    qt/qtst_ScreenshotEs.cpp
     qt/qtst_SecretStore.cpp
+    qt/qtst_SecretStore_2.cpp
+    qt/qtst_SecretStore_3.cpp
     qt/qtst_ServerSettings.cpp
     qt/qtst_ServerSettings_2.cpp
     qt/qtst_ServerUrl.cpp
@@ -84,6 +96,9 @@ set(QT_TEST_SOURCES
     qt/qtst_SiteDirectory.cpp
     qt/qtst_SiteDirectory_2.cpp
     qt/qtst_TenantInfo.cpp
+    qt/qtst_TranslationFiles.cpp
+    qt/qtst_UiBackendData.cpp
+    qt/qtst_UiBackendData_2.cpp
     qt/qtst_UiConnect.cpp
     qt/qtst_UiConnect_2.cpp
     qt/qtst_UiDeepLinkAndSettings.cpp
@@ -98,19 +113,22 @@ set(QT_TEST_SOURCES
     qt/qtst_UiGameModel.cpp
     qt/qtst_UiGameModel_2.cpp
     qt/qtst_UiGameModel_3.cpp
+    qt/qtst_UiLanguage.cpp
+    qt/qtst_UiLanguage_2.cpp
     qt/qtst_UiLinks.cpp
     qt/qtst_UiLinks_2.cpp
     qt/qtst_UiMainViewModel.cpp
     qt/qtst_UiMainViewModel_2.cpp
     qt/qtst_UiMainViewModel_3.cpp
     qt/qtst_UiPythonSetup.cpp
+    qt/qtst_UiPythonSetup_2.cpp
     qt/qtst_UiSelectedView.cpp
     qt/qtst_UiSelectedView_2.cpp
 )
 
 # QML-facing C++ types (models, view-models) compiled without the QML
 # module so QtTest can exercise them: suites named qtst_Ui*.cpp use it.
-find_package(Qt6 REQUIRED COMPONENTS Gui Qml)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick)
 set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/models/DependencyModel.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel.cpp
@@ -121,6 +139,7 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel_statusTextOf.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel.cpp
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel_filterAcceptsRow.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/AppOptions.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/ConnectController.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DeepLinkController.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter.cpp
@@ -128,6 +147,7 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_enqueue.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_external.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter_onProgress.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/LanguageWiring.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelBase.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_cancelDownload.cpp
@@ -140,6 +160,7 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_wireInstallSignals.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel_wireSettings.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup.cpp
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup_actions.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/PythonSetup_wire.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView.cpp
     ${CMAKE_SOURCE_DIR}/src/viewmodels/SelectedGameView_build.cpp
@@ -156,9 +177,12 @@ set(UI_SOURCES
     ${CMAKE_SOURCE_DIR}/src/models/GameDepModel.h
     ${CMAKE_SOURCE_DIR}/src/models/GameDepRows.h
     ${CMAKE_SOURCE_DIR}/src/models/GameFilterModel.h
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/AppOptions.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/ConnectController.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DeepLinkController.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenter.h
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/DownloadCenterBase.h
+    ${CMAKE_SOURCE_DIR}/src/viewmodels/LanguageWiring.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModel.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelBase.h
     ${CMAKE_SOURCE_DIR}/src/viewmodels/MainViewModelDeps.h
@@ -171,7 +195,7 @@ set(UI_SOURCES
 )
 add_library(hypernucleus_ui_test STATIC ${UI_SOURCES})
 target_link_libraries(hypernucleus_ui_test PUBLIC
-    hypernucleus_lib Qt6::Gui Qt6::Qml)
+    hypernucleus_lib Qt6::Gui Qt6::Qml Qt6::Quick)
 target_include_directories(hypernucleus_ui_test PUBLIC
     ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/models
     ${CMAKE_SOURCE_DIR}/src/viewmodels)
@@ -190,8 +214,16 @@ foreach(test_src ${QT_TEST_SOURCES})
     target_compile_definitions(${test_name} PRIVATE
         FAKEEXE_PATH="$<TARGET_FILE:fakeexe>"
         FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
-        QM_DIR="${HN_QM_DIR}")
+        QM_DIR="${HN_QM_DIR}"
+        TS_DIR="${CMAKE_SOURCE_DIR}/translations")
     add_dependencies(${test_name} hypernucleus_lrelease)
+    if(test_name MATCHES "Screenshot")
+        # runs the real launcher (offscreen) and looks at its window
+        add_dependencies(${test_name} hypernucleus)
+        target_link_libraries(${test_name} PRIVATE Qt6::Gui)
+        target_compile_definitions(${test_name} PRIVATE
+            APP_PATH="$<TARGET_FILE:hypernucleus>")
+    endif()
     add_test(NAME ${test_name} COMMAND ${test_name})
     # The suites use their own QSettings / data folders, never the user's.
     set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

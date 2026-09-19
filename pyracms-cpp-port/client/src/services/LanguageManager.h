@@ -15,8 +15,11 @@ class LanguageManager : public QObject {
 public:
     // `dir` holds the .qm files: ":/translations" in the app, a build
     // folder in tests.
-    explicit LanguageManager(const QString& dir = QStringLiteral(":/translations"),
-                             QObject* parent = nullptr);
+    explicit LanguageManager(
+        const QString& dir = QStringLiteral(":/translations"),
+        QObject* parent = nullptr);
+
+    ~LanguageManager() override;
 
     static QStringList supported(); // en, es, fr
     // "system" / "" -> the first OS UI language we have, else "en";

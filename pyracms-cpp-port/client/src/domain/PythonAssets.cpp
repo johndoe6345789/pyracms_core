@@ -36,7 +36,8 @@ PythonAsset pick(const QJsonObject& release, const QString& os,
         const auto m = re.match(a.value("name").toString());
         if (!m.hasMatch()) continue;
         const QString version = m.captured(1);
-        if (best.isValid() && VersionCompare::compare(version, best.version) <= 0)
+        if (best.isValid() &&
+            VersionCompare::compare(version, best.version) <= 0)
             continue;
         best.name = a.value("name").toString();
         best.url = a.value("browser_download_url").toString();

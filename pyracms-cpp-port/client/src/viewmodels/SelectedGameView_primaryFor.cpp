@@ -29,7 +29,8 @@ Primary primaryFor(int state, double progress, const QString& installedVersion,
     case GameStates::Installed:
         if (!selectedVersion.isEmpty() && !installedVersion.isEmpty() &&
             VersionCompare::compare(selectedVersion, installedVersion) != 0)
-            return make("install", PrimaryText::tr("Install v%1").arg(selectedVersion));
+            return make("install",
+                        PrimaryText::tr("Install v%1").arg(selectedVersion));
         return make("play", PrimaryText::tr("Play"));
     case GameStates::UpdateAvailable:
         return make("update", PrimaryText::tr("Update"));

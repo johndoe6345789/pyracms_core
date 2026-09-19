@@ -1,6 +1,7 @@
 #pragma once
 
 #include "viewmodels/ConnectController.h"
+#include "viewmodels/PythonSetup.h"
 
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
@@ -24,7 +25,6 @@ class PipInstaller;
 class PipResolver;
 class SettingsManager;
 class SettingsViewModel;
-class PythonSetup;
 
 // Owns nothing itself: createServices() builds every service and model as a
 // child of `owner`, in dependency order.
@@ -33,8 +33,11 @@ class ServiceHolder : public QObject {
     QML_ANONYMOUS
     Q_PROPERTY(Hypernucleus::ConnectController* connection READ connection
                    CONSTANT)
+    Q_PROPERTY(Hypernucleus::PythonSetup* pythonSetup READ pythonSetup
+                   CONSTANT)
 
 public:
+    PythonSetup* pythonSetup() const { return m_python; }
     ConnectController* connection() const { return m_connect; }
     using QObject::QObject;
 

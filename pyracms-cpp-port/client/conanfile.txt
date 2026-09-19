@@ -10,3 +10,4 @@ CMakeToolchain
 qt/*:shared=True
 qt/*:qtdeclarative=True
 qt/*:qtquickcontrols2=True
+qt/*:qttools=True

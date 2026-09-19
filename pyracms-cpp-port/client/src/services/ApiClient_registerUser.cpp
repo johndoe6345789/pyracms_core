@@ -40,8 +40,8 @@ void ApiClient::registerUser(const QString& username, const QString& email,
         }
 
         QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QString msg =
-            doc.object().value("message").toString(tr("Registration successful"));
+        QString msg = doc.object().value("message").toString(
+            tr("Registration successful"));
         emit registerResponse(true, msg);
     });
 }

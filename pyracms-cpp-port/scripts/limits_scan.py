@@ -9,7 +9,9 @@ EXTS = {".cpp", ".h", ".hpp", ".ts", ".tsx", ".js", ".py", ".qml"}
 MAX_LINES = 80
 MAX_COLS = 80
 # Generated or vendored files are exempt from the limits.
-SKIP_PARTS = ("node_modules/", "/build/", ".next/", "package-lock.json")
+SKIP_PARTS = ("node_modules/", "/build/", ".next/", "package-lock.json",
+              # Qt Linguist catalogs (.ts here is XML, not TypeScript)
+              "client/translations/")
 SKIP_NAMES = {"CMakeLists.txt", "next-env.d.ts"}
 # The original Pyramid app is kept for reference and is not the live code.
 LEGACY = ("pyracms/", "tools/", "setup.py")

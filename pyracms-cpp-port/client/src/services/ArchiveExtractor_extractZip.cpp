@@ -14,7 +14,8 @@ ExtractResult extractZip(const QString& zipPath, const QString& stagingDir)
     QDir staging(stagingDir);
     if (staging.exists()) staging.removeRecursively();
     if (!QDir().mkpath(stagingDir)) {
-        res.error = HnText::tr("Failed to create directory: %1").arg(stagingDir);
+        res.error =
+            HnText::tr("Failed to create directory: %1").arg(stagingDir);
         return res;
     }
 

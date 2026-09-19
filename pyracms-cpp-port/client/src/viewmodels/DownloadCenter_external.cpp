@@ -22,9 +22,9 @@ void DownloadCenter::beginExternal(const QString& label)
 void DownloadCenter::externalProgress(qint64 received, qint64 total)
 {
     if (!m_external) return;
-    m_progress = total > 0
-                     ? static_cast<double>(received) / static_cast<double>(total)
-                     : -1.0;
+    m_progress = total > 0 ? static_cast<double>(received) /
+                                 static_cast<double>(total)
+                           : -1.0;
     const qint64 now = m_clock.elapsed();
     if (now - m_lastMs >= 500 && now > 0) {
         m_speed = Format::speed(static_cast<double>(received - m_lastBytes) *

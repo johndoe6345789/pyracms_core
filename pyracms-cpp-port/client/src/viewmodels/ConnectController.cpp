@@ -30,6 +30,12 @@ bool ConnectController::needsConnect() const
     return m_settings->tenantSlug().isEmpty();
 }
 
+QString ConnectController::emptyText() const
+{
+    return needsConnect() ? tr("Connect to a site to browse games.")
+                          : QString();
+}
+
 QString ConnectController::serverError(const QString& url) const
 {
     return ServerUrl::error(url);

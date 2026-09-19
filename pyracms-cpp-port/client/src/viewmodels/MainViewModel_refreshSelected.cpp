@@ -38,12 +38,6 @@ void MainViewModel::refreshSelected()
     emit selectedChanged();
 }
 
-void MainViewModel::retranslate()
-{
-    m_model->refreshAll();
-    refreshSelected();
-}
-
 void MainViewModel::primaryAction()
 {
     if (m_selectedName.isEmpty()) return;

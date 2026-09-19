@@ -27,7 +27,8 @@ void ModuleInstaller::uninstall(const QString& name, const QString& version,
     Q_UNUSED(version)
 
     if (!removeDirectory(dir)) {
-        emit uninstallFailed(name, tr("Failed to remove installation directory"));
+        emit uninstallFailed(
+            name, tr("Failed to remove installation directory"));
         return;
     }
     if (rec.type == "game") removeDirectory(m_pathManager->pipTargetDir(name));

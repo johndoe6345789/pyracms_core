@@ -41,6 +41,7 @@ Dialog {
             SettingsPythonTab { ed: root.ed }
             SettingsLinksTab {}
         }
+        SettingsLanguage {}
     }
 
     footer: Item {
@@ -53,7 +54,6 @@ Dialog {
             anchors.topMargin: Theme.spaceM
             anchors.bottomMargin: Theme.spaceL
             spacing: Theme.spaceM
-            SettingsLanguage {}
             Button {
                 text: qsTr("Reset to defaults")
                 flat: true

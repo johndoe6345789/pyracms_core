@@ -14,7 +14,8 @@ bool copyCurrentEntry(QuaZip& zip, QuaZipFile& zipFile,
 {
     QDir().mkpath(QFileInfo(outputPath).absolutePath());
     if (!zipFile.open(QIODevice::ReadOnly)) {
-        res.error = HnText::tr("Failed to read archive entry: %1").arg(entryName);
+        res.error =
+            HnText::tr("Failed to read archive entry: %1").arg(entryName);
         return false;
     }
     QFile out(outputPath);

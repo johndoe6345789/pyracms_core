@@ -10,14 +10,15 @@
 namespace Hypernucleus {
 
 // Anonymous catalog of one site: the tenant id comes from the public
-// GET /api/tenants/<slug>, the catalog from /api/gamedep/catalog.
+// GET /api/tenants/<slug>, the catalog from /api/gamedep/catalog. Never
+// without a tenant id.
 void EntryRepository::resolveTenant(const QString& slug, int gen)
 {
     QPointer<EntryRepository> self(this);
     const QString path =
         "/api/tenants/" + QString::fromLatin1(QUrl::toPercentEncoding(slug));
     m_api->getJson(path, [self, slug, gen](bool ok, const QJsonDocument& doc,
-                                           int status, const QString&) {
+                                           int status, const QString& err) {
         if (!self || gen != self->m_generation) return;
         const int id = doc.object().value("id").toInt();
         if (ok && id > 0) {
@@ -29,8 +30,10 @@ void EntryRepository::resolveTenant(const QString& slug, int gen)
             self->setRefreshing(false);
             emit self->refreshFailed(
                 tr("Site \"%1\" was not found on this server.").arg(slug));
-        } else {
-            self->fetchCatalog({"/api/outputs/json"}, gen);
+        } else { // no tenant id, so no catalog request at all
+            self->setRefreshing(false);
+            emit self->refreshFailed(
+                tr("Could not reach the server: %1").arg(err));
         }
     });
 }

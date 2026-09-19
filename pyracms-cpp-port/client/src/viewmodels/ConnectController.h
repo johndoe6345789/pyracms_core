@@ -18,6 +18,7 @@ class ConnectController : public QObject {
     Q_PROPERTY(Hypernucleus::SiteDirectory* sites READ sites CONSTANT)
     Q_PROPERTY(QVariantList servers READ servers NOTIFY serversChanged)
     Q_PROPERTY(bool needsConnect READ needsConnect NOTIFY needsConnectChanged)
+    Q_PROPERTY(QString emptyText READ emptyText NOTIFY needsConnectChanged)
 
 public:
     ConnectController(SettingsManager* settings, SiteDirectory* sites,
@@ -28,6 +29,8 @@ public:
     QVariantList servers() const;
     // No site chosen yet: the window offers the Connect panel.
     bool needsConnect() const;
+    // Empty-list hint while no site is chosen (else empty).
+    QString emptyText() const;
 
     // Empty when `url` is usable, else a message for the user.
     Q_INVOKABLE QString serverError(const QString& url) const;

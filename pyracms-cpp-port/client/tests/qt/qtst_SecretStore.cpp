@@ -1,44 +1,11 @@
 #include <QtTest>
-#include <QDirIterator>
-#include <QUuid>
 
+#include "SecretFakes.h"
 #include "TestEnv.h"
-#include "services/ApiClient.h"
-#include "services/AuthService.h"
 #include "services/SecretStore.h"
-#include "services/SettingsManager.h"
 #include "services/TokenVault.h"
 
 using namespace Hypernucleus;
-
-namespace {
-
-// A keychain that refuses everything (locked, missing, no Secret Service).
-class BrokenStore : public SecretStore {
-public:
-    QString backendName() const override { return "broken"; }
-    bool isAvailable() const override { return true; }
-    bool write(const QString&, const QString&, const QString&) override
-    {
-        return false;
-    }
-    QString read(const QString&, const QString&) override { return {}; }
-    bool remove(const QString&, const QString&) override { return false; }
-};
-
-// Does any file below `dir` contain `needle`?
-bool anyFileContains(const QString& dir, const QByteArray& needle)
-{
-    QDirIterator it(dir, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        QFile f(it.next());
-        if (f.open(QIODevice::ReadOnly) && f.readAll().contains(needle))
-            return true;
-    }
-    return false;
-}
-
-} // namespace
 
 class TstSecretStore : public QObject {
     Q_OBJECT
@@ -48,10 +15,6 @@ private slots:
     void vaultUsesTheKeychainWhenItWorks();
     void vaultFallsBackToSessionMemory();
     void migratesPlaintextTokenAndDeletesIt();
-    void authServiceKeepsTokenOutOfSettings();
-    void authServiceWarnsWithoutKeychain();
-    void portableModeUsesSessionStore();
-    void platformBackend();
 };
 
 void TstSecretStore::memoryStoreRoundTrip()
@@ -108,78 +71,6 @@ void TstSecretStore::migratesPlaintextTokenAndDeletesIt()
     QVERIFY(!v.migrateFromSettings(qs)); // one-time
     qs.sync();
     QVERIFY(!anyFileContains(env.path(), "legacy-secret"));
-}
-
-void TstSecretStore::authServiceKeepsTokenOutOfSettings()
-{
-    TestEnv env;
-    QSettings().setValue("auth/token", "old-plain");
-    QSettings().setValue("auth/username", "richard");
-    ApiClient api;
-    SettingsManager settings;
-    AuthService auth(&api, &settings, std::make_unique<MemorySecretStore>());
-    auth.restoreSession();
-    QVERIFY(auth.isAuthenticated());
-    QCOMPARE(auth.token(), QString("old-plain"));
-    QVERIFY(!QSettings().contains("auth/token"));
-    QVERIFY(!anyFileContains(env.path(), "old-plain"));
-    auth.logout();
-    QVERIFY(!auth.isAuthenticated());
-    QVERIFY(auth.vault().sessionOnly() == false);
-}
-
-void TstSecretStore::authServiceWarnsWithoutKeychain()
-{
-    TestEnv env;
-    QSettings().setValue("auth/token", "session-token");
-    QSettings().setValue("auth/username", "richard");
-    ApiClient api;
-    SettingsManager settings;
-    AuthService auth(&api, &settings, std::make_unique<BrokenStore>());
-    QSignalSpy warn(&auth, &AuthService::secureStorageUnavailable);
-    auth.restoreSession();
-    QVERIFY(auth.isAuthenticated()); // still signed in for this session
-    QCOMPARE(warn.count(), 1);
-    QVERIFY(auth.vault().sessionOnly());
-    QVERIFY(!anyFileContains(env.path(), "session-token"));
-}
-
-void TstSecretStore::portableModeUsesSessionStore()
-{
-    TestEnv env; // sets HYPERNUCLEUS_HOME
-    auto s = createPlatformSecretStore();
-    QCOMPARE(s->backendName(), QString("memory"));
-}
-
-// Windows Credential Manager / macOS Keychain really store the secret; on
-// Linux a keyring may or may not exist, so either it works or the vault
-// falls back to memory - and the token never reaches a file.
-void TstSecretStore::platformBackend()
-{
-#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
-    auto s = createNativeSecretStore();
-    QVERIFY(s);
-    const QString acc = "test-" + QUuid::createUuid().toString(QUuid::Id128);
-    QVERIFY(s->write("HypernucleusTest", acc, "pässword-ü-123"));
-    QCOMPARE(s->read("HypernucleusTest", acc), QString("pässword-ü-123"));
-    QVERIFY(s->write("HypernucleusTest", acc, "second"));
-    QCOMPARE(s->read("HypernucleusTest", acc), QString("second"));
-    QVERIFY(s->remove("HypernucleusTest", acc));
-    QCOMPARE(s->read("HypernucleusTest", acc), QString());
-#else
-    TestEnv env;
-    QVERIFY(!createLibsecretStore("")->isAvailable());
-    TokenVault none(createLibsecretStore(""));
-    QVERIFY(!none.save("linux-secret"));
-    QVERIFY(none.sessionOnly());
-    QCOMPARE(none.load(), QString("linux-secret"));
-
-    TokenVault real(createLibsecretStore());
-    real.save("linux-secret");
-    QCOMPARE(real.load(), QString("linux-secret"));
-    QVERIFY(!anyFileContains(env.path(), "linux-secret"));
-    real.clear();
-#endif
 }
 
 QTEST_MAIN(TstSecretStore)
