@@ -14,7 +14,6 @@ using namespace Hypernucleus;
 // Installs a tiny game through the real installer, then launches it.
 class TstLaunchFlow : public QObject {
     Q_OBJECT
-
     MiniHttp m_http;
     QTemporaryDir m_dir;
     ApiClient m_api;

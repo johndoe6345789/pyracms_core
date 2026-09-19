@@ -1,6 +1,5 @@
 #include <QtTest>
 #include <QTemporaryDir>
-
 #include "FakeExe.h"
 #include "MiniHttp.h"
 #include "ZipBuilder.h"
@@ -12,7 +11,6 @@ using namespace Hypernucleus;
 
 class TstLaunchFlow : public QObject {
     Q_OBJECT
-
     MiniHttp m_http;
     QTemporaryDir m_dir;
     ApiClient m_api;

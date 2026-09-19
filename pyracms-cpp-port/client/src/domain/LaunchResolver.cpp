@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QSet>
+#include <QSysInfo>
 
 namespace Hypernucleus {
 namespace LaunchResolver {
@@ -11,11 +12,9 @@ bool isInside(const QString& base, const QString& path)
 {
     const QString b = QFileInfo(QDir::cleanPath(base)).absoluteFilePath();
     const QString p = QFileInfo(QDir::cleanPath(path)).absoluteFilePath();
-#ifdef Q_OS_WIN
-    const Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-#else
-    const Qt::CaseSensitivity cs = Qt::CaseSensitive;
-#endif
+    const auto cs = QSysInfo::productType() == "windows"
+                        ? Qt::CaseInsensitive
+                        : Qt::CaseSensitive;
     if (p.compare(b, cs) == 0) return true;
     return p.startsWith(b.endsWith('/') ? b : b + "/", cs);
 }
