@@ -2,7 +2,6 @@
 
 using namespace harness;
 
-static int idOf(const Reply &r) { return r.json["id"].asInt(); }
 
 TEST(ForumHttp, AdminBuildsBoardAndMembersPost) {
     REQUIRE_SERVER();
@@ -17,7 +16,7 @@ TEST(ForumHttp, AdminBuildsBoardAndMembersPost) {
     ASSERT_TRUE(ok(cat)) << cat.text;
     EXPECT_EQ(post("/api/forum/categories",
                    J({{"name", "x"}, {"tenantId", s.id}}), u).status, 403);
-    int cid = idOf(cat);
+    int cid = maxId("forum_categories");
     auto cs = std::to_string(cid);
     EXPECT_EQ(put("/api/forum/categories/" + cs, J({{"name", "C2"}}), a)
                   .status, 200);
@@ -29,15 +28,16 @@ TEST(ForumHttp, AdminBuildsBoardAndMembersPost) {
                    J({{"categoryId", cid}, {"name", "F"},
                       {"description", "d"}}), a);
     ASSERT_TRUE(ok(fr)) << fr.text;
-    auto fs = std::to_string(idOf(fr));
+    int fid = maxId("forums");
+    auto fs = std::to_string(fid);
     EXPECT_EQ(put("/api/forum/forums/" + fs,
                   J({{"name", "F2"}, {"description", "e"}}), a).status, 200);
     EXPECT_EQ(put("/api/forum/forums/" + fs, J({{"x", 1}}), a).status, 400);
     auto th = post("/api/forum/threads",
-                   J({{"forumId", idOf(fr)}, {"title", "T"},
+                   J({{"forumId", fid}, {"title", "T"},
                       {"content", "body"}, {"tenantId", s.id}}), u);
     ASSERT_TRUE(ok(th)) << th.text;
-    auto ts = std::to_string(idOf(th));
+    auto ts = std::to_string(th.json["id"].asInt());
     EXPECT_EQ(post("/api/forum/threads", J({{"title", "x"}}), u).status,
               400);
     EXPECT_EQ(get("/api/forum/forums/" + fs + t).status, 200);

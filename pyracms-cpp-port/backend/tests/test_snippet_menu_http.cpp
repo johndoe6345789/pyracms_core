@@ -37,7 +37,7 @@ TEST(MenuHttp, GroupsAndItems) {
     auto g = post("/api/menu-groups",
                   J({{"name", "main"}, {"tenantId", s.id}}), a);
     ASSERT_TRUE(ok(g)) << g.text;
-    auto gs = std::to_string(g.json["id"].asInt());
+    auto gs = std::to_string(maxId("menu_groups"));
     EXPECT_EQ(post("/api/menu-groups", J({{"name", "x"}}), a).status, 400);
     EXPECT_EQ(get("/api/menu-groups?tenant_id=" + std::to_string(s.id))
                   .status, 200);
@@ -47,7 +47,7 @@ TEST(MenuHttp, GroupsAndItems) {
     EXPECT_EQ(post("/api/menu-groups/" + gs + "/items", J({{"x", 1}}), a)
                   .status, 400);
     EXPECT_EQ(get("/api/menu-groups/" + gs + "/items").status, 200);
-    auto is = std::to_string(it.json["id"].asInt());
+    auto is = std::to_string(maxId("menu_items"));
     EXPECT_EQ(put("/api/menus/" + is, J({{"name", "H2"}}), a).status, 200);
     EXPECT_EQ(del("/api/menus/" + is, a).status, 200);
     EXPECT_EQ(del("/api/menu-groups/" + gs, a).status, 200);

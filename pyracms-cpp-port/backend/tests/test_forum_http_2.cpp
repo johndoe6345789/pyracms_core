@@ -10,10 +10,11 @@ TEST(ForumHttp, PostsVotesAndDeletes) {
     auto t = "?tenant_id=" + std::to_string(s.id);
     auto cat = post("/api/forum/categories",
                     J({{"name", "Cat"}, {"tenantId", s.id}}), a);
-    auto fr = post("/api/forum/forums",
-                   J({{"categoryId", cat.json["id"]}, {"name", "F"}}), a);
+    int cid = maxId("forum_categories");
+    post("/api/forum/forums", J({{"categoryId", cid}, {"name", "F"}}), a);
+    int fid = maxId("forums");
     auto th = post("/api/forum/threads",
-                   J({{"forumId", fr.json["id"]}, {"title", "T"},
+                   J({{"forumId", fid}, {"title", "T"},
                       {"content", "c"}, {"tenantId", s.id}}), u);
     auto tid = th.json["id"].asInt();
     auto p = post("/api/forum/posts",
@@ -35,9 +36,7 @@ TEST(ForumHttp, PostsVotesAndDeletes) {
     EXPECT_EQ(del("/api/forum/posts/" + ps, u).status, 200);
     EXPECT_EQ(del("/api/forum/threads/" + std::to_string(tid), u).status,
               200);
-    EXPECT_EQ(del("/api/forum/forums/" + std::to_string(
-                      fr.json["id"].asInt()), a).status, 200);
-    EXPECT_EQ(del("/api/forum/categories/" + std::to_string(
-                      cat.json["id"].asInt()), a).status, 200);
+    EXPECT_EQ(del("/api/forum/forums/" + std::to_string(fid), a).status, 200);
+    EXPECT_EQ(del("/api/forum/categories/" + std::to_string(cid), a).status, 200);
     EXPECT_EQ(del("/api/forum/categories/999999", a).status, 404);
 }

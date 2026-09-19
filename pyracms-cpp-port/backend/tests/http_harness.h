@@ -56,6 +56,13 @@ inline Json::Value A(std::initializer_list<const char *> items) {
 }
 inline bool ok(const Reply &r) { return r.status >= 200 && r.status < 300; }
 
+// Newest row id of a table (creates that only answer {"success":true}).
+inline int maxId(const std::string &table) {
+    auto r = testDb()->execSqlSync("SELECT COALESCE(MAX(id), 0) AS m FROM " +
+                                   table);
+    return r[0]["m"].as<int>();
+}
+
 // Multipart file upload (field "file").
 Reply upload(const std::string &path, const std::string &token,
              const std::string &filename, const std::string &content);
