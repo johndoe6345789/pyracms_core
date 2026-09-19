@@ -24,19 +24,20 @@ STATUS=0
 
 # Excluded from coverage (each needs a live third-party service that
 # cannot exist in the scratch database; only glue around it lives there):
-#  - main.cpp: process bootstrap (listeners, env config, timers).
-#  - ElasticsearchService: HTTP client for an Elasticsearch cluster.
+#  - main.cpp and startup/: process bootstrap (env config, timers).
+#  - services/elasticsearch/: HTTP client for an Elasticsearch cluster.
 #    Also the ES branches of SearchService (GCOVR_EXCL_START markers).
-#  - OAuthService: HTTP token/profile exchange with GitHub/Google/Discord.
-#  - EmailService: SMTP delivery.
-#  - CacheService: Redis client.
+#  - services/oauth/: HTTP token/profile exchange with GitHub/Google/Discord.
+#  - services/email/: SMTP delivery.
+#  - services/cache/: Redis client.
 #  - DockerExecutionService: runs snippets via the host docker daemon.
 EXCLUDES=(--exclude '/app/src/main.cpp'
-  --exclude '/app/src/services/ElasticsearchService.cpp'
-  --exclude '/app/src/services/OAuthService.cpp'
-  --exclude '/app/src/services/EmailService.cpp'
-  --exclude '/app/src/services/CacheService.cpp'
-  --exclude '/app/src/services/DockerExecutionService.cpp')
+  --exclude '/app/src/services/elasticsearch/'
+  --exclude '/app/src/services/oauth/'
+  --exclude '/app/src/services/email/'
+  --exclude '/app/src/services/cache/'
+  --exclude '/app/src/services/DockerExecutionService.cpp'
+  --exclude '/app/src/startup/')
 
 gcovr -r /app --object-directory /app/build --filter '/app/src/' \
   "${EXCLUDES[@]}" --json-summary /cov.json --txt /coverage.txt \

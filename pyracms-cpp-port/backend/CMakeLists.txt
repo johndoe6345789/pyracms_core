@@ -37,35 +37,23 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Auto-generated from source files — run `python generate_cmake.py` to update
 set(LIB_SOURCES
 
-    src/controllers/AnalyticsController.cpp
-
     src/controllers/ArticleController.cpp
 
     src/controllers/ArticleTagController.cpp
 
     src/controllers/BoolReply.cpp
 
-    src/controllers/CommentController.cpp
-
-    src/controllers/DocsController.cpp
-
-    src/controllers/GalleryController.cpp
-
-    src/controllers/NotificationController.cpp
-
-    src/controllers/SearchController.cpp
-
-    src/controllers/SeoController.cpp
-
-    src/controllers/SettingsController.cpp
-
-    src/controllers/SocialController.cpp
-
-    src/controllers/WebSocketCollabController.cpp
-
-    src/controllers/WebSocketNotificationController.cpp
-
     src/controllers/WsAuth.cpp
+
+    src/controllers/analytics/AnalyticsControllerGetPageViews.cpp
+
+    src/controllers/analytics/AnalyticsControllerGetSearchQueries.cpp
+
+    src/controllers/analytics/AnalyticsControllerGetTopContent.cpp
+
+    src/controllers/analytics/AnalyticsControllerGetTrafficSources.cpp
+
+    src/controllers/analytics/AnalyticsControllerTrackPageView.cpp
 
     src/controllers/article/ArticleControllerCreateArticle.cpp
 
@@ -74,6 +62,8 @@ set(LIB_SOURCES
     src/controllers/article/ArticleControllerGetArticle.cpp
 
     src/controllers/article/ArticleControllerGetRevision.cpp
+
+    src/controllers/article/ArticleControllerJson.cpp
 
     src/controllers/article/ArticleControllerListArticles.cpp
 
@@ -98,6 +88,8 @@ set(LIB_SOURCES
     src/controllers/article/ArticleControllerVoteArticle.cpp
 
     src/controllers/auth/AuthControllerApplyReset.cpp
+
+    src/controllers/auth/AuthControllerFinishLogin.cpp
 
     src/controllers/auth/AuthControllerForgotPassword.cpp
 
@@ -132,6 +124,20 @@ set(LIB_SOURCES
     src/controllers/auth/AuthControllerVerifyEmail.cpp
 
     src/controllers/auth/AuthControllerWithTenant.cpp
+
+    src/controllers/comment/CommentControllerCreateComment.cpp
+
+    src/controllers/comment/CommentControllerDeleteComment.cpp
+
+    src/controllers/comment/CommentControllerGetComments.cpp
+
+    src/controllers/comment/CommentControllerUpdateComment.cpp
+
+    src/controllers/comment/CommentControllerVoteComment.cpp
+
+    src/controllers/docs/DocsControllerOpenapiSpec.cpp
+
+    src/controllers/docs/DocsControllerSwaggerUi.cpp
 
     src/controllers/file/FileControllerDownload.cpp
 
@@ -177,6 +183,28 @@ set(LIB_SOURCES
 
     src/controllers/forum/ForumControllerVotePost.cpp
 
+    src/controllers/gallery/GalleryControllerAddPicture.cpp
+
+    src/controllers/gallery/GalleryControllerCreateAlbum.cpp
+
+    src/controllers/gallery/GalleryControllerDeleteAlbum.cpp
+
+    src/controllers/gallery/GalleryControllerDeletePicture.cpp
+
+    src/controllers/gallery/GalleryControllerGetAlbum.cpp
+
+    src/controllers/gallery/GalleryControllerGetPicture.cpp
+
+    src/controllers/gallery/GalleryControllerListAlbums.cpp
+
+    src/controllers/gallery/GalleryControllerSetDefaultPicture.cpp
+
+    src/controllers/gallery/GalleryControllerUpdateAlbum.cpp
+
+    src/controllers/gallery/GalleryControllerUpdatePicture.cpp
+
+    src/controllers/gallery/GalleryControllerVotePicture.cpp
+
     src/controllers/gamedep/GameDepAttachControllerDeps.cpp
 
     src/controllers/gamedep/GameDepAttachControllerMeta.cpp
@@ -205,6 +233,38 @@ set(LIB_SOURCES
 
     src/controllers/menu/MenuControllerUpdateItem.cpp
 
+    src/controllers/notification/NotificationControllerDeleteNotification.cpp
+
+    src/controllers/notification/NotificationControllerList.cpp
+
+    src/controllers/notification/NotificationControllerMarkAllRead.cpp
+
+    src/controllers/notification/NotificationControllerMarkRead.cpp
+
+    src/controllers/notification/NotificationControllerUnreadCount.cpp
+
+    src/controllers/search/SearchControllerAutocomplete.cpp
+
+    src/controllers/search/SearchControllerSearch.cpp
+
+    src/controllers/seo/SeoControllerArticleJsonLd.cpp
+
+    src/controllers/seo/SeoControllerArticleOpenGraph.cpp
+
+    src/controllers/seo/SeoControllerAtomFeed.cpp
+
+    src/controllers/seo/SeoControllerRssFeed.cpp
+
+    src/controllers/seo/SeoControllerSitemap.cpp
+
+    src/controllers/settings/SettingsControllerCreateOrUpdate.cpp
+
+    src/controllers/settings/SettingsControllerGetByName.cpp
+
+    src/controllers/settings/SettingsControllerList.cpp
+
+    src/controllers/settings/SettingsControllerRemove.cpp
+
     src/controllers/snippet/CodeSnippetControllerCreateSnippet.cpp
 
     src/controllers/snippet/CodeSnippetControllerDeleteSnippet.cpp
@@ -218,6 +278,20 @@ set(LIB_SOURCES
     src/controllers/snippet/CodeSnippetControllerRunSnippet.cpp
 
     src/controllers/snippet/CodeSnippetControllerUpdateSnippet.cpp
+
+    src/controllers/social/SocialControllerFollow.cpp
+
+    src/controllers/social/SocialControllerGetAchievements.cpp
+
+    src/controllers/social/SocialControllerGetActivity.cpp
+
+    src/controllers/social/SocialControllerGetFollowers.cpp
+
+    src/controllers/social/SocialControllerGetFollowing.cpp
+
+    src/controllers/social/SocialControllerGetReputation.cpp
+
+    src/controllers/social/SocialControllerUnfollow.cpp
 
     src/controllers/tenant/TenantControllerCreate.cpp
 
@@ -257,6 +331,36 @@ set(LIB_SOURCES
 
     src/controllers/webhook/WebhookControllerUpdate.cpp
 
+    src/controllers/wscollab/WebSocketCollabControllerHandleConnectionClosed.cpp
+
+    src/controllers/wscollab/WebSocketCollabControllerHandleNewConnection.cpp
+
+    src/controllers/wscollab/WebSocketCollabControllerHandleNewMessage.cpp
+
+    src/controllers/wscollab/WebSocketCollabControllerState.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerBroadcastNotification.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerGetOnlineUsers.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleConnectionClosed.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleNewConnection.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleNewMessage.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleThreadSubscribe.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleThreadUnsubscribe.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerHandleTypingIndicator.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerPushNotification.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerPushToThread.cpp
+
+    src/controllers/wsnotify/WebSocketNotificationControllerState.cpp
+
     src/filters/AdminFilter.cpp
 
     src/filters/JwtAccountState.cpp
@@ -295,17 +399,9 @@ set(LIB_SOURCES
 
     src/security/SsrfUrl.cpp
 
-    src/services/AnalyticsService.cpp
-
     src/services/ArticleService.cpp
 
     src/services/ArticleTagService.cpp
-
-    src/services/AuthService.cpp
-
-    src/services/CacheService.cpp
-
-    src/services/CommentService.cpp
 
     src/services/DbError.cpp
 
@@ -313,23 +409,7 @@ set(LIB_SOURCES
 
     src/services/DockerRunArgv.cpp
 
-    src/services/ElasticsearchService.cpp
-
-    src/services/EmailService.cpp
-
-    src/services/GalleryService.cpp
-
-    src/services/NotificationService.cpp
-
-    src/services/OAuthService.cpp
-
-    src/services/SearchService.cpp
-
-    src/services/SeoService.cpp
-
     src/services/SettingsService.cpp
-
-    src/services/SocialService.cpp
 
     src/services/WebhookDelivery.cpp
 
@@ -337,7 +417,17 @@ set(LIB_SOURCES
 
     src/services/WebhookSend.cpp
 
-    src/services/WebhookService.cpp
+    src/services/analytics/AnalyticsServiceGetPageViews.cpp
+
+    src/services/analytics/AnalyticsServiceGetSearchQueries.cpp
+
+    src/services/analytics/AnalyticsServiceGetTopContent.cpp
+
+    src/services/analytics/AnalyticsServiceGetTrafficSources.cpp
+
+    src/services/analytics/AnalyticsServiceRecordSearchQuery.cpp
+
+    src/services/analytics/AnalyticsServiceTrackPageView.cpp
 
     src/services/article/ArticleServiceCreateArticle.cpp
 
@@ -380,6 +470,132 @@ set(LIB_SOURCES
     src/services/article/ArticleServiceUpdateArticle.cpp
 
     src/services/article/ArticleServiceVoteArticle.cpp
+
+    src/services/auth/AuthServiceBurnPasswordCheck.cpp
+
+    src/services/auth/AuthServiceCtor.cpp
+
+    src/services/auth/AuthServiceGenerateRandomToken.cpp
+
+    src/services/auth/AuthServiceGenerateToken.cpp
+
+    src/services/auth/AuthServiceHashPassword.cpp
+
+    src/services/auth/AuthServiceVerifyPassword.cpp
+
+    src/services/auth/AuthServiceVerifyToken.cpp
+
+    src/services/cache/CacheServiceArticleKey.cpp
+
+    src/services/cache/CacheServiceArticleListKey.cpp
+
+    src/services/cache/CacheServiceAutocompleteKey.cpp
+
+    src/services/cache/CacheServiceDel.cpp
+
+    src/services/cache/CacheServiceDelPattern.cpp
+
+    src/services/cache/CacheServiceExecCommand.cpp
+
+    src/services/cache/CacheServiceGet.cpp
+
+    src/services/cache/CacheServiceGetOrSet.cpp
+
+    src/services/cache/CacheServiceInitialize.cpp
+
+    src/services/cache/CacheServiceInstance.cpp
+
+    src/services/cache/CacheServiceInvalidateArticle.cpp
+
+    src/services/cache/CacheServiceInvalidateArticleList.cpp
+
+    src/services/cache/CacheServiceInvalidateSearch.cpp
+
+    src/services/cache/CacheServiceInvalidateUser.cpp
+
+    src/services/cache/CacheServiceIsConnected.cpp
+
+    src/services/cache/CacheServiceReconnect.cpp
+
+    src/services/cache/CacheServiceSearchKey.cpp
+
+    src/services/cache/CacheServiceSet.cpp
+
+    src/services/cache/CacheServiceState.cpp
+
+    src/services/cache/CacheServiceUserKey.cpp
+
+    src/services/comment/CommentServiceCreateComment.cpp
+
+    src/services/comment/CommentServiceDeleteComment.cpp
+
+    src/services/comment/CommentServiceFindById.cpp
+
+    src/services/comment/CommentServiceGetComments.cpp
+
+    src/services/comment/CommentServiceRowToDto.cpp
+
+    src/services/comment/CommentServiceUpdateComment.cpp
+
+    src/services/comment/CommentServiceVoteComment.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceAutocomplete.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceCreateIndexes.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceCurlWriteCallback.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceDeleteDocument.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceHttpRequest.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceIndexArticle.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceIndexForumPost.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceIndexGameDep.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceIndexSnippet.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceInitialize.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceInstance.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceIsConfigured.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceParseJson.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSearch.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSearchBody.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSyncArticles.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSyncForumPosts.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSyncFromDatabase.cpp
+
+    src/services/elasticsearch/ElasticsearchServiceSyncGameDeps.cpp
+
+    src/services/email/EmailServiceBuildMimeMessage.cpp
+
+    src/services/email/EmailServiceCtor.cpp
+
+    src/services/email/EmailServiceNotificationEmailTemplate.cpp
+
+    src/services/email/EmailServicePasswordResetEmailTemplate.cpp
+
+    src/services/email/EmailServiceSendEmail.cpp
+
+    src/services/email/EmailServiceSendNotificationEmail.cpp
+
+    src/services/email/EmailServiceSendPasswordResetEmail.cpp
+
+    src/services/email/EmailServiceSendVerificationEmail.cpp
+
+    src/services/email/EmailServiceState.cpp
+
+    src/services/email/EmailServiceVerificationEmailTemplate.cpp
 
     src/services/file/FileServiceQueries.cpp
 
@@ -428,6 +644,32 @@ set(LIB_SOURCES
     src/services/forum/ForumServiceUpdateThread.cpp
 
     src/services/forum/ForumServiceVotePost.cpp
+
+    src/services/gallery/GalleryServiceAddPicture.cpp
+
+    src/services/gallery/GalleryServiceAlbumRowToDto.cpp
+
+    src/services/gallery/GalleryServiceCreateAlbum.cpp
+
+    src/services/gallery/GalleryServiceDeleteAlbum.cpp
+
+    src/services/gallery/GalleryServiceDeletePicture.cpp
+
+    src/services/gallery/GalleryServiceGetAlbum.cpp
+
+    src/services/gallery/GalleryServiceGetPicture.cpp
+
+    src/services/gallery/GalleryServiceListAlbums.cpp
+
+    src/services/gallery/GalleryServicePictureRowToDto.cpp
+
+    src/services/gallery/GalleryServiceSetDefaultPicture.cpp
+
+    src/services/gallery/GalleryServiceUpdateAlbum.cpp
+
+    src/services/gallery/GalleryServiceUpdatePicture.cpp
+
+    src/services/gallery/GalleryServiceVotePicture.cpp
 
     src/services/gamedep/GameDepAttachBinary.cpp
 
@@ -495,6 +737,82 @@ set(LIB_SOURCES
 
     src/services/menu/MenuServiceUpdateMenuItem.cpp
 
+    src/services/notification/NotificationServiceCreateNotification.cpp
+
+    src/services/notification/NotificationServiceDeleteNotification.cpp
+
+    src/services/notification/NotificationServiceGetNotifications.cpp
+
+    src/services/notification/NotificationServiceGetUnreadCount.cpp
+
+    src/services/notification/NotificationServiceMarkAllRead.cpp
+
+    src/services/notification/NotificationServiceMarkRead.cpp
+
+    src/services/notification/NotificationServiceRowToDto.cpp
+
+    src/services/oauth/OAuthServiceCtor.cpp
+
+    src/services/oauth/OAuthServiceCurlWriteCallback.cpp
+
+    src/services/oauth/OAuthServiceExchangeCode.cpp
+
+    src/services/oauth/OAuthServiceFindByProvider.cpp
+
+    src/services/oauth/OAuthServiceGetAuthorizationUrl.cpp
+
+    src/services/oauth/OAuthServiceGetConfig.cpp
+
+    src/services/oauth/OAuthServiceGetLinkedProviders.cpp
+
+    src/services/oauth/OAuthServiceGetProviderProfile.cpp
+
+    src/services/oauth/OAuthServiceHttpGet.cpp
+
+    src/services/oauth/OAuthServiceHttpPost.cpp
+
+    src/services/oauth/OAuthServiceLinkAccount.cpp
+
+    src/services/oauth/OAuthServiceLoadConfig.cpp
+
+    src/services/oauth/OAuthServiceUnlinkProvider.cpp
+
+    src/services/search/SearchServiceAutocomplete.cpp
+
+    src/services/search/SearchServiceCollector.cpp
+
+    src/services/search/SearchServiceEsAutocomplete.cpp
+
+    src/services/search/SearchServiceEsCodec.cpp
+
+    src/services/search/SearchServiceEsSearch.cpp
+
+    src/services/search/SearchServiceSearch.cpp
+
+    src/services/search/SearchServiceSearchArticles.cpp
+
+    src/services/search/SearchServiceSearchForumPosts.cpp
+
+    src/services/search/SearchServiceSearchGameDeps.cpp
+
+    src/services/search/SearchServiceSearchSnippets.cpp
+
+    src/services/search/SearchServiceToTsQuery.cpp
+
+    src/services/search/SearchServiceUseElasticsearch.cpp
+
+    src/services/seo/SeoServiceGenerateAtomFeed.cpp
+
+    src/services/seo/SeoServiceGenerateRssFeed.cpp
+
+    src/services/seo/SeoServiceGenerateSitemap.cpp
+
+    src/services/seo/SeoServiceGetArticleJsonLd.cpp
+
+    src/services/seo/SeoServiceGetOpenGraphData.cpp
+
+    src/services/seo/SeoServiceXmlEscape.cpp
+
     src/services/snippet/CodeSnippetServiceCreateSnippet.cpp
 
     src/services/snippet/CodeSnippetServiceDeleteSnippet.cpp
@@ -510,6 +828,28 @@ set(LIB_SOURCES
     src/services/snippet/CodeSnippetServiceRowToDto.cpp
 
     src/services/snippet/CodeSnippetServiceUpdateSnippet.cpp
+
+    src/services/social/SocialServiceAwardAchievement.cpp
+
+    src/services/social/SocialServiceCalculateReputation.cpp
+
+    src/services/social/SocialServiceCheckAndAwardAchievements.cpp
+
+    src/services/social/SocialServiceFollowUser.cpp
+
+    src/services/social/SocialServiceGetActivityFeed.cpp
+
+    src/services/social/SocialServiceGetFollowers.cpp
+
+    src/services/social/SocialServiceGetFollowing.cpp
+
+    src/services/social/SocialServiceGetUserAchievements.cpp
+
+    src/services/social/SocialServiceIsFollowing.cpp
+
+    src/services/social/SocialServiceParseMentions.cpp
+
+    src/services/social/SocialServiceUnfollowUser.cpp
 
     src/services/tenant/TenantServiceCreateTenant.cpp
 
@@ -564,6 +904,26 @@ set(LIB_SOURCES
     src/services/user/UserServiceUpdateProblem.cpp
 
     src/services/user/UserServiceUpdateUser.cpp
+
+    src/services/webhook/WebhookServiceCreateWebhook.cpp
+
+    src/services/webhook/WebhookServiceDeleteWebhook.cpp
+
+    src/services/webhook/WebhookServiceEventsLiteral.cpp
+
+    src/services/webhook/WebhookServiceGetDeliveries.cpp
+
+    src/services/webhook/WebhookServiceListWebhooks.cpp
+
+    src/services/webhook/WebhookServiceRowToDto.cpp
+
+    src/services/webhook/WebhookServiceUpdateWebhook.cpp
+
+    src/startup/StartupCacheSearch.cpp
+
+    src/startup/StartupDbClient.cpp
+
+    src/startup/StartupPublishTimer.cpp
 
 )
 

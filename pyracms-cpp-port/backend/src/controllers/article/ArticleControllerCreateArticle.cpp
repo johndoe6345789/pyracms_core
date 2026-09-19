@@ -9,10 +9,12 @@ void ArticleController::createArticle(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
 
     auto json = req->getJsonObject();
-    if (!json || !(*json).isMember("name") || !(*json).isMember("displayName") ||
-        !(*json).isMember("content") || !(*json).isMember("tenant_id")) {
+    if (!json || !(*json).isMember("name") ||
+        !(*json).isMember("displayName") || !(*json).isMember("content") ||
+        !(*json).isMember("tenant_id")) {
         auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "name, displayName, content, and tenant_id required";
+        (*resp->jsonObject())["error"] =
+            "name, displayName, content, and tenant_id required";
         resp->setStatusCode(drogon::k400BadRequest);
         callback(resp);
         return;
@@ -42,7 +44,8 @@ void ArticleController::createArticle(
         db, tenantId, name, displayName, content, renderer, userId,
         [callback](bool success, const std::string &error) {
             if (!success) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
                 resp->setStatusCode(drogon::k409Conflict);
                 callback(resp);

@@ -24,13 +24,18 @@ struct MenuItemDto {
 };
 
 class MenuService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
-    using GroupCallback = std::function<void(const std::optional<MenuGroupDto> &)>;
-    using GroupListCallback = std::function<void(const std::vector<MenuGroupDto> &)>;
-    using ItemCallback = std::function<void(const std::optional<MenuItemDto> &)>;
-    using ItemListCallback = std::function<void(const std::vector<MenuItemDto> &)>;
-    using BoolCallback = std::function<void(bool success, const std::string &error)>;
+    using GroupCallback =
+        std::function<void(const std::optional<MenuGroupDto> &)>;
+    using GroupListCallback =
+        std::function<void(const std::vector<MenuGroupDto> &)>;
+    using ItemCallback =
+        std::function<void(const std::optional<MenuItemDto> &)>;
+    using ItemListCallback =
+        std::function<void(const std::vector<MenuItemDto> &)>;
+    using BoolCallback =
+        std::function<void(bool success, const std::string &error)>;
 
     void listMenuGroups(const DbClientPtr &db, int tenantId,
                         GroupListCallback cb);
@@ -42,27 +47,22 @@ public:
     void deleteMenuGroup(const DbClientPtr &db, int id, int scopeTenant,
                          BoolCallback cb);
 
-    void listMenuItems(const DbClientPtr &db, int groupId,
-                       ItemListCallback cb);
+    void listMenuItems(const DbClientPtr &db, int groupId, ItemListCallback cb);
 
-    void createMenuItem(const DbClientPtr &db,
-                        const std::string &name,
-                        const std::string &routePath,
-                        const std::string &url,
-                        const std::string &type,
-                        int groupId,
-                        int position,
-                        const std::string &permissions,
-                        int scopeTenant, BoolCallback cb);
+    void createMenuItem(const DbClientPtr &db, const std::string &name,
+                        const std::string &routePath, const std::string &url,
+                        const std::string &type, int groupId, int position,
+                        const std::string &permissions, int scopeTenant,
+                        BoolCallback cb);
 
     void updateMenuItem(const DbClientPtr &db, int id,
-                        const Json::Value &updates,
-                        int scopeTenant, BoolCallback cb);
+                        const Json::Value &updates, int scopeTenant,
+                        BoolCallback cb);
 
     void deleteMenuItem(const DbClientPtr &db, int id, int scopeTenant,
                         BoolCallback cb);
 
-private:
+  private:
     MenuGroupDto rowToGroupDto(const drogon::orm::Row &row);
     MenuItemDto rowToItemDto(const drogon::orm::Row &row);
 };

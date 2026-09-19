@@ -153,6 +153,10 @@ set(TEST_SOURCES
 
     test_tenant_service.cpp
 
+    test_tenant_service_2.cpp
+
+    test_tenant_service_3.cpp
+
     test_user_admin_http_1.cpp
 
     test_user_admin_http_2.cpp
@@ -172,6 +176,10 @@ set(TEST_SOURCES
     test_user_service.cpp
 
     test_user_service_roles.cpp
+
+    test_user_service_roles_2.cpp
+
+    test_user_service_roles_3.cpp
 
     test_user_visibility.cpp
 

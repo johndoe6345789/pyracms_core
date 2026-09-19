@@ -5,8 +5,7 @@ namespace pyracms {
 void ArticleController::revertToRevision(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-    const std::string &name,
-    const std::string &revId) {
+    const std::string &name, const std::string &revId) {
 
     auto tenantIdStr = req->getParameter("tenant_id");
     auto json = req->getJsonObject();
@@ -30,9 +29,11 @@ void ArticleController::revertToRevision(
     // Find article by name first
     articleService_.findArticle(
         db, tenantId, name,
-        [this, db, revisionId, userId, callback](const std::optional<ArticleDto> &article) {
+        [this, db, revisionId, userId,
+         callback](const std::optional<ArticleDto> &article) {
             if (!article) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = "Article not found";
                 resp->setStatusCode(drogon::k404NotFound);
                 callback(resp);
@@ -43,7 +44,8 @@ void ArticleController::revertToRevision(
                 db, article->id, revisionId, userId,
                 [callback](bool success, const std::string &error) {
                     if (!success) {
-                        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(
+                            Json::Value{});
                         (*resp->jsonObject())["error"] = error;
                         resp->setStatusCode(drogon::k404NotFound);
                         callback(resp);

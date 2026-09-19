@@ -9,7 +9,7 @@
 namespace pyracms {
 
 struct ActivityItem {
-    std::string type;   // article, forum_post, snippet
+    std::string type; // article, forum_post, snippet
     int id;
     std::string title;
     std::string summary;
@@ -41,41 +41,33 @@ struct ReputationDto {
 };
 
 class SocialService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
     using BoolCallback = std::function<void(bool, const std::string &)>;
-
     void followUser(const DbClientPtr &db, int followerId, int followedId,
                     BoolCallback cb);
-
     void unfollowUser(const DbClientPtr &db, int followerId, int followedId,
                       BoolCallback cb);
-
     void isFollowing(const DbClientPtr &db, int followerId, int followedId,
                      std::function<void(bool)> cb);
-
-    void getFollowers(const DbClientPtr &db, int userId, int limit, int offset,
-                      std::function<void(const std::vector<UserFollowDto> &, int total)> cb);
-
-    void getFollowing(const DbClientPtr &db, int userId, int limit, int offset,
-                      std::function<void(const std::vector<UserFollowDto> &, int total)> cb);
-
-    void getActivityFeed(const DbClientPtr &db, int userId, int limit, int offset,
-                         std::function<void(const std::vector<ActivityItem> &)> cb);
-
-    void getUserAchievements(const DbClientPtr &db, int userId,
-                             std::function<void(const std::vector<AchievementDto> &)> cb);
-
+    void getFollowers(
+        const DbClientPtr &db, int userId, int limit, int offset,
+        std::function<void(const std::vector<UserFollowDto> &, int total)> cb);
+    void getFollowing(
+        const DbClientPtr &db, int userId, int limit, int offset,
+        std::function<void(const std::vector<UserFollowDto> &, int total)> cb);
+    void
+    getActivityFeed(const DbClientPtr &db, int userId, int limit, int offset,
+                    std::function<void(const std::vector<ActivityItem> &)> cb);
+    void getUserAchievements(
+        const DbClientPtr &db, int userId,
+        std::function<void(const std::vector<AchievementDto> &)> cb);
     void awardAchievement(const DbClientPtr &db, int userId,
-                          const std::string &achievementName,
-                          BoolCallback cb);
-
+                          const std::string &achievementName, BoolCallback cb);
     void checkAndAwardAchievements(const DbClientPtr &db, int userId,
-                                    BoolCallback cb);
-
+                                   BoolCallback cb);
     void calculateReputation(const DbClientPtr &db, int userId,
                              std::function<void(const ReputationDto &)> cb);
-
     std::vector<std::string> parseMentions(const std::string &text);
 };
 

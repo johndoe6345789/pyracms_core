@@ -1,16 +1,17 @@
 #pragma once
 
 #include <functional>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-#include <memory>
 
 namespace pyracms {
 
 class CacheService {
-public:
-    using StringCallback = std::function<void(const std::string &value, bool found)>;
+  public:
+    using StringCallback =
+        std::function<void(const std::string &value, bool found)>;
     using BoolCallback = std::function<void(bool success)>;
 
     static CacheService &instance();
@@ -19,7 +20,8 @@ public:
     bool isConnected() const;
 
     void get(const std::string &key, StringCallback cb);
-    void set(const std::string &key, const std::string &value, int ttlSeconds, BoolCallback cb);
+    void set(const std::string &key, const std::string &value, int ttlSeconds,
+             BoolCallback cb);
     void del(const std::string &key, BoolCallback cb);
     void delPattern(const std::string &pattern, BoolCallback cb);
 
@@ -31,7 +33,8 @@ public:
     // Key builders
     static std::string articleKey(int tenantId, const std::string &name);
     static std::string articleListKey(int tenantId, int limit, int offset);
-    static std::string searchKey(int tenantId, const std::string &query, const std::string &type);
+    static std::string searchKey(int tenantId, const std::string &query,
+                                 const std::string &type);
     static std::string userKey(int userId);
     static std::string autocompleteKey(int tenantId, const std::string &prefix);
 
@@ -41,7 +44,7 @@ public:
     void invalidateSearch(int tenantId);
     void invalidateUser(int userId);
 
-private:
+  private:
     CacheService() = default;
 
     struct RedisContext;

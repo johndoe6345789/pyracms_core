@@ -4,15 +4,15 @@
 namespace pyracms {
 
 void ArticleService::updateArticle(const DbClientPtr &db, int tenantId,
-                                    const std::string &name,
-                                    const std::string &content,
-                                    const std::string &summary,
-                                    int userId,
-                                    BoolCallback cb) {
+                                   const std::string &name,
+                                   const std::string &content,
+                                   const std::string &summary, int userId,
+                                   BoolCallback cb) {
     // Find the article first, then create a new revision
     db->execSqlAsync(
         "SELECT id FROM articles WHERE tenant_id = $1 AND name = $2",
-        [this, db, content, summary, userId, cb](const drogon::orm::Result &result) {
+        [this, db, content, summary, userId,
+         cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(false, "Article not found");
                 return;

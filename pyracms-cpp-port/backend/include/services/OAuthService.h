@@ -35,48 +35,37 @@ struct OAuthLinkDto {
 };
 
 class OAuthService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
     using BoolCallback = std::function<void(bool, const std::string &)>;
-
     OAuthService();
-
     std::string getAuthorizationUrl(const std::string &provider,
-                                     const std::string &state);
-
-    void exchangeCode(const std::string &provider,
-                      const std::string &code,
+                                    const std::string &state);
+    void exchangeCode(const std::string &provider, const std::string &code,
                       std::function<void(const std::string &accessToken,
-                                         const std::string &error)> cb);
-
-    void getProviderProfile(const std::string &provider,
-                            const std::string &accessToken,
-                            std::function<void(const std::optional<OAuthUserInfo> &)> cb);
-
+                                         const std::string &error)>
+                          cb);
+    void getProviderProfile(
+        const std::string &provider, const std::string &accessToken,
+        std::function<void(const std::optional<OAuthUserInfo> &)> cb);
     void linkAccount(const DbClientPtr &db, int userId,
-                     const std::string &provider,
-                     const OAuthUserInfo &info,
-                     const std::string &accessToken,
-                     BoolCallback cb);
-
-    void findByProvider(const DbClientPtr &db,
-                        const std::string &provider,
+                     const std::string &provider, const OAuthUserInfo &info,
+                     const std::string &accessToken, BoolCallback cb);
+    void findByProvider(const DbClientPtr &db, const std::string &provider,
                         const std::string &providerId,
                         std::function<void(std::optional<int> userId)> cb);
-
     void unlinkProvider(const DbClientPtr &db, int userId,
-                        const std::string &provider,
-                        BoolCallback cb);
+                        const std::string &provider, BoolCallback cb);
+    void getLinkedProviders(
+        const DbClientPtr &db, int userId,
+        std::function<void(const std::vector<OAuthLinkDto> &)> cb);
 
-    void getLinkedProviders(const DbClientPtr &db, int userId,
-                            std::function<void(const std::vector<OAuthLinkDto> &)> cb);
-
-private:
+  private:
     std::map<std::string, OAuthProviderConfig> configs_;
-
     void loadConfig();
     OAuthProviderConfig getConfig(const std::string &provider);
-    static size_t curlWriteCallback(char *ptr, size_t size, size_t nmemb, std::string *data);
+    static size_t curlWriteCallback(char *ptr, size_t size, size_t nmemb,
+                                    std::string *data);
     std::string httpPost(const std::string &url, const std::string &postData,
                          const std::vector<std::string> &headers = {});
     std::string httpGet(const std::string &url, const std::string &bearerToken);

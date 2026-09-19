@@ -29,7 +29,6 @@ def main():
     src_dir = BACKEND_DIR / "src"
     test_dir = BACKEND_DIR / "tests"
 
-    # Find all source files
     all_sources = find_sources(src_dir)
     main_source = "src/main.cpp"
     lib_sources = [f"src/{s}" for s in all_sources if s != "main.cpp"]

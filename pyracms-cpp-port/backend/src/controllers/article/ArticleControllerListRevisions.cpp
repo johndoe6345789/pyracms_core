@@ -25,7 +25,8 @@ void ArticleController::listRevisions(
         db, tenantId, name, viewerIdFor(req, tenantId),
         [this, db, callback](const std::optional<ArticleDto> &article) {
             if (!article) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = "Article not found";
                 resp->setStatusCode(drogon::k404NotFound);
                 callback(resp);

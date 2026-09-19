@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "services/UserRole.h"
+
+#include <gtest/gtest.h>
 
 using namespace pyracms;
 
@@ -28,113 +29,47 @@ TEST(UserRoleTest, SuperAdminHasValueFour) {
 // ── Ordering ─────────────────────────────────────────────────────────────────
 
 TEST(UserRoleTest, SuperAdminOutranksAll) {
-    EXPECT_GT(
-        static_cast<int>(UserRole::SuperAdmin),
-        static_cast<int>(UserRole::SiteAdmin));
+    EXPECT_GT(static_cast<int>(UserRole::SuperAdmin),
+              static_cast<int>(UserRole::SiteAdmin));
 }
 
 TEST(UserRoleTest, SiteAdminOutranksModerator) {
-    EXPECT_GT(
-        static_cast<int>(UserRole::SiteAdmin),
-        static_cast<int>(UserRole::Moderator));
+    EXPECT_GT(static_cast<int>(UserRole::SiteAdmin),
+              static_cast<int>(UserRole::Moderator));
 }
 
 TEST(UserRoleTest, ModeratorOutranksUser) {
-    EXPECT_GT(
-        static_cast<int>(UserRole::Moderator),
-        static_cast<int>(UserRole::User));
+    EXPECT_GT(static_cast<int>(UserRole::Moderator),
+              static_cast<int>(UserRole::User));
 }
 
 TEST(UserRoleTest, UserOutranksGuest) {
-    EXPECT_GT(
-        static_cast<int>(UserRole::User),
-        static_cast<int>(UserRole::Guest));
+    EXPECT_GT(static_cast<int>(UserRole::User),
+              static_cast<int>(UserRole::Guest));
 }
 
 // ── hasMinRole ───────────────────────────────────────────────────────────────
 
 TEST(HasMinRoleTest, SameRoleReturnsTrue) {
-    EXPECT_TRUE(
-        hasMinRole(UserRole::User, UserRole::User));
+    EXPECT_TRUE(hasMinRole(UserRole::User, UserRole::User));
 }
 
 TEST(HasMinRoleTest, HigherRoleReturnsTrue) {
-    EXPECT_TRUE(
-        hasMinRole(UserRole::SuperAdmin, UserRole::User));
+    EXPECT_TRUE(hasMinRole(UserRole::SuperAdmin, UserRole::User));
 }
 
 TEST(HasMinRoleTest, LowerRoleReturnsFalse) {
-    EXPECT_FALSE(
-        hasMinRole(UserRole::Guest, UserRole::User));
+    EXPECT_FALSE(hasMinRole(UserRole::Guest, UserRole::User));
 }
 
 TEST(HasMinRoleTest, GuestMeetsGuestMinimum) {
-    EXPECT_TRUE(
-        hasMinRole(UserRole::Guest, UserRole::Guest));
+    EXPECT_TRUE(hasMinRole(UserRole::Guest, UserRole::Guest));
 }
 
 TEST(HasMinRoleTest, SuperAdminMeetsSuperAdminMinimum) {
-    EXPECT_TRUE(
-        hasMinRole(
-            UserRole::SuperAdmin, UserRole::SuperAdmin));
+    EXPECT_TRUE(hasMinRole(UserRole::SuperAdmin, UserRole::SuperAdmin));
 }
 
 TEST(HasMinRoleTest, SiteAdminDoesNotMeetSuperAdmin) {
-    EXPECT_FALSE(
-        hasMinRole(
-            UserRole::SiteAdmin, UserRole::SuperAdmin));
-}
-
-TEST(HasMinRoleTest, ModeratorMeetsSiteAdminFalse) {
-    EXPECT_FALSE(
-        hasMinRole(
-            UserRole::Moderator, UserRole::SiteAdmin));
-}
-
-TEST(HasMinRoleTest, ModeratorMeeetsModeratorTrue) {
-    EXPECT_TRUE(
-        hasMinRole(
-            UserRole::Moderator, UserRole::Moderator));
-}
-
-// ── roleFromLegacyAdminFlag ───────────────────────────────────────────────────
-
-TEST(LegacyFlagTest, AdminFlagMapsToSiteAdmin) {
-    EXPECT_EQ(
-        roleFromLegacyAdminFlag(true),
-        UserRole::SiteAdmin);
-}
-
-TEST(LegacyFlagTest, NonAdminFlagMapsToUser) {
-    EXPECT_EQ(
-        roleFromLegacyAdminFlag(false),
-        UserRole::User);
-}
-
-TEST(LegacyFlagTest, SiteAdminPassesAdminMinimum) {
-    EXPECT_TRUE(
-        hasMinRole(
-            roleFromLegacyAdminFlag(true),
-            UserRole::SiteAdmin));
-}
-
-TEST(LegacyFlagTest, SiteAdminFailsSuperAdminMinimum) {
-    EXPECT_FALSE(
-        hasMinRole(
-            roleFromLegacyAdminFlag(true),
-            UserRole::SuperAdmin));
-}
-
-TEST(LegacyFlagTest, UserPassesUserMinimum) {
-    EXPECT_TRUE(
-        hasMinRole(
-            roleFromLegacyAdminFlag(false),
-            UserRole::User));
-}
-
-TEST(LegacyFlagTest, UserFailsModeratorMinimum) {
-    EXPECT_FALSE(
-        hasMinRole(
-            roleFromLegacyAdminFlag(false),
-            UserRole::Moderator));
+    EXPECT_FALSE(hasMinRole(UserRole::SiteAdmin, UserRole::SuperAdmin));
 }

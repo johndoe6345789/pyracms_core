@@ -1,36 +1,32 @@
 #pragma once
 
 #include <drogon/drogon.h>
-#include <string>
 #include <functional>
+#include <string>
 
 namespace pyracms {
 
 class EmailService {
-public:
-    using BoolCallback = std::function<void(bool success, const std::string &error)>;
+  public:
+    using BoolCallback =
+        std::function<void(bool success, const std::string &error)>;
 
     EmailService();
 
-    void sendEmail(const std::string &to,
-                   const std::string &subject,
-                   const std::string &htmlBody,
-                   BoolCallback cb);
+    void sendEmail(const std::string &to, const std::string &subject,
+                   const std::string &htmlBody, BoolCallback cb);
 
-    void sendVerificationEmail(const std::string &to,
-                               const std::string &token,
+    void sendVerificationEmail(const std::string &to, const std::string &token,
                                BoolCallback cb);
 
-    void sendPasswordResetEmail(const std::string &to,
-                                const std::string &token,
+    void sendPasswordResetEmail(const std::string &to, const std::string &token,
                                 BoolCallback cb);
 
     void sendNotificationEmail(const std::string &to,
                                const std::string &subject,
-                               const std::string &message,
-                               BoolCallback cb);
+                               const std::string &message, BoolCallback cb);
 
-private:
+  private:
     std::string smtpHost_;
     int smtpPort_;
     std::string smtpUser_;

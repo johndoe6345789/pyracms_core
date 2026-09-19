@@ -14,7 +14,7 @@ struct CommentDto {
     std::string username;
     std::string contentType;
     int contentId;
-    int parentId;  // 0 if no parent
+    int parentId; // 0 if no parent
     std::string body;
     int likes;
     int dislikes;
@@ -23,50 +23,36 @@ struct CommentDto {
 };
 
 class CommentService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
-    using BoolCallback = std::function<void(bool success, const std::string &error)>;
+    using BoolCallback =
+        std::function<void(bool success, const std::string &error)>;
     using ListCallback = std::function<void(const std::vector<CommentDto> &)>;
-    using SingleCallback = std::function<void(const std::optional<CommentDto> &)>;
-    using CreateCallback = std::function<void(bool success, int commentId, const std::string &error)>;
+    using SingleCallback =
+        std::function<void(const std::optional<CommentDto> &)>;
+    using CreateCallback = std::function<void(bool success, int commentId,
+                                              const std::string &error)>;
 
-    void createComment(const DbClientPtr &db,
-                       int userId,
-                       const std::string &contentType,
-                       int contentId,
-                       const std::string &body,
-                       std::optional<int> parentId,
+    void createComment(const DbClientPtr &db, int userId,
+                       const std::string &contentType, int contentId,
+                       const std::string &body, std::optional<int> parentId,
                        CreateCallback cb);
 
-    void getComments(const DbClientPtr &db,
-                     const std::string &contentType,
-                     int contentId,
-                     int limit,
-                     int offset,
-                     ListCallback cb);
+    void getComments(const DbClientPtr &db, const std::string &contentType,
+                     int contentId, int limit, int offset, ListCallback cb);
 
-    void updateComment(const DbClientPtr &db,
-                       int commentId,
-                       int userId,
-                       const std::string &body,
+    void updateComment(const DbClientPtr &db, int commentId, int userId,
+                       const std::string &body, BoolCallback cb);
+
+    void deleteComment(const DbClientPtr &db, int commentId, int userId,
                        BoolCallback cb);
 
-    void deleteComment(const DbClientPtr &db,
-                       int commentId,
-                       int userId,
-                       BoolCallback cb);
+    void voteComment(const DbClientPtr &db, int commentId, int userId,
+                     bool isLike, BoolCallback cb);
 
-    void voteComment(const DbClientPtr &db,
-                     int commentId,
-                     int userId,
-                     bool isLike,
-                     BoolCallback cb);
+    void findById(const DbClientPtr &db, int commentId, SingleCallback cb);
 
-    void findById(const DbClientPtr &db,
-                  int commentId,
-                  SingleCallback cb);
-
-private:
+  private:
     CommentDto rowToDto(const drogon::orm::Row &row);
 };
 

@@ -11,7 +11,8 @@ void ArticleController::deleteArticle(
     if (tenantIdStr.empty()) {
         auto json = req->getJsonObject();
         if (!json || !(*json).isMember("tenant_id")) {
-            auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+            auto resp =
+                drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
             (*resp->jsonObject())["error"] = "tenant_id is required";
             resp->setStatusCode(drogon::k400BadRequest);
             callback(resp);
@@ -24,7 +25,8 @@ void ArticleController::deleteArticle(
             db, tenantId, name,
             [callback](bool success, const std::string &error) {
                 if (!success) {
-                    auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                    auto resp = drogon::HttpResponse::newHttpJsonResponse(
+                        Json::Value{});
                     (*resp->jsonObject())["error"] = error;
                     resp->setStatusCode(drogon::k404NotFound);
                     callback(resp);
@@ -42,10 +44,10 @@ void ArticleController::deleteArticle(
     auto db = drogon::app().getDbClient();
 
     articleService_.deleteArticle(
-        db, tenantId, name,
-        [callback](bool success, const std::string &error) {
+        db, tenantId, name, [callback](bool success, const std::string &error) {
             if (!success) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
                 resp->setStatusCode(drogon::k404NotFound);
                 callback(resp);

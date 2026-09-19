@@ -9,7 +9,7 @@ namespace pyracms {
 
 class WebSocketNotificationController
     : public drogon::WebSocketController<WebSocketNotificationController> {
-public:
+  public:
     WS_PATH_LIST_BEGIN
     WS_PATH_ADD("/api/ws/notifications");
     WS_PATH_LIST_END
@@ -18,10 +18,12 @@ public:
                           std::string &&message,
                           const drogon::WebSocketMessageType &type) override;
 
-    void handleNewConnection(const drogon::HttpRequestPtr &req,
-                             const drogon::WebSocketConnectionPtr &wsConnPtr) override;
+    void handleNewConnection(
+        const drogon::HttpRequestPtr &req,
+        const drogon::WebSocketConnectionPtr &wsConnPtr) override;
 
-    void handleConnectionClosed(const drogon::WebSocketConnectionPtr &wsConnPtr) override;
+    void handleConnectionClosed(
+        const drogon::WebSocketConnectionPtr &wsConnPtr) override;
 
     // Static methods for pushing notifications from other services
     static void pushNotification(int userId, const std::string &jsonPayload);
@@ -29,22 +31,27 @@ public:
     static std::unordered_set<int> getOnlineUsers();
     static void pushToThread(int threadId, const std::string &jsonPayload);
 
-private:
+  private:
     static std::mutex connectionsMutex_;
     // userId -> set of WebSocket connections (user may have multiple tabs)
-    static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>> userConnections_;
+    static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
+        userConnections_;
     // threadId -> set of WebSocket connections subscribed to that thread
-    static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>> threadSubscriptions_;
+    static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
+        threadSubscriptions_;
 
     struct WsIdentity {
         int userId;
         int tenantId;
     };
     static constexpr size_t kMaxThreadSubscribers = 5000;
-    void handleThreadSubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
-    void handleThreadUnsubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
+    void handleThreadSubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr,
+                               int threadId);
+    void
+    handleThreadUnsubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr,
+                            int threadId);
     void handleTypingIndicator(const drogon::WebSocketConnectionPtr &wsConnPtr,
-                                int threadId, bool isTyping);
+                               int threadId, bool isTyping);
 };
 
 } // namespace pyracms

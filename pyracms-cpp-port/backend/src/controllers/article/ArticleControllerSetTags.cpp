@@ -27,7 +27,8 @@ void ArticleController::setTags(
         db, tenantId, name,
         [this, db, tags, callback](const std::optional<ArticleDto> &article) {
             if (!article) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = "Article not found";
                 resp->setStatusCode(drogon::k404NotFound);
                 callback(resp);
@@ -38,7 +39,8 @@ void ArticleController::setTags(
                 db, article->id, tags,
                 [callback](bool success, const std::string &error) {
                     if (!success) {
-                        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(
+                            Json::Value{});
                         (*resp->jsonObject())["error"] = error;
                         resp->setStatusCode(drogon::k500InternalServerError);
                         callback(resp);

@@ -36,60 +36,43 @@ struct GalleryAlbumDetailDto {
 };
 
 class GalleryService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
-    using AlbumCallback = std::function<void(const std::optional<GalleryAlbumDto> &)>;
-    using AlbumDetailCallback = std::function<void(const std::optional<GalleryAlbumDetailDto> &)>;
-    using AlbumListCallback = std::function<void(const std::vector<GalleryAlbumDto> &)>;
-    using PictureCallback = std::function<void(const std::optional<GalleryPictureDto> &)>;
-    using BoolCallback = std::function<void(bool success, const std::string &error)>;
-
-    void listAlbums(const DbClientPtr &db, int tenantId,
-                    AlbumListCallback cb);
-
+    using AlbumCallback =
+        std::function<void(const std::optional<GalleryAlbumDto> &)>;
+    using AlbumDetailCallback =
+        std::function<void(const std::optional<GalleryAlbumDetailDto> &)>;
+    using AlbumListCallback =
+        std::function<void(const std::vector<GalleryAlbumDto> &)>;
+    using PictureCallback =
+        std::function<void(const std::optional<GalleryPictureDto> &)>;
+    using BoolCallback =
+        std::function<void(bool success, const std::string &error)>;
+    void listAlbums(const DbClientPtr &db, int tenantId, AlbumListCallback cb);
     void createAlbum(const DbClientPtr &db, int tenantId,
                      const std::string &displayName,
-                     const std::string &description,
-                     int userId,
+                     const std::string &description, int userId,
                      BoolCallback cb);
-
-    void getAlbum(const DbClientPtr &db, int albumId,
-                  AlbumDetailCallback cb);
-
+    void getAlbum(const DbClientPtr &db, int albumId, AlbumDetailCallback cb);
     void updateAlbum(const DbClientPtr &db, int albumId,
                      const std::string &displayName,
-                     const std::string &description,
-                     BoolCallback cb);
-
-    void deleteAlbum(const DbClientPtr &db, int albumId,
-                     BoolCallback cb);
-
+                     const std::string &description, BoolCallback cb);
+    void deleteAlbum(const DbClientPtr &db, int albumId, BoolCallback cb);
     void addPicture(const DbClientPtr &db, int albumId,
                     const std::string &displayName,
-                    const std::string &description,
-                    const std::string &fileUuid,
-                    int userId,
-                    BoolCallback cb);
-
-    void getPicture(const DbClientPtr &db, int pictureId,
-                    PictureCallback cb);
-
+                    const std::string &description, const std::string &fileUuid,
+                    int userId, BoolCallback cb);
+    void getPicture(const DbClientPtr &db, int pictureId, PictureCallback cb);
     void updatePicture(const DbClientPtr &db, int pictureId,
                        const std::string &displayName,
-                       const std::string &description,
-                       BoolCallback cb);
-
-    void deletePicture(const DbClientPtr &db, int pictureId,
-                       BoolCallback cb);
-
+                       const std::string &description, BoolCallback cb);
+    void deletePicture(const DbClientPtr &db, int pictureId, BoolCallback cb);
     void setDefaultPicture(const DbClientPtr &db, int albumId, int pictureId,
                            BoolCallback cb);
-
     void votePicture(const DbClientPtr &db, int pictureId, int userId,
-                     bool isLike,
-                     BoolCallback cb);
+                     bool isLike, BoolCallback cb);
 
-private:
+  private:
     GalleryAlbumDto albumRowToDto(const drogon::orm::Row &row);
     GalleryPictureDto pictureRowToDto(const drogon::orm::Row &row);
 };

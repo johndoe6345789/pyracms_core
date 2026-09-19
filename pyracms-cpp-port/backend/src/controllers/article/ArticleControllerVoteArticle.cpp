@@ -9,7 +9,8 @@ void ArticleController::voteArticle(
     const std::string &name) {
 
     auto json = req->getJsonObject();
-    if (!json || !(*json).isMember("is_like") || !(*json).isMember("tenant_id")) {
+    if (!json || !(*json).isMember("is_like") ||
+        !(*json).isMember("tenant_id")) {
         auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
         (*resp->jsonObject())["error"] = "is_like and tenant_id required";
         resp->setStatusCode(drogon::k400BadRequest);
@@ -24,9 +25,11 @@ void ArticleController::voteArticle(
 
     articleService_.getArticle(
         db, tenantId, name, viewerIdFor(req, tenantId),
-        [this, db, userId, isLike, callback](const std::optional<ArticleDto> &article) {
+        [this, db, userId, isLike,
+         callback](const std::optional<ArticleDto> &article) {
             if (!article) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                auto resp =
+                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = "Article not found";
                 resp->setStatusCode(drogon::k404NotFound);
                 callback(resp);
@@ -37,7 +40,8 @@ void ArticleController::voteArticle(
                 db, article->id, userId, isLike,
                 [callback](bool success, const std::string &error) {
                     if (!success) {
-                        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(
+                            Json::Value{});
                         (*resp->jsonObject())["error"] = error;
                         resp->setStatusCode(drogon::k500InternalServerError);
                         callback(resp);

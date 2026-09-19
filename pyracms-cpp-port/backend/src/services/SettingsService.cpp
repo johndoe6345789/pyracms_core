@@ -1,4 +1,5 @@
 #include "services/SettingsService.h"
+
 #include "services/DbError.h"
 
 namespace pyracms {
@@ -24,10 +25,7 @@ void SettingsService::listSettings(const DbClientPtr &db, int tenantId,
             }
             cb(settings);
         },
-        [cb](const drogon::orm::DrogonDbException &) {
-            cb({});
-        },
-        tenantId);
+        [cb](const drogon::orm::DrogonDbException &) { cb({}); }, tenantId);
 }
 
 void SettingsService::getSetting(const DbClientPtr &db, int tenantId,
@@ -41,14 +39,11 @@ void SettingsService::getSetting(const DbClientPtr &db, int tenantId,
                 cb(rowToDto(result[0]));
             }
         },
-        [cb](const drogon::orm::DrogonDbException &) {
-            cb(std::nullopt);
-        },
+        [cb](const drogon::orm::DrogonDbException &) { cb(std::nullopt); },
         tenantId, name);
 }
 
-void SettingsService::createOrUpdateSetting(const DbClientPtr &db,
-                                            int tenantId,
+void SettingsService::createOrUpdateSetting(const DbClientPtr &db, int tenantId,
                                             const std::string &name,
                                             const std::string &value,
                                             BoolCallback cb) {
@@ -56,9 +51,7 @@ void SettingsService::createOrUpdateSetting(const DbClientPtr &db,
         "INSERT INTO settings (tenant_id, name, value) "
         "VALUES ($1, $2, $3) "
         "ON CONFLICT (tenant_id, name) DO UPDATE SET value = EXCLUDED.value",
-        [cb](const drogon::orm::Result &) {
-            cb(true, "");
-        },
+        [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
         },
@@ -66,8 +59,7 @@ void SettingsService::createOrUpdateSetting(const DbClientPtr &db,
 }
 
 void SettingsService::deleteSetting(const DbClientPtr &db, int tenantId,
-                                    const std::string &name,
-                                    BoolCallback cb) {
+                                    const std::string &name, BoolCallback cb) {
     db->execSqlAsync(
         "DELETE FROM settings WHERE tenant_id = $1 AND name = $2",
         [cb](const drogon::orm::Result &result) {

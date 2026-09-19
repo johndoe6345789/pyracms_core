@@ -21,40 +21,32 @@ struct FileDto {
 };
 
 class FileService {
-public:
+  public:
     using DbClientPtr = drogon::orm::DbClientPtr;
     using Callback = std::function<void(const std::optional<FileDto> &)>;
     using ListCallback = std::function<void(const std::vector<FileDto> &)>;
-    using BoolCallback = std::function<void(bool success, const std::string &error)>;
+    using BoolCallback =
+        std::function<void(bool success, const std::string &error)>;
 
-    void uploadFile(const DbClientPtr &db,
-                    const std::string &filename,
-                    const std::string &uuid,
-                    const std::string &mimetype,
-                    int64_t size,
-                    bool isPicture,
-                    bool isVideo,
-                    BoolCallback cb,
-                    const std::string &sha256 = "",
-                    int userId = 0, int tenantId = 0);
+    void uploadFile(const DbClientPtr &db, const std::string &filename,
+                    const std::string &uuid, const std::string &mimetype,
+                    int64_t size, bool isPicture, bool isVideo, BoolCallback cb,
+                    const std::string &sha256 = "", int userId = 0,
+                    int tenantId = 0);
 
-    void getFile(const DbClientPtr &db,
-                 const std::string &uuid,
-                 Callback cb);
+    void getFile(const DbClientPtr &db, const std::string &uuid, Callback cb);
 
-    void deleteFile(const DbClientPtr &db,
-                    const std::string &uuid,
+    void deleteFile(const DbClientPtr &db, const std::string &uuid,
                     BoolCallback cb);
 
     // scopeUser 0 = any uploader; scopeTenant < 0 = any site.
-    void listFiles(const DbClientPtr &db, int limit, int offset,
-                   int scopeUser, int scopeTenant, ListCallback cb);
+    void listFiles(const DbClientPtr &db, int limit, int offset, int scopeUser,
+                   int scopeTenant, ListCallback cb);
 
-    void incrementDownloadCount(const DbClientPtr &db,
-                                const std::string &uuid,
+    void incrementDownloadCount(const DbClientPtr &db, const std::string &uuid,
                                 BoolCallback cb);
 
-private:
+  private:
     FileDto rowToDto(const drogon::orm::Row &row);
 };
 
