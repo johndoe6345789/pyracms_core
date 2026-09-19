@@ -43,10 +43,10 @@ void NotificationService::getNotifications(const DbClientPtr &db,
     std::string sql;
     if (unreadOnly) {
         sql = "SELECT * FROM notifications WHERE user_id = $1 AND is_read = FALSE "
-              "ORDER BY created_at DESC LIMIT $2 OFFSET $3";
+              "ORDER BY created_at DESC LIMIT $2::int OFFSET $3::int";
     } else {
         sql = "SELECT * FROM notifications WHERE user_id = $1 "
-              "ORDER BY created_at DESC LIMIT $2 OFFSET $3";
+              "ORDER BY created_at DESC LIMIT $2::int OFFSET $3::int";
     }
 
     db->execSqlAsync(

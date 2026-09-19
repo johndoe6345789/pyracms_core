@@ -3,7 +3,8 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ThemeWrapper from '@/components/common/ThemeWrapper'
 import authReducer from '@/store/slices/authSlice'
-import uiReducer, { type ColorMode } from '@/store/slices/uiSlice'
+import uiReducer, { setColorMode, type ColorMode }
+  from '@/store/slices/uiSlice'
 
 jest.mock('@/hooks/useAuthHydration', () => ({
   useAuthHydration: jest.fn(),
@@ -20,9 +21,8 @@ function show(colorMode: ColorMode, dark: boolean) {
   window.matchMedia = jest.fn().mockReturnValue(mq(dark))
   const store = configureStore({
     reducer: { auth: authReducer, ui: uiReducer },
-    preloadedState: { ui: { colorMode, flashMessages: [],
-      sidebarCollapsed: false, notificationBellOpen: false } } as never,
   })
+  store.dispatch(setColorMode(colorMode))
   return render(<Provider store={store}>
     <ThemeWrapper><p>kid</p></ThemeWrapper></Provider>)
 }

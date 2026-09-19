@@ -1,7 +1,8 @@
 import {
-  Typography, Box, Button, Paper, Divider, Card, CardContent,
+  Typography, Button, Paper, Divider, Card, CardContent,
 } from '@mui/material'
 import type { ThemeConfig } from './themeConfig'
+import ThemePreviewSecondary from './ThemePreviewSecondary'
 
 export default function ThemePreview({
   theme,
@@ -59,46 +60,7 @@ export default function ThemePreview({
           </Button>
         </CardContent>
       </Card>
-      <Card sx={card}>
-        <CardContent>
-          <Typography
-            variant="h6"
-            sx={{ color: theme.secondaryColor, fontFamily: f, mb: 1 }}
-          >
-            Secondary Element
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ fontFamily: f, color: theme.textColor }}
-          >
-            This element uses the secondary color for its heading.
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                borderColor: theme.primaryColor,
-                color: theme.primaryColor,
-                borderRadius: r,
-              }}
-            >
-              Action
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                borderColor: theme.secondaryColor,
-                color: theme.secondaryColor,
-                borderRadius: r,
-              }}
-            >
-              Secondary
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
+      <ThemePreviewSecondary theme={theme} card={card} />
     </Paper>
   )
 }

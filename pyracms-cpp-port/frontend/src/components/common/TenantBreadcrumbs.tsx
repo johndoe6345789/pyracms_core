@@ -51,8 +51,7 @@ export default function TenantBreadcrumbs() {
     crumbs.push({
       label: humanize(s), href: cur })
   }
-  const last = crumbs[crumbs.length - 1]
-  if (!last) return null
+  const last = crumbs[crumbs.length - 1]!
 
   return (
     <Breadcrumbs

@@ -2,15 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { mapTenantRow, type TenantRow } from './superAdminRows'
 
-export interface TenantRow {
-  id: number
-  slug: string
-  name: string
-  owner: string
-  isActive: boolean
-  createdAt: string
-}
+export type { TenantRow }
 
 export interface CreateTenantPayload {
   slug: string
@@ -27,21 +21,7 @@ export function useSuperAdminTenants() {
 
   useEffect(() => {
     api.get('/api/tenants')
-      .then((res) => {
-        const mapped: TenantRow[] = (
-          res.data || []
-        ).map((t: Record<string, unknown>) => ({
-          id: Number(t.id),
-          slug: String(t.slug || ''),
-          name: String(t.displayName || t.slug || ''),
-          owner: String(t.ownerUsername || ''),
-          isActive: Boolean(t.isActive ?? true),
-          createdAt: typeof t.createdAt === 'string'
-            ? t.createdAt.split('T')[0] ?? ''
-            : '',
-        }))
-        setTenants(mapped)
-      })
+      .then((res) => setTenants((res.data || []).map(mapTenantRow)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
@@ -70,17 +50,7 @@ export function useSuperAdminTenants() {
     setCreateError(null)
     try {
       const res = await api.post('/api/tenants', payload)
-      const t = res.data as Record<string, unknown>
-      const row: TenantRow = {
-        id: Number(t.id),
-        slug: String(t.slug || ''),
-        name: String(t.displayName || t.slug || ''),
-        owner: String(t.ownerUsername || ''),
-        isActive: Boolean(t.isActive ?? true),
-        createdAt: typeof t.createdAt === 'string'
-          ? t.createdAt.split('T')[0] ?? ''
-          : '',
-      }
+      const row = mapTenantRow(res.data as Record<string, unknown>)
       setTenants((prev) => [...prev, row])
       return true
     } catch (e: any) {

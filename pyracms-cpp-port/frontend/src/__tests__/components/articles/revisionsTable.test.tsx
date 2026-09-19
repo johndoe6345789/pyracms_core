@@ -1,8 +1,5 @@
-import {
-  render, screen, fireEvent, waitFor, within,
-} from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { RevisionTable } from '@/components/articles/RevisionTable'
-import { RevisionDiffViewer } from '@/components/articles/RevisionDiffViewer'
 import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
@@ -10,7 +7,9 @@ jest.mock('react-diff-viewer-continued', () => ({
   __esModule: true,
   DiffMethod: { WORDS: 'words' },
   default: (p: { oldValue: string; newValue: string; splitView: boolean }) =>
-    <div data-testid="diff">{p.oldValue}|{p.newValue}|{String(p.splitView)}</div>,
+    <div data-testid="diff">
+      {p.oldValue}|{p.newValue}|{String(p.splitView)}
+    </div>,
 }))
 
 const revs = [
@@ -66,24 +65,4 @@ it('confirm without handler does nothing', () => {
   render(<RevisionTable revisions={revs} latestRevision={2} />)
   fireEvent.click(screen.getByTestId('revert-1'))
   fireEvent.click(screen.getByTestId('confirm-revert'))
-})
-
-const diffRevs = ['a', 'b', 'c'].map((id) => ({
-  id, label: `L${id}`, date: 'd', author: 'x', content: `c-${id}`,
-}))
-
-it('RevisionDiffViewer compares and toggles view', () => {
-  const { rerender } = render(<RevisionDiffViewer revisions={[]} />)
-  expect(screen.getByText(/No revisions/)).toBeInTheDocument()
-  rerender(<RevisionDiffViewer revisions={diffRevs.slice(0, 1)} />)
-  expect(screen.getByText(/Select two revisions/)).toBeInTheDocument()
-  rerender(<RevisionDiffViewer revisions={diffRevs} />)
-  expect(screen.getByTestId('diff')).toHaveTextContent('c-a|c-c|true')
-  fireEvent.click(screen.getByRole('button', { name: 'Unified' }))
-  expect(screen.getByTestId('diff')).toHaveTextContent('false')
-  fireEvent.click(screen.getByRole('button', { name: 'Unified' }))
-  const [from] = screen.getAllByRole('combobox')
-  fireEvent.mouseDown(from!)
-  fireEvent.click(within(screen.getByRole('listbox')).getByText(/Lb/))
-  expect(screen.getByTestId('diff')).toHaveTextContent('c-b|c-c')
 })

@@ -2,11 +2,12 @@ import { m } from './scopeApi'
 
 export const push = jest.fn()
 export const replace = jest.fn()
+const router = { push, replace }
 
 /** Factory for `jest.mock('next/navigation', ...)`. */
 export const navMock = {
   useParams: () => ({ slug: 's', name: 'n' }),
-  useRouter: () => ({ push, replace }),
+  useRouter: () => router,
   usePathname: () => '/site/s',
 }
 
@@ -45,3 +46,10 @@ export function stubResizeObserver() {
     disconnect() {}
   }
 }
+
+/** Factories for react-markdown (ESM only) and remark-gfm. */
+export const markdownMock = {
+  __esModule: true,
+  default: ({ children }: { children: string }) => <p>{children}</p>,
+}
+export const gfmMock = { __esModule: true, default: () => null }

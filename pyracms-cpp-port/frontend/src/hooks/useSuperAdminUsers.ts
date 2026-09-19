@@ -3,16 +3,9 @@
 import { useState, useEffect } from 'react'
 import { UserRole, USER_ROLE_LABELS } from '@/types'
 import api from '@/lib/api'
+import { mapUserRow, type GlobalUserRow } from './superAdminRows'
 
-export interface GlobalUserRow {
-  id: number
-  username: string
-  email: string
-  role: UserRole
-  roleLabel: string
-  isActive: boolean
-  createdAt: string
-}
+export type { GlobalUserRow }
 
 export function useSuperAdminUsers() {
   const [users, setUsers] = useState<GlobalUserRow[]>([])
@@ -20,29 +13,7 @@ export function useSuperAdminUsers() {
 
   useEffect(() => {
     api.get('/api/users')
-      .then((res) => {
-        const mapped: GlobalUserRow[] = (
-          res.data || []
-        ).map((u: Record<string, unknown>) => {
-          const role = u.role !== undefined
-            ? Number(u.role) as UserRole
-            : u.isAdmin
-              ? UserRole.SiteAdmin
-              : UserRole.User
-          return {
-            id: Number(u.id),
-            username: String(u.username || ''),
-            email: String(u.email || ''),
-            role,
-            roleLabel: USER_ROLE_LABELS[role],
-            isActive: Boolean(u.isActive ?? true),
-            createdAt: typeof u.createdAt === 'string'
-              ? u.createdAt.split('T')[0]
-              : '',
-          }
-        })
-        setUsers(mapped)
-      })
+      .then((res) => setUsers((res.data || []).map(mapUserRow)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
@@ -50,31 +21,20 @@ export function useSuperAdminUsers() {
   const updateRole = (id: number, role: UserRole) => {
     api.put(`/api/users/${id}`, { role })
       .then(() => {
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.id === id
-              ? {
-                  ...u,
-                  role,
-                  roleLabel: USER_ROLE_LABELS[role],
-                }
-              : u,
-          ),
-        )
+        setUsers((prev) => prev.map((u) => u.id === id
+          ? { ...u, role, roleLabel: USER_ROLE_LABELS[role] } : u))
       })
       .catch(() => {})
   }
 
   const toggleBan = (id: number) => {
-    setUsers((prev) => {
-      const target = prev.find((u) => u.id === id)
-      if (!target) return prev
-      const nextActive = !target.isActive
-      api.put(`/api/users/${id}`, { isActive: nextActive }).catch(() => {})
-      return prev.map((u) =>
-        u.id === id ? { ...u, isActive: nextActive } : u,
-      )
-    })
+    const target = users.find((u) => u.id === id)
+    if (!target) return
+    const isActive = !target.isActive
+    // Side effect stays out of the state updater (it may run twice).
+    api.put(`/api/users/${id}`, { isActive }).catch(() => {})
+    setUsers((prev) => prev.map((u) =>
+      u.id === id ? { ...u, isActive } : u))
   }
 
   return { users, loading, updateRole, toggleBan }

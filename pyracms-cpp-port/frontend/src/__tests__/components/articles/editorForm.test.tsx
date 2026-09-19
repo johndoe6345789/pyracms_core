@@ -8,7 +8,9 @@ import {
 import { useArticleEditor } from '@/hooks/useArticleEditor'
 
 jest.mock('@/components/articles/MonacoEditor', () => ({
-  MonacoEditorComponent: (p: { value: string; onChange: (v: string) => void }) =>
+  MonacoEditorComponent: (
+    p: { value: string; onChange: (v: string) => void },
+  ) =>
     <button data-testid="monaco" onClick={() => p.onChange('M')}>
       {p.value}
     </button>,
@@ -46,7 +48,7 @@ it('ArticleEditorContent monaco toggles preview', () => {
   fireEvent.click(screen.getByTestId('monaco'))
   act(() => result.current.setViewMode('preview'))
   rerender(<ArticleEditorContent mode="monaco" editor={result.current} />)
-  expect(screen.getByText(/Preview/)).toBeInTheDocument()
+  expect(screen.getByText(/Preview \(Markdown\)/)).toBeInTheDocument()
 })
 
 it('ArticleEditorForm edits fields', () => {

@@ -10,8 +10,14 @@ namespace pyracms {
 class CommentController : public drogon::HttpController<CommentController> {
 public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(CommentController::getComments, "/api/comments/{contentType}/{contentId}", drogon::Get);
-    ADD_METHOD_TO(CommentController::createComment, "/api/comments/{contentType}/{contentId}", drogon::Post, "pyracms::JwtAuthFilter");
+    // Regex routes: a numeric first segment is a comment id, so
+    // "/api/comments/{id}/vote" must not match {contentType}/{contentId}.
+    ADD_METHOD_VIA_REGEX(CommentController::getComments,
+                         "/api/comments/([A-Za-z_-]+)/([0-9]+)",
+                         drogon::Get);
+    ADD_METHOD_VIA_REGEX(CommentController::createComment,
+                         "/api/comments/([A-Za-z_-]+)/([0-9]+)",
+                         drogon::Post, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(CommentController::updateComment, "/api/comments/{id}", drogon::Put, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(CommentController::deleteComment, "/api/comments/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(CommentController::voteComment, "/api/comments/{id}/vote", drogon::Post, "pyracms::JwtAuthFilter");

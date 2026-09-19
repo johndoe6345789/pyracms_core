@@ -78,7 +78,7 @@ void AnalyticsService::getTopContent(
         "AND created_at >= NOW() - INTERVAL '30 days' "
         "GROUP BY path "
         "ORDER BY views DESC "
-        "LIMIT $2",
+        "LIMIT $2::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<TopContentItem> items;
             for (const auto &row : result) {
@@ -108,7 +108,7 @@ void AnalyticsService::getTrafficSources(
         "AND created_at >= NOW() - INTERVAL '30 days' "
         "GROUP BY referrer "
         "ORDER BY count DESC "
-        "LIMIT $2",
+        "LIMIT $2::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<TrafficSource> sources;
             for (const auto &row : result) {
@@ -137,7 +137,7 @@ void AnalyticsService::getSearchQueries(
         "AND created_at >= NOW() - INTERVAL '30 days' "
         "GROUP BY query "
         "ORDER BY count DESC "
-        "LIMIT $2",
+        "LIMIT $2::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<SearchQueryStat> stats;
             for (const auto &row : result) {

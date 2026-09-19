@@ -14,13 +14,19 @@ it('switches compatible modes directly', () => {
   expect(onModeChange).toHaveBeenCalledTimes(1)
 })
 
-it('confirms incompatible switches', () => {
+it('cancels an incompatible switch', () => {
   const onModeChange = jest.fn()
   render(<EditorModeSelector mode="wysiwyg" onModeChange={onModeChange} />)
   fireEvent.click(screen.getByRole('button', { name: /Markdown/ }))
   expect(onModeChange).not.toHaveBeenCalled()
   expect(screen.getByText('Switch Editor Mode?')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+  expect(onModeChange).not.toHaveBeenCalled()
+})
+
+it('confirms an incompatible switch', () => {
+  const onModeChange = jest.fn()
+  render(<EditorModeSelector mode="wysiwyg" onModeChange={onModeChange} />)
   fireEvent.click(screen.getByRole('button', { name: /BBCode/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Switch Anyway' }))
   expect(onModeChange).toHaveBeenCalledWith('bbcode')

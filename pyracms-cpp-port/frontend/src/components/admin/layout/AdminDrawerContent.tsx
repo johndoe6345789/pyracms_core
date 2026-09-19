@@ -1,14 +1,12 @@
 import Link from 'next/link'
 import {
-  Box, Typography, List, ListItem,
+  Box, List, ListItem,
   ListItemButton, ListItemIcon,
   ListItemText, Divider,
 } from '@mui/material'
-import {
-  ArrowBackOutlined,
-  AdminPanelSettingsOutlined,
-} from '@mui/icons-material'
+import { ArrowBackOutlined } from '@mui/icons-material'
 import { buildAdminNavItems } from './adminNavItems'
+import AdminDrawerHeader from './AdminDrawerHeader'
 
 export const DRAWER_WIDTH = 260
 
@@ -24,23 +22,7 @@ export default function AdminDrawerContent({
   const items = buildAdminNavItems(slug)
   return (
     <Box sx={{ width: DRAWER_WIDTH, pt: 2 }}>
-      <Box
-        sx={{
-          px: 2, pb: 2, display: 'flex',
-          alignItems: 'center', gap: 1,
-        }}
-      >
-        <AdminPanelSettingsOutlined
-          sx={{ color: 'primary.main' }}
-          aria-hidden="true"
-        />
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 700 }}
-        >
-          Admin
-        </Typography>
-      </Box>
+      <AdminDrawerHeader />
       <Divider />
       <nav
         aria-label="Admin navigation"

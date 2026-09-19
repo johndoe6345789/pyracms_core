@@ -7,17 +7,10 @@ import TemplateToolbar from
   '@/components/admin/templates/TemplateToolbar'
 import TemplatePreview from
   '@/components/admin/templates/TemplatePreview'
+import { EDITOR_OPTIONS } from './templateEditorOptions'
 import {
   DEFAULT_TEMPLATES, type TemplateSection, type Templates,
 } from '@/components/admin/templates/defaultTemplates'
-
-const EDITOR_OPTIONS = {
-  minimap: { enabled: false },
-  wordWrap: 'on' as const,
-  fontSize: 14,
-  scrollBeyondLastLine: false,
-  automaticLayout: true,
-}
 
 export default function TemplateEditorPage() {
   const [section, setSection] = useState<TemplateSection>('header')

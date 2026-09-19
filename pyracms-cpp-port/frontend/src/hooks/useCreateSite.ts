@@ -3,39 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
+import {
+  INITIAL, SLUG_PATTERN, SLUG_ERROR, nameToSlug, createSiteError,
+  type CreateSiteForm,
+} from './createSiteForm'
 
-/** Shape of the create-site form fields. */
-export interface CreateSiteForm {
-  slug: string
-  name: string
-  description: string
-}
-
-const INITIAL: CreateSiteForm = {
-  slug: '',
-  name: '',
-  description: '',
-}
-
-/** Regex that a valid slug must fully satisfy. */
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+export type { CreateSiteForm }
 
 /**
- * Converts an arbitrary display name into a URL-safe slug.
- *
- * @param name - Raw display name string.
- * @returns Lowercase, hyphenated slug with no leading/trailing hyphens.
- */
-function nameToSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
-/**
- * Hook that manages form state, validation, and submission for
- * creating a new CMS site (tenant).
+ * Manages form state, validation, and submission for creating a new
+ * CMS site (tenant).
  */
 export function useCreateSite() {
   const router = useRouter()
@@ -44,69 +21,36 @@ export function useCreateSite() {
   const [error, setError] = useState('')
 
   /**
-   * Updates a single form field.
-   *
-   * When `field` is `'name'` and the slug has not yet been manually
-   * set, the slug is auto-generated from the new name value.  The
-   * check uses the functional `prev` argument so it always reads the
-   * latest state rather than a potentially stale closure value.
-   *
-   * When `field` is `'slug'`, the value is validated against
-   * {@link SLUG_PATTERN}; an invalid value sets the error state and
-   * leaves the slug unchanged.
-   *
-   * @param field - Key of {@link CreateSiteForm} to update.
-   * @param value - New value for that field.
+   * Updates a single form field. Changing `name` auto-generates the
+   * slug while it is still empty (read from `prev`, never a stale
+   * closure); an invalid `slug` sets the error and is ignored.
    */
-  const updateField = (
-    field: keyof CreateSiteForm,
-    value: string,
-  ) => {
+  const updateField = (field: keyof CreateSiteForm, value: string) => {
     if (field === 'slug') {
       if (value !== '' && !SLUG_PATTERN.test(value)) {
-        setError(
-          'Slug must be lowercase letters/numbers separated by ' +
-          'single hyphens, no leading/trailing hyphens',
-        )
+        setError(SLUG_ERROR)
         return
       }
       setError('')
       setForm((prev) => ({ ...prev, slug: value }))
       return
     }
-
     if (field === 'name') {
-      // Use the functional updater so we read prev.slug (latest state)
-      // rather than the stale closure value of form.slug.
-      setForm((prev) => {
-        const auto = prev.slug === '' ? nameToSlug(value) : prev.slug
-        return { ...prev, name: value, slug: auto }
-      })
+      setForm((prev) => ({ ...prev, name: value,
+        slug: prev.slug === '' ? nameToSlug(value) : prev.slug }))
       return
     }
-
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  /**
-   * Resets the form to its initial empty state and clears any error.
-   */
+  /** Resets the form to its initial empty state and clears any error. */
   const resetForm = () => {
     setForm(INITIAL)
     setError('')
   }
 
-  /**
-   * Submits the form to `POST /api/tenants`.
-   *
-   * On success the router navigates to `/site/{slug}`.
-   * On failure an error message is stored in `error`.
-   *
-   * @param e - The React form-submission event.
-   */
-  const handleSubmit = async (
-    e: React.FormEvent,
-  ) => {
+  /** Submits to `POST /api/tenants`, then navigates to `/site/{slug}`. */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -118,18 +62,7 @@ export function useCreateSite() {
       })
       router.push(`/site/${form.slug}`)
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err
-      ) {
-        const r = (
-          err as { response: { data?: { error?: string } } }
-        ).response
-        setError(r?.data?.error || 'Failed to create site')
-      } else {
-        setError('Unable to connect to server')
-      }
+      setError(createSiteError(err))
     } finally {
       setLoading(false)
     }

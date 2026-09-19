@@ -58,6 +58,13 @@ public:
     void listUsers(const DbClientPtr &db, int limit, int offset,
                    ListCallback cb);
 
+    // Scoped listing: scope -1 = all accounts, else one tenant (0 = platform).
+    // `search` matches username/full name; `username` is an exact match.
+    void listUsersScoped(const DbClientPtr &db, int scope,
+                         const std::string &search,
+                         const std::string &username, int limit, int offset,
+                         ListCallback cb);
+
     void updateUser(const DbClientPtr &db, int id,
                     const Json::Value &updates,
                     BoolCallback cb);

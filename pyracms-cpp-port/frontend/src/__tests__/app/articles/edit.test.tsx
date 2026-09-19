@@ -3,12 +3,12 @@ import {
 } from '@testing-library/react'
 import EditArticlePage from
   '@/app/site/[slug]/(tenant)/articles/[name]/edit/page'
-import {
-  buildRevisionSummary, sameTags,
-} from '@/app/site/[slug]/(tenant)/articles/[name]/edit/editSummary'
 import { m } from '../../helpers/scopeApi'
 import { push, routeGet } from '../../helpers/scopeMocks'
 
+jest.mock('react-markdown',
+  () => require('../../helpers/scopeMocks').markdownMock)
+jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
 jest.mock('@/hooks/useTenantId',
@@ -27,15 +27,6 @@ beforeEach(() => {
 
 const summary = () =>
   within(screen.getByTestId('summary-input')).getByRole('textbox')
-
-it('builds revision summaries', () => {
-  const o = { content: 'a', renderer: 'HTML', tagsInput: 'x, y' }
-  expect(buildRevisionSummary(o, o)).toBe('')
-  expect(buildRevisionSummary(o, { content: 'b', renderer: 'Markdown',
-    tagsInput: 'z' })).toBe('Updated content, renderer, tags')
-  expect(sameTags('A, b', 'b,a')).toBe(true)
-  expect(sameTags('a', 'a,b')).toBe(false)
-})
 
 it('loads the article, auto-summarises and saves', async () => {
   render(<EditArticlePage />)
@@ -77,5 +68,4 @@ it('reports load and save failures', async () => {
   await waitFor(() => expect(m.get).toHaveBeenCalled())
   fireEvent.click(screen.getByTestId('save-article-btn'))
   await screen.findByText('Failed to save article')
-  m.put.mockRejectedValue(new Error('x'))
 })

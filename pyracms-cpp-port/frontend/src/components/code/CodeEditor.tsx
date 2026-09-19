@@ -8,7 +8,7 @@ import { LanguageSelect } from './LanguageSelect'
 
 interface CodeEditorProps {
   value: string
-  onChange: (value: string) => void
+  onChange?: ((value: string) => void) | undefined
   language: string
   onLanguageChange?: (language: string) => void
   readOnly?: boolean
@@ -23,7 +23,7 @@ export function CodeEditor({
   const monacoTheme = theme.palette.mode === 'dark' ? 'vs-dark' : 'light'
   const handleEditorChange = (newValue: string | undefined) => {
     const val = newValue ?? ''
-    onChange(val)
+    onChange?.(val)
     if (language === 'plaintext' && val.length > 20) {
       const detected = detectLanguage(val)
       if (detected) onLanguageChange?.(detected)

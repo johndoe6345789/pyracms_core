@@ -27,9 +27,15 @@ set(TEST_SOURCES
 
     test_article_http_2.cpp
 
+    test_auth_http.cpp
+
     test_auth_service.cpp
 
     test_auth_tenant_claim.cpp
+
+    test_comment_notify_http.cpp
+
+    test_file_http.cpp
 
     test_forum_flow_db_1.cpp
 
@@ -45,9 +51,15 @@ set(TEST_SOURCES
 
     test_forum_scope_db_2.cpp
 
+    test_gallery_http.cpp
+
     test_gamedep_http_1.cpp
 
     test_gamedep_http_2.cpp
+
+    test_gamedep_http_3.cpp
+
+    test_gamedep_http_4.cpp
 
     test_jwt_filter_1.cpp
 
@@ -56,6 +68,8 @@ set(TEST_SOURCES
     test_menu_tenant_db_1.cpp
 
     test_menu_tenant_db_2.cpp
+
+    test_public_reads_http.cpp
 
     test_role_rules.cpp
 
@@ -69,7 +83,10 @@ set(TEST_SOURCES
 
     test_snippet_scope_db_2.cpp
 
+    test_social_http.cpp
+
     test_tenant_rules.cpp
+    test_user_visibility.cpp
 
     test_tenant_service.cpp
 
@@ -80,6 +97,8 @@ set(TEST_SOURCES
     test_user_service.cpp
 
     test_user_service_roles.cpp
+
+    test_webhook_http.cpp
 
 )
 

@@ -8,6 +8,9 @@ import RevisionsPage from
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
 
+jest.mock('react-markdown',
+  () => require('../../helpers/scopeMocks').markdownMock)
+jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
 jest.mock('@/hooks/useTenantId',
@@ -20,9 +23,13 @@ jest.mock('@/components/common/JsonLd', () => () => <i data-testid="ld" />)
 jest.mock('@/components/common/PageTransition',
   () => ({ children }: { children: React.ReactNode }) => <>{children}</>)
 
-const { fetchArticleJsonLd } = jest.requireMock('@/lib/metadata')
+const { fetchArticleJsonLd, generateArticleMetadata } =
+  jest.requireMock('@/lib/metadata')
 
-beforeEach(() => jest.resetAllMocks())
+beforeEach(() => {
+  jest.resetAllMocks()
+  generateArticleMetadata.mockResolvedValue({ title: 'T' })
+})
 
 it('article page renders and votes', async () => {
   routeGet({ '/api/articles/n': { name: 'n', displayName: 'Title',

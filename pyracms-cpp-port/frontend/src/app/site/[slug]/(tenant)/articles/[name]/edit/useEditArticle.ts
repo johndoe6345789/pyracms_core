@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useArticleEditor } from '@/hooks/useArticleEditor'
 import api from '@/lib/api'
+import { saveArticle } from './saveArticle'
 import {
-  buildRevisionSummary, type ArticleEditSnapshot,
+  buildRevisionSummary, matchRenderer, type ArticleEditSnapshot,
 } from './editSummary'
-
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export function useEditArticle(
   slug: string,
@@ -29,7 +28,7 @@ export function useEditArticle(
       .get(`/api/articles/${name}?tenant_id=${tenantId}`)
       .then((res) => {
         const a = res.data
-        const r = cap((a.rendererName || 'html').toLowerCase())
+        const r = matchRenderer(a.rendererName || 'html')
         const tags = (a.tags || []).join(', ')
         editor.setTitle(a.displayName || '')
         editor.setContent(a.content || '')
@@ -60,25 +59,11 @@ export function useEditArticle(
     setSaving(true)
     setError('')
     try {
-      await api.put(`/api/articles/${name}`, {
-        content: editor.content,
-        summary: editor.summary || 'Updated article',
-        tenant_id: tenantId,
+      await saveArticle({
+        name, tenantId, content: editor.content,
+        summary: editor.summary, tags: editor.parsedTags,
+        renderer: editor.renderer, origRenderer,
       })
-      await api
-        .put(`/api/articles/${name}/tags`, {
-          tags: editor.parsedTags,
-          tenant_id: tenantId,
-        })
-        .catch(() => {})
-      if (editor.renderer !== origRenderer) {
-        await api
-          .put(`/api/articles/${name}/renderer`, {
-            renderer: editor.renderer.toLowerCase(),
-            tenant_id: tenantId,
-          })
-          .catch(() => {})
-      }
       router.push(`/site/${slug}/articles/${name}`)
     } catch {
       setError('Failed to save article')

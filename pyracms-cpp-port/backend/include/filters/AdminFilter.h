@@ -15,6 +15,12 @@ class AdminFilter : public drogon::HttpFilter<AdminFilter> {
         int userId, std::function<void(std::optional<int>)>)>;
     static RoleLookup &roleLookup();
 
+    // True when userId owns tenantId. A site's owner administers that site
+    // even though their stored role is only User.
+    using OwnerLookup = std::function<void(
+        int userId, int tenantId, std::function<void(bool)>)>;
+    static OwnerLookup &ownerLookup();
+
     void doFilter(const drogon::HttpRequestPtr &req,
                   drogon::FilterCallback &&fcb,
                   drogon::FilterChainCallback &&fccb) override;

@@ -41,4 +41,17 @@ inline int effectiveScope(int tokenTenant, const std::string &named) {
     }
 }
 
+// First explicitly named tenant id (query/body values), 0 when none.
+inline int firstNamedTenant(const std::vector<std::string> &named) {
+    for (const auto &v : named) {
+        try {
+            int id = std::stoi(v);
+            if (id > 0)
+                return id;
+        } catch (...) {
+        }
+    }
+    return 0;
+}
+
 } // namespace pyracms

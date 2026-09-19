@@ -65,7 +65,7 @@ void CommentService::getComments(const DbClientPtr &db,
         "FROM comments c "
         "JOIN users u ON c.user_id = u.id "
         "WHERE c.content_type = $1 AND c.content_id = $2 "
-        "ORDER BY c.created_at ASC LIMIT $3 OFFSET $4",
+        "ORDER BY c.created_at ASC LIMIT $3::int OFFSET $4::int",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<CommentDto> comments;
             comments.reserve(result.size());

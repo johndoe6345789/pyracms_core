@@ -1,17 +1,15 @@
 'use client'
 
 import { useEffect } from 'react'
-import {
-  Box, Button, Container, Paper, Typography,
-} from '@mui/material'
-import { ArrowBack, WebOutlined } from '@mui/icons-material'
-import Link from 'next/link'
+import { Box, Container, Paper } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import AuthPromptCard
   from '@/components/create-site/AuthPromptCard'
 import CreateSiteForm
   from '@/components/create-site/CreateSiteForm'
+import CreateSiteHeader
+  from '@/components/create-site/CreateSiteHeader'
 
 export default function CreateSitePage() {
   const isAuthenticated = useSelector(
@@ -38,39 +36,7 @@ export default function CreateSitePage() {
       aria-label="Create new site"
     >
       <Container maxWidth="sm">
-        <Box
-          sx={{
-            textAlign: 'center',
-            mb: 4,
-            color: 'white',
-          }}
-        >
-          <Button
-            component={Link}
-            href="/portal"
-            startIcon={<ArrowBack />}
-            data-testid="back-to-portal-link"
-            aria-label="Back to Portal"
-            sx={{
-              color: 'white',
-              mb: 2,
-              textTransform: 'none',
-            }}
-          >
-            Back to Portal
-          </Button>
-          <WebOutlined
-            sx={{ fontSize: 48, mb: 1 }}
-            aria-hidden="true"
-          />
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{ fontWeight: 700 }}
-          >
-            New Site
-          </Typography>
-        </Box>
+        <CreateSiteHeader />
         <Paper
           elevation={0}
           sx={{

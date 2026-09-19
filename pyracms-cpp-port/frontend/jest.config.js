@@ -19,6 +19,14 @@ const customJestConfig = {
     '**/__tests__/**/*.ts?(x)',
     '**/?(*.)+(spec|test).ts?(x)',
   ],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/__tests__/**',
+    '!src/**/*.d.ts',
+  ],
+  coverageThreshold: {
+    global: { statements: 80, branches: 80, functions: 80, lines: 80 },
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

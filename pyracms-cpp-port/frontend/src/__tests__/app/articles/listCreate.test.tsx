@@ -10,6 +10,9 @@ import {
 import { m } from '../../helpers/scopeApi'
 import { push, routeGet } from '../../helpers/scopeMocks'
 
+jest.mock('react-markdown',
+  () => require('../../helpers/scopeMocks').markdownMock)
+jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
 jest.mock('@/hooks/useTenantId',

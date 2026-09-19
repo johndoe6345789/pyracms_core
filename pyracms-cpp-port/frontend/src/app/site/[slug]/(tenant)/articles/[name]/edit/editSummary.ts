@@ -1,3 +1,5 @@
+import { RENDERERS } from '@/hooks/useArticleEditor'
+
 export interface ArticleEditSnapshot {
   content: string
   renderer: string
@@ -38,4 +40,13 @@ export function buildRevisionSummary(
     changes.push('tags')
   }
   return changes.length ? `Updated ${changes.join(', ')}` : ''
+}
+
+/** Maps an API renderer name onto the editor's RENDERERS entry. */
+export function matchRenderer(name: string) {
+  const lower = name.toLowerCase()
+  return (
+    RENDERERS.find((r) => r.toLowerCase() === lower)
+    ?? lower.charAt(0).toUpperCase() + lower.slice(1)
+  )
 }

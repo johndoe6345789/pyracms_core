@@ -30,7 +30,8 @@ void FileService::deleteFile(const DbClientPtr &db, const std::string &uuid,
 void FileService::listFiles(const DbClientPtr &db, int limit, int offset,
                             ListCallback cb) {
     db->execSqlAsync(
-        "SELECT * FROM files ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+        "SELECT * FROM files ORDER BY created_at DESC "
+        "LIMIT $1::int OFFSET $2::int",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<FileDto> files;
             files.reserve(result.size());

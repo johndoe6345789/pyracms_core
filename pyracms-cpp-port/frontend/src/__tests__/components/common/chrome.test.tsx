@@ -47,6 +47,7 @@ describe('TenantBreadcrumbs', () => {
     ['no pathname', null, { slug: 's' }],
     ['other prefix', '/other/x', { slug: 's' }],
     ['site root', '/site/s/', { slug: 's' }],
+    ['only slashes', '/site/s//', { slug: 's' }],
   ])('renders nothing for %s', (_n, p, prm) => {
     path = p as string | null
     params = prm as Record<string, string>

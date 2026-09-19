@@ -12,11 +12,11 @@ function parse(content: string): Part[] {
   const parts: Part[] = []
   let last = 0
   for (const m of content.matchAll(QUOTE_RE)) {
-    const at = m.index ?? 0
+    const at = m.index as number
     if (at > last) {
       parts.push({ kind: 'text', text: content.slice(last, at) })
     }
-    parts.push({ kind: 'quote', author: m[1] ?? '', text: m[2] ?? '' })
+    parts.push({ kind: 'quote', author: m[1] as string, text: m[2] as string })
     last = at + m[0].length
   }
   if (last < content.length) {

@@ -6,7 +6,6 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 
 const raw = [{ id: 1, filename: 'a.txt', uuid: 'u1',
   createdAt: '2024-01-01T00:00' }, { id: 2 }]
-
 beforeEach(() => {
   jest.resetAllMocks()
   m.get.mockResolvedValue({ data: raw })
@@ -18,7 +17,6 @@ const setup = async (t: number | null = 1) => {
   await waitFor(() => expect(h.result.current.loading).toBe(t === null))
   return h
 }
-
 it('formats sizes', () => {
   expect(formatFileSize(5)).toBe('5 B')
   expect(formatFileSize(2048)).toBe('2.0 KB')

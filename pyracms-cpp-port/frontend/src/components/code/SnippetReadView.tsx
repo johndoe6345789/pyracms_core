@@ -44,7 +44,6 @@ export function SnippetReadView(p: Props) {
       >
         <CodeEditor
           value={snippet.code}
-          onChange={() => {}}
           language={snippet.language}
           readOnly
           height={height}

@@ -137,7 +137,7 @@ void WebhookService::getDeliveries(
 
     db->execSqlAsync(
         "SELECT * FROM webhook_deliveries WHERE webhook_id = $1 "
-        "ORDER BY delivered_at DESC LIMIT $2 OFFSET $3",
+        "ORDER BY delivered_at DESC LIMIT $2::int OFFSET $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<WebhookDeliveryDto> deliveries;
             for (const auto &row : result) {

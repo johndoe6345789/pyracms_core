@@ -189,7 +189,7 @@ void SearchService::searchArticles(
         "FROM articles a "
         "WHERE a.tenant_id = $1 "
         "AND to_tsvector('english', a.name || ' ' || a.display_name) @@ to_tsquery('english', $2) "
-        "ORDER BY rank DESC LIMIT $3 OFFSET $4",
+        "ORDER BY rank DESC LIMIT $3::int OFFSET $4::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<SearchResultItem> items;
             for (const auto &row : result) {
@@ -227,7 +227,7 @@ void SearchService::searchForumPosts(
         "JOIN forum_categories c ON c.id = f.category_id "
         "WHERE c.tenant_id = $1 "
         "AND to_tsvector('english', p.title || ' ' || p.content) @@ to_tsquery('english', $2) "
-        "ORDER BY rank DESC LIMIT $3 OFFSET $4",
+        "ORDER BY rank DESC LIMIT $3::int OFFSET $4::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<SearchResultItem> items;
             for (const auto &row : result) {
@@ -262,7 +262,7 @@ void SearchService::searchSnippets(
         "FROM code_snippets s "
         "WHERE s.tenant_id = $1 AND s.visibility = 'public' "
         "AND to_tsvector('english', s.title || ' ' || s.code) @@ to_tsquery('english', $2) "
-        "ORDER BY rank DESC LIMIT $3 OFFSET $4",
+        "ORDER BY rank DESC LIMIT $3::int OFFSET $4::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<SearchResultItem> items;
             for (const auto &row : result) {
@@ -298,7 +298,7 @@ void SearchService::searchGameDeps(
         "WHERE g.tenant_id = $1 "
         "AND to_tsvector('english', g.name || ' ' || g.display_name || ' ' || g.description) "
         "@@ to_tsquery('english', $2) "
-        "ORDER BY rank DESC LIMIT $3 OFFSET $4",
+        "ORDER BY rank DESC LIMIT $3::int OFFSET $4::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<SearchResultItem> items;
             for (const auto &row : result) {
@@ -381,7 +381,7 @@ void SearchService::autocomplete(
         "  SELECT display_name AS text, 'article' AS type, "
         "  '/articles/' || name AS url "
         "  FROM articles WHERE tenant_id = $1 AND status = 'published' "
-        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3"
+        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3::int"
         ") UNION ALL ("
         "  SELECT title AS text, 'forum_post' AS type, "
         "  '/forum/thread/' || thread_id::text AS url "
@@ -390,13 +390,13 @@ void SearchService::autocomplete(
         "  JOIN forums f ON f.id = t.forum_id "
         "  JOIN forum_categories c ON c.id = f.category_id "
         "  WHERE c.tenant_id = $1 AND p.title IS NOT NULL "
-        "  AND LOWER(p.title) LIKE LOWER($2) LIMIT $3"
+        "  AND LOWER(p.title) LIKE LOWER($2) LIMIT $3::int"
         ") UNION ALL ("
         "  SELECT display_name AS text, 'gamedep' AS type, "
         "  '/gamedep/' || name AS url "
         "  FROM gamedep_pages WHERE tenant_id = $1 "
-        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3"
-        ") LIMIT $3",
+        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3::int"
+        ") LIMIT $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<AutocompleteItem> items;
             items.reserve(result.size());

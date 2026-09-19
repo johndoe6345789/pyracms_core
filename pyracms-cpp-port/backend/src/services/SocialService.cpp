@@ -63,7 +63,7 @@ void SocialService::getFollowers(const DbClientPtr &db, int userId, int limit, i
         "FROM follows f "
         "JOIN users u ON u.id = f.follower_id "
         "WHERE f.followed_id = $1 "
-        "ORDER BY f.created_at DESC LIMIT $2 OFFSET $3",
+        "ORDER BY f.created_at DESC LIMIT $2::int OFFSET $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<UserFollowDto> followers;
             int total = 0;
@@ -92,7 +92,7 @@ void SocialService::getFollowing(const DbClientPtr &db, int userId, int limit, i
         "FROM follows f "
         "JOIN users u ON u.id = f.followed_id "
         "WHERE f.follower_id = $1 "
-        "ORDER BY f.created_at DESC LIMIT $2 OFFSET $3",
+        "ORDER BY f.created_at DESC LIMIT $2::int OFFSET $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<UserFollowDto> following;
             int total = 0;
@@ -129,7 +129,7 @@ void SocialService::getActivityFeed(const DbClientPtr &db, int userId,
         "  SELECT 'snippet' AS type, s.id, s.title, "
         "  LEFT(s.code, 200) AS summary, s.created_at "
         "  FROM code_snippets s WHERE s.author_id = $1"
-        ") ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+        ") ORDER BY created_at DESC LIMIT $2::int OFFSET $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<ActivityItem> items;
             items.reserve(result.size());

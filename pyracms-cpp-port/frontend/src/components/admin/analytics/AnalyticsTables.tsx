@@ -1,43 +1,6 @@
-import {
-  Typography, Paper, Box, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow,
-} from '@mui/material'
+import { TableCell, TableRow } from '@mui/material'
+import Panel from './AnalyticsPanel'
 import { TOP_REFERRERS, POPULAR_SEARCHES } from './analyticsData'
-
-function Panel({
-  title,
-  heads,
-  children,
-}: {
-  title: string
-  heads: { label: string; right?: boolean }[]
-  children: React.ReactNode
-}) {
-  return (
-    <Paper variant="outlined" sx={{ borderColor: 'divider' }}>
-      <Box sx={{ px: 3, py: 2 }}>
-        <Typography variant="h6">{title}</Typography>
-      </Box>
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              {heads.map((h) => (
-                <TableCell
-                  key={h.label}
-                  align={h.right ? 'right' : 'left'}
-                >
-                  {h.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>{children}</TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
-  )
-}
 
 export function ReferrersTable() {
   return (

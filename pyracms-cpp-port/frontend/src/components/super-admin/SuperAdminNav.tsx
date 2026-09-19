@@ -5,19 +5,9 @@ import {
   ListItemIcon, ListItemText, Divider,
   Typography,
 } from '@mui/material'
-import {
-  DashboardOutlined, DnsOutlined,
-  PeopleOutlined, TuneOutlined,
-  ShieldOutlined,
-} from '@mui/icons-material'
+import { ShieldOutlined } from '@mui/icons-material'
 import Link from 'next/link'
-
-const NAV_ITEMS = [
-  { label: 'Dashboard', icon: <DashboardOutlined />, path: '/super-admin' },
-  { label: 'Tenants', icon: <DnsOutlined />, path: '/super-admin/tenants' },
-  { label: 'Users', icon: <PeopleOutlined />, path: '/super-admin/users' },
-  { label: 'Settings', icon: <TuneOutlined />, path: '/super-admin/settings' },
-]
+import { NAV_ITEMS } from './superAdminNavItems'
 
 interface Props {
   width: number

@@ -5,14 +5,13 @@ import {
   Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
   Paper, Typography, Box, CircularProgress,
-  TextField, InputAdornment,
 } from '@mui/material'
-import { SearchOutlined } from '@mui/icons-material'
 import {
   useSuperAdminTenants,
 } from '@/hooks/useSuperAdminTenants'
 import TenantTableRow from './TenantTableRow'
 import TenantDeleteDialog from './TenantDeleteDialog'
+import TenantFilter from './TenantFilter'
 
 export default function TenantManagementTable() {
   const {
@@ -41,24 +40,7 @@ export default function TenantManagementTable() {
 
   return (
     <>
-      <TextField
-        size="small"
-        placeholder="Filter by name…"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        inputProps={{ 'aria-label': 'Filter tenants' }}
-        data-testid="tenant-filter-input"
-        sx={{ mb: 1, width: 320 }}
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchOutlined fontSize="small" />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+      <TenantFilter value={filter} onChange={setFilter} />
       <TableContainer
         component={Paper}
         variant="outlined"

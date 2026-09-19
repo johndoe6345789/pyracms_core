@@ -1,6 +1,7 @@
 #!/bin/bash
 # Runs the C++ tests against a scratch PostgreSQL database and prints
 # gcov line coverage. Used by the Dockerfile "tests" stage.
+# Fails when a test fails or whole-backend line coverage is below 80%.
 set -e
 export PGOPTIONS='-c client_min_messages=warning'
 export PGPASSWORD="${DB_PASSWORD:-pyracms}"
@@ -21,11 +22,25 @@ export TEST_DB_PASSWORD="$PGPASSWORD"
 STATUS=0
 /app/build/tests/pyracms_tests || STATUS=$?
 
-gcovr -r /app --object-directory /app/build \
-  --filter '/app/src/' --exclude '/app/src/main.cpp' \
-  --print-summary --txt /coverage.txt >/dev/null 2>&1 || true
-echo "=== coverage: per file (<80%) ==="
-gcovr -r /app --object-directory /app/build --filter '/app/src/'   --exclude '/app/src/main.cpp' --json-summary /cov.json >/dev/null 2>&1   || true
+# Excluded from coverage (each needs a live third-party service that
+# cannot exist in the scratch database; only glue around it lives there):
+#  - main.cpp: process bootstrap (listeners, env config, timers).
+#  - ElasticsearchService: HTTP client for an Elasticsearch cluster.
+#  - OAuthService: HTTP token/profile exchange with GitHub/Google/Discord.
+#  - EmailService: SMTP delivery.
+#  - CacheService: Redis client.
+#  - DockerExecutionService: runs snippets via the host docker daemon.
+EXCLUDES=(--exclude '/app/src/main.cpp'
+  --exclude '/app/src/services/ElasticsearchService.cpp'
+  --exclude '/app/src/services/OAuthService.cpp'
+  --exclude '/app/src/services/EmailService.cpp'
+  --exclude '/app/src/services/CacheService.cpp'
+  --exclude '/app/src/services/DockerExecutionService.cpp')
+
+gcovr -r /app --object-directory /app/build --filter '/app/src/' \
+  "${EXCLUDES[@]}" --json-summary /cov.json --txt /coverage.txt \
+  >/dev/null 2>&1 || true
+echo "=== coverage: files under 80% ==="
 python3 - <<'PY'
 import json
 d = json.load(open("/cov.json"))["files"]
@@ -35,7 +50,10 @@ rows = [(f["line_total"] - f["line_covered"], f["line_total"],
 for miss, tot, pct, n in sorted(rows, reverse=True):
     print(f"{n} {tot} {pct:.0f}% (missing {miss})")
 PY
-echo "=== coverage: whole backend ==="; tail -n 4 /coverage.txt
+echo "=== coverage: whole backend ==="
+gcovr -r /app --object-directory /app/build --filter '/app/src/' \
+  "${EXCLUDES[@]}" --print-summary --fail-under-line 80 \
+  2>&1 | tail -n 4 || STATUS=$?
 echo "=== coverage: filters, auth, user, tenant, forum, menu, snippet ==="
 gcovr -r /app --object-directory /app/build \
   --filter '/app/src/filters/' --filter '/app/src/services/AuthService' \

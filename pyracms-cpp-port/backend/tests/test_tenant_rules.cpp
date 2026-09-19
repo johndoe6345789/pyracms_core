@@ -38,3 +38,9 @@ TEST(TenantRulesTest, EffectiveScopePrefersToken) {
     EXPECT_EQ(effectiveScope(0, ""), 0);
     EXPECT_EQ(effectiveScope(0, "junk"), 0);
 }
+
+TEST(TenantRulesTest, FirstNamedTenantSkipsEmptyAndGarbage) {
+    EXPECT_EQ(firstNamedTenant({"", "x", "7", "9"}), 7);
+    EXPECT_EQ(firstNamedTenant({"", ""}), 0);
+    EXPECT_EQ(firstNamedTenant({"-2"}), 0);
+}

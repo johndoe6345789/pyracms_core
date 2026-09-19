@@ -3,14 +3,13 @@
 import {
   Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
-  Paper, Chip, Typography,
+  Paper, Typography,
   Box, CircularProgress,
 } from '@mui/material'
 import {
   useSuperAdminUsers,
 } from '@/hooks/useSuperAdminUsers'
-import { UserRole } from '@/types'
-import RoleSelectCell from './RoleSelectCell'
+import GlobalUserRowView from './GlobalUserRowView'
 
 export default function GlobalUsersTable() {
   const { users, loading, updateRole } =
@@ -51,36 +50,8 @@ export default function GlobalUsersTable() {
             </TableRow>
           )}
           {users.map((u) => (
-            <TableRow
-              key={u.id}
-              data-testid={`user-row-${u.username}`}
-            >
-              <TableCell sx={{ fontWeight: 500 }}>
-                {u.username}
-              </TableCell>
-              <TableCell>{u.email}</TableCell>
-              <TableCell>
-                <RoleSelectCell
-                  username={u.username}
-                  role={u.role}
-                  onChange={(r: UserRole) =>
-                    updateRole(u.id, r)
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <Chip
-                  label={
-                    u.isActive ? 'Active' : 'Banned'
-                  }
-                  color={
-                    u.isActive ? 'success' : 'error'
-                  }
-                  size="small"
-                />
-              </TableCell>
-              <TableCell>{u.createdAt}</TableCell>
-            </TableRow>
+            <GlobalUserRowView key={u.id} user={u}
+              onRoleChange={updateRole} />
           ))}
         </TableBody>
       </Table>

@@ -8,7 +8,7 @@ void ArticleService::listArticlesByStatus(const DbClientPtr &db, int tenantId,
                                            ArticleListCallback cb) {
     db->execSqlAsync(
         "SELECT * FROM articles WHERE tenant_id = $1 AND status = $2 "
-        "ORDER BY created_at DESC LIMIT $3 OFFSET $4",
+        "ORDER BY created_at DESC LIMIT $3::int OFFSET $4::int",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<ArticleDto> articles;
             articles.reserve(result.size());

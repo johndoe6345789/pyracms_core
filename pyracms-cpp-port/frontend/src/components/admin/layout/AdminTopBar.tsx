@@ -1,20 +1,10 @@
-import Link from 'next/link'
 import {
-  AppBar, Toolbar, Typography, Box,
-  Button, IconButton,
+  AppBar, Toolbar, Typography, IconButton,
 } from '@mui/material'
 import {
-  MenuOutlined, ArrowBackOutlined,
-  AdminPanelSettingsOutlined,
+  MenuOutlined, AdminPanelSettingsOutlined,
 } from '@mui/icons-material'
-import NotificationBell
-  from '@/components/common/NotificationBell'
-import ThemeToggle
-  from '@/components/common/ThemeToggle'
-import LanguageSelect
-  from '@/components/common/LanguageSelect'
-import UserBubble
-  from '@/components/common/UserBubble'
+import AdminTopBarActions from './AdminTopBarActions'
 
 interface Props {
   slug: string
@@ -67,27 +57,7 @@ export default function AdminTopBar({
         >
           {slug} Admin
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: { xs: 0.5, md: 1 },
-          }}
-        >
-          <LanguageSelect />
-          <ThemeToggle />
-          <NotificationBell />
-          <UserBubble />
-          <Button
-            component={Link}
-            href={`/site/${slug}`}
-            startIcon={<ArrowBackOutlined />}
-            data-testid="admin-site-link"
-            sx={{ color: 'text.secondary', ml: 1 }}
-          >
-            Site
-          </Button>
-        </Box>
+        <AdminTopBarActions slug={slug} />
       </Toolbar>
     </AppBar>
   )
