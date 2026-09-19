@@ -16,8 +16,11 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editor = useEditor({
+    // Server render first, mount on the client (avoids the SSR error)
+    immediatelyRender: false,
     extensions: [
-      StarterKit,
+      // tiptap 3's StarterKit already bundles Link; ours is configured
+      StarterKit.configure({ link: false }),
       TiptapLink.configure({
         openOnClick: false,
       }),
@@ -31,7 +34,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false)
+      editor.commands.setContent(value, { emitUpdate: false })
     }
   }, [value, editor])
 
