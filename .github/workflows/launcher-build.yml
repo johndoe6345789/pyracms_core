@@ -201,6 +201,16 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: ctest --test-dir "$CLIENT/build" --output-on-failure
 
+      - name: Show failing QtTest output (ctest hides it on Windows)
+        if: failure() && runner.os == 'Windows' && matrix.arch == 'x86_64'
+        shell: bash
+        run: |
+          cd "$CLIENT/build"
+          for t in $(sed -n 's/^[0-9]*:qtst_/qtst_/p' Testing/Temporary/LastTestsFailed.log); do
+            exe="$(find . -name "$t.exe" | head -1)"; echo "== $t ($exe)"
+            timeout 90 "$exe" -o -,txt 2>&1 | grep -E "^FAIL|Loc:|Actual|Expected|QFATAL|QWARN" | head -20 || true
+          done
+
       - name: Compute version and asset name
         id: meta
         shell: bash

@@ -22,8 +22,8 @@ TEST_F(SettingsManagerTest, SetSameRepoUrlDoesNotEmit) {
 
 TEST_F(SettingsManagerTest, SetOsName) {
     QSignalSpy spy(m_manager, &SettingsManager::osNameChanged);
-    m_manager->setOsName("windows");
-    EXPECT_EQ(m_manager->osName(), QString("windows"));
+    m_manager->setOsName("haiku");
+    EXPECT_EQ(m_manager->osName(), QString("haiku"));
     EXPECT_EQ(spy.count(), 1);
 }
 

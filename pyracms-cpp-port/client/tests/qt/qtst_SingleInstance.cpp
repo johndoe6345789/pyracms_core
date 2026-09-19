@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QRandomGenerator>
+#include <thread>
 
 #include "services/SingleInstance.h"
 
@@ -53,9 +54,12 @@ void TstSingleInstance::oversizedMessageIsTruncated()
     QVERIFY(primary.listenAsPrimary());
     QSignalSpy got(&primary, &SingleInstance::messageReceived);
     SingleInstance second(key);
-    QTimer::singleShot(
-        0, [&]() { second.sendToPrimary(QString(20000, 'x'), 3000); });
+    // Own thread: macOS/Windows socket buffers are small, so a blocking
+    // sender must not share the thread that drains the primary.
+    std::thread sender(
+        [&]() { second.sendToPrimary(QString(20000, 'x'), 3000); });
     QTRY_COMPARE_WITH_TIMEOUT(got.count(), 1, 5000);
+    sender.join();
     QCOMPARE(got.at(0).at(0).toString().size(),
              SingleInstance::kMaxMessageBytes);
 }

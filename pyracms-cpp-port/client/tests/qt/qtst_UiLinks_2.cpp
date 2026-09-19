@@ -37,9 +37,11 @@ void TstUiLinks::registersUrlSchemeForCurrentUser()
     QSignalSpy note(a.vm, &MainViewModel::notify);
     a.vm->registerUrlScheme();
     QCOMPARE(note.count(), 1);
+#ifdef Q_OS_LINUX // a .desktop entry is only how Linux registers schemes
     QVERIFY(QFileInfo::exists(
         QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
         "/applications/hypernucleus-url.desktop"));
+#endif
 }
 
 void TstUiLinks::loginAndLogoutRefreshCatalog()
