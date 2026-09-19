@@ -1,4 +1,5 @@
 #include "services/MenuService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -16,7 +17,7 @@ void MenuService::deleteMenuItem(const DbClientPtr &db, int id, int scopeTenant,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         id, scopeTenant);
 }

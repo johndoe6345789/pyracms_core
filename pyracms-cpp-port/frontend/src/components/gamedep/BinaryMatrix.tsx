@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { DownloadOutlined } from '@mui/icons-material'
 import type { Binary } from '@/hooks/useGameDepDetail'
+import { safeHref } from '@/lib/safeUrl'
 
 interface BinaryMatrixProps {
   binaries: Binary[]
@@ -37,7 +38,7 @@ export default function BinaryMatrix({ binaries }: BinaryMatrixProps) {
                 <Button
                   size="small"
                   startIcon={<DownloadOutlined />}
-                  href={bin.url}
+                  href={safeHref(bin.url)}
                 >
                   Download
                 </Button>

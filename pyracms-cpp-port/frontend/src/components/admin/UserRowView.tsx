@@ -6,12 +6,14 @@ interface Props {
   user: UserRow
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
+  onEdit?: ((user: UserRow) => void) | undefined
 }
 
 export default function UserRowView({
   user,
   onToggleBan,
   onDelete,
+  onEdit,
 }: Props) {
   return (
     <TableRow hover data-testid={`user-row-${user.id}`}>
@@ -31,6 +33,7 @@ export default function UserRowView({
           user={user}
           onToggleBan={onToggleBan}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       </TableCell>
     </TableRow>

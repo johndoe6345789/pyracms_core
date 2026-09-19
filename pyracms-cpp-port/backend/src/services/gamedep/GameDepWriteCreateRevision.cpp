@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -25,7 +26,7 @@ void GameDepWriteService::createRevision(const GdCtx &c,
                     cb(out);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId, ver, body.get("moduleType", "").asString(),
                 body.get("executable", "").asString());

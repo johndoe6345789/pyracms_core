@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -11,7 +12,7 @@ void ArticleService::publishDueArticles(const DbClientPtr &db,
             cb(true, std::to_string(result.affectedRows()) + " articles published");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         });
 }
 

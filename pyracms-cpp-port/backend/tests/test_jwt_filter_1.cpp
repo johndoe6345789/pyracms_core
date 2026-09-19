@@ -1,5 +1,6 @@
 #include "filters/JwtAuthFilter.h"
 #include "filters/TenantGuard.h"
+#include "jwt_stub.h"
 
 #include <gtest/gtest.h>
 
@@ -13,6 +14,7 @@ struct Outcome {
 
 Outcome run(const drogon::HttpRequestPtr &req) {
     Outcome o;
+    stubAccountState(req->getHeader("Authorization"));
     JwtAuthFilter f;
     f.doFilter(
         req,

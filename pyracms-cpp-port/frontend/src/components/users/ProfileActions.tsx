@@ -4,6 +4,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import { GitHub, Twitter } from '@mui/icons-material'
+import { safeHref } from '@/lib/safeUrl'
 
 interface ProfileActionsProps {
   githubUrl?: string
@@ -26,9 +27,9 @@ export function ProfileActions({
           <IconButton
             size="small"
             component="a"
-            href={githubUrl}
+            href={safeHref(githubUrl)}
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer ugc"
             aria-label="GitHub profile"
             data-testid="github-link"
           >
@@ -41,9 +42,9 @@ export function ProfileActions({
           <IconButton
             size="small"
             component="a"
-            href={twitterUrl}
+            href={safeHref(twitterUrl)}
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer ugc"
             aria-label="Twitter profile"
             data-testid="twitter-link"
           >

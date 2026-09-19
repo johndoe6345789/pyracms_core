@@ -1,4 +1,5 @@
 #include "filters/RoleRules.h"
+#include "services/DbError.h"
 #include "services/gamedep/GdTypes.h"
 
 namespace pyracms {
@@ -26,7 +27,7 @@ void gdWithPage(const GdCtx &c, const std::string &type,
             ok(r[0]["id"].as<int>());
         },
         [fail](const drogon::orm::DrogonDbException &e) {
-            fail(gdDbError(e.base().what()));
+            fail(gdDbError(dbError(e)));
         },
         c.scope, type, name, c.userId);
 }

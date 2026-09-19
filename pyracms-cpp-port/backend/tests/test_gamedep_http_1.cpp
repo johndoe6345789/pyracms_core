@@ -10,12 +10,6 @@ static std::string mkFile(const std::string &sha = "") {
     return uuid;
 }
 
-static Json::Value obj(const std::string &k, const Json::Value &v) {
-    Json::Value j;
-    j[k] = v;
-    return j;
-}
-
 TEST(GameDepHttp, FullGameLifecycleAndCatalogShape) {
     REQUIRE_SERVER();
     auto admin = platformAdmin();
@@ -45,10 +39,8 @@ TEST(GameDepHttp, FullGameLifecycleAndCatalogShape) {
     Json::Value pip;
     pip["pipRequirements"].append("pygame==2.6.1");
     EXPECT_EQ(put(base + "/pip", pip, owner.token).status, 200);
-    EXPECT_EQ(put(base + "/tags", obj("tags", Json::Value(Json::arrayValue)),
-                  owner.token)
-                  .status,
-              200);
+    EXPECT_EQ(put(base + "/tags", J({{"tags", A({"a"})}}), owner.token)
+                  .status, 200);
     Json::Value dep;
     dep["kind"] = "pip";
     dep["name"] = "numpy";

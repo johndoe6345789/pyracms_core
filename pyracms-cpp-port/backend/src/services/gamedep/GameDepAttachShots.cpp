@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -30,7 +31,7 @@ void GameDepAttachService::addScreenshot(
                             cb(out);
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(gdDbError(e.base().what()));
+                            cb(gdDbError(dbError(e)));
                         },
                         pageId, fileId, body.get("default", false).asBool());
                 },
@@ -54,7 +55,7 @@ void GameDepAttachService::removeScreenshot(
                            : gdError(404, "Screenshot not found"));
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 id, pageId);
         },

@@ -1,4 +1,5 @@
 #include "services/gamedep/GdTypes.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -20,7 +21,7 @@ void gdWithRevision(const GdCtx &c, const std::string &type,
                     ok(pageId, r[0]["id"].as<int>());
                 },
                 [fail](const drogon::orm::DrogonDbException &e) {
-                    fail(gdDbError(e.base().what()));
+                    fail(gdDbError(dbError(e)));
                 },
                 pageId, ver);
         },

@@ -7,6 +7,9 @@ import { replace } from '../../helpers/scopeMocks'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock('@/hooks/useAdminGate', () => ({
+  useAdminGate: () => ({ slug: 's', allowed: true, checking: false }),
+}))
 jest.mock('@/components/common/TenantBreadcrumbs', () => () => <i />)
 jest.mock('@/components/common/NotificationBell', () => () => <i />)
 jest.mock('@/components/common/ThemeToggle', () => () => <i />)

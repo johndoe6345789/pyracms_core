@@ -2,26 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { mapUser, type UserRow } from './admin/userRow'
+import { useUserEdit } from './admin/useUserEdit'
 
-export interface UserRow {
-  id: number
-  username: string
-  email: string
-  created: string
-  banned: boolean
-}
-
-function mapUser(u: Record<string, unknown>): UserRow {
-  const created = u.createdAt
-  return {
-    id: u.id as number,
-    username: (u.username as string) || '',
-    email: (u.email as string) || '',
-    created:
-      typeof created === 'string' ? created.split('T')[0] ?? '' : '',
-    banned: (u.banned as boolean) || false,
-  }
-}
+export type { UserRow }
 
 export function useAdminUsers() {
   const [users, setUsers] = useState<UserRow[]>([])
@@ -29,6 +13,7 @@ export function useAdminUsers() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedUser, setSelectedUser] =
     useState<UserRow | null>(null)
+  const edit = useUserEdit(setUsers)
 
   useEffect(() => {
     api.get('/api/users')
@@ -72,6 +57,6 @@ export function useAdminUsers() {
   return {
     users, loading, deleteDialogOpen, selectedUser,
     handleToggleBan, handleDeleteClick,
-    handleDeleteConfirm, handleDeleteCancel,
+    handleDeleteConfirm, handleDeleteCancel, ...edit,
   }
 }

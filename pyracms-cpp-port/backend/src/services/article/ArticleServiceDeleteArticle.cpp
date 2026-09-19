@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 #include "services/CacheService.h"
 #include "services/ElasticsearchService.h"
 
@@ -22,7 +23,7 @@ void ArticleService::deleteArticle(const DbClientPtr &db, int tenantId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name);
 }

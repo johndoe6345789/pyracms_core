@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -16,7 +17,7 @@ void ArticleService::scheduleArticle(const DbClientPtr &db, int articleId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         articleId, scheduledAt);
 }

@@ -1,4 +1,5 @@
 #include "services/UserService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -15,7 +16,7 @@ void UserService::createUser(const DbClientPtr &db, int tenantId,
         "RETURNING id",
         [cb](const drogon::orm::Result &result) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         username, fullName, email, passwordHash, tenantId);
 }

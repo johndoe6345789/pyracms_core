@@ -1,4 +1,5 @@
 #include "services/gamedep/GdTypes.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -19,7 +20,7 @@ void gdFileId(const GdCtx &c, const Json::Value &body,
                 ok(r[0]["id"].as<int>());
         },
         [fail](const drogon::orm::DrogonDbException &e) {
-            fail(gdDbError(e.base().what()));
+            fail(gdDbError(dbError(e)));
         },
         id, uuid);
 }

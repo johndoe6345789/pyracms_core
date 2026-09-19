@@ -1,4 +1,5 @@
 #include "services/TenantService.h"
+#include "services/DbError.h"
 
 #include <algorithm>
 #include <cctype>
@@ -15,7 +16,7 @@ void TenantService::createTenant(const DbClientPtr &db, const std::string &slug,
         "VALUES ($1, $2, $3, $4, NOW()) RETURNING id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         slug, displayName, description, ownerId);
 }

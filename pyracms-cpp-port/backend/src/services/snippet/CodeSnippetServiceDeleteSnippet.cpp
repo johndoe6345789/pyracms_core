@@ -1,4 +1,5 @@
 #include "services/CodeSnippetService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -15,7 +16,7 @@ void CodeSnippetService::deleteSnippet(const DbClientPtr &db, int snippetId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         snippetId, userId);
 }

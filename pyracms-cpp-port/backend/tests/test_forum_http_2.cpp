@@ -37,6 +37,7 @@ TEST(ForumHttp, PostsVotesAndDeletes) {
     EXPECT_EQ(del("/api/forum/threads/" + std::to_string(tid), u).status,
               200);
     EXPECT_EQ(del("/api/forum/forums/" + std::to_string(fid), a).status, 200);
-    EXPECT_EQ(del("/api/forum/categories/" + std::to_string(cid), a).status, 200);
+    EXPECT_EQ(del("/api/forum/categories/" + std::to_string(cid), a).status,
+              200);
     EXPECT_EQ(del("/api/forum/categories/999999", a).status, 404);
 }

@@ -1,4 +1,5 @@
 #include "services/SocialService.h"
+#include "services/DbError.h"
 
 #include <regex>
 #include <memory>
@@ -20,7 +21,7 @@ void SocialService::followUser(const DbClientPtr &db, int followerId, int follow
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         followerId, followedId);
 }
@@ -37,7 +38,7 @@ void SocialService::unfollowUser(const DbClientPtr &db, int followerId, int foll
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         followerId, followedId);
 }
@@ -192,7 +193,7 @@ void SocialService::awardAchievement(const DbClientPtr &db, int userId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId, achievementName);
 }
@@ -238,7 +239,7 @@ void SocialService::checkAndAwardAchievements(const DbClientPtr &db, int userId,
             if (*remaining == 0) cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId);
 }

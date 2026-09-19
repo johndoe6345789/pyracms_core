@@ -9,6 +9,7 @@ interface UserTableProps {
   users: UserRow[]
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
+  onEdit?: ((user: UserRow) => void) | undefined
 }
 
 const HEADS = ['Username', 'Email', 'Created', 'Status']
@@ -17,6 +18,7 @@ export default function UserTable({
   users,
   onToggleBan,
   onDelete,
+  onEdit,
 }: UserTableProps) {
   return (
     <TableContainer
@@ -53,6 +55,7 @@ export default function UserTable({
               user={user}
               onToggleBan={onToggleBan}
               onDelete={onDelete}
+              onEdit={onEdit}
             />
           ))}
         </TableBody>

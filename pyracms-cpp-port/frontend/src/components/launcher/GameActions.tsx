@@ -7,6 +7,7 @@ import {
 } from './gameActionState'
 import PrimaryActionButton from './PrimaryActionButton'
 import VersionSelect from './VersionSelect'
+import { safeHref } from '@/lib/safeUrl'
 
 interface Props {
   slug: string
@@ -29,7 +30,8 @@ export default function GameActions(p: Props) {
   const run = () => {
     const kind = st.isInstalled && !st.needsUpdate ? 'launch' : 'install'
     window.location.href = deepLink(kind, p.slug, p.name)
-    if (bin) window.setTimeout(() => { window.location.href = bin.url }, 1500)
+    const dl = bin && safeHref(bin.url)
+    if (dl) window.setTimeout(() => { window.location.href = dl }, 1500)
     p.onInstalled(chosen)
     setMsg(bin ? MSG_WITH_BINARY : MSG_NO_BINARY)
   }

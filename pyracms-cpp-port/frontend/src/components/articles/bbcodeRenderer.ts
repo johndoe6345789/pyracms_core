@@ -1,4 +1,7 @@
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
+import { safeHref, safeSrc } from '@/lib/safeUrl'
+
+const attr = (v: string) => v.replace(/["'<>]/g, '')
 
 export function renderBBCode(bbcode: string): string {
   let html = bbcode
@@ -16,15 +19,22 @@ export function renderBBCode(bbcode: string): string {
   )
   html = html.replace(
     /\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi,
-    '<a href="$1">$2</a>',
+    (_m, u: string, t: string) =>
+      `<a href="${attr(safeHref(u) ?? '#')}">${t}</a>`,
   )
   html = html.replace(
     /\[url\]([\s\S]*?)\[\/url\]/gi,
-    '<a href="$1">$1</a>',
+    (_m, u: string) =>
+      `<a href="${attr(safeHref(u) ?? '#')}">${attr(u)}</a>`,
   )
   html = html.replace(
     /\[img\]([\s\S]*?)\[\/img\]/gi,
-    '<img src="$1" style="max-width:100%" />',
+    (_m, u: string) => {
+      const src = safeSrc(u)
+      return src
+        ? `<img src="${attr(src)}" style="max-width:100%" />`
+        : ''
+    },
   )
   html = html.replace(
     /\[code\]([\s\S]*?)\[\/code\]/gi,
@@ -60,13 +70,13 @@ export function renderBBCode(bbcode: string): string {
     },
   )
   html = html.replace(
-    /\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi,
+    /\[color=(#?[a-z0-9]{1,20})\]([\s\S]*?)\[\/color\]/gi,
     '<span style="color:$1">$2</span>',
   )
   html = html.replace(
-    /\[size=([^\]]+)\]([\s\S]*?)\[\/size\]/gi,
+    /\[size=(\d{1,3})\]([\s\S]*?)\[\/size\]/gi,
     '<span style="font-size:$1px">$2</span>',
   )
   html = html.replace(/\n/g, '<br />')
-  return DOMPurify.sanitize(html)
+  return sanitizeHtml(html, true)
 }

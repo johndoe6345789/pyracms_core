@@ -19,6 +19,7 @@ void SearchService::search(
     int limit, int offset,
     std::function<void(const SearchResults &)> cb) {
 
+    // GCOVR_EXCL_START (Elasticsearch/Redis glue: needs a live cluster)
     // Delegate to Elasticsearch if configured
     if (useElasticsearch()) {
         // Check Redis cache first
@@ -89,6 +90,7 @@ void SearchService::search(
         ElasticsearchService::instance().search(tenantId, query, type, limit, offset, cb);
         return;
     }
+    // GCOVR_EXCL_STOP
 
     // Fallback: PostgreSQL full-text search
     // Convert user query to tsquery format
@@ -325,6 +327,7 @@ void SearchService::autocomplete(
     const std::string &prefix, int limit,
     std::function<void(const std::vector<AutocompleteItem> &)> cb) {
 
+    // GCOVR_EXCL_START (Elasticsearch/Redis glue: needs a live cluster)
     // Delegate to Elasticsearch if configured
     if (useElasticsearch()) {
         // Check Redis cache
@@ -372,6 +375,7 @@ void SearchService::autocomplete(
         ElasticsearchService::instance().autocomplete(tenantId, prefix, limit, cb);
         return;
     }
+    // GCOVR_EXCL_STOP
 
     // Fallback: PostgreSQL prefix search
     auto likePattern = prefix + "%";

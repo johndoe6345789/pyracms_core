@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 #include "services/gamedep/GdPip.h"
 
 namespace pyracms {
@@ -37,12 +38,12 @@ void GameDepAttachService::setPip(const GdCtx &c, const std::string &type,
                         "FROM jsonb_array_elements($2::text::jsonb) e",
                         [cb](const drogon::orm::Result &) { cb(gdOk()); },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(gdDbError(e.base().what()));
+                            cb(gdDbError(dbError(e)));
                         },
                         pageId, json);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId);
         },

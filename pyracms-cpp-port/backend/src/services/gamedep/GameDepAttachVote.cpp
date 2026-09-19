@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -18,7 +19,7 @@ void GameDepAttachService::vote(const GdCtx &c, const std::string &type,
                 "DO UPDATE SET is_like = $3",
                 [cb](const drogon::orm::Result &) { cb(gdOk()); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId, c.userId, body["isLike"].asBool());
         },

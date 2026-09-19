@@ -1,4 +1,5 @@
 #include "services/ForumService.h"
+#include "services/DbError.h"
 #include "services/forum/ForumServiceInternal.h"
 
 namespace pyracms {
@@ -32,22 +33,22 @@ void ForumService::deleteThread(const DbClientPtr &db, int id, int userId,
                                     cb(true, "");
                                 },
                                 [cb](const drogon::orm::DrogonDbException &e) {
-                                    cb(false, e.base().what());
+                                    cb(false, dbError(e));
                                 },
                                 id);
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(false, e.base().what());
+                            cb(false, dbError(e));
                         },
                         id);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(false, dbError(e));
                 },
                 id);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId, id);
 }

@@ -1,4 +1,5 @@
 #include "services/CodeSnippetService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -30,12 +31,12 @@ void CodeSnippetService::forkSnippet(
                     cb(true, newId, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, 0, e.base().what());
+                    cb(false, 0, dbError(e));
                 },
                 tenantId, userId, title, code, language, snippetId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, 0, e.base().what());
+            cb(false, 0, dbError(e));
         },
         snippetId, userId, tenantId);
 }

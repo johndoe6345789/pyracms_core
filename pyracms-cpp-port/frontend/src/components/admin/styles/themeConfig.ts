@@ -42,6 +42,20 @@ export function exportTheme(theme: ThemeConfig) {
   URL.revokeObjectURL(url)
 }
 
+export const MAX_IMPORT_BYTES = 1024 * 1024
+
+/** Keeps only known theme keys with string values (no proto keys). */
+export function pickTheme(imported: unknown): ThemeConfig {
+  const out: Record<string, unknown> = { ...DEFAULT_THEME }
+  if (imported && typeof imported === 'object') {
+    for (const k of Object.keys(DEFAULT_THEME)) {
+      const v = (imported as Record<string, unknown>)[k]
+      if (typeof v === typeof (DEFAULT_THEME as never)[k]) out[k] = v
+    }
+  }
+  return out as unknown as ThemeConfig
+}
+
 export function importTheme(
   apply: (t: ThemeConfig) => void,
 ) {
@@ -50,12 +64,12 @@ export function importTheme(
   input.accept = '.json'
   input.onchange = (e) => {
     const file = (e.target as HTMLInputElement).files?.[0]
-    if (!file) return
+    if (!file || file.size > MAX_IMPORT_BYTES) return
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {
         const imported = JSON.parse(ev.target?.result as string)
-        apply({ ...DEFAULT_THEME, ...imported })
+        apply(pickTheme(imported))
       } catch {
         console.error('Invalid theme JSON')
       }

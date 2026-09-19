@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -16,7 +17,7 @@ void GameDepWriteService::updatePage(const GdCtx &c,
                 "description END WHERE id = $1",
                 [cb](const drogon::orm::Result &) { cb(gdOk()); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId, body.isMember("displayName"),
                 body.get("displayName", "").asString(),
@@ -36,7 +37,7 @@ void GameDepWriteService::deletePage(const GdCtx &c,
                 "DELETE FROM gamedep_pages WHERE id = $1",
                 [cb](const drogon::orm::Result &) { cb(gdOk()); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId);
         },

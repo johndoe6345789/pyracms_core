@@ -1,4 +1,5 @@
 #include "services/MenuService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -18,7 +19,7 @@ void MenuService::createMenuItem(const DbClientPtr &db, const std::string &name,
             r.affectedRows() ? cb(true, "") : cb(false, "Not found");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         name, routePath, url, type, groupId, position, permissions,
         scopeTenant);

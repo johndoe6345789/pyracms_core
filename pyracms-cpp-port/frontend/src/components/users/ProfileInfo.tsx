@@ -3,6 +3,7 @@ import {
   LocationOnOutlined, LanguageOutlined,
   CalendarTodayOutlined,
 } from '@mui/icons-material'
+import { safeHref } from '@/lib/safeUrl'
 
 const iSx = {
   fontSize: 18, color: 'text.secondary',
@@ -37,8 +38,8 @@ export function ProfileInfo({
       {website && (
         <Box sx={rowSx}>
           <LanguageOutlined sx={iSx} />
-          <MuiLink href={website}
-            target="_blank" rel="noopener"
+          <MuiLink href={safeHref(website)}
+            target="_blank" rel="noopener noreferrer ugc"
             variant="body2"
             data-testid="website-link">
             {website}

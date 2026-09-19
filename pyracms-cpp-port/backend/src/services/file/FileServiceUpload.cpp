@@ -1,4 +1,5 @@
 #include "services/FileService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -29,7 +30,7 @@ void FileService::uploadFile(const DbClientPtr &db,
         "VALUES ($1, $2, $3, $4, $5, $6, 0, $7, NOW()) RETURNING id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         filename, uuid, mimetype, size, isPicture, isVideo, sha256);
 }

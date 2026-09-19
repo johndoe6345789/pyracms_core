@@ -1,4 +1,5 @@
 #include "services/SettingsService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -59,7 +60,7 @@ void SettingsService::createOrUpdateSetting(const DbClientPtr &db,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name, value);
 }
@@ -77,7 +78,7 @@ void SettingsService::deleteSetting(const DbClientPtr &db, int tenantId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name);
 }

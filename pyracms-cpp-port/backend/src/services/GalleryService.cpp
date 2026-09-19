@@ -1,4 +1,5 @@
 #include "services/GalleryService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -66,7 +67,7 @@ void GalleryService::createAlbum(const DbClientPtr &db, int tenantId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, displayName, description, userId);
 }
@@ -122,7 +123,7 @@ void GalleryService::updateAlbum(const DbClientPtr &db, int albumId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         displayName, description, albumId);
 }
@@ -135,7 +136,7 @@ void GalleryService::deleteAlbum(const DbClientPtr &db, int albumId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         albumId);
 }
@@ -155,7 +156,7 @@ void GalleryService::addPicture(const DbClientPtr &db, int albumId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         albumId, displayName, description, fileUuid, userId);
 }
@@ -188,7 +189,7 @@ void GalleryService::updatePicture(const DbClientPtr &db, int pictureId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         displayName, description, pictureId);
 }
@@ -201,7 +202,7 @@ void GalleryService::deletePicture(const DbClientPtr &db, int pictureId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         pictureId);
 }
@@ -215,7 +216,7 @@ void GalleryService::setDefaultPicture(const DbClientPtr &db, int albumId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         pictureId, albumId);
 }
@@ -232,7 +233,7 @@ void GalleryService::votePicture(const DbClientPtr &db, int pictureId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         pictureId, userId, isLike);
 }

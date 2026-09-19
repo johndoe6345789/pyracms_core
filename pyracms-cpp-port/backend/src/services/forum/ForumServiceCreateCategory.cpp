@@ -1,4 +1,5 @@
 #include "services/ForumService.h"
+#include "services/DbError.h"
 #include "services/forum/ForumServiceInternal.h"
 
 namespace pyracms {
@@ -10,7 +11,7 @@ void ForumService::createCategory(const DbClientPtr &db, int tenantId,
         "RETURNING id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         name, tenantId);
 }

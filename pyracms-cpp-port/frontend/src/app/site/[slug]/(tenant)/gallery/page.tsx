@@ -1,26 +1,22 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
-} from '@mui/material'
-import {
-  AddPhotoAlternateOutlined,
-} from '@mui/icons-material'
+import { Container } from '@mui/material'
 import AlbumGrid from '@/components/gallery/AlbumGrid'
-import {
-  useGalleryAlbums,
-} from '@/hooks/useGalleryAlbums'
+import CreateAlbumDialog from '@/components/gallery/CreateAlbumDialog'
+import GalleryHeader from '@/components/gallery/GalleryHeader'
+import { useCreateAlbum } from '@/hooks/useCreateAlbum'
+import { useGalleryAlbums } from '@/hooks/useGalleryAlbums'
+import { useSiteSession } from '@/hooks/useSiteSession'
 import { useTenantId } from '@/hooks/useTenantId'
 
 export default function GalleryPage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
-  const { albums } = useGalleryAlbums(tenantId)
+  const { albums, refresh } = useGalleryAlbums(tenantId)
+  const signedIn = useSiteSession(slug)
+  const create = useCreateAlbum(tenantId, refresh)
 
   return (
     <Container
@@ -28,42 +24,12 @@ export default function GalleryPage() {
       sx={{ py: 6 }}
       data-testid="gallery-page"
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 4,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h3"
-            component="h1"
-            gutterBottom
-          >
-            Gallery
-          </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-          >
-            Browse photo albums and collections.
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={
-            <AddPhotoAlternateOutlined />
-          }
-          size="large"
-          data-testid="create-album-btn"
-          aria-label="Create album"
-        >
-          Create Album
-        </Button>
-      </Box>
+      <GalleryHeader
+        canCreate={signedIn}
+        onCreate={() => create.setOpen(true)}
+      />
       <AlbumGrid albums={albums} slug={slug} />
+      <CreateAlbumDialog s={create} />
     </Container>
   )
 }

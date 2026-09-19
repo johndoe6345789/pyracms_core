@@ -21,6 +21,7 @@ const mapAlbum = (a: Record<string, unknown>): GalleryAlbum => ({
 export function useGalleryAlbums(tenantId: number | null) {
   const [albums, setAlbums] = useState<GalleryAlbum[]>([])
   const [loading, setLoading] = useState(true)
+  const [version, setVersion] = useState(0)
 
   useEffect(() => {
     if (!tenantId) return
@@ -29,7 +30,9 @@ export function useGalleryAlbums(tenantId: number | null) {
       .then(res => setAlbums((res.data || []).map(mapAlbum)))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [tenantId])
+  }, [tenantId, version])
 
-  return { albums, loading }
+  const refresh = () => setVersion((v) => v + 1)
+
+  return { albums, loading, refresh }
 }

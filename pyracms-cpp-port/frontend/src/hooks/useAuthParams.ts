@@ -10,8 +10,15 @@ export function safeRedirect(
   if (!value.startsWith('/') || value.startsWith('//')) {
     return undefined
   }
+  // "/\host" and control chars are read as "//host" by browsers
+  if (value.includes('\\')) return undefined
+  for (const ch of value) {
+    if (ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127) return undefined
+  }
   return value
 }
+
+const SLUG = /^[A-Za-z0-9][A-Za-z0-9_-]{0,62}$/
 
 /**
  * Reads `?tenant=<slug>` and `?redirect=<path>` from the URL. `tenant`
@@ -20,7 +27,8 @@ export function safeRedirect(
  */
 export function useAuthParams(fallbackRedirect?: string) {
   const params = useSearchParams()
-  const tenant = params.get('tenant') || undefined
+  const rawTenant = params.get('tenant') || ''
+  const tenant = SLUG.test(rawTenant) ? rawTenant : undefined
   const redirectTo =
     safeRedirect(params.get('redirect'))
     ?? fallbackRedirect

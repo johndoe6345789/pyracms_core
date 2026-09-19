@@ -12,6 +12,10 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 1 }),
 }))
+let signedIn = false
+jest.mock('@/hooks/useSiteSession', () => ({
+  useSiteSession: () => signedIn,
+}))
 jest.mock('@/hooks/useGalleryAlbums', () => ({
   useGalleryAlbums: () => ({ albums: [{ id: '1', name: 'A',
     coverImage: '/c', pictureCount: 2 }] }),
@@ -38,6 +42,7 @@ describe('gallery pages', () => {
     render(<GalleryPage />)
     expect(screen.getByTestId('gallery-page')).toBeInTheDocument()
     expect(screen.getByTestId('album-card-1')).toBeInTheDocument()
+    expect(screen.queryByTestId('create-album-btn')).toBeNull()
   })
 
   it('shows an album', () => {

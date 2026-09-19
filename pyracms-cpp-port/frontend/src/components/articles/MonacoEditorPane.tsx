@@ -1,7 +1,7 @@
 'use client'
 
 import { Box } from '@mui/material'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
 import Editor, {
   type OnMount,
 } from '@monaco-editor/react'
@@ -58,7 +58,7 @@ export function MonacoEditorPane({
             {value
               ? <HtmlPreviewContent
                   sanitizedHtml={
-                    DOMPurify.sanitize(value)} />
+                    sanitizeHtml(value)} />
               : <EmptyPreview />}
           </EditorPreviewPane>
         </Box>)}

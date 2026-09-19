@@ -1,4 +1,5 @@
 #include "services/NotificationService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -29,7 +30,7 @@ void NotificationService::createNotification(const DbClientPtr &db,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId, type, title, message, link);
 }
@@ -80,7 +81,7 @@ void NotificationService::markRead(const DbClientPtr &db,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         notificationId, userId);
 }
@@ -95,7 +96,7 @@ void NotificationService::markAllRead(const DbClientPtr &db,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId);
 }
@@ -114,7 +115,7 @@ void NotificationService::deleteNotification(const DbClientPtr &db,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         notificationId, userId);
 }

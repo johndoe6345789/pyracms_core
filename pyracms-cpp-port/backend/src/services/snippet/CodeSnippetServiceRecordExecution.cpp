@@ -1,4 +1,5 @@
 #include "services/CodeSnippetService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -18,12 +19,12 @@ void CodeSnippetService::recordExecution(const DbClientPtr &db, int snippetId,
                 "$1",
                 [cb](const drogon::orm::Result &) { cb(true, ""); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(false, dbError(e));
                 },
                 snippetId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         snippetId, userId, output, exitCode, executionTimeMs);
 }

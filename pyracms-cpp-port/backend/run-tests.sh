@@ -5,7 +5,7 @@
 set -e
 export PGOPTIONS='-c client_min_messages=warning'
 export PGPASSWORD="${DB_PASSWORD:-pyracms}"
-H="${DB_HOST:-postgres}"; U="${DB_USER:-pyracms}"; DB=pyracms_test
+H="${DB_HOST:-postgres}"; U="${DB_USER:-pyracms}"; DB="${TEST_DB_NAME:-pyracms_test}"
 until pg_isready -h "$H" -U "$U" -q; do sleep 1; done
 
 psql -h "$H" -U "$U" -d postgres -q \
@@ -26,6 +26,7 @@ STATUS=0
 # cannot exist in the scratch database; only glue around it lives there):
 #  - main.cpp: process bootstrap (listeners, env config, timers).
 #  - ElasticsearchService: HTTP client for an Elasticsearch cluster.
+#    Also the ES branches of SearchService (GCOVR_EXCL_START markers).
 #  - OAuthService: HTTP token/profile exchange with GitHub/Google/Discord.
 #  - EmailService: SMTP delivery.
 #  - CacheService: Redis client.

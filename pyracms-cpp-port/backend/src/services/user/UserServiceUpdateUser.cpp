@@ -1,4 +1,5 @@
 #include "services/UserService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -40,7 +41,7 @@ void UserService::updateUser(const DbClientPtr &db, int id,
     // For simplicity, handle the common case of up to 5 update fields
     auto successCb = [cb](const drogon::orm::Result &) { cb(true, ""); };
     auto errorCb = [cb](const drogon::orm::DrogonDbException &e) {
-        cb(false, e.base().what());
+        cb(false, dbError(e));
     };
 
     // Build parameter string for the ID

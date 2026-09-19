@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -16,7 +17,7 @@ void GameDepWriteService::updateRevision(
                 "executable END WHERE id = $1",
                 [cb](const drogon::orm::Result &) { cb(gdOk()); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 revId, body.get("version", "").asString(),
                 body.isMember("moduleType"),
@@ -37,7 +38,7 @@ void GameDepWriteService::deleteRevision(
                 "DELETE FROM gamedep_revisions WHERE id = $1",
                 [cb](const drogon::orm::Result &) { cb(gdOk()); },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 revId);
         },

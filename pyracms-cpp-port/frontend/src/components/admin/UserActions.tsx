@@ -11,7 +11,7 @@ interface UserActionsProps {
   user: UserRow
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
-  onEdit?: (user: UserRow) => void
+  onEdit?: ((user: UserRow) => void) | undefined
 }
 
 export default function UserActions({

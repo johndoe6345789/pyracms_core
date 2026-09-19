@@ -1,4 +1,5 @@
 #include "services/CommentService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -34,7 +35,7 @@ void CommentService::createComment(const DbClientPtr &db,
                 cb(true, newId, "");
             },
             [cb](const drogon::orm::DrogonDbException &e) {
-                cb(false, 0, e.base().what());
+                cb(false, 0, dbError(e));
             },
             userId, contentType, contentId, body, parentId.value());
     } else {
@@ -46,7 +47,7 @@ void CommentService::createComment(const DbClientPtr &db,
                 cb(true, newId, "");
             },
             [cb](const drogon::orm::DrogonDbException &e) {
-                cb(false, 0, e.base().what());
+                cb(false, 0, dbError(e));
             },
             userId, contentType, contentId, body);
     }
@@ -96,7 +97,7 @@ void CommentService::updateComment(const DbClientPtr &db,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         body, commentId, userId);
 }
@@ -115,7 +116,7 @@ void CommentService::deleteComment(const DbClientPtr &db,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         commentId, userId);
 }
@@ -134,7 +135,7 @@ void CommentService::voteComment(const DbClientPtr &db,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         commentId, userId, isLike);
 }

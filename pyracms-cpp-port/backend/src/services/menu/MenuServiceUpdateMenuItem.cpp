@@ -1,4 +1,5 @@
 #include "services/MenuService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -39,7 +40,7 @@ void MenuService::updateMenuItem(const DbClientPtr &db, int id,
     binder >> [cb](const drogon::orm::Result &r) {
         r.affectedRows() ? cb(true, "") : cb(false, "Not found");
     } >> [cb](const drogon::orm::DrogonDbException &e) {
-        cb(false, e.base().what());
+        cb(false, dbError(e));
     };
 }
 

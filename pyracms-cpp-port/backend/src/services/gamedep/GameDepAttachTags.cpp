@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -30,12 +31,12 @@ void GameDepAttachService::setTags(const GdCtx &c, const std::string &type,
                         "ORDER BY t.o",
                         [cb](const drogon::orm::Result &) { cb(gdOk()); },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(gdDbError(e.base().what()));
+                            cb(gdDbError(dbError(e)));
                         },
                         pageId, json);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId);
         },

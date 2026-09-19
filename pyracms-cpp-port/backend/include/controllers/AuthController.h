@@ -13,14 +13,14 @@ namespace pyracms {
 class AuthController : public drogon::HttpController<AuthController> {
 public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(AuthController::login, "/api/auth/login", drogon::Post);
-    ADD_METHOD_TO(AuthController::registerUser, "/api/auth/register", drogon::Post);
+    ADD_METHOD_TO(AuthController::login, "/api/auth/login", drogon::Post, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(AuthController::registerUser, "/api/auth/register", drogon::Post, "pyracms::RateLimitFilter");
     ADD_METHOD_TO(AuthController::me, "/api/auth/me", drogon::Get, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(AuthController::forgotPassword, "/api/auth/forgot-password", drogon::Post);
-    ADD_METHOD_TO(AuthController::resetPassword, "/api/auth/reset-password", drogon::Post);
-    ADD_METHOD_TO(AuthController::verifyEmail, "/api/auth/verify-email", drogon::Post);
-    ADD_METHOD_TO(AuthController::oauthUrl, "/api/auth/oauth/{provider}/url", drogon::Get);
-    ADD_METHOD_TO(AuthController::oauthCallback, "/api/auth/oauth/{provider}/callback", drogon::Post);
+    ADD_METHOD_TO(AuthController::forgotPassword, "/api/auth/forgot-password", drogon::Post, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(AuthController::resetPassword, "/api/auth/reset-password", drogon::Post, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(AuthController::verifyEmail, "/api/auth/verify-email", drogon::Post, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(AuthController::oauthUrl, "/api/auth/oauth/{provider}/url", drogon::Get, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(AuthController::oauthCallback, "/api/auth/oauth/{provider}/callback", drogon::Post, "pyracms::RateLimitFilter");
     ADD_METHOD_TO(AuthController::oauthUnlink, "/api/auth/oauth/{provider}", drogon::Delete, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(AuthController::oauthProviders, "/api/auth/oauth/providers", drogon::Get, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
@@ -65,8 +65,11 @@ private:
     void registerIn(int tenantId, const std::string &slug,
                     const NewAccount &acct, HttpCb callback);
     void registerDone(int tenantId, const std::string &slug,
-                      const std::string &username, int count,
+                      const std::string &username, bool firstUser,
                       HttpCb callback);
+    void finishLogin(const drogon::orm::DbClientPtr &db, int tenantId,
+                     const std::string &slug, const std::string &username,
+                     HttpCb callback);
     void applyReset(int userId, const std::string &token,
                     const std::string &password, HttpCb callback);
     // OAuth callback steps (see AuthControllerOauth*.cpp)

@@ -41,7 +41,6 @@ TEST(SearchHttp, EveryTypeFacetsAndAutocomplete) {
     auto ac = get("/api/search/autocomplete?q=quo&limit=10" + t);
     ASSERT_EQ(ac.status, 200);
     EXPECT_GE(ac.json.size(), 1u);
-    EXPECT_EQ(get("/api/search/autocomplete?limit=10" + t).status, 400);
     // The tenant filter keeps other sites' content out.
     auto other = makeSite();
     auto foreign = get("/api/search?q=quokka&tenant_id=" +

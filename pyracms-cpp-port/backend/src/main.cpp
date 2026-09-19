@@ -1,10 +1,22 @@
 #include <drogon/drogon.h>
 #include <iostream>
+#include "security/HttpSecurity.h"
+#include "security/SecurityConfig.h"
 #include "services/ArticleService.h"
 #include "services/CacheService.h"
 #include "services/ElasticsearchService.h"
 
 int main() {
+    // Refuse to run in production without a strong JWT_SECRET.
+    auto secErr = pyracms::startupSecurityError();
+    if (!secErr.empty()) {
+        std::cerr << "FATAL: " << secErr << " (PYRACMS_ENV=production)"
+                  << std::endl;
+        return 1;
+    }
+    if (!std::getenv("JWT_SECRET"))
+        std::cerr << "WARNING: JWT_SECRET not set; using a random "
+                     "per-process secret (dev only)" << std::endl;
     // Load config from json file if it exists, otherwise use defaults
     auto &app = drogon::app();
 
@@ -17,33 +29,8 @@ int main() {
                     port_str ? std::stoi(port_str) : 8080);
     app.setThreadNum(std::thread::hardware_concurrency());
 
-    // Enable CORS for frontend
-    // Use sync advice (fires before routing) to handle OPTIONS preflight
-    app.registerSyncAdvice(
-        [](const drogon::HttpRequestPtr &req) -> drogon::HttpResponsePtr {
-            if (req->method() == drogon::Options) {
-                auto resp = drogon::HttpResponse::newHttpResponse();
-                resp->setStatusCode(drogon::k204NoContent);
-                resp->addHeader("Access-Control-Allow-Origin", "*");
-                resp->addHeader("Access-Control-Allow-Methods",
-                                "GET, POST, PUT, DELETE, OPTIONS");
-                resp->addHeader("Access-Control-Allow-Headers",
-                                "Content-Type, Authorization");
-                resp->addHeader("Access-Control-Max-Age", "86400");
-                return resp;
-            }
-            return {};
-        });
-    // Add CORS headers to all responses
-    app.registerPostHandlingAdvice(
-        [](const drogon::HttpRequestPtr &req,
-           const drogon::HttpResponsePtr &resp) {
-            resp->addHeader("Access-Control-Allow-Origin", "*");
-            resp->addHeader("Access-Control-Allow-Methods",
-                            "GET, POST, PUT, DELETE, OPTIONS");
-            resp->addHeader("Access-Control-Allow-Headers",
-                            "Content-Type, Authorization");
-        });
+    // CORS, security headers, body limits, generic error handler
+    pyracms::installHttpSecurity(app);
 
     // PostgreSQL database client
     const char *db_host = std::getenv("DB_HOST");

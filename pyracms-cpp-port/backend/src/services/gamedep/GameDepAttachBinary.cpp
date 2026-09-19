@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -28,7 +29,7 @@ void GameDepAttachService::addBinary(
                             cb(out);
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(gdDbError(e.base().what()));
+                            cb(gdDbError(dbError(e)));
                         },
                         revId, fileId, body.get("sha256", "").asString(),
                         body.get("executable", "").asString(),
@@ -56,7 +57,7 @@ void GameDepAttachService::deleteBinary(
                                         : gdError(404, "Binary not found"));
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 id, revId);
         },

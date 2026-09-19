@@ -8,7 +8,7 @@ namespace pyracms {
 class FileController : public drogon::HttpController<FileController> {
 public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(FileController::upload, "/api/files", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(FileController::upload, "/api/files", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::RateLimitFilter");
     ADD_METHOD_TO(FileController::download, "/api/files/{uuid}", drogon::Get);
     ADD_METHOD_TO(FileController::thumbnail, "/api/files/{uuid}/thumbnail", drogon::Get);
     ADD_METHOD_TO(FileController::remove, "/api/files/{uuid}", drogon::Delete, "pyracms::JwtAuthFilter");

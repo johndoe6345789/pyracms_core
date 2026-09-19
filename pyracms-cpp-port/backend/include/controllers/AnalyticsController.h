@@ -12,7 +12,7 @@ public:
     ADD_METHOD_TO(AnalyticsController::getTopContent, "/api/analytics/top-content", drogon::Get, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(AnalyticsController::getTrafficSources, "/api/analytics/traffic-sources", drogon::Get, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(AnalyticsController::getSearchQueries, "/api/analytics/search-queries", drogon::Get, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(AnalyticsController::trackPageView, "/api/analytics/track", drogon::Post);
+    ADD_METHOD_TO(AnalyticsController::trackPageView, "/api/analytics/track", drogon::Post, "pyracms::RateLimitFilter");
     METHOD_LIST_END
 
     void getPageViews(const drogon::HttpRequestPtr &req,

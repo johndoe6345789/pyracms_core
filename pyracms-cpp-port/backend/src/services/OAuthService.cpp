@@ -1,4 +1,5 @@
 #include "services/OAuthService.h"
+#include "services/DbError.h"
 
 #include <curl/curl.h>
 #include <json/json.h>
@@ -227,7 +228,7 @@ void OAuthService::linkAccount(const DbClientPtr &db, int userId,
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId, provider, info.providerId, accessToken,
         info.email, info.displayName, info.avatarUrl);
@@ -266,7 +267,7 @@ void OAuthService::unlinkProvider(const DbClientPtr &db, int userId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         userId, provider);
 }

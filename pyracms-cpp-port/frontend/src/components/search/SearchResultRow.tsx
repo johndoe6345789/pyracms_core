@@ -13,6 +13,7 @@ import {
   TYPE_ICONS,
 } from './SearchResultTitle'
 import { highlightMatch } from './highlightMatch'
+import { safeHref } from '@/lib/safeUrl'
 
 interface SearchResultRowProps {
   index: number
@@ -30,7 +31,7 @@ export function SearchResultRow({
   return (
     <ListItem
       component="a"
-      href={result.url}
+      href={safeHref(result.url) ?? '#'}
       data-testid={`search-result-${index}`}
       divider={!last}
       sx={{ alignItems: 'flex-start', gap: 1, px: 0, py: 2 }}

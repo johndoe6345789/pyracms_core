@@ -1,4 +1,5 @@
 #include "services/ForumService.h"
+#include "services/DbError.h"
 #include "services/forum/ForumServiceInternal.h"
 
 namespace pyracms {
@@ -36,17 +37,17 @@ void ForumService::createPost(const DbClientPtr &db, int threadId,
                             cb(postId, "");
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(0, e.base().what());
+                            cb(0, dbError(e));
                         },
                         threadId);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(0, e.base().what());
+                    cb(0, dbError(e));
                 },
                 threadId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(0, e.base().what());
+            cb(0, dbError(e));
         },
         title, content, threadId, userId);
 }

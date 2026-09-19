@@ -10,7 +10,7 @@ public:
     METHOD_LIST_BEGIN
     ADD_METHOD_TO(TenantController::list, "/api/tenants", drogon::Get);
     ADD_METHOD_TO(TenantController::getBySlug, "/api/tenants/{slug}", drogon::Get);
-    ADD_METHOD_TO(TenantController::create, "/api/tenants", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(TenantController::create, "/api/tenants", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::RateLimitFilter");
     ADD_METHOD_TO(TenantController::remove, "/api/tenants/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 

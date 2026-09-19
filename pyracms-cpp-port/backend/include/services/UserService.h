@@ -43,6 +43,18 @@ public:
                     const std::string &passwordHash,
                     BoolCallback cb);
 
+    using RegisterCallback = std::function<void(
+        bool success, const std::string &error, bool firstUser)>;
+
+    // Atomic sign-up: inserts the account and, if it is the first of its
+    // scope, makes it the owner (race free). `attempt` starts at 0.
+    void registerAccount(const DbClientPtr &db, int tenantId,
+                         const std::string &username,
+                         const std::string &fullName,
+                         const std::string &email,
+                         const std::string &passwordHash, int attempt,
+                         RegisterCallback cb);
+
     void findByUsername(const DbClientPtr &db,
                        int tenantId,
                        const std::string &username,

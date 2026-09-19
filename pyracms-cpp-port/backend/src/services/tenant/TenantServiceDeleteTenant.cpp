@@ -1,4 +1,5 @@
 #include "services/TenantService.h"
+#include "services/DbError.h"
 
 #include <algorithm>
 #include <cctype>
@@ -16,7 +17,7 @@ void TenantService::deleteTenant(const DbClientPtr &db, int id,
             r.affectedRows() ? cb(true, "") : cb(false, "Not found");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         id, actingUserId);
 }

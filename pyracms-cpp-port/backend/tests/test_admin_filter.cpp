@@ -1,12 +1,12 @@
 #include "controllers/BoolReply.h"
 #include "filters/AdminFilter.h"
 #include "filters/Viewer.h"
+#include "role_lookup_restore.h"
 #include "services/AuthService.h"
 
 #include <gtest/gtest.h>
 
 using namespace pyracms;
-
 namespace {
 struct Outcome {
     bool passed{false};
@@ -14,12 +14,7 @@ struct Outcome {
 };
 
 Outcome run(std::optional<int> role, bool authed = true) {
-    // Restore the real DB lookup afterwards: HTTP tests share the process.
-    auto saved = AdminFilter::roleLookup();
-    struct Restore {
-        AdminFilter::RoleLookup keep;
-        ~Restore() { AdminFilter::roleLookup() = keep; }
-    } restore{saved};
+    RoleLookupRestore restore{AdminFilter::roleLookup()};
     AdminFilter::roleLookup() =
         [role](int, std::function<void(std::optional<int>)> cb) { cb(role); };
     auto req = drogon::HttpRequest::newHttpRequest();

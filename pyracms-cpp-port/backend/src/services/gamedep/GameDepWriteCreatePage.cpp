@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 #include <regex>
 
 namespace pyracms {
@@ -23,7 +24,7 @@ void GameDepWriteService::createPage(const GdCtx &c,
             cb(out);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(gdDbError(e.base().what()));
+            cb(gdDbError(dbError(e)));
         },
         type, name, display, body.get("description", "").asString(),
         c.userId, c.scope);

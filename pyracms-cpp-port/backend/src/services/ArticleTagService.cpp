@@ -1,4 +1,5 @@
 #include "services/ArticleTagService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -25,7 +26,7 @@ void ArticleTagService::listTagCloud(
             cb(tags);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "listTagCloud error: " << e.base().what();
+            LOG_ERROR << "listTagCloud error: " << dbError(e);
             cb({});
         },
         tenantId);

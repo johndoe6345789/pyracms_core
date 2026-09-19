@@ -1,4 +1,5 @@
 #include "services/ForumService.h"
+#include "services/DbError.h"
 #include "services/forum/ForumServiceInternal.h"
 
 namespace pyracms {
@@ -12,7 +13,7 @@ void ForumService::deleteCategory(const DbClientPtr &db, int id,
             r.affectedRows() ? cb(true, "") : cb(false, "Not found");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         id, scopeTenant);
 }

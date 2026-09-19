@@ -1,4 +1,5 @@
 #include "services/WebhookService.h"
+#include "services/DbError.h"
 
 #include <drogon/HttpClient.h>
 #include <openssl/hmac.h>
@@ -78,7 +79,7 @@ void WebhookService::createWebhook(
             cb(true, newId, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, 0, e.base().what());
+            cb(false, 0, dbError(e));
         },
         tenantId, url, eventsArray, secret);
 }
@@ -109,7 +110,7 @@ void WebhookService::updateWebhook(
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         url, eventsArray, secret, active, webhookId);
 }
@@ -126,7 +127,7 @@ void WebhookService::deleteWebhook(const DbClientPtr &db, int webhookId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         webhookId);
 }
@@ -212,11 +213,19 @@ void WebhookService::deliverWebhook(
     Json::StreamWriterBuilder writer;
     std::string payloadStr = Json::writeString(writer, payload);
 
-    auto httpClient = drogon::HttpClient::newHttpClient(webhook.url);
+    // HttpClient wants the origin; the URL's path/query goes on the request.
+    auto hostStart = webhook.url.find("://");
+    auto pathStart = webhook.url.find(
+        '/', hostStart == std::string::npos ? 0 : hostStart + 3);
+    auto origin = webhook.url.substr(0, pathStart);
+    auto path = pathStart == std::string::npos ? std::string("/")
+                                               : webhook.url.substr(pathStart);
+    auto httpClient = drogon::HttpClient::newHttpClient(origin);
     httpClient->setSockOptCallback([](int) {});
 
     auto httpReq = drogon::HttpRequest::newHttpJsonRequest(payload);
     httpReq->setMethod(drogon::Post);
+    httpReq->setPath(path);
     httpReq->addHeader("Content-Type", "application/json");
     httpReq->addHeader("X-Webhook-Event", event);
 

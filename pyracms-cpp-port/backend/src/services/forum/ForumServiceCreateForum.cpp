@@ -1,4 +1,5 @@
 #include "services/ForumService.h"
+#include "services/DbError.h"
 #include "services/forum/ForumServiceInternal.h"
 
 namespace pyracms {
@@ -17,7 +18,7 @@ void ForumService::createForum(const DbClientPtr &db, int categoryId,
             r.affectedRows() ? cb(true, "") : cb(false, "Not found");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         name, description, categoryId, scopeTenant);
 }

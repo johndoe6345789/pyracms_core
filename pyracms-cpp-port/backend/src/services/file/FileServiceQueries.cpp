@@ -1,4 +1,5 @@
 #include "services/FileService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -22,7 +23,7 @@ void FileService::deleteFile(const DbClientPtr &db, const std::string &uuid,
         "DELETE FROM files WHERE uuid = $1",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         uuid);
 }
@@ -51,7 +52,7 @@ void FileService::incrementDownloadCount(const DbClientPtr &db,
         "WHERE uuid = $1",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         uuid);
 }

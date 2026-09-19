@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -19,7 +20,7 @@ static void lookup(const GdCtx &c, const char *table, GdCb cb) {
             cb(out);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(gdDbError(e.base().what()));
+            cb(gdDbError(dbError(e)));
         });
 }
 

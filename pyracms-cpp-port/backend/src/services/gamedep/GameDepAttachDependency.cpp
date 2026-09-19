@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -9,7 +10,7 @@ static void addPip(const GdCtx &c, int pageId, const std::string &n,
         "VALUES ($1, 'pip', $2, $3)",
         [cb](const drogon::orm::Result &) { cb(gdOk(201)); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(gdDbError(e.base().what()));
+            cb(gdDbError(dbError(e)));
         },
         pageId, n, v);
 }
@@ -41,7 +42,7 @@ void GameDepAttachService::addDependency(
                            : gdError(404, "Dependency not found"));
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 pageId, c.scope, body.get("depRevisionId", 0).asInt(), dn,
                 dv);
@@ -64,7 +65,7 @@ void GameDepAttachService::removeDependency(
                            : gdError(404, "Dependency not found"));
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 id, pageId);
         },

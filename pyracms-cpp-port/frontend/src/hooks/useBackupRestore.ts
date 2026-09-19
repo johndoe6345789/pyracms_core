@@ -52,6 +52,11 @@ export function useBackupRestore() {
   ) => {
     const file = e.target.files?.[0]
     if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      notify('File is too large to import.', 'warning')
+      e.target.value = ''
+      return
+    }
     const reader = new FileReader()
     reader.onload = (event) => {
       try {

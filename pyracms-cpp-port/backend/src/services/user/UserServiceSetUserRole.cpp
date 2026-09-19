@@ -1,4 +1,5 @@
 #include "services/UserService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -15,7 +16,7 @@ void UserService::setUserRole(const DbClientPtr &db, int userId, UserRole role,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         roleInt, userId);
 }

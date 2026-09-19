@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -22,7 +23,7 @@ void ArticleService::listArticles(const DbClientPtr &db, int tenantId,
             cb(articles);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "listArticles error: " << e.base().what();
+            LOG_ERROR << "listArticles error: " << dbError(e);
             cb({});
         },
         tenantId);

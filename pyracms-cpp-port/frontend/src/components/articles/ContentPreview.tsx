@@ -6,7 +6,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface ContentPreviewProps {
   content: string
@@ -34,7 +34,7 @@ export function ContentPreview({
 }: ContentPreviewProps) {
   // Sanitized via DOMPurify before rendering
   const sanitized =
-    DOMPurify.sanitize(content)
+    sanitizeHtml(content)
 
   return (
     <Paper

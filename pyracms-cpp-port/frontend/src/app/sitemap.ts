@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const articles = await res.json()
       for (const article of articles) {
         entries.push({
-          url: `${SITE()}/site/default/articles/${article.name}`,
+          url: `${SITE()}/site/default/articles/${encodeURIComponent(article.name)}`,
           lastModified: new Date(article.createdAt),
           changeFrequency: 'weekly',
           priority: 0.8,

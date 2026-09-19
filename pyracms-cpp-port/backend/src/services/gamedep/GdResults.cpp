@@ -17,7 +17,7 @@ GdResult gdOk(int status) {
 }
 
 GdResult gdDbError(const std::string &what) {
-    bool dup = what.find("duplicate key") != std::string::npos;
+    bool dup = what == "Already exists";
     return gdError(dup ? 409 : 400, dup ? "Already exists" : what);
 }
 

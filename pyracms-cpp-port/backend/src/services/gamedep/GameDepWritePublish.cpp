@@ -1,4 +1,5 @@
 #include "services/GameDepService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -17,7 +18,7 @@ void GameDepWriteService::togglePublish(
                     cb(out);
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(gdDbError(e.base().what()));
+                    cb(gdDbError(dbError(e)));
                 },
                 revId);
         },
@@ -40,7 +41,7 @@ void GameDepWriteService::uploadSource(
                             cb(gdOk());
                         },
                         [cb](const drogon::orm::DrogonDbException &e) {
-                            cb(gdDbError(e.base().what()));
+                            cb(gdDbError(dbError(e)));
                         },
                         fileId, revId);
                 },

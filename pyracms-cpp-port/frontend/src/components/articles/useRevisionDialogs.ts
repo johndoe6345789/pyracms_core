@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Revision } from '@/hooks/useRevisions'
 import api from '@/lib/api'
 
@@ -18,7 +18,7 @@ export function useRevisionDialogs(
     const url = `/api/articles/${articleName}`
       + `/revisions/${rev.number}?tenant_id=${tenantId}`
     api.get(url).then((res) => {
-      setContent(DOMPurify.sanitize(res.data.content || ''))
+      setContent(sanitizeHtml(res.data.content || ''))
       setViewRev(rev)
       setDlgOpen(true)
     }).catch(() => {})

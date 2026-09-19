@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -48,7 +49,7 @@ void ArticleService::setTags(const DbClientPtr &db, int articleId,
                         (*remaining)--;
                         if (!*failed) {
                             *failed = true;
-                            *errorMsg = e.base().what();
+                            *errorMsg = dbError(e);
                         }
                         if (*remaining == 0) {
                             cb(false, *errorMsg);
@@ -58,7 +59,7 @@ void ArticleService::setTags(const DbClientPtr &db, int articleId,
             }
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         articleId);
 }

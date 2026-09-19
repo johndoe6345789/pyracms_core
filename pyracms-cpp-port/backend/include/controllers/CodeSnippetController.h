@@ -14,7 +14,7 @@ public:
     ADD_METHOD_TO(CodeSnippetController::getSnippet, "/api/snippets/{id}", drogon::Get);
     ADD_METHOD_TO(CodeSnippetController::updateSnippet, "/api/snippets/{id}", drogon::Put, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(CodeSnippetController::deleteSnippet, "/api/snippets/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(CodeSnippetController::runSnippet, "/api/snippets/{id}/run", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(CodeSnippetController::runSnippet, "/api/snippets/{id}/run", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::RateLimitFilter");
     ADD_METHOD_TO(CodeSnippetController::forkSnippet, "/api/snippets/{id}/fork", drogon::Post, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 

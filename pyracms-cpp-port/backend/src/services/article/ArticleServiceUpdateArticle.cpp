@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -25,12 +26,12 @@ void ArticleService::updateArticle(const DbClientPtr &db, int tenantId,
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(false, dbError(e));
                 },
                 articleId, content, summary, userId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name);
 }

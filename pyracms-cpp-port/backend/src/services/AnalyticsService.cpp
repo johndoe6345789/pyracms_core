@@ -1,4 +1,5 @@
 #include "services/AnalyticsService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -15,7 +16,7 @@ void AnalyticsService::trackPageView(
             cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, path, referrer, userAgent, ipHash);
 }
@@ -168,7 +169,7 @@ void AnalyticsService::recordSearchQuery(
                 cb(true, "");
             },
             [cb](const drogon::orm::DrogonDbException &e) {
-                cb(false, e.base().what());
+                cb(false, dbError(e));
             },
             tenantId, query, resultCount, userId);
     } else {
@@ -179,7 +180,7 @@ void AnalyticsService::recordSearchQuery(
                 cb(true, "");
             },
             [cb](const drogon::orm::DrogonDbException &e) {
-                cb(false, e.base().what());
+                cb(false, dbError(e));
             },
             tenantId, query, resultCount);
     }

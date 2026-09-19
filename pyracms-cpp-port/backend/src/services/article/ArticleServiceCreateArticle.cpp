@@ -1,4 +1,5 @@
 #include "services/ArticleService.h"
+#include "services/DbError.h"
 #include "services/CacheService.h"
 #include "services/ElasticsearchService.h"
 
@@ -34,12 +35,12 @@ void ArticleService::createArticle(const DbClientPtr &db, int tenantId,
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {
-                    cb(false, e.base().what());
+                    cb(false, dbError(e));
                 },
                 articleId, content, userId);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name, displayName, userId, renderer);
 }

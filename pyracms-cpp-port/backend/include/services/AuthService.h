@@ -11,6 +11,7 @@ struct TokenPayload {
     std::string username;
     std::string role;
     int tenantId{0}; // 0 = platform account
+    long long issuedAt{0}; // epoch seconds
 };
 
 class AuthService {
@@ -28,6 +29,12 @@ public:
 
     // Token management
     std::string generateRandomToken();
+
+    // Password limit: PBKDF2 cost grows with input length.
+    static constexpr size_t kMaxPasswordLen = 256;
+
+    // Spend one hash-verify of time (login for an unknown account).
+    void burnPasswordCheck(const std::string &password);
 
 private:
     std::string jwtSecret_;

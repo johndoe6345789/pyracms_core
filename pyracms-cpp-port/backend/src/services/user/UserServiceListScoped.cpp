@@ -1,4 +1,5 @@
 #include "services/UserService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -20,7 +21,7 @@ void UserService::listUsersScoped(const DbClientPtr &db, int scope,
             cb(users);
         },
         [cb](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "listUsersScoped: " << e.base().what();
+            LOG_ERROR << "listUsersScoped: " << dbError(e);
             cb({});
         },
         scope,

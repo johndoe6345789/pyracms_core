@@ -1,4 +1,5 @@
 #include "services/MenuService.h"
+#include "services/DbError.h"
 
 namespace pyracms {
 
@@ -9,7 +10,7 @@ void MenuService::createMenuGroup(const DbClientPtr &db, int tenantId,
         "id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
-            cb(false, e.base().what());
+            cb(false, dbError(e));
         },
         tenantId, name);
 }

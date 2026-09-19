@@ -1,5 +1,5 @@
 import { Typography, Box, Paper, Divider } from '@mui/material'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 export default function TemplatePreview({
   section,
@@ -29,7 +29,7 @@ export default function TemplatePreview({
       <Box
         data-testid="template-preview-body"
         dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(html),
+          __html: sanitizeHtml(html),
         }}
         sx={{
           fontFamily: 'sans-serif',

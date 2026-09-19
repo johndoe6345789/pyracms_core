@@ -1,4 +1,5 @@
 #include "services/gamedep/GdQuery.h"
+#include "services/DbError.h"
 #include "services/gamedep/GdSql.h"
 
 namespace pyracms {
@@ -33,7 +34,7 @@ void gdQueryPages(const GdCtx &c, const GdPageFilter &f,
             ok(out);
         },
         [fail](const drogon::orm::DrogonDbException &e) {
-            fail(gdDbError(e.base().what()));
+            fail(gdDbError(dbError(e)));
         },
         c.scope, c.base, c.userId, f.type, f.name, f.q, f.tag);
 }

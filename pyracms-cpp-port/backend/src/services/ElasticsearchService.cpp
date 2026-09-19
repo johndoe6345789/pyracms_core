@@ -1,4 +1,5 @@
 #include "services/ElasticsearchService.h"
+#include "services/DbError.h"
 
 #include <curl/curl.h>
 #include <json/json.h>
@@ -347,7 +348,7 @@ void ElasticsearchService::syncFromDatabase(const DbClientPtr &db, int tenantId)
             LOG_INFO << "Synced " << result.size() << " articles to Elasticsearch";
         },
         [](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "ES sync articles failed: " << e.base().what();
+            LOG_ERROR << "ES sync articles failed: " << dbError(e);
         },
         tenantId);
 
@@ -370,7 +371,7 @@ void ElasticsearchService::syncFromDatabase(const DbClientPtr &db, int tenantId)
             LOG_INFO << "Synced " << result.size() << " forum posts to Elasticsearch";
         },
         [](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "ES sync forum posts failed: " << e.base().what();
+            LOG_ERROR << "ES sync forum posts failed: " << dbError(e);
         },
         tenantId);
 
@@ -389,7 +390,7 @@ void ElasticsearchService::syncFromDatabase(const DbClientPtr &db, int tenantId)
             LOG_INFO << "Synced " << result.size() << " gamedeps to Elasticsearch";
         },
         [](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << "ES sync gamedeps failed: " << e.base().what();
+            LOG_ERROR << "ES sync gamedeps failed: " << dbError(e);
         },
         tenantId);
 }
