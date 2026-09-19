@@ -330,9 +330,8 @@ jobs:
       matrix:
         include:
           - { runner: windows-2022,     hn_os: win, arch: x86_64, experimental: false }
-          # pygame 2.6.1 publishes no win_arm64 wheel, so pip would compile SDL from source and probably fail.
-          # pyglet-only games should still build; keep the entry, allow failure.
-          - { runner: windows-11-arm,   hn_os: win, arch: arm64,  experimental: true }
+          # pygame-ce (drop-in `import pygame`) ships win_arm64 wheels; upstream pygame does not.
+          - { runner: windows-11-arm,   hn_os: win, arch: arm64,  experimental: false }
           - { runner: macos-15-intel,   hn_os: mac, arch: x86_64, experimental: false }
           - { runner: macos-14,         hn_os: mac, arch: arm64,  experimental: false }
           - { runner: ubuntu-24.04,     hn_os: lin, arch: x86_64, experimental: false }

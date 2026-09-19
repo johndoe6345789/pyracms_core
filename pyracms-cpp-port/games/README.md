@@ -54,7 +54,7 @@ above, then does this for windows/macos/linux on x86_64 and arm64 and uploads
 ```json
 { "name": "snake", "displayName": "Snake", "description": "...", "version": "1.0.0",
   "engine": "pygame", "tags": ["arcade"], "entry": "main.py", "moduleType": "python",
-  "pipRequirements": ["pygame==2.6.1"], "dependencies": [] }
+  "pipRequirements": ["pygame-ce==2.5.8"], "dependencies": [] }
 ```
 
 * `pipRequirements` - dependencies resolved from PyPI first (pinned; every game declares its engine here).
