@@ -19,3 +19,4 @@ using HttpStr = const std::string &;
 #define PYR_ADMIN "pyracms::AdminFilter"
 #define PYR_OWNER "pyracms::OwnerFilter"
 #define PYR_RATE "pyracms::RateLimitFilter"
+#define PYR_AUDIT "pyracms::AuditScopeFilter"

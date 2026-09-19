@@ -1,6 +1,8 @@
 'use client'
 
-import { Box, Typography } from '@mui/material'
+import NextLink from 'next/link'
+import { useParams } from 'next/navigation'
+import { Box, Typography, Link } from '@mui/material'
 import type { Comment } from './types'
 import { timeAgo } from './types'
 
@@ -9,8 +11,9 @@ export default function CommentHeader({
 }: {
   comment: Comment
 }) {
+  const slug = useParams()?.slug as string | undefined
   const edited =
-    comment.updated_at !== comment.created_at
+    comment.updatedAt !== comment.createdAt
   return (
     <Box
       sx={{
@@ -20,17 +23,20 @@ export default function CommentHeader({
         mb: 0.5,
       }}
     >
-      <Typography
-        variant="body2"
-        fontWeight={600}
-      >
-        {comment.username}
+      <Typography variant="body2" fontWeight={600}>
+        {slug ? (
+          <Link component={NextLink} color="inherit" underline="hover"
+            href={`/site/${slug}/users/${comment.username}`}
+            data-testid="comment-author-link">
+            {comment.username}
+          </Link>
+        ) : comment.username}
       </Typography>
       <Typography
         variant="caption"
         color="text.secondary"
       >
-        {timeAgo(comment.created_at)}
+        {timeAgo(comment.createdAt)}
       </Typography>
       {edited && (
         <Typography

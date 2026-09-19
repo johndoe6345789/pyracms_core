@@ -3,6 +3,8 @@
 import { Box } from '@mui/material'
 import PortalShell from
   '@/components/layout/PortalShell'
+import SiteFooter from
+  '@/components/layout/SiteFooter'
 import HeroSection from
   '@/components/portal/HeroSection'
 import TenantGrid from
@@ -29,6 +31,7 @@ export default function PortalPage() {
         sites={sites}
         loading={loading}
       />
+      <SiteFooter />
     </Box>
   )
 }

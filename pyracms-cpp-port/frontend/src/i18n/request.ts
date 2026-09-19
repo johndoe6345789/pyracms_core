@@ -1,11 +1,11 @@
+import { cookies } from 'next/headers'
 import { getRequestConfig } from 'next-intl/server'
-import { routing } from './routing'
+import { LOCALE_COOKIE, resolveLocale } from './config'
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale
-  if (!locale || !routing.locales.includes(locale as any)) {
-    locale = routing.defaultLocale
-  }
+// No [locale] route segments: the language lives in a cookie that the
+// LanguageSelect in the top bar sets.
+export default getRequestConfig(async () => {
+  const locale = resolveLocale((await cookies()).get(LOCALE_COOKIE)?.value)
   return {
     locale,
     messages: (await import(`./messages/${locale}.json`)).default,

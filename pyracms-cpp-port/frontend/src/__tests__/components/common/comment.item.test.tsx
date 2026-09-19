@@ -16,21 +16,24 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, user_id: 1, username: 'bob', avatar: null,
-  content: 'hello', parent_id: null, upvotes: 0, downvotes: 0,
-  user_vote: 1, created_at: 'x', updated_at: 'x', children: [] }
+const c: Comment = { id: 5, userId: 1, username: 'bob',
+  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
+  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
 type U = ReturnType<typeof makeUser> | null
 const show = (u: U = makeUser(), depth = 1) => renderWithStore(
   <CommentItem comment={c} contentType="a" contentId={2} depth={depth}
     onRefresh={refresh} />, u ?? undefined)
 
 describe('CommentItem', () => {
-  it('votes (toggling an existing vote off)', async () => {
+  it('votes like and dislike', async () => {
     show()
     fireEvent.click(screen.getByTestId('comment-upvote-btn'))
     await waitFor(() => expect(m.post).toHaveBeenCalledWith(
-      '/api/comments/5/vote', { value: 0 }))
+      '/api/comments/5/vote', { isLike: true }))
     expect(refresh).toHaveBeenCalled()
+    fireEvent.click(screen.getByTestId('comment-downvote-btn'))
+    await waitFor(() => expect(m.post).toHaveBeenLastCalledWith(
+      '/api/comments/5/vote', { isLike: false }))
   })
 
   it('ignores votes from guests', () => {

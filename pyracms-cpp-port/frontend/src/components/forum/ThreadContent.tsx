@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Divider } from '@mui/material'
 import type { useThread } from '@/hooks/useThread'
 import { useThreadLive } from '@/hooks/useThreadLive'
@@ -9,16 +9,20 @@ import { PostList } from './PostList'
 import { ThreadHeader } from './ThreadHeader'
 import { TypingIndicator } from './TypingIndicator'
 import { QuickReplyForm } from './QuickReplyForm'
-import { ThreadActions } from './ThreadActions'
+import { useTypingSender } from './useTypingSender'
+import { ThreadModActions } from './ThreadModActions'
 
 interface Props {
   t: ReturnType<typeof useThread>
   threadId: string
+  tenantId?: number | null
   onDeleted: () => void
 }
 
 /** Header, posts, live typing hint and reply form of a thread. */
-export function ThreadContent({ t, threadId, onDeleted }: Props) {
+export function ThreadContent(
+  { t, threadId, tenantId = null, onDeleted }: Props,
+) {
   const { isAuthenticated, isModerator } = useForumUser()
   const { thread } = t
   const live = useThreadLive({
@@ -26,28 +30,23 @@ export function ThreadContent({ t, threadId, onDeleted }: Props) {
     onNewPost: () => { t.refresh() },
   })
   const [page, setPage] = useState(1)
-  const lastTyping = useRef(0)
-
-  const onTyping = () => {
-    if (Date.now() - lastTyping.current < 3000) return
-    lastTyping.current = Date.now()
-    live.sendTypingStart()
-  }
+  const onTyping = useTypingSender(live.sendTypingStart)
   // Jump to the last page after posting (the new reply is at the end).
   const onSubmit = () => t.handleSubmitReply().then(() => setPage(9999))
-
   return (
     <>
       <ThreadHeader
         thread={thread}
         actions={
-          <ThreadActions
+          <ThreadModActions
             threadId={threadId}
+            tenantId={tenantId}
             isPinned={thread.pinned}
             isLocked={thread.locked}
             isModerator={isModerator}
             onPin={t.handleTogglePin}
             onLock={t.handleToggleLock}
+            onMove={t.handleMoveThread}
             onDelete={() => t.handleDeleteThread().then(onDeleted)}
           />
         }
@@ -58,6 +57,7 @@ export function ThreadContent({ t, threadId, onDeleted }: Props) {
         page={page}
         onPage={setPage}
         canVote={isAuthenticated}
+        tenantId={tenantId}
         canQuote={!thread.locked && isAuthenticated}
         onVote={t.handleVotePost}
         onEdit={t.handleEditPost}

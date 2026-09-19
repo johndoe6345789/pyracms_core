@@ -13,8 +13,10 @@ jest.mock('@/lib/api', () => ({
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
 
-const res = { id: '1', threadTitle: 'T', postContent: 'c', author: 'a',
-  date: '', forumName: 'f' }
+const res = {
+  id: '1', threadId: '1', threadTitle: 'T', postContent: 'c', author: 'a',
+  date: '', forumName: 'f',
+}
 
 describe('forum component defaults', () => {
   it('VoteButtons work without handlers', () => {

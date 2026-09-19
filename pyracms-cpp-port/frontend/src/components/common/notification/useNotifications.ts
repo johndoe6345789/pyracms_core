@@ -5,8 +5,8 @@ import type { RootState } from '@/store/store'
 import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useWebSocket } from '@/hooks/useWebSocket'
-import type { Notification }
-  from './NotificationList'
+import type { Notification } from './NotificationList'
+import { mapNotificationList } from './notificationApi'
 
 export function useNotifications() {
   const [items, setItems] =
@@ -46,7 +46,7 @@ export function useNotifications() {
     setLoading(true)
     try {
       const r = await api.get('/api/notifications?limit=20')
-      setItems(r.data.notifications || [])
+      setItems(mapNotificationList(r.data))
     } catch { /* ignore */ }
     setLoading(false)
   }

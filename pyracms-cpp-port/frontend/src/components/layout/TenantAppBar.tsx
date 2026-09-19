@@ -22,6 +22,7 @@ export default function TenantAppBar({
       drawerOpen={drawerOpen}
       onMenuClick={onMenuClick}
       navLabel="Site navigation"
+      downloadHref={`/site/${slug}/download`}
     />
   )
 }

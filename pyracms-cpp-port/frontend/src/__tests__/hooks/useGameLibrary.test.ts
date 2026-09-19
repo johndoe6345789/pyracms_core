@@ -51,7 +51,6 @@ describe('useGameLibrary', () => {
     get.mockResolvedValue({ data: rows })
     const { result } = renderHook(() => useGameLibrary())
     await waitFor(() => expect(result.current.loading).toBe(false))
-    expect(result.current.sample).toBe(false)
     expect(result.current.tags).toEqual(['x', 'y'])
     act(() => result.current.markInstalled('a', '1'))
     expect(result.current.installed).toEqual({ a: '1' })
@@ -63,13 +62,14 @@ describe('useGameLibrary', () => {
     expect(result.current.visible).toHaveLength(1)
   })
 
-  it('uses samples when empty or failing', async () => {
+  it('is empty (no fake games) when the api is empty or failing', async () => {
     get.mockResolvedValue({ data: [] })
     const a = renderHook(() => useGameLibrary())
     await waitFor(() => expect(a.result.current.loading).toBe(false))
-    expect(a.result.current.sample).toBe(true)
+    expect(a.result.current.games).toEqual([])
     get.mockRejectedValue(new Error('x'))
     const b = renderHook(() => useGameLibrary())
-    await waitFor(() => expect(b.result.current.sample).toBe(true))
+    await waitFor(() => expect(b.result.current.loading).toBe(false))
+    expect(b.result.current.games).toEqual([])
   })
 })

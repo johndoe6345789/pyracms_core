@@ -7,7 +7,7 @@ const push = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
 }))
-let hook = { open: true, setOpen: jest.fn(), q: 'hello',
+const hook = { open: true, setOpen: jest.fn(), q: 'hello',
   setQ: jest.fn(), res: [] as unknown[] }
 jest.mock('@/components/common/search/useGlobalSearch', () => ({
   useGlobalSearch: () => hook,

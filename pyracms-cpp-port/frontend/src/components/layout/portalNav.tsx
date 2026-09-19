@@ -4,8 +4,17 @@ import {
   AddCircleOutlineOutlined,
   GridViewOutlined,
   ShieldOutlined,
+  DownloadOutlined,
 } from '@mui/icons-material'
 import type { NavEntry, NavSection } from './navTypes'
+
+/** Drawer-only entry (the inline top-bar links leave room for the tool). */
+export function launcherEntry(href: string): NavEntry {
+  return {
+    key: 'download', label: 'Get the launcher', href,
+    icon: <DownloadOutlined />, testId: 'download',
+  }
+}
 
 export function portalEntries(): NavEntry[] {
   return [
@@ -30,7 +39,10 @@ export function portalEntries(): NavEntry[] {
 
 export function portalSections(isSuperAdmin: boolean): NavSection[] {
   const sections: NavSection[] = [
-    { title: 'Portal', items: portalEntries() },
+    {
+      title: 'Portal',
+      items: [...portalEntries(), launcherEntry('/download')],
+    },
   ]
   if (isSuperAdmin) {
     sections.push({

@@ -1,25 +1,29 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   IconButton, Menu, MenuItem, ListItemText, Typography,
 } from '@mui/material'
 import { TranslateOutlined } from '@mui/icons-material'
 import { LANGUAGES } from './languages'
+import { LOCALE_COOKIE } from '@/i18n/config'
 
-const initialLocale = () =>
-  typeof window !== 'undefined'
-    ? localStorage.getItem('locale') || 'en'
-    : 'en'
+const YEAR = 60 * 60 * 24 * 365
 
+/** Sets the locale cookie and re-renders the server tree in that language. */
 export default function LanguageSelect() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [locale, setLocale] = useState(initialLocale)
+  const locale = useLocale()
+  const t = useTranslations('common')
+  const router = useRouter()
 
   const handleChange = (code: string) => {
-    setLocale(code)
-    localStorage.setItem('locale', code)
+    document.cookie =
+      `${LOCALE_COOKIE}=${code}; path=/; max-age=${YEAR}; samesite=lax`
     setAnchorEl(null)
+    router.refresh()
   }
 
   const current = LANGUAGES.find((l) => l.code === locale)
@@ -30,9 +34,7 @@ export default function LanguageSelect() {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{ color: 'text.primary' }}
         size="small"
-        aria-label={`Change language, current: ${
-          current?.name || 'English'
-        }`}
+        aria-label={`${t('language')}: ${current?.name || 'English'}`}
         aria-haspopup="true"
         aria-expanded={Boolean(anchorEl)}
         data-testid="language-select"
@@ -50,7 +52,7 @@ export default function LanguageSelect() {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
-        aria-label="Language selection"
+        aria-label={t('language')}
         data-testid="language-menu"
       >
         {LANGUAGES.map((lang) => (

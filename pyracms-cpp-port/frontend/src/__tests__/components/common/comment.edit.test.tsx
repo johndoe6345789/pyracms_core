@@ -16,9 +16,9 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, user_id: 1, username: 'bob', avatar: null,
-  content: 'hello', parent_id: null, upvotes: 0, downvotes: 0,
-  user_vote: 1, created_at: 'x', updated_at: 'x', children: [] }
+const c: Comment = { id: 5, userId: 1, username: 'bob',
+  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
+  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
 type U = ReturnType<typeof makeUser> | null
 const show = (u: U = makeUser(), depth = 1) => renderWithStore(
   <CommentItem comment={c} contentType="a" contentId={2} depth={depth}
@@ -33,7 +33,7 @@ describe('CommentItem editing', () => {
     fireEvent.change(box, { target: { value: 'new' } })
     fireEvent.click(screen.getByTestId('comment-save-btn'))
     await waitFor(() => expect(m.put).toHaveBeenCalledWith(
-      '/api/comments/5', { content: 'new' }))
+      '/api/comments/5', { body: 'new' }))
     expect(screen.queryByTestId('comment-save-btn')).toBeNull()
   })
 

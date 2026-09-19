@@ -21,9 +21,9 @@ beforeEach(() => {
   refresh.mockReset()
 })
 
-const c: Comment = { id: 5, user_id: 1, username: 'bob', avatar: null,
-  content: 'hello', parent_id: null, upvotes: 0, downvotes: 0,
-  user_vote: 1, created_at: 'x', updated_at: 'x', children: [] }
+const c: Comment = { id: 5, userId: 1, username: 'bob',
+  contentType: 'a', contentId: 2, body: 'hello', parentId: null,
+  likes: 0, dislikes: 0, createdAt: 'x', updatedAt: 'x', children: [] }
 const item = () => renderPlain(
   <CommentItem comment={c} contentType="a" contentId={2} depth={1}
     onRefresh={refresh} />, makeUser())

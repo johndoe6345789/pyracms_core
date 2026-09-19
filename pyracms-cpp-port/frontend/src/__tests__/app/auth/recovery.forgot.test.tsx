@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import api from '@/lib/api'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
 import { asMockApi } from '../../helpers/mockApi'

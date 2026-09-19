@@ -5,21 +5,33 @@ export interface Reaction {
   reacted: boolean
 }
 
+/** Server-side reaction keys, each with the glyph shown for it. */
 export const REACTIONS = [
-  { emoji: '👍', label: 'thumbsup' },
+  { emoji: '👍', label: 'thumbs_up' },
   { emoji: '❤️', label: 'heart' },
   { emoji: '😂', label: 'laugh' },
-  { emoji: '🤔', label: 'thinking' },
-  { emoji: '🙏', label: 'pray' },
-  { emoji: '🚀', label: 'rocket' },
-  { emoji: '👀', label: 'eyes' },
+  { emoji: '😮', label: 'wow' },
+  { emoji: '😢', label: 'sad' },
   { emoji: '🎉', label: 'party' },
 ]
 
-export const DEFAULT_REACTIONS: Reaction[] = [
-  { emoji: '👍', label: 'thumbsup', count: 3, reacted: false },
-  { emoji: '❤️', label: 'heart', count: 1, reacted: true },
-]
+export interface RawReaction {
+  emoji: string
+  count: number
+  mine?: boolean
+}
+
+/** Maps the API's {emoji: key, count, mine} rows to displayable badges. */
+export function mapReactions(raw?: RawReaction[] | null): Reaction[] {
+  const out: Reaction[] = []
+  for (const opt of REACTIONS) {
+    const r = (raw ?? []).find((x) => x.emoji === opt.label)
+    if (r && r.count > 0) {
+      out.push({ ...opt, count: r.count, reacted: Boolean(r.mine) })
+    }
+  }
+  return out
+}
 
 /** Returns the reaction list after toggling one emoji. */
 export function toggleReaction(

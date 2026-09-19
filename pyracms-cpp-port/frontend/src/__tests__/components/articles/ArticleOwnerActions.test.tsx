@@ -45,6 +45,17 @@ describe('ArticleOwnerActions', () => {
     await waitFor(() => expect(m.put).toHaveBeenCalledWith(
       '/api/articles/n/private', { tenant_id: 3 }))
   })
+  it('schedules a publish time', async () => {
+    mount()
+    fireEvent.change(screen.getByTestId('article-schedule-input')
+      .querySelector('input')!, { target: { value: '2030-01-02T03:04' } })
+    click('article-schedule-btn')
+    await waitFor(() => expect(changed).toHaveBeenCalled())
+    expect(m.post).toHaveBeenCalledWith('/api/articles/n/schedule', {
+      tenant_id: 3,
+      scheduled_at: new Date('2030-01-02T03:04').toISOString(),
+    })
+  })
   it('confirms before deleting', async () => {
     mount()
     click('article-delete-btn')

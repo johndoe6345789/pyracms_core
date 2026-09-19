@@ -7,7 +7,7 @@
 
 namespace pyracms {
 
-std::string EmailService::passwordResetEmailTemplate(const std::string &token) {
+std::string EmailService::passwordResetEmailTemplate(const std::string &link) {
     return R"html(
 <!DOCTYPE html>
 <html>
@@ -19,7 +19,7 @@ std::string EmailService::passwordResetEmailTemplate(const std::string &token) {
            R"html( button below to set a new password.</p>
     <p style="text-align: center; margin: 30px 0;">
         <a href=")html" +
-           std::string("{{BASE_URL}}/reset-password?token=") + token +
+           link +
            R"html("
            style="background-color: #2196F3; color: white; padding: 12px 24px;
                   text-decoration: none; border-radius: 4px;)html"
@@ -32,8 +32,8 @@ std::string EmailService::passwordResetEmailTemplate(const std::string &token) {
         This link will expire in 1 hour.
     </p>
     <p style="color: #666; font-size: 12px;">
-        Or copy this link: {{BASE_URL}}/reset-password?token=)html" +
-           token + R"html(
+        Or copy this link: )html" +
+           link + R"html(
     </p>
 </body>
 </html>

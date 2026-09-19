@@ -134,6 +134,27 @@ services:
       SEED_DEV: "0"
       PYRACMS_ENV: production
       DOCKER_HOST: tcp://docker-proxy:2375
+      # Public origin: e-mail links, CORS allow-list, sitemap (no trailing /).
+      PUBLIC_BASE_URL: ${SITE_URL:-http://localhost:3199}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-${SITE_URL:-http://localhost:3199}}
+      # SMTP: the server treats an *empty* SMTP_PORT as an error, so give
+      # every value a safe default. Unset SMTP_HOST = mail is not delivered.
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@pyracms.com}
+      # First-run bootstrap (see docs/DEPLOY.md): creates the Platform Owner
+      # only while NO platform account exists. Remove after the first start.
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    # OAuth stays OFF unless this optional file exists: the server enables a
+    # provider whenever the variables are merely *set*, even when empty.
+    # Put OAUTH_<GITHUB|GOOGLE|DISCORD>_CLIENT_ID/_SECRET/_REDIRECT_URI in it.
+    env_file:
+      - path: ${OAUTH_ENV_FILE:-.env.oauth}
+        required: false
     volumes: !override
       - uploads_data:/app/uploads
     read_only: true
@@ -149,6 +170,9 @@ services:
   frontend:
     <<: *hardened
     networks: [edge]
+    environment:
+      API_URL: http://backend:8080
+      NEXT_PUBLIC_SITE_URL: ${SITE_URL:-}
     read_only: true
     tmpfs:
       - /tmp
@@ -173,3 +197,31 @@ services:
     mem_limit: 128m
     cpus: 1
     pids_limit: 100
+
+  # Optional scheduled backups: `--profile backup up -d` (docs/OPERATIONS.md).
+  # Runs scripts/backup-inner.sh every BACKUP_INTERVAL_H hours (default 24).
+  backup:
+    <<: *hardened
+    profiles: [backup]
+    image: postgres:15-alpine@sha256:a46e076249ce434e41203b8c1dadfaa025b9726331d72390df038385d6dc29cd
+    user: "0:0"
+    cap_add: [DAC_OVERRIDE]     # read uploads owned by uid 10001
+    networks: [data]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-pyracms}
+      PGDATABASE: ${POSTGRES_DB:-pyracms}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      BACKUP_INTERVAL_H: ${BACKUP_INTERVAL_H:-24}
+      BACKUP_KEEP: ${BACKUP_KEEP:-14}
+    entrypoint: ["sh", "/backup-inner.sh"]
+    command: ["loop"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./scripts/backup-inner.sh:/backup-inner.sh:ro
+      - uploads_data:/uploads:ro
+      - ${BACKUP_DIR:-./backups}:/backups
+    mem_limit: 256m
+    pids_limit: 50

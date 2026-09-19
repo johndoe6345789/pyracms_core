@@ -3,6 +3,7 @@
 #include "filters/AdminFilter.h"
 #include "filters/Viewer.h"
 #include "security/Validate.h"
+#include "services/AuditLog.h"
 #include "services/UserRole.h"
 
 namespace pyracms {
@@ -36,7 +37,8 @@ void SettingsController::createOrUpdate(
     auto db = drogon::app().getDbClient();
     settingsService_.createOrUpdateSetting(
         db, tenantId, name, value,
-        [callback](bool success, const std::string &error) {
+        [req, callback, tenantId, name](bool success,
+                                        const std::string &error) {
             if (!success) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -46,6 +48,8 @@ void SettingsController::createOrUpdate(
                 return;
             }
 
+            auditLog(tenantId, req->attributes()->get<int>("userId"),
+                     "settings.write", name);
             Json::Value result;
             result["success"] = true;
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

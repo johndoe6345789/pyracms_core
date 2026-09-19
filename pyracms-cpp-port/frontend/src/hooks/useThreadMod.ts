@@ -28,7 +28,14 @@ export function useThreadMod(
       .then(() => refresh())
       .catch((err) => setError(errMsg(err, 'Action not permitted.')))
 
+  const handleMoveThread = (forumId: string) =>
+    api
+      .put(`/api/forum/threads/${threadId}/move`, { forumId: Number(forumId) })
+      .then(() => refresh())
+      .catch((err) => setError(errMsg(err, 'Could not move the thread.')))
+
   return {
+    handleMoveThread,
     handleVotePost,
     handleEditPost,
     handleDeletePost,

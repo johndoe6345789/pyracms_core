@@ -1,4 +1,4 @@
-#include "controllers/BoolReply.h"
+#include "controllers/AuditReply.h"
 #include "controllers/ForumController.h"
 #include "filters/TenantGuard.h"
 
@@ -21,7 +21,9 @@ void ForumController::createCategory(
     int tenantId = (*json)["tenantId"].asInt();
     auto db = drogon::app().getDbClient();
 
-    forumService_.createCategory(db, tenantId, name, boolReply(callback));
+    forumService_.createCategory(
+        db, tenantId, name,
+        auditedReply(req, callback, "category.create", name));
 }
 
 } // namespace pyracms

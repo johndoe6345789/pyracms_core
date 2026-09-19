@@ -24,10 +24,9 @@ it('ColorPickerField toggles the picker and emits', () => {
 
 it('ThemeActions fire callbacks', () => {
   const p = { onReset: jest.fn(), onExport: jest.fn(),
-    onImport: jest.fn() }
+    onImport: jest.fn(), onSave: jest.fn() }
   render(<ThemeActions {...p} />)
-  expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
-  for (const n of ['Reset', 'Export JSON', 'Import JSON']) {
+  for (const n of ['Save', 'Reset', 'Export JSON', 'Import JSON']) {
     fireEvent.click(screen.getByRole('button', { name: n }))
   }
   Object.values(p).forEach((f) => expect(f).toHaveBeenCalled())

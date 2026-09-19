@@ -1,6 +1,7 @@
 'use client'
 
 import { TextField } from '@mui/material'
+import { MentionTextField } from '../common/MentionTextField'
 
 interface Props {
   title: string
@@ -30,10 +31,10 @@ export function CreateThreadFields(p: Props) {
         placeholder="Brief description of what this thread is about..."
         data-testid="thread-description-input"
       />
-      <TextField
+      <MentionTextField
         label="Post Content"
         value={p.content}
-        onChange={(e) => p.setContent(e.target.value)}
+        onValue={p.setContent}
         fullWidth
         multiline
         minRows={8}

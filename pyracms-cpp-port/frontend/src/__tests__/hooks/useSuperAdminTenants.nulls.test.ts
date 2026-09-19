@@ -1,10 +1,8 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
-import { RAW_TENANTS } from
-  '../helpers/superAdminTenantsFixtures'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,

@@ -35,7 +35,8 @@ const createNoopStorage = () => ({
 
 const storage =
   typeof window !== 'undefined'
-    ? require('redux-persist/lib/storage').default
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('redux-persist/lib/storage').default
     : createNoopStorage()
 
 const persistConfig = {

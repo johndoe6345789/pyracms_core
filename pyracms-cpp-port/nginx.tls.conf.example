@@ -8,8 +8,14 @@
 # logs see the real client address (uncomment and adjust the CIDR):
 #   set_real_ip_from 10.0.0.0/8;
 #   set_real_ip_from 172.16.0.0/12;
-#   real_ip_header   X-Forwarded-For;
+#   real_ip_header   X-Forwarded-For;   # Cloudflare: CF-Connecting-IP
 #   real_ip_recursive on;
+# ...and, if that proxy terminates TLS, forward its scheme (HSTS, OAuth
+# redirects and Next.js origin detection need "https"): replace every
+# `proxy_set_header X-Forwarded-Proto $scheme;` below with
+#   proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+# ONLY when nginx is reachable exclusively through that trusted proxy.
+# Full walkthrough: docs/DEPLOY.md ("Behind a reverse proxy").
 
 # -- rate limiting (per client IP) --------------------------------------
 # Credential-guessing surface only: /api/auth/me (session poll) is not limited
@@ -75,6 +81,23 @@ server {
     add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Cross-Origin-Resource-Policy "same-origin" always;
+
+    # Liveness: answered by nginx itself (no upstream, no rate limit).
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        add_header Cache-Control "no-store" always;
+        return 200 "ok";
+    }
+
+    # Readiness: 200 only while the backend + database answer (the backend
+    # has no dedicated /api/health yet; /api/tenants runs a DB query).
+    location = /readyz {
+        access_log off;
+        proxy_pass http://backend:8080/api/tenants;
+        proxy_read_timeout 5s;
+        add_header Cache-Control "no-store" always;
+    }
 
     # Never serve dotfiles (.git, .env, ...) even if something proxies them.
     location ~ /\. {

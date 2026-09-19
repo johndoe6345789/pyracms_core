@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import api from '@/lib/api'
+import { threadIdOf } from './threadIdOf'
 
 export interface ForumSearchResult {
   id: string
+  threadId: string
   threadTitle: string
   postContent: string
   author: string
@@ -42,6 +44,7 @@ export function useForumSearch(
         let mapped: ForumSearchResult[] =
           items.map((item: R) => ({
             id: String(item.id),
+            threadId: threadIdOf(item),
             threadTitle: item.title || '',
             postContent: item.snippet
               || item.content || '',

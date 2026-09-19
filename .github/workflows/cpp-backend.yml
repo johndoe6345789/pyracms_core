@@ -20,17 +20,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Runs the real suite the way the Dockerfile "tests" stage does: Conan
+  # dependencies, gcov-instrumented build, a PostgreSQL service container and
+  # the 80% line-coverage gate in backend/run-tests.sh. Native per-arch runners
+  # (no QEMU: the Conan build is too slow under emulation).
   build-and-test:
-    runs-on: ${{ matrix.os }}
+    name: build-and-test (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        build_type: [Debug, Release]
-        arch: [x86_64, aarch64]
-        exclude:
-          # Exclude aarch64 on macOS for now (native arm64 support only)
-          - os: macos-latest
-            arch: aarch64
+        runner: [ ubuntu-24.04, ubuntu-24.04-arm ]
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: pyracms
+          POSTGRES_PASSWORD: pyracms
+          POSTGRES_DB: pyracms
+        options: >-
+          --health-cmd "pg_isready -U pyracms"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
     - name: Checkout code
@@ -38,71 +52,22 @@ jobs:
       with:
         persist-credentials: false
 
-    - name: Set up QEMU (Linux only)
-      if: runner.os == 'Linux' && matrix.arch == 'aarch64'
-      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+    - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+    - name: Build test image
+      uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
       with:
-        platforms: arm64
+        context: pyracms-cpp-port/backend
+        target: tests
+        load: true
+        push: false
+        tags: pyracms-backend-tests:ci
+        cache-from: type=gha,scope=backend-tests-${{ matrix.runner }}
+        cache-to: type=gha,mode=max,scope=backend-tests-${{ matrix.runner }}
 
-    - name: Set up CMake
-      uses: jwlawson/actions-setup-cmake@d06b37b47cfd043ec794ffa3e40e0b6b5858a7ec # v1.14
-      with:
-        cmake-version: '3.25.x'
-
-    - name: Install dependencies (Ubuntu x86_64)
-      if: runner.os == 'Linux' && matrix.arch == 'x86_64'
+    - name: Run tests and coverage gate
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libssl-dev
-
-    - name: Install dependencies (Ubuntu aarch64)
-      if: runner.os == 'Linux' && matrix.arch == 'aarch64'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user-static
-
-    - name: Install dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install openssl
-
-    - name: Configure CMake (x86_64)
-      if: matrix.arch == 'x86_64'
-      working-directory: pyracms-cpp-port/backend
-      run: |
-        mkdir -p build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTS=ON
-
-    - name: Configure CMake (aarch64 cross-compile)
-      if: matrix.arch == 'aarch64'
-      working-directory: pyracms-cpp-port/backend
-      run: |
-        mkdir -p build
-        cd build
-        cmake .. \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DBUILD_TESTS=ON \
-          -DCMAKE_SYSTEM_NAME=Linux \
-          -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
-          -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-          -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
-
-    - name: Build
-      working-directory: pyracms-cpp-port/backend/build
-      run: cmake --build . --config ${{ matrix.build_type }}
-
-    - name: Run tests (x86_64)
-      if: matrix.arch == 'x86_64'
-      working-directory: pyracms-cpp-port/backend/build
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
-
-    - name: Run tests (aarch64 with QEMU)
-      if: matrix.arch == 'aarch64'
-      working-directory: pyracms-cpp-port/backend/build
-      run: |
-        # Tests for aarch64 would run under QEMU
-        echo "Skipping tests for aarch64 cross-compiled build (QEMU available for runtime)"
+        docker run --rm           --network "${{ job.services.postgres.network }}"           -e DB_HOST=postgres -e DB_USER=pyracms -e DB_PASSWORD=pyracms           pyracms-backend-tests:ci
 
   lint:
     runs-on: ubuntu-latest

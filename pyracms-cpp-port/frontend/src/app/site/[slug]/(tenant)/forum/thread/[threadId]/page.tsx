@@ -45,6 +45,7 @@ export default function ViewThreadPage() {
       <ThreadContent
         t={t}
         threadId={threadId}
+        tenantId={tenantId}
         onDeleted={() => router.push(`${base}/${thread.forumId}`)}
       />
     </Container>

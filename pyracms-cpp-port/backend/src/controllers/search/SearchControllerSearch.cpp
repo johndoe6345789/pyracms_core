@@ -1,4 +1,5 @@
 #include "controllers/SearchController.h"
+#include "controllers/SearchItemJson.h"
 #include "filters/UserVisibility.h"
 
 namespace pyracms {
@@ -52,15 +53,7 @@ void SearchController::search(
             response["items"] = Json::Value(Json::arrayValue);
 
             for (const auto &item : results.items) {
-                Json::Value jsonItem;
-                jsonItem["type"] = item.type;
-                jsonItem["id"] = item.id;
-                jsonItem["title"] = item.title;
-                jsonItem["snippet"] = item.snippet;
-                jsonItem["url"] = item.url;
-                jsonItem["rank"] = item.rank;
-                jsonItem["createdAt"] = item.createdAt;
-                response["items"].append(jsonItem);
+                response["items"].append(searchItemJson(item));
             }
 
             // Add facet counts

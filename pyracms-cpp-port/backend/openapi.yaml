@@ -57,6 +57,8 @@ components:
               snippet: { type: string }
               url: { type: string }
               rank: { type: number }
+              postId: { type: integer, description: forum_post hits only }
+              threadId: { type: integer, description: forum_post hits only }
 
     AutocompleteItem:
       type: object
@@ -230,7 +232,7 @@ paths:
           schema: { type: integer }
         - name: type
           in: query
-          schema: { type: string, enum: [all, article, forum_post, snippet, gamedep] }
+          schema: { type: string, enum: [all, article, forum_post, post, snippet, gamedep] }
       responses:
         '200':
           description: Search results with facets
@@ -329,6 +331,93 @@ paths:
     get:
       tags: [Social]
       summary: Calculate user reputation
+
+  /api/forum/posts/{id}/reactions:
+    put:
+      tags: [Forum]
+      summary: Toggle the caller's emoji reaction on a post
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [emoji]
+              properties:
+                emoji: { type: string, enum: [thumbs_up, heart, laugh, wow, sad, party] }
+      responses:
+        '200': { description: "{success, reactions:[{emoji,count,mine}]}" }
+        '400': { description: Unknown emoji }
+        '404': { description: Post not found on the caller's site }
+
+  /api/forum/posts/{id}/reactions/{emoji}:
+    delete:
+      tags: [Forum]
+      summary: Remove the caller's reaction
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: "{success, reactions}" }
+        '404': { description: Post not found on the caller's site }
+
+  /api/forum/threads/{id}/move:
+    put:
+      tags: [Forum]
+      summary: Move a thread to another forum of the same site
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [forumId]
+              properties:
+                forumId: { type: integer }
+      responses:
+        '200': { description: "{success, id, forumId}" }
+        '404': { description: Not a moderator/owner, or thread/forum not on the same site }
+
+  /api/forum/users/{id}/stats:
+    get:
+      tags: [Forum]
+      summary: Public forum statistics of one member on one site
+      parameters:
+        - { name: tenant_id, in: query, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: "{postCount, threadCount, joinedAt, reputation}" }
+        '404': { description: No such member on that site }
+
+  /api/activity:
+    get:
+      tags: [Activity]
+      summary: Recent public activity of a site
+      parameters:
+        - { name: tenant_id, in: query, required: true, schema: { type: integer } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
+      responses:
+        '200': { description: "[{id, type (article|thread|post|comment|user), actor, title, link, createdAt}]" }
+
+  /api/analytics/summary:
+    get:
+      tags: [Analytics]
+      summary: Views over 7/30 days and top pages (site admin or owner)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: tenant_id, in: query, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: "{views7d, views30d, topPages:[{path, views}]}" }
+
+  /api/audit:
+    get:
+      tags: [Audit]
+      summary: Admin action log of a site (site admin or owner)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: tenant_id, in: query, required: true, schema: { type: integer } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200 } }
+      responses:
+        '200': { description: "[{id, action, target, actor, actorId, createdAt}]" }
 
   /api/docs:
     get:

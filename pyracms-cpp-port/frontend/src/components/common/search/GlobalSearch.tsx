@@ -3,15 +3,17 @@
 import { TextField, InputAdornment } from '@mui/material'
 import { SearchOutlined } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import SearchDialog from './SearchDialog'
 import { useGlobalSearch } from './useGlobalSearch'
 
 export function GlobalSearch() {
   const { open, setOpen, q, setQ, res } = useGlobalSearch()
   const router = useRouter()
+  const t = useTranslations('common')
   return (<>
     <TextField size="small"
-      placeholder="Search... (Cmd+K)"
+      placeholder={`${t('search')}... (Cmd+K)`}
       onClick={() => setOpen(true)}
       data-testid="global-search-trigger"
       InputProps={{

@@ -24,7 +24,8 @@ void SearchService::search(const DbClientPtr &db, int tenantId,
 
     bool searchAll = type.empty() || type == "all";
     bool doArticles = searchAll || type == "article";
-    bool doForumPosts = searchAll || type == "forum_post";
+    bool doForumPosts =
+        searchAll || type == "forum_post" || type == "post";
     bool doSnippets = searchAll || type == "snippet";
     bool doGameDeps = searchAll || type == "gamedep";
     int pending =

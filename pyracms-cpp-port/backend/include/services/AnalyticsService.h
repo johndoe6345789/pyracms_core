@@ -29,11 +29,20 @@ struct SearchQueryStat {
     double avgResults;
 };
 
+struct AnalyticsSummary {
+    int views7{0};
+    int views30{0};
+    std::vector<TopContentItem> topPages; // last 30 days, at most 10
+};
+
 class AnalyticsService {
   public:
     using DbClientPtr = drogon::orm::DbClientPtr;
     using BoolCallback =
         std::function<void(bool success, const std::string &error)>;
+
+    void getSummary(const DbClientPtr &db, int tenantId,
+                    std::function<void(bool ok, const AnalyticsSummary &)> cb);
 
     void trackPageView(const DbClientPtr &db, int tenantId,
                        const std::string &path, const std::string &referrer,

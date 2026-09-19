@@ -33,6 +33,15 @@ describe('gallery cards', () => {
     expect(screen.getByAltText('Pic')).toBeInTheDocument()
   })
 
+  it('shows no fake image for covers and pictures without one', () => {
+    render(<AlbumCard album={{ ...(album as object), coverImage: '' } as never}
+      slug="s" />)
+    expect(screen.getByTestId('album-no-cover')).toBeInTheDocument()
+    render(<PictureGrid slug="s"
+      pictures={[{ id: 8, src: '', title: 'Nada' } as never]} />)
+    expect(screen.getByTestId('picture-missing-8')).toHaveTextContent('Nada')
+  })
+
   it('TagCloudChips renders labelled chips', () => {
     render(<TagCloudChips items={[{
       name: 'a', count: 2, href: '/t/a', fontSize: 12, height: 20,

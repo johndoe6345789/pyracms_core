@@ -13,19 +13,19 @@ class ForumController : public drogon::HttpController<ForumController> {
     ADD_METHOD_TO(ForumController::listCategories, "/api/forum/categories",
                   drogon::Get);
     ADD_METHOD_TO(ForumController::createCategory, "/api/forum/categories",
-                  drogon::Post, PYR_JWT, PYR_ADMIN);
+                  drogon::Post, PYR_JWT, PYR_ADMIN, PYR_AUDIT);
     ADD_METHOD_TO(ForumController::updateCategory, "/api/forum/categories/{id}",
                   drogon::Put, PYR_JWT, PYR_ADMIN);
     ADD_METHOD_TO(ForumController::deleteCategory, "/api/forum/categories/{id}",
-                  drogon::Delete, PYR_JWT, PYR_ADMIN);
+                  drogon::Delete, PYR_JWT, PYR_ADMIN, PYR_AUDIT);
     ADD_METHOD_TO(ForumController::getForum, "/api/forum/forums/{id}",
                   drogon::Get);
     ADD_METHOD_TO(ForumController::createForum, "/api/forum/forums",
-                  drogon::Post, PYR_JWT, PYR_ADMIN);
+                  drogon::Post, PYR_JWT, PYR_ADMIN, PYR_AUDIT);
     ADD_METHOD_TO(ForumController::updateForum, "/api/forum/forums/{id}",
                   drogon::Put, PYR_JWT, PYR_ADMIN);
     ADD_METHOD_TO(ForumController::deleteForum, "/api/forum/forums/{id}",
-                  drogon::Delete, PYR_JWT, PYR_ADMIN);
+                  drogon::Delete, PYR_JWT, PYR_ADMIN, PYR_AUDIT);
     ADD_METHOD_TO(ForumController::getThread, "/api/forum/threads/{id}",
                   drogon::Get);
     ADD_METHOD_TO(ForumController::createThread, "/api/forum/threads",

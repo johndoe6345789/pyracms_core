@@ -7,6 +7,7 @@ import {
 } from './gameActionState'
 import PrimaryActionButton from './PrimaryActionButton'
 import VersionSelect from './VersionSelect'
+import GetLauncherLink from './GetLauncherLink'
 import { safeHref } from '@/lib/safeUrl'
 
 interface Props {
@@ -49,6 +50,9 @@ export default function GameActions(p: Props) {
         {st.isInstalled && (
           <Button size="small" onClick={p.onUninstall}>Clear mark</Button>
         )}
+      </Box>
+      <Box sx={{ mt: 1.5 }}>
+        <GetLauncherLink href={`/site/${p.slug}/download`} compact />
       </Box>
       <Typography variant="caption" color="text.secondary"
         sx={{ display: 'block', mt: 1 }}>

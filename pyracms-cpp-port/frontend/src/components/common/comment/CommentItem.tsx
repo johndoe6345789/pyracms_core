@@ -27,12 +27,11 @@ export default function CommentItem({
   const [exp, setExp] = useState(true)
   const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
   const usr = useSelector((s: RootState) => s.auth.user)
-  const a = useCommentActions(c.id, c.content, onRefresh)
+  const a = useCommentActions(c.id, c.body, onRefresh)
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
         <Avatar
-          {...(c.avatar ? { src: c.avatar } : {})}
           sx={{ width: 32, height: 32, fontSize: 14 }}>
           {c.username[0]?.toUpperCase()}</Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -47,12 +46,12 @@ export default function CommentItem({
             : <Typography variant="body2"
                 sx={{ mb: 0.5,
                   whiteSpace: 'pre-wrap' }}>
-                {c.content}</Typography>}
+                {c.body}</Typography>}
           <CommentActions comment={c}
             isAuthenticated={isAuth}
-            isOwner={usr?.id === c.user_id}
+            isOwner={usr?.id === c.userId}
             depth={depth}
-            onVote={(v) => a.vote(v, c.user_vote, isAuth)}
+            onVote={(v) => a.vote(v, isAuth)}
             onReply={() => setReplying(!replying)}
             onEdit={() => a.setEditing(true)}
             onDelete={() => a.setDelOpen(true)} />

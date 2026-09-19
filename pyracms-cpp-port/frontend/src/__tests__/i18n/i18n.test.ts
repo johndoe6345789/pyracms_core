@@ -1,13 +1,12 @@
-import { locales, defaultLocale, localeNames } from '@/i18n/config'
-import { config } from '@/middleware'
+import {
+  locales, defaultLocale, localeNames, isLocale, resolveLocale,
+} from '@/i18n/config'
 
-jest.mock('next-intl/routing', () => ({
-  defineRouting: (c: unknown) => c,
-}))
-jest.mock('next-intl/navigation', () => ({
-  createNavigation: (r: unknown) => ({ routing: r, Link: 'a',
-    redirect: jest.fn(), usePathname: jest.fn(), useRouter: jest.fn(),
-    getPathname: jest.fn() }),
+let cookie: string | undefined
+jest.mock('next/headers', () => ({
+  cookies: async () => ({
+    get: () => (cookie === undefined ? undefined : { value: cookie }),
+  }),
 }))
 jest.mock('next-intl/server', () => ({
   getRequestConfig: (fn: unknown) => fn,
@@ -19,34 +18,36 @@ describe('i18n config', () => {
     expect(Object.keys(localeNames).sort()).toEqual([...locales].sort())
   })
 
-  it('builds routing and navigation from the config', () => {
-    const { routing } = jest.requireActual('@/i18n/routing')
-    expect(routing).toMatchObject({ defaultLocale: 'en',
-      localePrefix: 'as-needed' })
-    const nav = jest.requireActual('@/i18n/navigation')
-    expect(nav.Link).toBe('a')
-    expect(Object.keys(nav)).toHaveLength(5)
-    Object.values(nav).forEach((v) => expect(v).toBeDefined())
+  it('validates locales', () => {
+    expect(isLocale('fr')).toBe(true)
+    expect(isLocale('xx')).toBe(false)
+    expect(resolveLocale('cy')).toBe('cy')
+    expect(resolveLocale(undefined)).toBe('en')
   })
 
-  it('has middleware disabled', () => {
-    expect(config.matcher).toEqual([])
+  it('has a message file with the same top-level keys per locale', () => {
+    const en = Object.keys(require('@/i18n/messages/en.json')).sort()
+    locales.forEach((l) => {
+      const m = require(`@/i18n/messages/${l}.json`)
+      expect(Object.keys(m).sort()).toEqual(en)
+      expect(m.common.language).toBeTruthy()
+    })
   })
 })
 
 describe('i18n request config', () => {
   const load = () => jest.requireActual('@/i18n/request').default as
-    (a: { requestLocale: Promise<string | undefined> }) =>
-      Promise<{ locale: string; messages: Record<string, unknown> }>
+    () => Promise<{ locale: string; messages: Record<string, unknown> }>
 
-  it('loads messages for a supported locale', async () => {
-    const r = await load()({ requestLocale: Promise.resolve('de') })
+  it('reads the locale from the cookie', async () => {
+    cookie = 'de'
+    const r = await load()()
     expect(r.locale).toBe('de')
     expect(Object.keys(r.messages).length).toBeGreaterThan(0)
   })
 
-  it.each([undefined, 'xx'])('falls back to English for %s', async (l) => {
-    const r = await load()({ requestLocale: Promise.resolve(l) })
-    expect(r.locale).toBe('en')
+  it.each([undefined, 'xx'])('falls back to English for %s', async (c) => {
+    cookie = c
+    expect((await load()()).locale).toBe('en')
   })
 })

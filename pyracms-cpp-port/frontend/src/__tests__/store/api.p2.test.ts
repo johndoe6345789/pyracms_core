@@ -1,10 +1,8 @@
 /** @jest-environment node */
 import '../helpers/apiEnv'
 import { makeStore } from '@/store/store'
-import { setCredentials } from '@/store/slices/authSlice'
 import { api } from '@/store/api'
 import * as mod from '@/store/api'
-import type { User } from '@/types'
 const calls: Request[] = []
 beforeEach(() => {
   calls.length = 0
@@ -16,17 +14,6 @@ beforeEach(() => {
     { status: 200, headers: { 'content-type': 'application/json' } })
   }) as unknown as typeof fetch
 })
-
-const user = { id: 1, username: 'u' } as User
-const run = async (
-  action: (s: ReturnType<typeof makeStore>['store']) => unknown,
-  signedIn = false,
-) => {
-  const { store } = makeStore()
-  if (signedIn) store.dispatch(setCredentials({ user, token: 'tok' }))
-  await store.dispatch(action(store) as never)
-  return calls.at(-1)!
-}
 
 describe('rtk-query api failures and exports', () => {
   it('provides list tags even when the request fails', async () => {

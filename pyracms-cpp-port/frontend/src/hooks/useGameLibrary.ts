@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import api from '@/lib/api'
 import type { GameDepItem } from '@/hooks/useGameDepList'
-import { PLACEHOLDER_GAMES } from '@/hooks/data/gamePlaceholders'
 import { mapListItem } from '@/hooks/data/gameMappers'
 import { installedStore, favouriteStore } from '@/lib/launcher'
 
@@ -30,7 +29,6 @@ export function filterGames(
 
 export function useGameLibrary() {
   const [games, setGames] = useState<GameDepItem[]>([])
-  const [sample, setSample] = useState(false)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<LibraryFilter>('all')
@@ -44,10 +42,9 @@ export function useGameLibrary() {
     api.get('/api/gamedep/game?limit=100')
       .then((res) => {
         const rows = Array.isArray(res.data) ? res.data : []
-        if (rows.length > 0) setGames(rows.map(mapListItem))
-        else { setGames(PLACEHOLDER_GAMES); setSample(true) }
+        setGames(rows.map(mapListItem))
       })
-      .catch(() => { setGames(PLACEHOLDER_GAMES); setSample(true) })
+      .catch(() => setGames([]))
       .finally(() => setLoading(false))
   }, [])
 
@@ -68,7 +65,7 @@ export function useGameLibrary() {
   const toggleFav = (name: string) => setFavs(favouriteStore.toggle(name))
 
   return {
-    games, visible, sample, loading, search, setSearch, filter, setFilter,
+    games, visible, loading, search, setSearch, filter, setFilter,
     tag, setTag, tags, installed, favs, markInstalled, unmark, toggleFav,
   }
 }

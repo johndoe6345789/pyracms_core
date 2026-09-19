@@ -30,6 +30,8 @@ describe('SuperAdminLayout', () => {
       makeUser({ role: 4 } as never))
     expect(screen.getByText('secret')).toBeInTheDocument()
     expect(screen.getByTestId('super-admin-sidebar')).toBeInTheDocument()
+    expect(screen.getByTestId('super-admin-breadcrumbs'))
+      .toBeInTheDocument()
   })
 
   it('opens the mobile drawer from the app bar', () => {

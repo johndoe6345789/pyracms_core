@@ -9,7 +9,6 @@ import type { TenantRow } from
   '@/hooks/useSuperAdminTenants'
 import {
   TENANT_A,
-  TENANT_B,
 } from '../../helpers/tenantTableHelpers'
 
 jest.mock('next/link', () =>

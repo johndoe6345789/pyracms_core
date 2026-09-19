@@ -24,11 +24,12 @@ beforeEach(() => {
 })
 
 describe('GameLibrary', () => {
-  it('shows samples when the api is empty', async () => {
+  it('shows an empty state when the api is empty', async () => {
     get.mockResolvedValue({ data: [] })
     render(<GameLibrary slug="s" />)
     await waitFor(() =>
-      expect(screen.getByText(/sample entries/)).toBeInTheDocument())
+      expect(screen.getAllByText('No games match.').length)
+        .toBeGreaterThan(0))
   })
 
   it('uses a drawer on mobile', async () => {

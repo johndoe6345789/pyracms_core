@@ -19,7 +19,7 @@ describe('useGalleryAlbums', () => {
     const { result } = renderHook(() => useGalleryAlbums(5))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.albums[0]).toMatchObject({ name: 'A' })
-    expect(result.current.albums[1]!.coverImage).toContain('album2')
+    expect(result.current.albums[1]!.coverImage).toBe('')
     renderHook(() => useGalleryAlbums(null))
     expect(m.get).toHaveBeenCalledTimes(1)
   })
@@ -36,13 +36,18 @@ describe('useGalleryAlbum', () => {
   it('maps pictures', async () => {
     m.get!.mockResolvedValue({ data: { name: 'N', pictures: [
       { id: 1, url: '/u' }, { id: 2, title: 'T', thumbnailUrl: '/t' },
-      { id: 3 }] } })
+      { id: 3 }, { id: 4, displayName: 'D', fileUuid: 'u' }],
+      description: 'desc', userId: 8 } })
     const { result } = renderHook(() => useGalleryAlbum('9'))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.albumName).toBe('N')
     expect(result.current.pictures.map((p) => p.title))
-      .toEqual(['Photo 1', 'T', 'Photo 3'])
-    expect(result.current.pictures[2]!.src).toContain('pic3')
+      .toEqual(['Photo 1', 'T', 'Photo 3', 'D'])
+    expect(result.current.pictures[3]!.src)
+      .toMatch(/\/api\/files\/u\/thumbnail$/)
+    expect(result.current).toMatchObject(
+      { albumDescription: 'desc', ownerId: 8 })
+    expect(result.current.pictures[2]!.src).toBe('')
   })
 
   it('handles failure and empty id', async () => {

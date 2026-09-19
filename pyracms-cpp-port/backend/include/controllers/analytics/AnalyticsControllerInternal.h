@@ -10,6 +10,17 @@
 
 namespace pyracms {
 
+// A tracked path is a site-relative URL: starts with "/", printable only.
+inline bool validTrackPath(const std::string &p) {
+    if (p.empty() || p[0] != '/')
+        return false;
+    for (unsigned char c : p) {
+        if (c < 0x20 || c == 0x7f)
+            return false;
+    }
+    return true;
+}
+
 inline std::string sha256Hash(const std::string &input) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256(reinterpret_cast<const unsigned char *>(input.c_str()), input.size(),

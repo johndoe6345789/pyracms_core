@@ -16,22 +16,26 @@ describe('ThemeToggle', () => {
   })
 })
 
-describe('LanguageSelect', () => {
-  beforeEach(() => localStorage.clear())
+const refresh = jest.fn()
+jest.mock('next/navigation', () => ({ useRouter: () => ({ refresh }) }))
 
-  it('uses the stored locale and persists a change', () => {
-    localStorage.setItem('locale', 'fr')
-    render(<LanguageSelect />)
-    expect(screen.getByTestId('language-select').getAttribute(
-      'aria-label')).toContain('current:')
-    fireEvent.click(screen.getByTestId('language-select'))
-    fireEvent.click(screen.getByTestId('lang-de'))
-    expect(localStorage.getItem('locale')).toBe('de')
+describe('LanguageSelect', () => {
+  beforeEach(() => {
+    refresh.mockReset()
+    document.cookie = 'NEXT_LOCALE=; path=/; max-age=0'
   })
 
-  it('falls back to English', () => {
+  it('sets the locale cookie and refreshes the server tree', () => {
     render(<LanguageSelect />)
-    expect(screen.getByTestId('language-select').getAttribute(
-      'aria-label')).toContain('English')
+    fireEvent.click(screen.getByTestId('language-select'))
+    fireEvent.click(screen.getByTestId('lang-de'))
+    expect(document.cookie).toContain('NEXT_LOCALE=de')
+    expect(refresh).toHaveBeenCalled()
+  })
+
+  it('labels the active language using the translated word', () => {
+    render(<LanguageSelect />)
+    expect(screen.getByTestId('language-select'))
+      .toHaveAttribute('aria-label', 'Language: English')
   })
 })

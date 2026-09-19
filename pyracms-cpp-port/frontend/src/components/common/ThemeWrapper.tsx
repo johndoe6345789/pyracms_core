@@ -8,6 +8,10 @@ import type { RootState } from '@/store/store'
 import { useMemo, useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useAuthHydration } from '@/hooks/useAuthHydration'
+import { usePathname } from 'next/navigation'
+import { slugFromPath } from '@/lib/siteSlug'
+import { useSiteTheme } from '@/hooks/useSiteTheme'
+import { applySiteTheme } from '@/lib/siteTheme'
 
 export default function ThemeWrapper({
   children,
@@ -15,6 +19,7 @@ export default function ThemeWrapper({
   children: React.ReactNode
 }) {
   useAuthHydration()
+  const site = useSiteTheme(slugFromPath(usePathname()))
   const colorMode = useSelector((state: RootState) => state.ui.colorMode)
   const [systemDark, setSystemDark] = useState(false)
 
@@ -27,11 +32,11 @@ export default function ThemeWrapper({
   }, [])
 
   const theme = useMemo(() => {
-    if (colorMode === 'system') {
-      return systemDark ? darkTheme : lightTheme
-    }
-    return colorMode === 'dark' ? darkTheme : lightTheme
-  }, [colorMode, systemDark])
+    const dark = colorMode === 'system'
+      ? systemDark : colorMode === 'dark'
+    const base = dark ? darkTheme : lightTheme
+    return site ? applySiteTheme(base, site, dark) : base
+  }, [colorMode, systemDark, site])
 
   return (
     <ThemeProvider theme={theme}>

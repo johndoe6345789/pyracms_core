@@ -1,28 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import LocaleSwitcher from '@/components/common/LocaleSwitcher'
+import { render, screen } from '@testing-library/react'
 import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
 
-const replace = jest.fn()
 let path: string | null = '/site/s/articles/create'
 let params: Record<string, string> = { slug: 's' }
-jest.mock('next-intl', () => ({ useLocale: () => 'en' }))
-jest.mock('@/i18n/navigation', () => ({
-  useRouter: () => ({ replace }),
-  usePathname: () => '/here',
-}))
 jest.mock('next/navigation', () => ({
   useParams: () => params,
   usePathname: () => path,
 }))
-
-describe('LocaleSwitcher', () => {
-  it('switches locale in place', () => {
-    render(<LocaleSwitcher />)
-    fireEvent.click(screen.getByRole('button'))
-    fireEvent.click(screen.getByText('Español'))
-    expect(replace).toHaveBeenCalledWith('/here', { locale: 'es' })
-  })
-})
 
 describe('TenantBreadcrumbs', () => {
   beforeEach(() => { path = '/site/s/articles/create'; params = { slug: 's' } })

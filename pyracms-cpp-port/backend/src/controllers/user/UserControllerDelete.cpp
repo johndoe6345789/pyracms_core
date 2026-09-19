@@ -1,6 +1,7 @@
 #include "controllers/UserAdminGate.h"
 #include "controllers/UserController.h"
 #include "filters/TenantGuard.h"
+#include "services/AuditLog.h"
 
 namespace pyracms {
 
@@ -13,10 +14,12 @@ void UserController::remove(
             return replyVerdict(v, callback);
         userService_.deleteUser(
             drogon::app().getDbClient(), id,
-            [callback](bool ok, const std::string &err) {
+            [callback, c, id](bool ok, const std::string &err) {
                 if (!ok)
                     return callback(filterError(
                         "Cannot delete: " + err, drogon::k409Conflict));
+                auditLog(c.target.tenant, c.actor.id, "user.delete",
+                         std::to_string(id));
                 replyOk(callback);
             });
     });

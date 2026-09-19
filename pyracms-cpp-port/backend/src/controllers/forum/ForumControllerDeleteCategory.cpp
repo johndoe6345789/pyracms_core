@@ -1,4 +1,4 @@
-#include "controllers/BoolReply.h"
+#include "controllers/AuditReply.h"
 #include "controllers/ForumController.h"
 #include "filters/TenantGuard.h"
 
@@ -9,8 +9,9 @@ void ForumController::deleteCategory(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback, int id) {
 
     auto db = drogon::app().getDbClient();
-    forumService_.deleteCategory(db, id, scopeTenantOf(req),
-                                 boolReply(callback));
+    forumService_.deleteCategory(
+        db, id, scopeTenantOf(req),
+        auditedReply(req, callback, "category.delete", std::to_string(id)));
 }
 
 } // namespace pyracms

@@ -1,7 +1,6 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { useSuperAdminUsers } from '@/hooks/useSuperAdminUsers'
-import { UserRole } from '@/types'
 import api from '@/lib/api'
 import { asMockApi } from '../helpers/mockApi'
 import { RAW_USERS, MAPPED_USERS } from

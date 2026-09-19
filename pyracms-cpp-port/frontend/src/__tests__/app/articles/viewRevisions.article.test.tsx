@@ -4,6 +4,8 @@ import ArticlePageClient from
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
 
+jest.mock('@/components/common/CommentSection',
+  () => require('../../helpers/commentMock').commentSectionMock())
 jest.mock('react-markdown',
   () => require('../../helpers/scopeMocks').markdownMock)
 jest.mock('remark-gfm', () => require('../../helpers/scopeMocks').gfmMock)
@@ -23,11 +25,12 @@ beforeEach(() => {
 })
 
 it('article page renders and votes', async () => {
-  routeGet({ '/api/articles/n': { name: 'n', displayName: 'Title',
+  routeGet({ '/api/articles/n': { id: 8, name: 'n', displayName: 'Title',
     content: '<p>hi</p>', tags: ['t'], likes: 1 } })
   m.post.mockResolvedValue({})
   render(<ArticlePageClient />)
   await screen.findByTestId('article-detail-page')
+  expect(screen.getByTestId('comments-article-8')).toBeInTheDocument()
   fireEvent.click(screen.getByTestId('like-btn'))
   await waitFor(() => expect(screen.getByTestId('like-count'))
     .toHaveTextContent('2'))

@@ -6,7 +6,7 @@ import '@testing-library/jest-dom'
 import GlobalUsersTable from
   '@/components/super-admin/GlobalUsersTable'
 import {
-  USER_ALICE, USER_BOB, resetHook,
+  resetHook,
 } from '../../helpers/globalUsersHook'
 
 jest.mock('@/hooks/useSuperAdminUsers', () => ({

@@ -1,6 +1,7 @@
 #include "controllers/UserAdminGate.h"
 #include "controllers/UserController.h"
 #include "filters/TenantGuard.h"
+#include "services/AuditLog.h"
 
 namespace pyracms {
 
@@ -21,10 +22,13 @@ void UserController::setRole(
             return replyVerdict(v, callback);
         UserAdminService().setRole(
             drogon::app().getDbClient(), id, role,
-            [callback](bool ok, const std::string &err) {
+            [callback, c, id, role](bool ok, const std::string &err) {
                 if (!ok)
                     return callback(
                         filterError(err, drogon::k500InternalServerError));
+                auditLog(c.target.tenant, c.actor.id, "user.role",
+                         std::to_string(id) + " role=" +
+                             std::to_string(role));
                 replyOk(callback);
             });
     });

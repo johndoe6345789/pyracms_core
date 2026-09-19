@@ -1,21 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { Alert, Container, Typography, Box } from '@mui/material'
-import Editor from '@monaco-editor/react'
+import { useParams } from 'next/navigation'
+import { Alert, Container, Typography } from '@mui/material'
 import TemplateToolbar from
   '@/components/admin/templates/TemplateToolbar'
-import TemplatePreview from
-  '@/components/admin/templates/TemplatePreview'
-import { EDITOR_OPTIONS } from './templateEditorOptions'
+import TemplatePane from
+  '@/components/admin/templates/TemplatePane'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useSettingJson } from '@/hooks/admin/useSettingJson'
 import {
-  DEFAULT_TEMPLATES, type TemplateSection, type Templates,
+  TEMPLATES_KEY, parseTemplates,
+} from '@/components/admin/templates/templateStore'
+import {
+  DEFAULT_TEMPLATES, type TemplateSection,
 } from '@/components/admin/templates/defaultTemplates'
 
 export default function TemplateEditorPage() {
   const [section, setSection] = useState<TemplateSection>('header')
-  const [templates, setTemplates] =
-    useState<Templates>(DEFAULT_TEMPLATES)
+  const slug = useParams().slug as string
+  const { tenantId } = useTenantId(slug)
+  const {
+    value: templates, edit: setTemplates, save, saved, error,
+  } = useSettingJson(
+    tenantId, TEMPLATES_KEY, parseTemplates, DEFAULT_TEMPLATES)
   const [showPreview, setShowPreview] = useState(true)
 
   return (
@@ -30,48 +39,27 @@ export default function TemplateEditorPage() {
       >
         Edit the HTML templates for your site sections.
       </Typography>
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Saving templates is not available yet: the backend has no
-        template route. Edits are a local preview only.
-      </Alert>
+      <ErrorAlert error={error} testId="templates-error" />
+      {saved && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          Templates saved.
+        </Alert>
+      )}
       <TemplateToolbar
         section={section}
         onSection={setSection}
         showPreview={showPreview}
         onTogglePreview={() => setShowPreview(!showPreview)}
         onReset={() => setTemplates(DEFAULT_TEMPLATES)}
+        onSave={save}
       />
-      <Box sx={{ display: 'flex', gap: 2, minHeight: 500 }}>
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            border: 1,
-            borderColor: 'divider',
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
-          <Editor
-            height="500px"
-            language="html"
-            value={templates[section]}
-            onChange={(v) =>
-              setTemplates((prev) => ({ ...prev, [section]: v ?? '' }))
-            }
-            theme="vs-dark"
-            options={EDITOR_OPTIONS}
-          />
-        </Box>
-        {showPreview && (
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <TemplatePreview
-              section={section}
-              html={templates[section]}
-            />
-          </Box>
-        )}
-      </Box>
+      <TemplatePane
+        section={section}
+        html={templates[section]}
+        showPreview={showPreview}
+        onChange={(html) =>
+          setTemplates((prev) => ({ ...prev, [section]: html }))}
+      />
     </Container>
   )
 }

@@ -3,6 +3,8 @@
 import { Box, Container } from '@mui/material'
 import TenantAppBar from '@/components/layout/TenantAppBar'
 import TenantDrawer from '@/components/layout/TenantDrawer'
+import SiteFooter from '@/components/layout/SiteFooter'
+import ForkRibbon from '@/components/common/ForkRibbon'
 import SkipLink from '@/components/layout/SkipLink'
 import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
 import { useTenantNav } from '@/hooks/useTenantNav'
@@ -34,13 +36,16 @@ export default function TenantSiteLayout({
         open={drawerOpen}
         onClose={closeDrawer}
       />
-      <Container
-        maxWidth="lg"
-        disableGutters
-        sx={{ px: { xs: 2, md: 3 } }}
-      >
-        <TenantBreadcrumbs />
-      </Container>
+      <Box sx={{ position: 'relative' }}>
+        <ForkRibbon size={48} />
+        <Container
+          maxWidth="lg"
+          disableGutters
+          sx={{ px: { xs: 2, md: 3 }, pr: { xs: 8, md: 9 }, minHeight: 48 }}
+        >
+          <TenantBreadcrumbs />
+        </Container>
+      </Box>
       <Box
         component="main"
         id="main-content"
@@ -49,6 +54,7 @@ export default function TenantSiteLayout({
       >
         {children}
       </Box>
+      <SiteFooter downloadHref={`/site/${slug}/download`} />
     </Box>
   )
 }

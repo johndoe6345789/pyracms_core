@@ -1,6 +1,7 @@
 #include "controllers/UserAdminGate.h"
 #include "controllers/UserController.h"
 #include "filters/TenantGuard.h"
+#include "services/AuditLog.h"
 
 namespace pyracms {
 
@@ -22,10 +23,13 @@ void UserController::ban(
             return replyVerdict(v, callback);
         UserAdminService().setBanned(
             drogon::app().getDbClient(), id, banned,
-            [callback](bool ok, const std::string &err) {
+            [callback, c, banned, id](bool ok, const std::string &err) {
                 if (!ok)
                     return callback(
                         filterError(err, drogon::k500InternalServerError));
+                auditLog(c.target.tenant, c.actor.id,
+                         banned ? "user.ban" : "user.unban",
+                         std::to_string(id));
                 replyOk(callback);
             });
     });

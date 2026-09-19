@@ -41,6 +41,26 @@ for i in $(seq 1 30); do
         else
             echo "SEED_DEV!=1 (or production): skipping demo seed data."
         fi
+        # First-run bootstrap: create the Platform Owner from ADMIN_* env,
+        # only while NO platform-level account exists (never a takeover).
+        if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
+            esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
+            n=$(PGPASSWORD="${DB_PASSWORD:-pyracms}" psql \
+                -h "${DB_HOST:-localhost}" -U "${DB_USER:-pyracms}" \
+                -d "${DB_NAME:-pyracms}" -tAc \
+                "SELECT count(*) FROM users WHERE tenant_id IS NULL")
+            if [ "$n" = "0" ]; then
+                body="{\"username\":\"$(esc "${ADMIN_USERNAME:-owner}")\","
+                body="$body\"email\":\"$(esc "$ADMIN_EMAIL")\","
+                body="$body\"password\":\"$(esc "$ADMIN_PASSWORD")\"}"
+                printf '%s' "$body" | curl -sS -X POST -o /dev/null \
+                    -w 'Platform Owner bootstrap: HTTP %{http_code}\n' \
+                    -H 'Content-Type: application/json' --data-binary @- \
+                    http://localhost:8080/api/auth/register || true
+            else
+                echo "ADMIN_* set but platform accounts exist: skipping."
+            fi
+        fi
         break
     fi
     sleep 1

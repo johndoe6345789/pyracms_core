@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
+import { galleryFileUrl } from '@/lib/galleryImage'
 
 export interface GalleryPicture {
   id: string
@@ -15,15 +16,17 @@ type Raw = Record<string, unknown>
 
 const mapPicture = (p: Raw, i: number): GalleryPicture => ({
   id: String(p.id),
-  title: (p.title as string) || `Photo ${i + 1}`,
+  title: (p.displayName || p.title) as string || `Photo ${i + 1}`,
   src: (p.url || p.thumbnailUrl
-    || `https://picsum.photos/seed/pic${p.id}/400/300`) as string,
+    || galleryFileUrl(p.fileUuid, true)) as string,
   cols: i % 5 === 0 ? 2 : 1,
   rows: i % 7 === 0 ? 2 : 1,
 })
 
 export function useGalleryAlbum(albumId: string) {
   const [albumName, setAlbumName] = useState('')
+  const [albumDescription, setDescription] = useState('')
+  const [ownerId, setOwnerId] = useState<number | null>(null)
   const [pictures, setPictures] = useState<GalleryPicture[]>([])
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
@@ -36,11 +39,15 @@ export function useGalleryAlbum(albumId: string) {
       .then(res => {
         const data = res.data
         setAlbumName(data.displayName || data.name || '')
+        setDescription(data.description || '')
+        setOwnerId(typeof data.userId === 'number' ? data.userId : null)
         setPictures((data.pictures || []).map(mapPicture))
       })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [albumId, tick])
 
-  return { albumName, pictures, loading, refresh }
+  return {
+    albumName, albumDescription, ownerId, pictures, loading, refresh,
+  }
 }

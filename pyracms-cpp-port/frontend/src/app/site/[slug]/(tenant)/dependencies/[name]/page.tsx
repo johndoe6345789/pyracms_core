@@ -14,6 +14,7 @@ import {
   useGameDepDetail, type GameDepDetailData,
 } from '@/hooks/useGameDepDetail'
 import { useGameDepItem } from '@/hooks/useGameDepItem'
+import CommentSection from '@/components/common/CommentSection'
 import ItemGate from '@/components/gamedep/ItemGate'
 
 export default function DependencyDetailPage() {
@@ -66,6 +67,10 @@ function DepView(
           <ScreenshotGrid screenshots={detail.screenshots} />
         </TabPanel>
       </GameDepDetail>
+      {data.id !== undefined && (
+        <CommentSection contentType="dependency"
+          contentId={data.id} />
+      )}
     </Container>
   )
 }

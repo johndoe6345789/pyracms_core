@@ -54,3 +54,9 @@ id_rsa*
 *.kdbx
 secrets/
 certs/
+
+# Local ops artefacts
+backups/
+.env.prod*
+!.env.prod.example
+.env.oauth

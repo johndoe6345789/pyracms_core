@@ -12,6 +12,7 @@ interface Props {
   onPage: (p: number) => void
   canVote: boolean
   canQuote: boolean
+  tenantId?: number | null
   onVote: (id: string, like: boolean) => void
   onEdit: (id: string, content: string) => Promise<unknown>
   onDelete: (id: string) => Promise<unknown>
@@ -37,6 +38,7 @@ export function PostList(p: Props) {
             key={post.id}
             post={post}
             canVote={p.canVote}
+            tenantId={p.tenantId ?? null}
             onVote={p.onVote}
             onEdit={p.onEdit}
             onDelete={p.onDelete}

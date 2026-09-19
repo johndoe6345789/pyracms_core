@@ -7,7 +7,7 @@ import {
   TENANT_FOOTER,
 } from '@/components/layout/navConfig'
 
-let path = '/site/demo/forum'
+const path = '/site/demo/forum'
 jest.mock('next/navigation', () => ({ usePathname: () => path }))
 
 describe('nav config', () => {

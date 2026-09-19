@@ -5,6 +5,7 @@ import {
   ArrowBackOutlined,
 } from '@mui/icons-material'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
+import { launcherEntry } from './portalNav'
 import type { NavEntry, NavSection } from './navTypes'
 
 /** Module links for one site (also used for the inline top-bar links). */
@@ -31,6 +32,7 @@ export function tenantSections(
       key: 'search', label: 'Search', href: '/search',
       icon: <SearchOutlined />, testId: 'search',
     },
+    launcherEntry(`/site/${slug}/download`),
   ]
   const sections: NavSection[] = [{ title: 'Explore', items: site }]
   if (canAdmin) {

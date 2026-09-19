@@ -1,11 +1,11 @@
 import {
   Card,
   CardActionArea,
-  CardMedia,
   CardContent,
   Typography,
 } from '@mui/material'
 import Link from 'next/link'
+import AlbumCover from './AlbumCover'
 import type {
   GalleryAlbum,
 } from '@/hooks/useGalleryAlbums'
@@ -44,16 +44,7 @@ export default function AlbumCard(
           `album-link-${album.id}`
         }
       >
-        <CardMedia
-          component="img"
-          height="200"
-          image={album.coverImage}
-          alt={
-            `Cover image for album `
-            + `${album.name}`
-          }
-          sx={{ objectFit: 'cover' }}
-        />
+        <AlbumCover src={album.coverImage} name={album.name} />
         <CardContent>
           <Typography
             variant="h5"

@@ -15,9 +15,14 @@ const m = api as unknown as Record<string, jest.Mock>
 beforeEach(() => Object.values(m).forEach((f) => f.mockReset()))
 
 const mk = (id: number, kids: Comment[] = []): Comment => ({
-  id, user_id: 1, username: 'bob', avatar: id === 1 ? '/a.png' : null,
-  content: `c${id}`, parent_id: null, upvotes: 0, downvotes: 0,
-  user_vote: null, created_at: 'x', updated_at: 'x', children: kids })
+  id, userId: 1, username: 'bob', contentType: 'a', contentId: 1,
+  body: `c${id}`, parentId: null, likes: 0, dislikes: 0,
+  createdAt: 'x', updatedAt: 'x', children: kids })
+const flat = (id: number, parentId: number | null = null) => {
+  const { children, ...rest } = mk(id)
+  void children
+  return { ...rest, parentId }
+}
 
 describe('CommentList', () => {
   const p = { contentType: 'a', contentId: 1, onRefresh: jest.fn() }
@@ -45,10 +50,13 @@ describe('CommentList', () => {
 
 describe('CommentSection', () => {
   it('loads comments for guests without a form', async () => {
-    m.get!.mockResolvedValue({ data: { comments: [mk(1)] } })
+    m.get!.mockResolvedValue({ data: [flat(1), flat(2, 1)] })
     renderWithStore(<CommentSection contentType="a" contentId={1} />)
     expect(await screen.findByText('c1')).toBeInTheDocument()
+    expect(screen.getByText('c2')).toBeInTheDocument()
     expect(screen.queryByTestId('comment-input')).toBeNull()
+    expect(screen.getByTestId('comment-login-hint'))
+      .toHaveTextContent('Log in to post')
   })
 
   it('shows the form when signed in and survives errors', async () => {
@@ -60,7 +68,7 @@ describe('CommentSection', () => {
       .toBeInTheDocument())
   })
 
-  it('handles a response without comments', async () => {
+  it('handles a non-array response', async () => {
     m.get!.mockResolvedValue({ data: {} })
     renderWithStore(<CommentSection contentType="a" contentId={1} />)
     expect(await screen.findByText(/Be the first/)).toBeInTheDocument()

@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import LibraryHeader from '@/components/launcher/LibraryHeader'
 import VersionSelect from '@/components/launcher/VersionSelect'
 import PrimaryActionButton from '@/components/launcher/PrimaryActionButton'
-import SampleNotice from '@/components/launcher/SampleNotice'
 import { actionState } from '@/components/launcher/gameActionState'
 import { detail } from '../../helpers/launcherParts'
 
@@ -36,11 +35,6 @@ describe('header and actions', () => {
     render(<VersionSelect versions={detail.revisions} value="2"
       onChange={jest.fn()} />)
     expect(screen.getByText('v2')).toBeInTheDocument()
-  })
-
-  it('shows the sample notice', () => {
-    render(<SampleNotice />)
-    expect(screen.getByText(/sample entries/)).toBeInTheDocument()
   })
 })
 

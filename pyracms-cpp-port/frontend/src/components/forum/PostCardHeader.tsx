@@ -7,6 +7,7 @@ interface PostCardHeaderProps {
   author: string
   date: string
   isOwner: boolean
+  showAuthor?: boolean
   editing: boolean
   onSave: () => void
   onCancelEdit: () => void
@@ -15,7 +16,7 @@ interface PostCardHeaderProps {
 }
 
 export function PostCardHeader({
-  author, date, isOwner, ...actions
+  author, date, isOwner, showAuthor = true, ...actions
 }: PostCardHeaderProps) {
   return (
     <Box sx={{
@@ -23,13 +24,17 @@ export function PostCardHeader({
       justifyContent: 'space-between', alignItems: 'center',
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main' }}>
-          {author.charAt(0)}
-        </Avatar>
+        {showAuthor && (
+          <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main' }}>
+            {author.charAt(0)}
+          </Avatar>
+        )}
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-            {author}
-          </Typography>
+          {showAuthor && (
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+              {author}
+            </Typography>
+          )}
           <Typography variant="caption" color="text.secondary">
             {date}
           </Typography>

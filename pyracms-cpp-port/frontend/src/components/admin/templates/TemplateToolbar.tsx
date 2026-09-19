@@ -1,6 +1,6 @@
 import {
   Box, Button, FormControl, InputLabel, Select, MenuItem,
-  ToggleButton, Tooltip,
+  ToggleButton,
 } from '@mui/material'
 import {
   SaveOutlined, RestoreOutlined, VerticalSplit,
@@ -13,6 +13,7 @@ interface Props {
   showPreview: boolean
   onTogglePreview: () => void
   onReset: () => void
+  onSave: () => void
 }
 
 export default function TemplateToolbar(p: Props) {
@@ -58,17 +59,13 @@ export default function TemplateToolbar(p: Props) {
         >
           Reset
         </Button>
-        <Tooltip title="Saving templates is not available yet">
-          <span>
-            <Button
-              variant="contained"
-              startIcon={<SaveOutlined />}
-              disabled
-            >
-              Save
-            </Button>
-          </span>
-        </Tooltip>
+        <Button
+          variant="contained"
+          startIcon={<SaveOutlined />}
+          onClick={p.onSave}
+        >
+          Save
+        </Button>
       </Box>
     </Box>
   )

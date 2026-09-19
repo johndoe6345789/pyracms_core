@@ -5,8 +5,6 @@ import { useGameDepEditor } from '@/hooks/useGameDepEditor'
 const mk = (n: string, l: number, v: number, d: string, t: string[]) =>
   ({ name: n, displayName: n, description: `about ${n}`, tags: t,
     likes: l, dislikes: 0, views: v, created: d }) as GameDepItem
-const items = [mk('a', 1, 9, '2024-01-01', ['x']),
-  mk('b', 5, 1, '2024-03-01', ['y'])]
 
 describe('useGameDepEditor', () => {
   it('adds normalized unique tags and deletes', () => {

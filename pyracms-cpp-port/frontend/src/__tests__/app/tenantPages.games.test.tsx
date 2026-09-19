@@ -10,6 +10,8 @@ import { st } from '../helpers/tenantPagesMocks'
 jest.mock('next/navigation',
   () => require('../helpers/tenantPagesMocks').navMock())
 jest.mock('@/lib/api', () => require('../helpers/tenantPagesMocks').apiMock())
+jest.mock('@/components/common/CommentSection',
+  () => require('../helpers/commentMock').commentSectionMock())
 jest.mock('@/components/launcher/GameLibrary',
   () => require('../helpers/tenantPagesMocks').libMock())
 jest.mock('@/components/common/TenantBreadcrumbs',
@@ -23,11 +25,13 @@ const push = st.push
 describe('tenant pages', () => {
   beforeEach(() => { push.mockClear(); put.mockReset() })
 
-  it('games pages pass the slug and name', () => {
+  it('games pages pass the slug and name', async () => {
+    ;(api.get as jest.Mock).mockResolvedValue({ data: { id: 3, name: 'g' } })
     render(<GamesPage />)
     expect(screen.getByTestId('lib')).toHaveTextContent('demo:-')
     render(<GamePage />)
     expect(screen.getAllByTestId('lib')[1]).toHaveTextContent('demo:g')
+    expect(await screen.findByTestId('comments-game-3')).toBeInTheDocument()
   })
 
   it('edit page saves and navigates', async () => {

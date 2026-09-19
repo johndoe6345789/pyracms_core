@@ -5,7 +5,7 @@ import {
   MenuBookOutlined, SecurityOutlined,
   FolderOutlined, BackupOutlined,
   BarChartOutlined, PaletteOutlined,
-  CodeOutlined,
+  CodeOutlined, WebhookOutlined, HistoryOutlined,
 } from '@mui/icons-material'
 
 export interface AdminNavItem {
@@ -14,6 +14,8 @@ export interface AdminNavItem {
   path: string
 }
 
+// Static tuples, not a rendered list: no keys needed.
+/* eslint-disable react/jsx-key */
 const ITEMS: [string, ReactNode, string][] = [
   ['Dashboard', <DashboardOutlined />, ''],
   ['Users', <PeopleOutlined />, '/users'],
@@ -25,8 +27,11 @@ const ITEMS: [string, ReactNode, string][] = [
   ['Templates', <CodeOutlined />, '/templates'],
   ['Styles', <PaletteOutlined />, '/styles'],
   ['Analytics', <BarChartOutlined />, '/analytics'],
+  ['Webhooks', <WebhookOutlined />, '/webhooks'],
+  ['Audit Log', <HistoryOutlined />, '/audit'],
   ['Backup', <BackupOutlined />, '/backup'],
 ]
+/* eslint-enable react/jsx-key */
 
 export function buildAdminNavItems(
   slug: string,

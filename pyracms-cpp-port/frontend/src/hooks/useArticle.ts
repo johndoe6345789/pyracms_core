@@ -6,6 +6,7 @@ import { formatDay } from './articleDate'
 import { useActionError } from './useActionError'
 
 export interface Article {
+  id?: number
   title: string
   content: string
   author: string
@@ -19,10 +20,12 @@ export interface Article {
   /** draft | published | scheduled */
   status?: string
   isPrivate?: boolean
+  scheduledAt?: string
 }
 
 function mapArticle(a: Record<string, any>): Article {
   return {
+    ...(typeof a.id === 'number' ? { id: a.id } : {}),
     title: a.displayName || a.name,
     content: a.content || '',
     author: a.authorUsername || 'Unknown',
@@ -35,6 +38,7 @@ function mapArticle(a: Record<string, any>): Article {
     revisionCount: a.revisionCount || 0,
     status: a.status || 'published',
     isPrivate: Boolean(a.isPrivate),
+    ...(a.scheduledAt ? { scheduledAt: String(a.scheduledAt) } : {}),
   }
 }
 

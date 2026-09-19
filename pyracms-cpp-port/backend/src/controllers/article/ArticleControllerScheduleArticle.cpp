@@ -1,6 +1,14 @@
 #include "controllers/ArticleController.h"
+#include "filters/TenantGuard.h"
+
+#include <regex>
 
 namespace pyracms {
+
+// 2026-09-19T12:30[:00[.123]][Z|+01:00] (a space may replace the T).
+static const std::regex kIsoTime(
+    R"(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)"
+    R"((Z|[+-]\d{2}(:?\d{2})?)?)");
 
 void ArticleController::scheduleArticle(
     const drogon::HttpRequestPtr &req,
@@ -19,6 +27,12 @@ void ArticleController::scheduleArticle(
 
     int tenantId = (*json)["tenant_id"].asInt();
     auto scheduledAt = (*json)["scheduled_at"].asString();
+    if (!(*json)["scheduled_at"].isString() ||
+        !std::regex_match(scheduledAt, kIsoTime)) {
+        callback(filterError("scheduled_at must be an ISO 8601 time",
+                             drogon::k400BadRequest));
+        return;
+    }
     auto db = drogon::app().getDbClient();
 
     articleService_.findArticle(

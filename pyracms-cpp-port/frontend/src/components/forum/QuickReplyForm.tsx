@@ -1,8 +1,9 @@
 'use client'
 
-import { Paper, Typography, TextField, Button, Alert } from '@mui/material'
+import { Paper, Typography, Button, Alert } from '@mui/material'
 import { SendOutlined } from '@mui/icons-material'
 import { replyNotice } from './ReplyNotice'
+import { MentionTextField } from '../common/MentionTextField'
 
 interface QuickReplyFormProps {
   value: string
@@ -40,15 +41,15 @@ export function QuickReplyForm({
             {error}
           </Alert>
         )}
-        <TextField
+        <MentionTextField
           fullWidth
           multiline
           minRows={3}
           maxRows={8}
           placeholder="Write your reply..."
           value={value}
-          onChange={(e) => {
-            onChange(e.target.value)
+          onValue={(v) => {
+            onChange(v)
             onTyping?.()
           }}
           sx={{ mb: 2 }}

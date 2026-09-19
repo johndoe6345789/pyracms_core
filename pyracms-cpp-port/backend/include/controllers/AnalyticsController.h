@@ -21,6 +21,9 @@ class AnalyticsController : public drogon::HttpController<AnalyticsController> {
     ADD_METHOD_TO(AnalyticsController::getSearchQueries,
                   "/api/analytics/search-queries", drogon::Get,
                   "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(AnalyticsController::getSummary, "/api/analytics/summary",
+                  drogon::Get, "pyracms::JwtAuthFilter",
+                  "pyracms::AdminFilter");
     ADD_METHOD_TO(AnalyticsController::trackPageView, "/api/analytics/track",
                   drogon::Post, "pyracms::RateLimitFilter");
     METHOD_LIST_END
@@ -38,6 +41,10 @@ class AnalyticsController : public drogon::HttpController<AnalyticsController> {
         std::function<void(const drogon::HttpResponsePtr &)> &&callback);
 
     void getSearchQueries(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback);
+
+    void getSummary(
         const drogon::HttpRequestPtr &req,
         std::function<void(const drogon::HttpResponsePtr &)> &&callback);
 

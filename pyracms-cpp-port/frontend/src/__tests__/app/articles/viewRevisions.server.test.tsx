@@ -44,12 +44,21 @@ it('server page renders json-ld only when present', async () => {
   expect(container.querySelector('[data-testid="ld"]')).toBeNull()
 })
 
-it('revisions page lists and reverts', async () => {
-  routeGet({ '/revisions': [{ revisionNumber: 2 }, { revisionNumber: 1 }] })
+jest.mock('react-diff-viewer-continued', () => ({
+  __esModule: true, DiffMethod: { WORDS: 'w' },
+  default: (p: { oldValue: string; newValue: string }) =>
+    <div data-testid="diff">{p.oldValue}&gt;{p.newValue}</div>,
+}))
+
+it('revisions page lists, compares and reverts', async () => {
+  routeGet({ '/revisions': [
+    { id: 8, revisionNumber: 2, content: 'two' },
+    { id: 7, revisionNumber: 1, content: 'one' }] })
   m.post.mockResolvedValue({})
   render(<RevisionsPage />)
   await screen.findByTestId('revert-1')
   expect(screen.queryByTestId('revert-2')).toBeNull()
+  expect(screen.getByTestId('diff')).toHaveTextContent('one>two')
   fireEvent.click(screen.getByTestId('revert-1'))
   fireEvent.click(screen.getByTestId('confirm-revert'))
   await waitFor(() => expect(m.post).toHaveBeenCalledWith(

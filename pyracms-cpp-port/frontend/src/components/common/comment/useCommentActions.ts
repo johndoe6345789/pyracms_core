@@ -13,17 +13,12 @@ export function useCommentActions(
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const vote = async (
-    v: number, userVote: number | null,
-    isAuth: boolean,
-  ) => {
+  const vote = async (isLike: boolean, isAuth: boolean) => {
     if (!isAuth) return
     setError('')
     try {
-      const nv = userVote === v ? 0 : v
       await api.post(
-        `/api/comments/${commentId}/vote`,
-        { value: nv })
+        `/api/comments/${commentId}/vote`, { isLike })
       onRefresh()
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not record vote'))
@@ -36,7 +31,7 @@ export function useCommentActions(
     try {
       await api.put(
         `/api/comments/${commentId}`,
-        { content: editTxt })
+        { body: editTxt })
       setEditing(false); onRefresh()
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not save comment'))

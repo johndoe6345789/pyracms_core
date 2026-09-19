@@ -1,6 +1,7 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { Alert, Container, Typography } from '@mui/material'
 import PictureGrid from '@/components/gallery/PictureGrid'
 import AlbumHeader from '@/components/gallery/AlbumHeader'
@@ -9,13 +10,21 @@ import GalleryBreadcrumbs
 import { useGalleryAlbum } from '@/hooks/useGalleryAlbum'
 import { useAlbumUpload } from '@/hooks/useAlbumUpload'
 import { useSiteSession } from '@/hooks/useSiteSession'
+import { useCanManage } from '@/hooks/useCanManage'
+import GalleryManageDialogs, { type ManageDialog }
+  from '@/components/gallery/GalleryManageDialogs'
 import { useTenantId } from '@/hooks/useTenantId'
 
 export default function AlbumViewPage() {
   const params = useParams()
   const slug = params.slug as string
   const albumId = params.albumId as string
-  const { albumName, pictures, refresh } = useGalleryAlbum(albumId)
+  const router = useRouter()
+  const {
+    albumName, albumDescription, ownerId, pictures, refresh,
+  } = useGalleryAlbum(albumId)
+  const [dialog, setDialog] = useState<ManageDialog>(null)
+  const canManage = useCanManage(slug, ownerId)
   const { tenantId } = useTenantId(slug)
   const signedIn = useSiteSession(slug)
   const up = useAlbumUpload(albumId, tenantId, refresh)
@@ -34,7 +43,16 @@ export default function AlbumViewPage() {
       />
       <AlbumHeader albumName={albumName} count={pictures.length}
         canUpload={signedIn} uploading={up.uploading}
-        onFiles={up.upload} />
+        onFiles={up.upload} description={albumDescription}
+        {...(canManage ? {
+          onEdit: () => setDialog('edit'),
+          onDelete: () => setDialog('delete'),
+        } : {})} />
+      <GalleryManageDialogs key={`${albumName}|${albumDescription}`}
+        kind="albums" id={albumId} name={albumName}
+        description={albumDescription} open={dialog}
+        onClose={() => setDialog(null)} onChanged={refresh}
+        onDeleted={() => router.push(`/site/${slug}/gallery`)} />
       {up.error && (
         <Alert severity="error" sx={{ mb: 2 }} data-testid="upload-error">
           {up.error}

@@ -27,11 +27,8 @@ jest.mock('@/hooks/useSnippetRun', () => ({
 jest.mock('@/hooks/useSnippetActions', () => ({
   useSnippetActions: () => act,
 }))
-jest.mock('@/hooks/useSnippetComments', () => ({
-  useSnippetComments: () => ({
-    comments: [], loading: false, error: '', post: jest.fn(),
-  }),
-}))
+jest.mock('@/components/common/CommentSection',
+  () => require('../../helpers/commentMock').commentSectionMock())
 
 beforeEach(() => {
   user = { id: 7 }
@@ -40,6 +37,11 @@ beforeEach(() => {
     snippet: mapSnippet({ id: 4, authorId: 7, code: 'x', language: 'go' }),
     loading: false, notFound: false, reload,
   }
+})
+
+it('mounts the shared comments for the snippet', () => {
+  render(<ViewSnippetPage />)
+  expect(screen.getByTestId('comments-snippet-4')).toBeInTheDocument()
 })
 
 it('shows loading and not-found states', () => {

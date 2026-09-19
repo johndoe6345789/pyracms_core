@@ -6,15 +6,17 @@ import api from '@/lib/api'
 export interface GalleryAlbum {
   id: string
   name: string
+  /** '' when the album has no cover picture */
   coverImage: string
+  ownerId: number | null
   pictureCount: number
 }
 
 const mapAlbum = (a: Record<string, unknown>): GalleryAlbum => ({
   id: String(a.id),
   name: (a.displayName || a.name || '') as string,
-  coverImage: (a.defaultPictureUrl
-    || `https://picsum.photos/seed/album${a.id}/400/300`) as string,
+  coverImage: (a.defaultPictureUrl || '') as string,
+  ownerId: typeof a.userId === 'number' ? a.userId : null,
   pictureCount: (a.pictureCount || 0) as number,
 })
 

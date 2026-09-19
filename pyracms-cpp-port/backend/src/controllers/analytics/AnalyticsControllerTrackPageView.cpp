@@ -1,5 +1,6 @@
 #include "controllers/AnalyticsController.h"
 #include "controllers/analytics/AnalyticsControllerInternal.h"
+#include "filters/TenantGuard.h"
 #include "filters/UserVisibility.h"
 
 #include <functional>
@@ -28,6 +29,12 @@ void AnalyticsController::trackPageView(
         (*resp->jsonObject())["error"] = "path and tenant_id required";
         resp->setStatusCode(drogon::k400BadRequest);
         callback(resp);
+        return;
+    }
+    if (!validTrackPath((*json)["path"].asString()) ||
+        (*json)["tenant_id"].asInt() <= 0) {
+        callback(filterError("path must be a site path and tenant_id "
+                             "positive", drogon::k400BadRequest));
         return;
     }
     // Anonymous endpoint: cap every stored string to its column size

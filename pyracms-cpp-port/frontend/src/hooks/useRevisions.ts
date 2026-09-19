@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import api from '@/lib/api'
 import { formatDateTime } from './articleDate'
+import type { DiffRevision } from '@/components/articles/RevisionSelect'
 
 export interface Revision {
   number: number
@@ -28,11 +29,27 @@ export function mapRevisions(
   }))
 }
 
+/** Oldest first: "from" defaults to oldest, "to" to newest. */
+export function mapDiffRevisions(
+  data: Record<string, unknown>[]
+): DiffRevision[] {
+  const rows = mapRevisions(data)
+  return data.map((r, i) => ({
+    id: String(r.id ?? rows[i]?.number),
+    label: `Revision #${rows[i]?.number}`,
+    date: rows[i]?.date ?? '',
+    author: rows[i]?.author ?? '',
+    content: typeof r.content === 'string' ? r.content : '',
+  })).reverse()
+}
+
 export function useRevisions(
   name: string,
   tenantId: number | null
 ) {
-  const [revisions, setRevisions] = useState<Revision[]>([])
+  const [raw, setRaw] = useState<Record<string, unknown>[]>([])
+  const revisions = useMemo(() => mapRevisions(raw), [raw])
+  const diffs = useMemo(() => mapDiffRevisions(raw), [raw])
   const [loading, setLoading] = useState(true)
   const listUrl =
     `/api/articles/${name}/revisions?tenant_id=${tenantId}`
@@ -41,7 +58,7 @@ export function useRevisions(
     if (!name || !tenantId) return
     setLoading(true)
     api.get(listUrl)
-      .then((res) => setRevisions(mapRevisions(res.data || [])))
+      .then((res) => setRaw(res.data || []))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [name, tenantId, listUrl])
@@ -55,8 +72,8 @@ export function useRevisions(
         tenant_id: tenantId,
       })
       .then(() => api.get(listUrl))
-      .then((res) => setRevisions(mapRevisions(res.data || [])))
+      .then((res) => setRaw(res.data || []))
   }
 
-  return { revisions, latestRevision, loading, handleRevert }
+  return { revisions, diffs, latestRevision, loading, handleRevert }
 }

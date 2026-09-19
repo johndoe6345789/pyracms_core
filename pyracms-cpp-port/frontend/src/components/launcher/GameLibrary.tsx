@@ -9,7 +9,6 @@ import { useGameDetail } from '@/hooks/useGameDetail'
 import { useSiteSession } from '@/hooks/useSiteSession'
 import LibrarySidebar from './LibrarySidebar'
 import LibraryHeader, { type LibraryView } from './LibraryHeader'
-import SampleNotice from './SampleNotice'
 import BrowseGrid from './BrowseGrid'
 import GameDetailView from './GameDetailView'
 
@@ -18,7 +17,6 @@ const shellSx = {
   display: 'flex', minHeight: '70vh', bgcolor: '#171d25',
   color: '#c7d5e0', borderRadius: 1, overflow: 'hidden',
 } as const
-
 export default function GameLibrary({ slug, initialName }: Props) {
   const lib = useGameLibrary()
   const signedIn = useSiteSession(slug)
@@ -28,7 +26,7 @@ export default function GameLibrary({ slug, initialName }: Props) {
     initialName ? 'library' : 'browse')
   const [selected, setSelected] = useState(initialName ?? null)
   const [drawer, setDrawer] = useState(false)
-  const detail = useGameDetail(selected, lib.sample)
+  const detail = useGameDetail(selected)
 
   useEffect(() => {
     if (!selected && view === 'library' && lib.visible[0])
@@ -57,8 +55,8 @@ export default function GameLibrary({ slug, initialName }: Props) {
       <Box sx={{ flex: 1, p: { xs: 1.5, md: 3 }, minWidth: 0 }}>
         <LibraryHeader mobile={mobile} view={view} onView={setView}
           onOpenDrawer={() => setDrawer(true)}
-          newHref={signedIn ? `/site/${slug}/games/new` : undefined} />
-        {lib.sample && <SampleNotice />}
+          newHref={signedIn ? `/site/${slug}/games/new` : undefined}
+          downloadHref={`/site/${slug}/download`} />
         {lib.loading && <Typography>Loading...</Typography>}
         {view === 'browse' ? (
           <BrowseGrid games={lib.visible} onSelect={select} />

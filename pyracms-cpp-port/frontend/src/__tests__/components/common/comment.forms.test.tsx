@@ -50,7 +50,7 @@ describe('CommentForm', () => {
     fireEvent.click(screen.getByTestId('comment-submit-btn'))
     await waitFor(() => expect(done).toHaveBeenCalled())
     expect(post).toHaveBeenCalledWith('/api/comments/article/2',
-      { content: 'yo', parent_id: null })
+      { body: 'yo' })
   })
 
   it('keeps the text on failure and can cancel', async () => {

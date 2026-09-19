@@ -2,7 +2,7 @@
 
 import { Box, Typography, IconButton, Button } from '@mui/material'
 import {
-  ThumbUpOutlined, ThumbUp, ThumbDownOutlined, ThumbDown,
+  ThumbUpOutlined, ThumbDownOutlined,
   ReplyOutlined, EditOutlined, DeleteOutlined,
 } from '@mui/icons-material'
 import type { Comment } from './types'
@@ -12,41 +12,39 @@ interface Props {
   isAuthenticated: boolean
   isOwner: boolean
   depth: number
-  onVote: (v: number) => void
+  onVote: (isLike: boolean) => void
   onReply: () => void
   onEdit: () => void
   onDelete: () => void
 }
 
 export default function CommentActions(p: Props) {
-  const score = p.comment.upvotes - p.comment.downvotes
-  const up = p.comment.user_vote === 1
-  const down = p.comment.user_vote === -1
+  const { likes, dislikes } = p.comment
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <IconButton
         size="small" disabled={!p.isAuthenticated}
-        onClick={() => p.onVote(1)}
+        onClick={() => p.onVote(true)}
         aria-label="Upvote"
         data-testid="comment-upvote-btn"
       >
-        {up
-          ? <ThumbUp fontSize="small" color="primary" />
-          : <ThumbUpOutlined fontSize="small" />}
+        <ThumbUpOutlined fontSize="small" />
       </IconButton>
       <Typography variant="caption" color="text.secondary">
-        {score}
+        {likes}
       </Typography>
       <IconButton
         size="small" disabled={!p.isAuthenticated}
-        onClick={() => p.onVote(-1)}
+        onClick={() => p.onVote(false)}
         aria-label="Downvote"
         data-testid="comment-downvote-btn"
       >
-        {down
-          ? <ThumbDown fontSize="small" color="error" />
-          : <ThumbDownOutlined fontSize="small" />}
+        <ThumbDownOutlined fontSize="small" />
       </IconButton>
+      <Typography variant="caption" color="text.secondary"
+        data-testid="comment-dislikes">
+        {dislikes}
+      </Typography>
       {p.isAuthenticated && p.depth < 4 && (
         <Button size="small"
           startIcon={<ReplyOutlined />}

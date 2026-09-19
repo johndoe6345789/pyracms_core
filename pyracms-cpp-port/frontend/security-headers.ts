@@ -13,8 +13,10 @@ export function buildCsp(apiUrl?: string, dev = false): string {
   // Cloudflare injects its web-analytics beacon on proxied sites
   const cfScript = 'https://static.cloudflareinsights.com'
   const cfConnect = 'https://cloudflareinsights.com'
+  // Latest Hypernucleus release lookup on the /download page
+  const gh = 'https://api.github.com'
   const scriptSrc = `'self' 'unsafe-inline' ${cdn} ${cfScript}`
-  const connectSrc = `'self' ${api} ${ws} ${cdn} ${cfConnect}`
+  const connectSrc = `'self' ${api} ${ws} ${cdn} ${cfConnect} ${gh}`
   const d = [
     ["default-src", "'self'"],
     // Next.js emits inline bootstrap scripts; nonces would need middleware

@@ -17,6 +17,8 @@ interface Props {
   drawerOpen: boolean
   onMenuClick: () => void
   navLabel: string
+  /** Where the 'Get the launcher' tool points */
+  downloadHref?: string | undefined
 }
 
 const barSx = {
@@ -40,7 +42,7 @@ const brandSx = {
  * left (always), brand, inline links on wide screens, tools on the right.
  */
 export default function AppTopBar({
-  brand, brandHref, items, drawerOpen, onMenuClick, navLabel,
+  brand, brandHref, items, drawerOpen, onMenuClick, navLabel, downloadHref,
 }: Props) {
   const pathname = usePathname() ?? ''
   return (
@@ -66,7 +68,7 @@ export default function AppTopBar({
           {brand}
         </Typography>
         <TopBarLinks items={items} pathname={pathname} />
-        <TopBarTools />
+        <TopBarTools {...(downloadHref ? { downloadHref } : {})} />
       </Toolbar>
     </AppBar>
   )

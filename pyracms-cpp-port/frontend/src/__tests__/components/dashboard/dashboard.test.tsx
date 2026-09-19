@@ -52,7 +52,10 @@ describe('dashboard components', () => {
   })
 
   it('QuickActions lists the shortcuts', () => {
-    render(<QuickActions />)
-    expect(screen.getByText('Manage Users')).toBeInTheDocument()
+    render(<QuickActions slug="s" />)
+    expect(screen.getByTestId('quick-action-Manage Users'))
+      .toHaveAttribute('href', '/site/s/admin/users')
+    expect(screen.getByTestId('quick-action-Create New Content'))
+      .toHaveAttribute('href', '/site/s/articles/create')
   })
 })

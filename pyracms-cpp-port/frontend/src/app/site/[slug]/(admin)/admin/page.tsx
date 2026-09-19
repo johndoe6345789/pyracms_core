@@ -5,6 +5,10 @@ import { Typography, Box, Grid } from '@mui/material'
 import { useTenantId } from '@/hooks/useTenantId'
 import DashboardStats from
   '@/components/dashboard/DashboardStats'
+import QuickActions from
+  '@/components/dashboard/QuickActions'
+import RecentActivity from
+  '@/components/activity/RecentActivity'
 import QuickLinkCard from
   '@/components/admin/QuickLinkCard'
 import { buildQuickLinks } from
@@ -28,6 +32,8 @@ export default function TenantAdminDashboardPage() {
         Overview of your {slug} site.
       </Typography>
       <DashboardStats tenantId={tenantId} />
+      <RecentActivity tenantId={tenantId} />
+      <QuickActions slug={slug} />
       <Typography variant="h4" sx={{ mb: 3 }}>
         Quick Links
       </Typography>

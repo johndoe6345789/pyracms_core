@@ -166,6 +166,13 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 | 144 | GET | `/api/webhooks/{id}/deliveries` | JwtAuthFilter, OwnerFilter | by-id webhook | OwnerFilter: site admin/owner of the webhook site | OK (was F-07) |
 | 145 | WS | `/api/ws/notifications` | token (query/header) via AuthService | own notifications, thread typing | thread must be on caller site; must be subscribed to signal | OK (was F-01); token in URL: A-02 |
 | 146 | WS | `/api/ws/collab` | token (query/header) via AuthService | doc relay | rooms namespaced per site; name allow-list; 1 MB frames | OK (was F-01) |
+| 147 | PUT | `/api/forum/posts/{id}/reactions` | JwtAuthFilter | toggles caller's emoji (allow-list) on a post; returns reactions | post's site via thread->forum->category must equal token site (platform token any); else 404 | OK: new |
+| 148 | DELETE | `/api/forum/posts/{id}/reactions/{emoji}` | JwtAuthFilter | removes caller's own reaction only | same site gate as PUT | OK: new |
+| 149 | PUT | `/api/forum/threads/{id}/move` | JwtAuthFilter | moves thread to another forum; counters kept | single statement: moderator (role>=2) or site owner; target forum must be on the thread's site and the token's site; else 404 | OK: new |
+| 150 | GET | `/api/forum/users/{id}/stats` | none | postCount, threadCount, joinedAt, reputation; no email | tenant_id required; counts only that site's content; foreign account 404 | OK: new |
+| 151 | GET | `/api/activity` | none | public feed: published non-private articles, threads, posts, comments on those articles, registrations (username only) | tenant_id required; every branch filtered by site; limit 1..50; banned users omitted | OK: new |
+| 152 | GET | `/api/analytics/summary` | JwtAuthFilter, AdminFilter | views 7/30 days, top pages | tenant_id; AdminFilter checks site admin/owner; JwtAuthFilter blocks foreign site tokens | OK: new |
+| 153 | GET | `/api/audit` | JwtAuthFilter, AdminFilter | admin action log (actor, action, target) | tenant_id; rows filtered by site; admin/owner only; limit 1..200 | OK: new |
 
 ## Findings (fixed)
 
@@ -346,3 +353,25 @@ the Administrator-level answer, and only for that site.
 | Gamedep pages/revisions (`gdWithPage`) | Fixed. The owner of the page's tenant counts as administrator; scope still comes from token/named tenant, so another site's owner gets 404/403. |
 | `GET /api/settings[/{name}]` credential-like names | Fixed. `withAdminFlag` accepts role >= 3 or ownership of the tenant, matching the write side. |
 | Articles (OwnerFilter) | Accepted. Looked up by name, so the client must send `tenant_id`; inherent. |
+
+## Feature additions (reactions, move, activity, audit)
+
+- `POST /api/analytics/track` now rejects paths that are not `/...` printable
+  text and tenants that do not exist (400); still rate limited (120/min/IP).
+- `POST /api/articles/{name}/schedule` rejects a non-ISO `scheduled_at`
+  (400); authorization unchanged (OwnerFilter: author, moderator+, owner).
+- The 60 s scheduled-publish timer fires `article.published` per article
+  and per site (same event as a manual publish).
+- `POST /api/auth/reset-password` accepts an optional `tenant` slug (the
+  emailed link now carries `&tenant=<slug>`); if given, the token must
+  belong to an account of that site, otherwise 400 and the token stays
+  unspent. No verification e-mail is sent by the backend today, so there is
+  no verify link to extend.
+- `GET /api/search` forum hits carry `postId` and `threadId`; `type=post`
+  is an alias of `forum_post`.
+- Audit rows are written for user ban/unban/role/delete, forum category and
+  forum create/delete, and settings write/delete. `AuditScopeFilter` fixes
+  the site before a delete removes the row that names it. Gallery
+  album/picture PUT/DELETE and article schedule were re-checked: both
+  enforce author/moderator/owner already (no gap).
+

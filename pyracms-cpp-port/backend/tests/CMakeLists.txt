@@ -23,15 +23,21 @@ set(TEST_SOURCES
 
     http_harness.cpp
 
+    test_activity_http.cpp
+
     test_admin_filter.cpp
 
     test_admin_target.cpp
+
+    test_analytics_summary_http.cpp
 
     test_article_http_1.cpp
 
     test_article_http_2.cpp
 
     test_article_http_3.cpp
+
+    test_audit_http.cpp
 
     test_auth_http.cpp
 
@@ -55,9 +61,15 @@ set(TEST_SOURCES
 
     test_forum_http_2.cpp
 
+    test_forum_move_http.cpp
+
+    test_forum_reactions_http.cpp
+
     test_forum_scope_db_1.cpp
 
     test_forum_scope_db_2.cpp
+
+    test_forum_stats_http.cpp
 
     test_gallery_http.cpp
 
@@ -91,9 +103,15 @@ set(TEST_SOURCES
 
     test_public_reads_http.cpp
 
+    test_publish_due_http.cpp
+
+    test_reset_tenant_http.cpp
+
     test_role_rules.cpp
 
     test_search_http.cpp
+
+    test_search_thread_http.cpp
 
     test_security_auth_http_1.cpp
 

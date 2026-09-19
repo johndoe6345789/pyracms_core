@@ -10,8 +10,9 @@ import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
 import { ErrorAlert } from '../ErrorAlert'
 import type {
-  Comment, CommentSectionProps,
+  ApiComment, Comment, CommentSectionProps,
 } from './types'
+import { buildTree } from './types'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
 
@@ -34,7 +35,8 @@ export default function CommentSection({
       const url =
         `/api/comments/${contentType}/${contentId}`
       const res = await api.get(url)
-      setComments(res.data.comments || [])
+      const flat: ApiComment[] = Array.isArray(res.data) ? res.data : []
+      setComments(buildTree(flat))
       setError('')
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not load comments'))
@@ -47,7 +49,7 @@ export default function CommentSection({
   }, [fetchComments])
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 4 }} data-testid="comment-section">
       <Typography
         variant="h6"
         fontWeight={700}
@@ -57,12 +59,17 @@ export default function CommentSection({
       </Typography>
       <Divider sx={{ mb: 2 }} />
       <ErrorAlert error={error} testId="comments-error" />
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <CommentForm
           contentType={contentType}
           contentId={contentId}
           onSubmitted={fetchComments}
         />
+      ) : (
+        <Typography color="text.secondary" sx={{ mb: 2 }}
+          data-testid="comment-login-hint">
+          Log in to post a comment.
+        </Typography>
       )}
       <CommentList
         comments={comments}

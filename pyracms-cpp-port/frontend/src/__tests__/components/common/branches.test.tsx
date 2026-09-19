@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor, renderHook, act }
   from '@testing-library/react'
 import ThemeToggle from '@/components/common/ThemeToggle'
-import LanguageSelect from '@/components/common/LanguageSelect'
 import NotificationBell from '@/components/common/notification'
 import PasswordStrengthBar from '@/components/auth/PasswordStrengthBar'
 import { useCommentActions }
@@ -25,17 +24,6 @@ describe('menus close on Escape', () => {
     fireEvent.keyDown(screen.getByTestId('theme-menu'), { key: 'Escape' })
     await waitFor(() => expect(screen.getByTestId('theme-toggle'))
       .toHaveAttribute('aria-expanded', 'false'))
-  })
-
-  it('LanguageSelect handles unknown stored locales', async () => {
-    localStorage.setItem('locale', 'xx')
-    render(<LanguageSelect />)
-    fireEvent.click(screen.getByTestId('language-select'))
-    fireEvent.keyDown(screen.getByTestId('language-menu'),
-      { key: 'Escape' })
-    await waitFor(() => expect(screen.getByTestId('language-select'))
-      .toHaveAttribute('aria-expanded', 'false'))
-    localStorage.clear()
   })
 
   it('NotificationBell popover closes', async () => {

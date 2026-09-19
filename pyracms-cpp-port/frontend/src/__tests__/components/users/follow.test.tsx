@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor }
+import { screen, fireEvent, waitFor }
   from '@testing-library/react'
 import { FollowButton } from '@/components/users/FollowButton'
 import { UserHeader } from '@/components/users/UserHeader'

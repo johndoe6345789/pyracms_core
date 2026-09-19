@@ -35,7 +35,7 @@ export const DEP_DETAIL: GameDepDetailData = {
   ],
   screenshots: Array.from({ length: 4 }, (_, i) => ({
     id: `dep-ss-${i + 1}`,
-    src: `https://picsum.photos/seed/dep${i + 1}/600/400`,
+    src: `/img/dep${i + 1}.png`,
     title: `Screenshot ${i + 1}`,
   })),
 }

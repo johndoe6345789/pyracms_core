@@ -29,6 +29,7 @@ describe('useForumSearch', () => {
     expect(mock.get).toHaveBeenCalledWith(
       '/api/search?q=q&tenant_id=3&type=forum_post')
     expect(result.current.results.map((x) => x.id)).toEqual(['1'])
+    expect(result.current.results[0]!.threadId).toBe('')
   })
   it('accepts array data and tolerates errors', async () => {
     mock.get.mockResolvedValueOnce({ data: items })

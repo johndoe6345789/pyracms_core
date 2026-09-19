@@ -1,24 +1,36 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useParams } from 'next/navigation'
 import { Alert, Container, Typography, Grid } from '@mui/material'
 import ThemeActions from '@/components/admin/styles/ThemeActions'
 import ThemeControls from '@/components/admin/styles/ThemeControls'
 import ThemePreview from '@/components/admin/styles/ThemePreview'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import {
   DEFAULT_THEME, exportTheme, importTheme,
   type ThemeConfig,
 } from '@/components/admin/styles/themeConfig'
+import { useTenantId } from '@/hooks/useTenantId'
+import { useSettingJson } from '@/hooks/admin/useSettingJson'
+import { announceSiteTheme } from '@/hooks/useSiteTheme'
+import { THEME_KEY, parseSiteTheme } from '@/lib/siteTheme'
 
 export default function StyleEditorPage() {
-  const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_THEME)
+  const slug = useParams().slug as string
+  const { tenantId } = useTenantId(slug)
+  const { value: theme, edit, save, saved, error } = useSettingJson(
+    tenantId, THEME_KEY, parseSiteTheme, DEFAULT_THEME)
 
   const update = useCallback(
     (key: keyof ThemeConfig, value: string | number) => {
-      setTheme((prev) => ({ ...prev, [key]: value }))
+      edit((prev) => ({ ...prev, [key]: value }))
     },
-    [],
+    [edit],
   )
+  const onSave = async () => {
+    if (await save()) announceSiteTheme(slug, theme)
+  }
 
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
@@ -32,15 +44,15 @@ export default function StyleEditorPage() {
       >
         Customize your site theme and appearance.
       </Typography>
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Saving themes is not available yet: the backend has no
-        theme route. Changes here are a local preview; use Export
-        JSON to keep them.
-      </Alert>
+      <ErrorAlert error={error} testId="theme-error" />
+      {saved && (
+        <Alert severity="success" sx={{ mb: 3 }}>Theme saved.</Alert>
+      )}
       <ThemeActions
-        onReset={() => setTheme(DEFAULT_THEME)}
+        onReset={() => edit(DEFAULT_THEME)}
+        onSave={onSave}
         onExport={() => exportTheme(theme)}
-        onImport={() => importTheme(setTheme)}
+        onImport={() => importTheme(edit)}
       />
       <Grid container spacing={3}>
         <Grid item xs={12} md={5}>

@@ -2,11 +2,8 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import NotificationList from '@/components/common/notification/NotificationList'
 import api from '@/lib/api'
 
-let onMessage: (d: unknown) => void = () => {}
 jest.mock('@/hooks/useWebSocket', () => ({
-  useWebSocket: (o: { onMessage: (d: unknown) => void }) => {
-    onMessage = o.onMessage
-  },
+  useWebSocket: () => undefined,
 }))
 jest.mock('@/lib/api', () => ({
   __esModule: true, default: { get: jest.fn(), put: jest.fn() },

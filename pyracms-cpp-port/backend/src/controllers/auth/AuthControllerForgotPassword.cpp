@@ -33,7 +33,7 @@ void AuthController::forgotPassword(
     auto email = (*json)["email"].asString();
     withTenant(
         *json, callback,
-        [this, email, callback](int tenantId, const std::string &) {
+        [this, email, callback](int tenantId, const std::string &slug) {
             sameAnswer(callback);
             // At most 3 mails per address per hour (no mail-bombing)
             bool room = !RateLimiter::enabled() ||
@@ -44,15 +44,16 @@ void AuthController::forgotPassword(
             auto db = drogon::app().getDbClient();
             userService_.findByEmail(
                 db, tenantId, email,
-                [this, db, email](const std::optional<UserDto> &user) {
+                [this, db, email, slug](const std::optional<UserDto> &user) {
                     if (!user)
                         return;
                     auto token = authService_.generateRandomToken();
                     db->execSqlAsync(
                         kStoreToken,
-                        [this, email, token](const drogon::orm::Result &) {
+                        [this, email, token,
+                         slug](const drogon::orm::Result &) {
                             emailService_.sendPasswordResetEmail(
-                                email, token,
+                                email, token, slug,
                                 [](bool, const std::string &) {});
                         },
                         [](const drogon::orm::DrogonDbException &) {},

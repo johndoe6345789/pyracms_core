@@ -7,6 +7,7 @@ import { useForumAdmin } from '@/hooks/useForumAdmin'
 import { useTenantNav } from '@/hooks/useTenantNav'
 import { useTenantId } from '@/hooks/useTenantId'
 import { CategoryAccordion } from '@/components/forum/CategoryAccordion'
+import { ForumSearchPanel } from '@/components/forum/ForumSearchPanel'
 import { ForumAdminDialog } from '@/components/forum/ForumAdminDialog'
 import {
   ForumLoading, ForumError, ForumEmpty,
@@ -19,6 +20,7 @@ export default function ForumPage() {
   const { categories, loading, error, refresh } = useForumCategories(tenantId)
   const { canAdmin } = useTenantNav()
   const admin = useForumAdmin(tenantId, refresh)
+  const forumNames = categories.flatMap((c) => c.forums.map((f) => f.name))
   const busy = tenantLoading || loading
   const addCategory = () => admin.open({ kind: 'category', mode: 'create' })
   const addBtn = canAdmin && (
@@ -64,6 +66,12 @@ export default function ForumPage() {
         </Typography>
         {categories.length > 0 && addBtn}
       </Box>
+      {tenantId && (
+        <Box sx={{ mb: 3 }}>
+          <ForumSearchPanel slug={slug} tenantId={tenantId}
+            forums={forumNames} />
+        </Box>
+      )}
       {body}
       <ForumAdminDialog s={admin} />
     </Container>

@@ -4,6 +4,8 @@ import { Container, Typography, Box } from '@mui/material'
 import { RocketLaunchOutlined } from '@mui/icons-material'
 import CreateSiteButton from './CreateSiteButton'
 import HeroBackdrop from './HeroBackdrop'
+import HeroLauncherButton from './HeroLauncherButton'
+import ForkRibbon from '@/components/common/ForkRibbon'
 
 const fade = (dir: number) => ({
   from: { opacity: 0, transform: `translateY(${dir}px)` },
@@ -27,6 +29,7 @@ export default function HeroSection() {
   return (
     <Box sx={bgSx}>
       <HeroBackdrop />
+      <ForkRibbon />
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Box sx={colSx}>
           <Box sx={{
@@ -56,6 +59,7 @@ export default function HeroSection() {
             </Typography>
           </Typography>
           <CreateSiteButton />
+          <HeroLauncherButton />
         </Box>
       </Container>
     </Box>

@@ -45,9 +45,13 @@ set(LIB_SOURCES
 
     src/controllers/WsAuth.cpp
 
+    src/controllers/activity/ActivityControllerList.cpp
+
     src/controllers/analytics/AnalyticsControllerGetPageViews.cpp
 
     src/controllers/analytics/AnalyticsControllerGetSearchQueries.cpp
+
+    src/controllers/analytics/AnalyticsControllerGetSummary.cpp
 
     src/controllers/analytics/AnalyticsControllerGetTopContent.cpp
 
@@ -86,6 +90,8 @@ set(LIB_SOURCES
     src/controllers/article/ArticleControllerUpdateArticle.cpp
 
     src/controllers/article/ArticleControllerVoteArticle.cpp
+
+    src/controllers/audit/AuditControllerList.cpp
 
     src/controllers/auth/AuthControllerApplyReset.cpp
 
@@ -185,6 +191,14 @@ set(LIB_SOURCES
 
     src/controllers/forum/ForumControllerVotePost.cpp
 
+    src/controllers/forum/ForumExtrasMove.cpp
+
+    src/controllers/forum/ForumExtrasReact.cpp
+
+    src/controllers/forum/ForumExtrasStats.cpp
+
+    src/controllers/forum/ForumThreadJson.cpp
+
     src/controllers/gallery/GalleryControllerAddPicture.cpp
 
     src/controllers/gallery/GalleryControllerCreateAlbum.cpp
@@ -248,6 +262,8 @@ set(LIB_SOURCES
     src/controllers/search/SearchControllerAutocomplete.cpp
 
     src/controllers/search/SearchControllerSearch.cpp
+
+    src/controllers/search/SearchItemJson.cpp
 
     src/controllers/seo/SeoControllerArticleJsonLd.cpp
 
@@ -367,6 +383,8 @@ set(LIB_SOURCES
 
     src/filters/AdminOwner.cpp
 
+    src/filters/AuditScopeFilter.cpp
+
     src/filters/JwtAccountState.cpp
 
     src/filters/JwtAuthFilter.cpp
@@ -427,6 +445,8 @@ set(LIB_SOURCES
 
     src/services/analytics/AnalyticsServiceGetSearchQueries.cpp
 
+    src/services/analytics/AnalyticsServiceGetSummary.cpp
+
     src/services/analytics/AnalyticsServiceGetTopContent.cpp
 
     src/services/analytics/AnalyticsServiceGetTrafficSources.cpp
@@ -472,6 +492,8 @@ set(LIB_SOURCES
     src/services/article/ArticleServiceUpdateArticle.cpp
 
     src/services/article/ArticleServiceVoteArticle.cpp
+
+    src/services/audit/AuditLog.cpp
 
     src/services/auth/AuthServiceBurnPasswordCheck.cpp
 
@@ -572,6 +594,10 @@ set(LIB_SOURCES
     src/services/file/FileServiceQueries.cpp
 
     src/services/file/FileServiceUpload.cpp
+
+    src/services/forum/ForumReactions.cpp
+
+    src/services/forum/ForumReactionsWrite.cpp
 
     src/services/forum/ForumServiceCreateCategory.cpp
 

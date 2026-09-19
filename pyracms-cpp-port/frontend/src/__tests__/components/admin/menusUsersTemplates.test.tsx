@@ -14,13 +14,14 @@ it('TemplatePreview sanitizes html', () => {
 
 it('TemplateToolbar wires controls', () => {
   const p = { onSection: jest.fn(), onTogglePreview: jest.fn(),
-    onReset: jest.fn() }
+    onReset: jest.fn(), onSave: jest.fn() }
   render(<TemplateToolbar section="header" showPreview {...p} />)
   fireEvent.mouseDown(screen.getByRole('combobox'))
   fireEvent.click(screen.getByRole('option', { name: 'Footer' }))
   fireEvent.click(screen.getByRole('button', { name: 'Preview' }))
   fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
-  expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+  fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+  expect(p.onSave).toHaveBeenCalled()
   expect(p.onSection).toHaveBeenCalledWith('footer')
   expect(p.onTogglePreview).toHaveBeenCalled()
   expect(p.onReset).toHaveBeenCalled()

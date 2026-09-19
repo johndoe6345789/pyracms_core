@@ -1,31 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, IconButton } from '@mui/material'
 import { AddReactionOutlined } from '@mui/icons-material'
 import { ReactionBadge } from './ReactionBadge'
 import { ReactionPicker } from './ReactionPicker'
-import {
-  DEFAULT_REACTIONS, REACTIONS, toggleReaction, type Reaction,
-} from './reactionData'
+import { REACTIONS, toggleReaction, type Reaction } from './reactionData'
+import { setReaction } from '@/lib/forumReactions'
 
 interface PostReactionsProps {
   postId: string
-  initialReactions?: Reaction[]
-  onReact?: (id: string, e: string) => void
+  reactions?: Reaction[]
+  disabled?: boolean
 }
 
+/** Reaction badges; toggles optimistically and rolls back on failure. */
 export function PostReactions({
-  postId, initialReactions, onReact,
+  postId, reactions, disabled = false,
 }: PostReactionsProps) {
-  const [list, setList] =
-    useState<Reaction[]>(initialReactions ?? DEFAULT_REACTIONS)
+  const [list, setList] = useState<Reaction[]>(reactions ?? [])
   const [anchor, setAnchor] = useState<null | HTMLElement>(null)
+  // Re-sync only when the server data changes, not on every re-render.
+  const key = JSON.stringify(reactions ?? [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setList(reactions ?? []), [key])
 
   const toggle = (em: string, lb: string) => {
-    setList((prev) => toggleReaction(prev, em, lb))
-    onReact?.(postId, em)
     setAnchor(null)
+    if (disabled) return
+    const prev = list
+    const add = !prev.find((r) => r.emoji === em)?.reacted
+    setList(toggleReaction(prev, em, lb))
+    setReaction(postId, lb, add).catch(() => setList(prev))
   }
 
   return (
@@ -38,7 +44,7 @@ export function PostReactions({
           count={r.count} reacted={r.reacted}
           onClick={() => toggle(r.emoji, r.label)} />
       ))}
-      <IconButton size="small"
+      <IconButton size="small" disabled={disabled}
         onClick={(e) => setAnchor(e.currentTarget)}
         sx={{ ml: 0.5 }}
         aria-label="Add reaction"

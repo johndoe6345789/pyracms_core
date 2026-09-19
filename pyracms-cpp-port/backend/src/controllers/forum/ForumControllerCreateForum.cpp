@@ -1,4 +1,4 @@
-#include "controllers/BoolReply.h"
+#include "controllers/AuditReply.h"
 #include "controllers/ForumController.h"
 #include "filters/TenantGuard.h"
 
@@ -24,8 +24,9 @@ void ForumController::createForum(
                            : "";
     auto db = drogon::app().getDbClient();
 
-    forumService_.createForum(db, categoryId, name, description,
-                              scopeTenantOf(req), boolReply(callback));
+    forumService_.createForum(
+        db, categoryId, name, description, scopeTenantOf(req),
+        auditedReply(req, callback, "forum.create", name));
 }
 
 } // namespace pyracms

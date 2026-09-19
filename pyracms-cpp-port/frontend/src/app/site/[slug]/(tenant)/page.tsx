@@ -4,6 +4,7 @@ import { Container, Typography, Box } from '@mui/material'
 import TenantModuleCards from '@/components/layout/TenantModuleCards'
 import SiteNotFound from '@/components/layout/SiteNotFound'
 import { useTenantNav } from '@/hooks/useTenantNav'
+import RecentActivity from '@/components/activity/RecentActivity'
 import { useTenant } from '@/hooks/useTenant'
 
 const welcome = (name: string) =>
@@ -33,6 +34,7 @@ export default function SiteHomePage() {
         </Typography>
       </Box>
       <TenantModuleCards slug={slug} canAdmin={canAdmin} />
+      <RecentActivity tenantId={tenant?.id ?? null} />
     </Container>
   )
 }

@@ -8,10 +8,17 @@ interface Props {
   canUpload?: boolean
   uploading?: boolean
   onFiles?: (files: FileList) => void
+  description?: string
+  /** Owner/admin controls; omitted for everyone else */
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
 export default function AlbumHeader(
-  { albumName, count, canUpload = true, uploading = false, onFiles }: Props,
+  {
+    albumName, count, canUpload = true, uploading = false, onFiles,
+    description, onEdit, onDelete,
+  }: Props,
 ) {
   return (
     <Box sx={{
@@ -23,11 +30,15 @@ export default function AlbumHeader(
           {albumName}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          A curated collection of photographs.
-          {' '}
+          {description ? `${description} - ` : ''}
           {count} pictures in this album.
         </Typography>
       </Box>
+      <Box sx={{ display: 'flex', gap: 1 }}>
+      {onEdit && <Button variant="outlined" onClick={onEdit}
+        data-testid="edit-album-btn">Edit</Button>}
+      {onDelete && <Button variant="outlined" color="error"
+        onClick={onDelete} data-testid="delete-album-btn">Delete</Button>}
       {canUpload && <Button
         variant="contained"
         startIcon={<UploadOutlined />}
@@ -50,6 +61,7 @@ export default function AlbumHeader(
           }}
         />
       </Button>}
+      </Box>
     </Box>
   )
 }

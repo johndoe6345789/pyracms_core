@@ -1,21 +1,37 @@
-export interface Comment {
+export interface ApiComment {
   id: number
-  user_id: number
+  userId: number
   username: string
-  avatar: string | null
-  content: string
-  parent_id: number | null
-  upvotes: number
-  downvotes: number
-  user_vote: number | null
-  created_at: string
-  updated_at: string
+  contentType: string
+  contentId: number
+  parentId: number | null
+  body: string
+  likes: number
+  dislikes: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Comment extends ApiComment {
   children: Comment[]
 }
 
 export interface CommentSectionProps {
   contentType: string
   contentId: number
+}
+
+/** Nest the backend's flat list by parentId (orphans become roots). */
+export function buildTree(flat: ApiComment[]): Comment[] {
+  const nodes = new Map<number, Comment>()
+  flat.forEach((c) => nodes.set(c.id, { ...c, children: [] }))
+  const roots: Comment[] = []
+  nodes.forEach((n) => {
+    const parent = n.parentId == null ? undefined : nodes.get(n.parentId)
+    if (parent) parent.children.push(n)
+    else roots.push(n)
+  })
+  return roots
 }
 
 export function timeAgo(dateStr: string): string {

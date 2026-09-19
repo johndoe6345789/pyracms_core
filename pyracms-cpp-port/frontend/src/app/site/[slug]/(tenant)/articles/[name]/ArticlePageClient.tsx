@@ -14,6 +14,7 @@ import {
   ArticleVoteButtons,
 } from '@/components/articles/ArticleVoteButtons'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
+import CommentSection from '@/components/common/CommentSection'
 import PageTransition from '@/components/common/PageTransition'
 import ArticleHeader from './ArticleHeader'
 
@@ -63,6 +64,10 @@ export default function ArticlePageClient() {
             />
           </section>
         </article>
+        {article.id !== undefined && (
+          <CommentSection contentType="article"
+            contentId={article.id} />
+        )}
       </Container>
     </PageTransition>
   )

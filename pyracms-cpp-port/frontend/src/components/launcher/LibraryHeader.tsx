@@ -3,6 +3,7 @@ import {
 } from '@mui/material'
 import { AddOutlined, MenuOutlined } from '@mui/icons-material'
 import Link from 'next/link'
+import GetLauncherLink from './GetLauncherLink'
 
 export type LibraryView = 'library' | 'browse'
 
@@ -13,11 +14,14 @@ interface Props {
   onOpenDrawer: () => void
   /** Link to the create page; omitted for guests */
   newHref?: string | undefined
+  /** Site download page; shows the 'Need Hypernucleus?' link */
+  downloadHref?: string | undefined
 }
 
 /** Title row: mobile menu button, heading and Library/Browse toggle. */
 export default function LibraryHeader(p: Props) {
   return (
+    <>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
       {p.mobile && (
         <IconButton aria-label="Open library" onClick={p.onOpenDrawer}>
@@ -41,5 +45,7 @@ export default function LibraryHeader(p: Props) {
         <ToggleButton value="browse">Browse</ToggleButton>
       </ToggleButtonGroup>
     </Box>
+    {p.downloadHref && <GetLauncherLink href={p.downloadHref} />}
+    </>
   )
 }

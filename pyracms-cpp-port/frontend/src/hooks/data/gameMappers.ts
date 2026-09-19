@@ -21,6 +21,7 @@ export function mapDetail(r: Record<string, unknown>): GameDepDetailData {
   const revs = Array.isArray(r.revisions) ? r.revisions : []
   const list = mapListItem(r)
   return {
+    ...(typeof r.id === 'number' ? { id: r.id } : {}),
     name: list.name,
     displayName: list.displayName,
     description: list.description,

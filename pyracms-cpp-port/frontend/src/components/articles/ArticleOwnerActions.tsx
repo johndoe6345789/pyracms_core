@@ -6,6 +6,7 @@ import {
   DialogContentText, DialogTitle,
 } from '@mui/material'
 import type { Article } from '@/hooks/useArticle'
+import ArticleSchedule from './ArticleSchedule'
 import { useArticleAdmin } from '@/hooks/useArticleAdmin'
 
 interface Props {
@@ -46,6 +47,10 @@ export default function ArticleOwnerActions(p: Props) {
           Delete
         </Button>
       </Box>
+      <ArticleSchedule status={p.article.status ?? 'published'}
+        busy={a.busy} onSchedule={a.schedule} onClear={a.unpublish}
+        {...(p.article.scheduledAt
+          ? { scheduledAt: p.article.scheduledAt } : {})} />
       {a.error && (
         <Alert severity="error" sx={{ mt: 1 }}
           data-testid="article-admin-error">

@@ -3,6 +3,7 @@
 #include "filters/AdminFilter.h"
 #include "filters/Viewer.h"
 #include "security/Validate.h"
+#include "services/AuditLog.h"
 #include "services/UserRole.h"
 
 namespace pyracms {
@@ -25,7 +26,9 @@ void SettingsController::remove(
 
     auto db = drogon::app().getDbClient();
     settingsService_.deleteSetting(
-        db, tenantId, name, [callback](bool success, const std::string &error) {
+        db, tenantId, name,
+        [req, callback, tenantId, name](bool success,
+                                        const std::string &error) {
             if (!success) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -35,6 +38,8 @@ void SettingsController::remove(
                 return;
             }
 
+            auditLog(tenantId, req->attributes()->get<int>("userId"),
+                     "settings.delete", name);
             Json::Value result;
             result["success"] = true;
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

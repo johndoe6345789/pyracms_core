@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
 import { useThread } from '@/hooks/useThread'
 import { asMockApi } from '../helpers/mockApi'

@@ -9,7 +9,7 @@ import {
   SnippetLoading, SnippetNotFound, SnippetActionError,
 } from '@/components/code/SnippetStatus'
 import { SnippetHeader } from '@/components/code/SnippetHeader'
-import { SnippetComments } from '@/components/code/SnippetComments'
+import CommentSection from '@/components/common/CommentSection'
 import { SnippetEditView } from '@/components/code/SnippetEditView'
 import { SnippetReadView } from '@/components/code/SnippetReadView'
 import { DeleteSnippetDialog } from '@/components/code/DeleteSnippetDialog'
@@ -64,7 +64,7 @@ export default function ViewSnippetPage() {
           onDelete={() => setConfirmDel(true)}
         />
       )}
-      <SnippetComments id={id} />
+      <CommentSection contentType="snippet" contentId={Number(id)} />
       <DeleteSnippetDialog
         open={confirmDel}
         onClose={() => setConfirmDel(false)}

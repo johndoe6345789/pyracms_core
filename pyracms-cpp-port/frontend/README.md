@@ -94,7 +94,16 @@ Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
 API_URL=http://localhost:8080
+NEXT_PUBLIC_GITHUB_REPO=johndoe6345789/pyracms_core  # optional
 ```
+
+`NEXT_PUBLIC_GITHUB_REPO` (default `johndoe6345789/pyracms_core`) drives the
+footer links, the "Fork me on GitHub" ribbon and the `/download` page, which
+reads the newest `launcher-v*` / `v*` release (assets `hypernucleus-<os>-<arch>`,
+os `win|mac|lin`, arch `x86_64|arm64`) from the public GitHub API in the
+browser (allowed by `connect-src https://api.github.com`), cached in memory and
+sessionStorage. When the API is unreachable or rate-limited it links to the
+repo's Releases page instead. Also served per site at `/site/<slug>/download`.
 
 ## Features
 

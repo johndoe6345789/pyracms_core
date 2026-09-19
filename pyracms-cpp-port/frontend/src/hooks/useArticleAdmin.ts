@@ -34,6 +34,8 @@ export function useArticleAdmin(
     busy, error,
     publish: () => act(() => api.post(`${base}/publish`, body), onChanged),
     unpublish: () => act(() => api.post(`${base}/unpublish`, body), onChanged),
+    schedule: (at: string) => act(() => api.post(`${base}/schedule`,
+      { ...body, scheduled_at: new Date(at).toISOString() }), onChanged),
     togglePrivate: () => act(() => api.put(`${base}/private`, body), onChanged),
     remove: () => act(
       () => api.delete(`${base}?tenant_id=${tenantId}`), onDeleted),

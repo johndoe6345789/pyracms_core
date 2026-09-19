@@ -5,8 +5,12 @@ import Link from 'next/link'
 import PasswordField from './PasswordField'
 import { useResetPassword } from '@/hooks/useResetPassword'
 
-export default function ResetPasswordForm({ token }: { token: string }) {
+export default function ResetPasswordForm(
+  { token, tenant }: { token: string; tenant?: string | undefined },
+) {
   const s = useResetPassword(token)
+  const login = tenant
+    ? `/auth/login?tenant=${encodeURIComponent(tenant)}` : '/auth/login'
   return (
     <Box component="form" onSubmit={s.submit} data-testid="reset-form">
       <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
@@ -20,7 +24,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       {s.done ? (
         <Alert severity="success" data-testid="reset-done">
           Password updated. You can now{' '}
-          <Link href="/auth/login" data-testid="reset-login-link">
+          <Link href={login} data-testid="reset-login-link">
             sign in
           </Link>.
         </Alert>

@@ -4,6 +4,7 @@ import { emptyCats } from '../../helpers/forumPagesState'
 
 jest.mock('next/navigation', () => ({
   useParams: () => ({ slug: 's', forumId: '2' }),
+  useRouter: () => ({ push: jest.fn() }),
 }))
 jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: tenant, loading: false }),
@@ -53,6 +54,10 @@ describe('ForumPage', () => {
     render(<ForumPage />)
     expect(screen.queryByTestId('add-category-btn')).toBeNull()
     expect(screen.queryByTestId('add-forum-1')).toBeNull()
+  })
+  it('shows the forum search bar', () => {
+    render(<ForumPage />)
+    expect(screen.getByTestId('forum-search-input')).toBeInTheDocument()
   })
   it('reports an unknown site', () => {
     tenant = null

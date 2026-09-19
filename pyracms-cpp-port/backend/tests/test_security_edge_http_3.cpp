@@ -26,7 +26,8 @@ TEST(SecurityAnalytics, ReadsAreForAdminsAndTrackingIsBounded) {
     EXPECT_EQ(bad.text.find("violates"), std::string::npos);
     EXPECT_EQ(bad.text.find("constraint"), std::string::npos);
     EXPECT_EQ(post("/api/analytics/track",
-                   J({{"path", std::string(900, 'p')}, {"tenant_id", s.id}}))
+                   J({{"path", "/" + std::string(900, 'p')},
+                     {"tenant_id", s.id}}))
                   .status, 200);
     EXPECT_EQ(post("/api/analytics/track",
                    J({{"path", 5}, {"tenant_id", s.id}})).status, 400);

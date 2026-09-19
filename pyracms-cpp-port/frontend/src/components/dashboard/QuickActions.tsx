@@ -1,17 +1,19 @@
 'use client'
 
+import NextLink from 'next/link'
 import { Paper, Typography, Box } from '@mui/material'
 
-const ACTIONS = [
-  'Create New Content',
-  'Manage Users',
-  'View Analytics',
-  'Plugin Settings',
+const actions = (slug: string) => [
+  { label: 'Create New Content', href: `/site/${slug}/articles/create` },
+  { label: 'Manage Users', href: `/site/${slug}/admin/users` },
+  { label: 'View Analytics', href: `/site/${slug}/admin/analytics` },
+  { label: 'Feature Settings', href: `/site/${slug}/admin/features` },
 ]
 
-export default function QuickActions() {
+export default function QuickActions({ slug }: { slug: string }) {
   return (
-    <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+    <Paper sx={{ p: 3, borderRadius: 3, mb: 4 }}
+      data-testid="quick-actions">
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
         Quick Actions
       </Typography>
@@ -20,12 +22,16 @@ export default function QuickActions() {
         Common tasks
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {ACTIONS.map((action, i) => (
+        {actions(slug).map((a) => (
           <Box
-            key={i}
+            key={a.href}
+            component={NextLink}
+            href={a.href}
+            data-testid={`quick-action-${a.label}`}
             sx={{
               p: 2, borderRadius: 2, bgcolor: 'background.default',
-              cursor: 'pointer', transition: 'all 0.2s',
+              color: 'text.primary', textDecoration: 'none',
+              transition: 'all 0.2s',
               '&:hover': {
                 bgcolor: 'primary.main', color: 'white',
                 transform: 'translateX(4px)',
@@ -33,7 +39,7 @@ export default function QuickActions() {
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {action}
+              {a.label}
             </Typography>
           </Box>
         ))}

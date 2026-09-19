@@ -1,4 +1,7 @@
 import { formatForumDate } from '@/lib/forumDate'
+import {
+  mapReactions, type RawReaction, type Reaction,
+} from '@/components/forum/reactionData'
 
 export interface Post {
   id: string
@@ -8,6 +11,8 @@ export interface Post {
   likes: number
   dislikes: number
   isOwner: boolean
+  authorId?: number
+  reactions?: Reaction[]
 }
 
 export interface ThreadInfo {
@@ -28,6 +33,7 @@ export interface RawPost {
   likes?: number
   dislikes?: number
   userId?: number
+  reactions?: RawReaction[]
 }
 
 export const EMPTY_THREAD: ThreadInfo = {
@@ -63,5 +69,7 @@ export function mapPosts(
     likes: p.likes || 0,
     dislikes: p.dislikes || 0,
     isOwner: isModerator || (userId !== null && p.userId === userId),
+    ...(p.userId != null ? { authorId: p.userId } : {}),
+    reactions: mapReactions(p.reactions),
   }))
 }

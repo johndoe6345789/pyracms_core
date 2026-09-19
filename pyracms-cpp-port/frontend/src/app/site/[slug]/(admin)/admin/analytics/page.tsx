@@ -7,6 +7,8 @@ import { TrafficPieChart } from '@/components/admin/charts/TrafficPieChart'
 import {
   ReferrersTable, SearchesTable,
 } from '@/components/admin/analytics/AnalyticsTables'
+import SummaryCards from
+  '@/components/admin/analytics/SummaryCards'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 
@@ -26,6 +28,7 @@ export default function AnalyticsPage() {
       >
         Overview of site traffic and content performance.
       </Typography>
+      <SummaryCards tenantId={tenantId} />
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <PageViewChart />

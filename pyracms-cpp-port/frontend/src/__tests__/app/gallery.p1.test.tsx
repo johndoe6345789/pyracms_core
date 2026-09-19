@@ -5,6 +5,8 @@ import PicturePage
   from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
 
 const push = jest.fn()
+jest.mock('@/components/common/CommentSection',
+  () => require('../helpers/commentMock').commentSectionMock())
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's', albumId: '4', pictureId: '9' }),
@@ -12,7 +14,8 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/hooks/useTenantId', () => ({
   useTenantId: () => ({ tenantId: 1 }),
 }))
-let signedIn = false
+jest.mock('@/hooks/useCanManage', () => ({ useCanManage: () => true }))
+const signedIn = false
 jest.mock('@/hooks/useSiteSession', () => ({
   useSiteSession: () => signedIn,
 }))
@@ -21,22 +24,23 @@ jest.mock('@/hooks/useGalleryAlbums', () => ({
     coverImage: '/c', pictureCount: 2 }] }),
 }))
 jest.mock('@/hooks/useGalleryAlbum', () => ({
-  useGalleryAlbum: () => ({ albumName: 'Trip', pictures: [
+  useGalleryAlbum: () => ({ albumName: 'Trip', albumDescription: 'd',
+    ownerId: 1, refresh: jest.fn(), pictures: [
     { id: '1', title: 'P', src: '/p' }] }),
 }))
 const pic = { title: 'Pic', description: 'd', src: '/s', tags: [],
-  likes: 1, dislikes: 0, isVideo: false, albumId: '4', albumName: 'Trip' }
+  likes: 1, dislikes: 0, isVideo: false, albumId: '4', albumName: 'Trip',
+  ownerId: 1 }
 const h = { picture: pic as unknown, handleLike: jest.fn(),
   handleDislike: jest.fn(), handleSetCover: jest.fn(),
-  handleDelete: jest.fn() }
+  refresh: jest.fn() }
 jest.mock('@/hooks/useGalleryPicture', () => ({
   useGalleryPicture: () => h,
 }))
-let tags = { items: [] as unknown[], loading: false }
+const tags = { items: [] as unknown[], loading: false }
 jest.mock('@/hooks/useTagCloudPage', () => ({
   useTagCloudPage: () => tags,
 }))
-
 describe('gallery pages', () => {
   it('lists albums', () => {
     render(<GalleryPage />)
@@ -51,14 +55,11 @@ describe('gallery pages', () => {
     expect(screen.getByTestId('picture-item-1')).toBeInTheDocument()
   })
 
-  it('shows a picture and deletes it', async () => {
+  it('sets the cover from the picture page', async () => {
     h.handleSetCover.mockResolvedValue({})
-    h.handleDelete.mockResolvedValue({})
     render(<PicturePage />)
     fireEvent.click(screen.getByTestId('set-cover-btn'))
-    fireEvent.click(screen.getByTestId('delete-picture-btn'))
-    await waitFor(() => expect(push).toHaveBeenCalledWith(
-      '/site/s/gallery/4'))
+    await waitFor(() => expect(h.handleSetCover).toHaveBeenCalled())
   })
 
   it('shows picture action failures', async () => {

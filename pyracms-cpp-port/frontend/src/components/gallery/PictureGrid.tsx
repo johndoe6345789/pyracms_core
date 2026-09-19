@@ -1,4 +1,5 @@
 import {
+  Box,
   ImageList,
   ImageListItem,
 } from '@mui/material'
@@ -45,7 +46,15 @@ export default function PictureGrid(
             },
           }}
         >
-          <img
+          {!pic.src && (
+            <Box data-testid={`picture-missing-${pic.id}`} sx={{
+              height: 160, display: 'grid', placeItems: 'center',
+              bgcolor: 'action.hover', color: 'text.secondary', p: 1,
+            }}>
+              {pic.title}
+            </Box>
+          )}
+          {pic.src && <img
             src={pic.src}
             alt={pic.title}
             loading="lazy"
@@ -54,7 +63,7 @@ export default function PictureGrid(
               width: '100%',
               borderRadius: 12,
             }}
-          />
+          />}
         </ImageListItem>
       ))}
     </ImageList>

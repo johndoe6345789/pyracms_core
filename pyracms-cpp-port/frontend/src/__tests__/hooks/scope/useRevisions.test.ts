@@ -1,5 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useRevisions, mapRevisions } from '@/hooks/useRevisions'
+import {
+  useRevisions, mapRevisions, mapDiffRevisions,
+} from '@/hooks/useRevisions'
 import { m } from '../../helpers/scopeApi'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
@@ -36,4 +38,16 @@ it('rejects revert without tenant; tolerates load error', async () => {
   m.get.mockRejectedValue(new Error('x'))
   const b = renderHook(() => useRevisions('n', 1))
   await waitFor(() => expect(b.result.current.loading).toBe(false))
+})
+
+it('maps diff revisions oldest first with their content', () => {
+  const d = mapDiffRevisions([
+    { id: 9, revisionNumber: 2, content: 'new', authorUsername: 'a' },
+    { id: 5, revisionNumber: 1, content: 'old' },
+    { revisionNumber: 3, content: 4 },
+  ])
+  expect(d.map((x) => x.id)).toEqual(['3', '5', '9'])
+  expect(d[1]).toMatchObject(
+    { label: 'Revision #1', content: 'old' })
+  expect(d[0]!.content).toBe('')
 })

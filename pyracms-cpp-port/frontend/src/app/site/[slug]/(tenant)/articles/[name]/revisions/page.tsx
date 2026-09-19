@@ -18,6 +18,9 @@ import {
 import {
   RevisionTable,
 } from '@/components/articles/RevisionTable'
+import {
+  RevisionDiffViewer,
+} from '@/components/articles/RevisionDiffViewer'
 
 export default function RevisionsPage() {
   const params = useParams()
@@ -26,6 +29,7 @@ export default function RevisionsPage() {
   const { tenantId } = useTenantId(slug)
   const {
     revisions,
+    diffs,
     latestRevision,
     handleRevert,
   } = useRevisions(name, tenantId)
@@ -73,6 +77,17 @@ export default function RevisionsPage() {
           onRevert={handleRevert}
         />
       </section>
+      {diffs.length > 1 && (
+        <section
+          aria-label="Compare revisions"
+          data-testid="revisions-compare"
+        >
+          <Typography variant="h5" sx={{ mt: 5, mb: 2 }}>
+            Compare Revisions
+          </Typography>
+          <RevisionDiffViewer revisions={diffs} />
+        </section>
+      )}
     </Container>
   )
 }

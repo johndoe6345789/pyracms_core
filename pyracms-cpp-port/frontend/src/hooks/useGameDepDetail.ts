@@ -26,6 +26,7 @@ export interface Screenshot {
 }
 
 export interface GameDepDetailData {
+  id?: number
   name: string
   displayName: string
   description: string
