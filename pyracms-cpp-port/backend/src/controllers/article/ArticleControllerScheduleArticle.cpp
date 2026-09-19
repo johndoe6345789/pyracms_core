@@ -20,7 +20,7 @@ void ArticleController::scheduleArticle(
     auto scheduledAt = (*json)["scheduled_at"].asString();
     auto db = drogon::app().getDbClient();
 
-    articleService_.getArticle(
+    articleService_.findArticle(
         db, tenantId, name,
         [this, db, scheduledAt, callback](const std::optional<ArticleDto> &article) {
             if (!article) {

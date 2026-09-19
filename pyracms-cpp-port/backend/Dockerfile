@@ -1,4 +1,5 @@
-FROM ubuntu:24.04 AS deps
+# Base images are pinned by digest (renovate keeps them current).
+FROM ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3 AS deps
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -16,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Conan 2
-RUN pip3 install --break-system-packages conan && conan profile detect
+RUN pip3 install --break-system-packages "conan==2.32.0" && conan profile detect
 
 WORKDIR /app
 
@@ -57,18 +58,21 @@ RUN sed -i 's/\r$//' /app/run-tests.sh && chmod +x /app/run-tests.sh
 CMD ["/app/run-tests.sh"]
 
 # Production stage
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl3t64 \
     libpq5 \
     postgresql-client \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 10001 pyracms \
+    && useradd --system --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin pyracms
 
 # Docker CLI (static) so the code runner can start sandbox containers via
 # the host's docker.sock
-COPY --from=docker:27-cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker:27-cli@sha256:851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c /usr/local/bin/docker /usr/local/bin/docker
 
 WORKDIR /app
 
@@ -87,6 +91,15 @@ COPY seed.sh seed_games.sh /app/
 # Windows checkouts can hand us CRLF scripts, which break the shebang
 RUN sed -i 's/\r$//' /app/docker-entrypoint.sh /app/seed.sh /app/seed_games.sh && chmod +x /app/docker-entrypoint.sh /app/seed.sh
 
+# uploads land in ./uploads (relative to WORKDIR); make only that writable.
+RUN mkdir -p /app/uploads && chown pyracms:pyracms /app/uploads
+
+# Run unprivileged. Talking to the host docker.sock (code runner) as this user
+# needs a socket proxy (docker-compose.prod.yml) or `user: "0:0"` (dev only).
+USER 10001:10001
+
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:8080/api/tenants -o /dev/null || exit 1
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

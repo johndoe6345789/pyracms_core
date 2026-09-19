@@ -1,4 +1,6 @@
 #include "controllers/ArticleController.h"
+#include "filters/UserVisibility.h"
+#include "filters/Viewer.h"
 
 namespace pyracms {
 
@@ -16,17 +18,13 @@ void ArticleController::listArticles(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    int limit = 20;
-    int offset = 0;
-    auto limitStr = req->getParameter("limit");
-    auto offsetStr = req->getParameter("offset");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
-    if (!offsetStr.empty()) offset = std::stoi(offsetStr);
+    int limit = clampLimit(req->getParameter("limit"), 20, 100);
+    int offset = clampOffset(req->getParameter("offset"));
 
     auto db = drogon::app().getDbClient();
 
     articleService_.listArticles(
-        db, tenantId, limit, offset,
+        db, tenantId, limit, offset, viewerIdFor(req, tenantId),
         [callback](const std::vector<ArticleDto> &articles) {
             Json::Value result(Json::arrayValue);
             for (const auto &a : articles) {

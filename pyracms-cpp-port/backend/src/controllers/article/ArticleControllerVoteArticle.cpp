@@ -1,4 +1,5 @@
 #include "controllers/ArticleController.h"
+#include "filters/Viewer.h"
 
 namespace pyracms {
 
@@ -22,7 +23,7 @@ void ArticleController::voteArticle(
     auto db = drogon::app().getDbClient();
 
     articleService_.getArticle(
-        db, tenantId, name,
+        db, tenantId, name, viewerIdFor(req, tenantId),
         [this, db, userId, isLike, callback](const std::optional<ArticleDto> &article) {
             if (!article) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});

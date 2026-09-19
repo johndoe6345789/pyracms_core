@@ -1,6 +1,24 @@
 #include "controllers/SettingsController.h"
+#include "filters/AdminFilter.h"
+#include "services/UserRole.h"
+#include "filters/Viewer.h"
+#include "security/Validate.h"
 
 namespace pyracms {
+
+// Credential-like settings (names such as *secret*, *password*, *key*) are
+// shown to site administrators only; everything else is public site config.
+static void withAdminFlag(const drogon::HttpRequestPtr &req, int tenantId,
+                          std::function<void(bool)> next) {
+    int viewer = viewerIdFor(req, tenantId);
+    if (viewer == 0) {
+        next(false);
+        return;
+    }
+    AdminFilter::roleLookup()(viewer, [next](std::optional<int> role) {
+        next(role && *role >= static_cast<int>(UserRole::SiteAdmin));
+    });
+}
 
 void SettingsController::list(
     const drogon::HttpRequestPtr &req,
@@ -17,11 +35,14 @@ void SettingsController::list(
 
     int tenantId = std::stoi(tenantIdStr);
     auto db = drogon::app().getDbClient();
+    withAdminFlag(req, tenantId, [this, db, tenantId, callback](bool admin) {
     settingsService_.listSettings(
         db, tenantId,
-        [callback](const std::vector<SettingDto> &settings) {
+        [admin, callback](const std::vector<SettingDto> &settings) {
             Json::Value result(Json::arrayValue);
             for (const auto &s : settings) {
+                if (!admin && isSensitiveSettingName(s.name))
+                    continue;
                 Json::Value item;
                 item["id"] = s.id;
                 item["tenantId"] = s.tenantId;
@@ -31,6 +52,7 @@ void SettingsController::list(
             }
             callback(drogon::HttpResponse::newHttpJsonResponse(result));
         });
+    });
 }
 
 void SettingsController::getByName(
@@ -49,10 +71,12 @@ void SettingsController::getByName(
 
     int tenantId = std::stoi(tenantIdStr);
     auto db = drogon::app().getDbClient();
+    withAdminFlag(req, tenantId, [this, db, tenantId, name,
+                                  callback](bool admin) {
     settingsService_.getSetting(
         db, tenantId, name,
-        [callback](const std::optional<SettingDto> &setting) {
-            if (!setting) {
+        [admin, callback](const std::optional<SettingDto> &setting) {
+            if (!setting || (!admin && isSensitiveSettingName(setting->name))) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(
                     Json::Value{});
                 (*resp->jsonObject())["error"] = "Setting not found";
@@ -68,6 +92,7 @@ void SettingsController::getByName(
             result["value"] = setting->value;
             callback(drogon::HttpResponse::newHttpJsonResponse(result));
         });
+    });
 }
 
 void SettingsController::createOrUpdate(
@@ -84,6 +109,15 @@ void SettingsController::createOrUpdate(
         return;
     }
 
+    if (!(*json)["tenantId"].isInt() || !(*json)["value"].isString() ||
+        !isSafeKey(name, 128) ||
+        !isBoundedText((*json)["value"].asString(), 20000)) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "Invalid setting name or value";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     int tenantId = (*json)["tenantId"].asInt();
     auto value = (*json)["value"].asString();
 

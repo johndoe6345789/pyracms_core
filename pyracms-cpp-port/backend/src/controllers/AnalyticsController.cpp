@@ -1,4 +1,5 @@
 #include "controllers/AnalyticsController.h"
+#include "filters/UserVisibility.h"
 
 #include <functional>
 #include <openssl/sha.h>
@@ -66,7 +67,7 @@ void AnalyticsController::getTopContent(
     int tenantId = std::stoi(tenantIdStr);
     int limit = 20;
     auto limitStr = req->getParameter("limit");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
+    limit = clampLimit(limitStr, limit, 100);
 
     auto db = drogon::app().getDbClient();
 
@@ -101,7 +102,7 @@ void AnalyticsController::getTrafficSources(
     int tenantId = std::stoi(tenantIdStr);
     int limit = 20;
     auto limitStr = req->getParameter("limit");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
+    limit = clampLimit(limitStr, limit, 100);
 
     auto db = drogon::app().getDbClient();
 
@@ -135,7 +136,7 @@ void AnalyticsController::getSearchQueries(
     int tenantId = std::stoi(tenantIdStr);
     int limit = 20;
     auto limitStr = req->getParameter("limit");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
+    limit = clampLimit(limitStr, limit, 100);
 
     auto db = drogon::app().getDbClient();
 
@@ -167,12 +168,24 @@ void AnalyticsController::trackPageView(
         return;
     }
 
-    auto path = (*json)["path"].asString();
-    auto referrer = (*json).get("referrer", "").asString();
+    if (!(*json)["path"].isString() || !(*json)["tenant_id"].isInt() ||
+        !(*json).get("referrer", "").isString()) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "path and tenant_id required";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+    // Anonymous endpoint: cap every stored string to its column size
+    auto cap = [](std::string s) {
+        return s.size() > 500 ? s.substr(0, 500) : s;
+    };
+    auto path = cap((*json)["path"].asString());
+    auto referrer = cap((*json).get("referrer", "").asString());
     int tenantId = (*json)["tenant_id"].asInt();
 
     // Get user agent from request headers
-    auto userAgent = req->getHeader("User-Agent");
+    auto userAgent = cap(std::string(req->getHeader("User-Agent")));
 
     // Hash the IP for privacy
     auto peerAddr = req->getPeerAddr();
@@ -186,7 +199,7 @@ void AnalyticsController::trackPageView(
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
-                resp->setStatusCode(drogon::k500InternalServerError);
+                resp->setStatusCode(drogon::k400BadRequest);
                 callback(resp);
                 return;
             }

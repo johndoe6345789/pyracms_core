@@ -23,6 +23,8 @@ TEST(ArticleHttp, StateChangingEndpoints) {
     EXPECT_EQ(put(base + "/renderer", tid, tok).status, 400);
     EXPECT_EQ(put(base + "/private", tid, tok).status, 200);
     EXPECT_EQ(put(base + "/private", J({{"a", 1}}), tok).status, 400);
+    // private drafts are invisible to other accounts: make it public again
+    EXPECT_EQ(put(base + "/private", tid, tok).status, 200);
     auto vote = J({{"is_like", true}, {"tenant_id", s.id}});
     EXPECT_EQ(post(base + "/vote", vote, s.user.token).status, 200);
     EXPECT_EQ(post(base + "/vote", tid, s.user.token).status, 400);
@@ -40,7 +42,11 @@ TEST(ArticleHttp, StateChangingEndpoints) {
                      std::to_string(s.id));
     EXPECT_EQ(cloud.status, 200);
     EXPECT_EQ(get("/api/articles/tags/cloud").status, 400);
-    EXPECT_EQ(get(base + "?tenant_id=" + std::to_string(s.id)).status, 200);
+    // Scheduled (not yet published): hidden from the public, open to staff
+    auto url = base + "?tenant_id=" + std::to_string(s.id);
+    EXPECT_EQ(get(url).status, 404);
+    EXPECT_EQ(get(url, s.user.token).status, 404);
+    EXPECT_EQ(get(url, tok).status, 200);
 }
 
 TEST(ArticleHttp, RequiresLoginAndTenantMatch) {

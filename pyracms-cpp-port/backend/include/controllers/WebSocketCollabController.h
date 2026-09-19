@@ -32,7 +32,7 @@ private:
     // room name -> connections in that room
     static std::unordered_map<std::string, std::vector<drogon::WebSocketConnectionPtr>> rooms_;
 
-    int authenticateFromToken(const std::string &token);
+    static constexpr size_t kMaxMessageBytes = 1024 * 1024;
 };
 
 } // namespace pyracms

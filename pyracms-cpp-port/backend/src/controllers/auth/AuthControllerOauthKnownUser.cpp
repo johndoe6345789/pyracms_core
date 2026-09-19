@@ -12,6 +12,11 @@ void AuthController::oauthKnownUser(int userId, HttpCb callback) {
                 sendError(callback, "User not found", drogon::k404NotFound);
                 return;
             }
+            if (user->banned) {
+                sendError(callback, "Account is banned",
+                          drogon::k403Forbidden);
+                return;
+            }
             Json::Value result;
             result["token"] = authService_.generateToken(
                 user->id, user->username, user->tenantId);

@@ -70,7 +70,7 @@ private:
     void finishLogin(const drogon::orm::DbClientPtr &db, int tenantId,
                      const std::string &slug, const std::string &username,
                      HttpCb callback);
-    void applyReset(int userId, const std::string &token,
+    void applyReset(int userId,
                     const std::string &password, HttpCb callback);
     // OAuth callback steps (see AuthControllerOauth*.cpp)
     void oauthProfile(const std::string &provider,

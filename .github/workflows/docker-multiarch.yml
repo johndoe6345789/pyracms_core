@@ -51,6 +51,8 @@ jobs:
           - { platform: linux/arm64, runner: ubuntu-24.04-arm, pair: arm64 }
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
@@ -75,6 +77,9 @@ jobs:
           context: pyracms-cpp-port/${{ matrix.image }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
+          # BuildKit SBOM + max-detail provenance attestations (pushed builds)
+          sbom: ${{ github.event_name != 'pull_request' }}
+          provenance: ${{ github.event_name != 'pull_request' && 'mode=max' || 'false' }}
           outputs: >-
             type=image,name=${{ env.REGISTRY }}/${{ env.OWNER }}/pyracms-${{ matrix.image }},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' }}
           cache-from: type=gha,scope=${{ matrix.image }}-${{ matrix.pair }}
@@ -103,7 +108,10 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      packages: write
+      packages: write          # push the manifest list
+      id-token: write          # keyless build-provenance attestation
+      attestations: write
+      security-events: write   # upload Trivy SARIF
     strategy:
       fail-fast: false
       matrix:
@@ -146,4 +154,39 @@ jobs:
             $(printf "${REPO}@sha256:%s " *)
 
       - name: Inspect
-        run: docker buildx imagetools inspect ${REPO}:${{ steps.meta.outputs.version }}
+        id: inspect
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          docker buildx imagetools inspect "${REPO}:${VERSION}"
+          digest="$(docker buildx imagetools inspect "${REPO}:${VERSION}" --format '{{json .Manifest}}' | jq -r .digest)"
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+
+      # Vulnerability scan of the published image. Report-only (Security tab):
+      # the image is already public, so this is monitoring, not a gate.
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.REPO }}@${{ steps.inspect.outputs.digest }}
+          format: sarif
+          output: trivy-${{ matrix.image }}.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy SARIF
+        if: ${{ !cancelled() }}
+        uses: github/codeql-action/upload-sarif@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
+        with:
+          sarif_file: trivy-${{ matrix.image }}.sarif
+          category: trivy-${{ matrix.image }}
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-name: ${{ env.REPO }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          push-to-registry: true

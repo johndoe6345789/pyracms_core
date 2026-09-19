@@ -77,6 +77,9 @@ public:
                          const std::string &username, int limit, int offset,
                          ListCallback cb);
 
+    // "" when the profile update is acceptable, else why not.
+    static std::string updateProblem(const Json::Value &updates);
+
     void updateUser(const DbClientPtr &db, int id,
                     const Json::Value &updates,
                     BoolCallback cb);

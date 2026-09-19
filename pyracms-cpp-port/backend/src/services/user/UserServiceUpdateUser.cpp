@@ -1,70 +1,90 @@
-#include "services/UserService.h"
+#include "security/Validate.h"
 #include "services/DbError.h"
+#include "services/UserService.h"
+
 
 namespace pyracms {
 
+static bool okTimezone(const std::string &s) {
+    if (s.empty() || s.size() > 64)
+        return false;
+    for (unsigned char c : s) {
+        if (!std::isalnum(c) && c != '_' && c != '/' && c != '+' &&
+            c != '-' && c != ':')
+            return false;
+    }
+    return true;
+}
+
+static bool okWebsite(const std::string &s) {
+    if (s.empty())
+        return true;
+    return s.size() <= 256 && !hasControlChars(s) && s.find(' ') == s.npos &&
+           (s.rfind("http://", 0) == 0 || s.rfind("https://", 0) == 0);
+}
+
+// Only these five profile fields can ever be written here: role, banned,
+// tenant_id, password_hash and the rest are not reachable from a request.
+std::string UserService::updateProblem(const Json::Value &u) {
+    if (!u.isObject())
+        return "Invalid JSON body";
+    for (const char *k :
+         {"fullName", "email", "website", "aboutme", "timezone"}) {
+        if (u.isMember(k) && !u[k].isString())
+            return std::string(k) + " must be text";
+    }
+    if (u.isMember("fullName") && (u["fullName"].asString().size() > 128 ||
+                                   hasControlChars(u["fullName"].asString())))
+        return "Invalid full name";
+    if (u.isMember("email") && !isValidEmail(u["email"].asString()))
+        return "A valid email address is required";
+    if (u.isMember("website") && !okWebsite(u["website"].asString()))
+        return "Website must be an http(s) URL";
+    if (u.isMember("aboutme") && u["aboutme"].asString().size() > 5000)
+        return "About me is too long";
+    if (u.isMember("timezone") && !okTimezone(u["timezone"].asString()))
+        return "Invalid timezone";
+    return "";
+}
+
 void UserService::updateUser(const DbClientPtr &db, int id,
                              const Json::Value &updates, BoolCallback cb) {
-    // Build dynamic update query
-    std::vector<std::string> setClauses;
-    std::vector<std::string> params;
-    int paramIdx = 1;
-
-    auto addField = [&](const char *jsonKey, const char *dbCol) {
-        if (updates.isMember(jsonKey)) {
-            setClauses.push_back(std::string(dbCol) + " = $" +
-                                 std::to_string(paramIdx++));
-            params.push_back(updates[jsonKey].asString());
-        }
+    auto problem = updateProblem(updates);
+    if (!problem.empty()) {
+        cb(false, problem);
+        return;
+    }
+    // Each field travels as (value, present): a field that was not sent
+    // keeps its stored value.
+    bool hasAny = false;
+    auto val = [&](const char *key) {
+        hasAny = hasAny || updates.isMember(key);
+        return updates.isMember(key) ? updates[key].asString()
+                                     : std::string();
     };
-
-    addField("fullName", "full_name");
-    addField("email", "email");
-    addField("website", "website");
-    addField("aboutme", "aboutme");
-    addField("timezone", "timezone");
-
-    if (setClauses.empty()) {
+    auto fullName = val("fullName"), email = val("email"),
+         website = val("website"), aboutme = val("aboutme"),
+         timezone = val("timezone");
+    if (!hasAny) {
         cb(false, "No fields to update");
         return;
     }
-
-    std::string sql = "UPDATE users SET ";
-    for (size_t i = 0; i < setClauses.size(); ++i) {
-        if (i > 0)
-            sql += ", ";
-        sql += setClauses[i];
-    }
-    sql += " WHERE id = $" + std::to_string(paramIdx);
-
-    // Use raw SQL with positional params
-    // For simplicity, handle the common case of up to 5 update fields
-    auto successCb = [cb](const drogon::orm::Result &) { cb(true, ""); };
-    auto errorCb = [cb](const drogon::orm::DrogonDbException &e) {
-        cb(false, dbError(e));
-    };
-
-    // Build parameter string for the ID
-    params.push_back(std::to_string(id));
-
-    // Execute with string parameters
-    if (params.size() == 2) {
-        db->execSqlAsync(sql, successCb, errorCb, params[0], params[1]);
-    } else if (params.size() == 3) {
-        db->execSqlAsync(sql, successCb, errorCb, params[0], params[1],
-                         params[2]);
-    } else if (params.size() == 4) {
-        db->execSqlAsync(sql, successCb, errorCb, params[0], params[1],
-                         params[2], params[3]);
-    } else if (params.size() == 5) {
-        db->execSqlAsync(sql, successCb, errorCb, params[0], params[1],
-                         params[2], params[3], params[4]);
-    } else if (params.size() == 6) {
-        db->execSqlAsync(sql, successCb, errorCb, params[0], params[1],
-                         params[2], params[3], params[4], params[5]);
-    } else {
-        cb(false, "Too many fields to update");
-    }
+    db->execSqlAsync(
+        "UPDATE users SET "
+        "full_name = CASE WHEN $2::bool THEN $1::text ELSE full_name END, "
+        "email = CASE WHEN $4::bool THEN $3::text ELSE email END, "
+        "website = CASE WHEN $6::bool THEN $5::text ELSE website END, "
+        "aboutme = CASE WHEN $8::bool THEN $7::text ELSE aboutme END, "
+        "timezone = CASE WHEN $10::bool THEN $9::text ELSE timezone END "
+        "WHERE id = $11::int",
+        [cb](const drogon::orm::Result &) { cb(true, ""); },
+        [cb](const drogon::orm::DrogonDbException &e) {
+            cb(false, dbError(e));
+        },
+        fullName, updates.isMember("fullName"), email,
+        updates.isMember("email"), website, updates.isMember("website"),
+        aboutme, updates.isMember("aboutme"), timezone,
+        updates.isMember("timezone"), id);
 }
 
 } // namespace pyracms

@@ -1,5 +1,6 @@
 # Stage 1: Conan dependency installation
-FROM ubuntu:22.04 AS conan-stage
+# Pinned by digest (renovate keeps it current)
+FROM ubuntu:22.04@sha256:b8b6ee6aa931ecd9d0d952abc34dc0e5f7c6a30c6bb71b079fe399fde0329c02 AS conan-stage
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -39,7 +40,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install conan jinja2
+RUN pip3 install "conan==2.11.0" jinja2
 
 WORKDIR /app
 
@@ -66,7 +67,7 @@ RUN cd build && \
     cmake --build . --parallel $(nproc)
 
 # Stage 3: Runtime
-FROM ubuntu:22.04 AS runtime
+FROM ubuntu:22.04@sha256:b8b6ee6aa931ecd9d0d952abc34dc0e5f7c6a30c6bb71b079fe399fde0329c02 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -96,5 +97,8 @@ COPY --from=build-stage /root/.conan2/p/*/p/plugins /usr/local/plugins/
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ENV QT_PLUGIN_PATH=/usr/local/plugins
 ENV QT_QPA_PLATFORM=xcb
+
+RUN useradd --system --uid 10001 --create-home hypernucleus
+USER 10001:10001
 
 ENTRYPOINT ["/app/hypernucleus"]

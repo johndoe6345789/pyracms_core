@@ -1,6 +1,7 @@
 #include "controllers/CodeSnippetController.h"
 #include "filters/TenantGuard.h"
 #include "filters/TenantRules.h"
+#include "filters/UserVisibility.h"
 #include "filters/Viewer.h"
 
 namespace pyracms {
@@ -26,10 +27,8 @@ void CodeSnippetController::listSnippets(
     auto offsetStr = req->getParameter("offset");
     auto language = req->getParameter("language");
     auto authorStr = req->getParameter("author_id");
-    if (!limitStr.empty())
-        limit = std::stoi(limitStr);
-    if (!offsetStr.empty())
-        offset = std::stoi(offsetStr);
+    limit = clampLimit(limitStr, limit, 100);
+    offset = clampOffset(offsetStr);
     if (!authorStr.empty())
         authorId = std::stoi(authorStr);
 

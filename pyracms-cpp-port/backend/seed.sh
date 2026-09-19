@@ -1,4 +1,18 @@
 #!/bin/bash
+# DEVELOPMENT ONLY. This script creates well-known accounts
+# (admin/password123, alice/password123, ...). It refuses to run unless
+# SEED_DEV=1 is set explicitly, and never runs when PYRACMS_ENV=production,
+# so a production deployment cannot be seeded by accident
+# (docker-compose.prod.yml sets SEED_DEV=0 and PYRACMS_ENV=production).
+if [ "${SEED_DEV:-0}" != "1" ]; then
+  echo "seed.sh: SEED_DEV!=1, refusing to seed (dev-only, known passwords)."
+  exit 0
+fi
+if [ "${PYRACMS_ENV:-}" = "production" ]; then
+  echo "seed.sh: PYRACMS_ENV=production, refusing to seed." >&2
+  exit 1
+fi
+
 # Idempotent seed script — runs only if no tenants exist yet.
 
 API="http://localhost:8080"

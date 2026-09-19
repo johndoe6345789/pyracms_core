@@ -23,16 +23,19 @@ void FileService::uploadFile(const DbClientPtr &db,
                              const std::string &uuid,
                              const std::string &mimetype, int64_t size,
                              bool isPicture, bool isVideo, BoolCallback cb,
-                             const std::string &sha256) {
+                             const std::string &sha256, int userId,
+                             int tenantId) {
     db->execSqlAsync(
         "INSERT INTO files (filename, uuid, mimetype, size, is_picture, "
-        "is_video, download_count, sha256, created_at) "
-        "VALUES ($1, $2, $3, $4, $5, $6, 0, $7, NOW()) RETURNING id",
+        "is_video, download_count, sha256, created_at, user_id, tenant_id) "
+        "VALUES ($1, $2, $3, $4, $5, $6, 0, $7, NOW(), NULLIF($8::int, 0), "
+        "NULLIF($9::int, 0)) RETURNING id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
         },
-        filename, uuid, mimetype, size, isPicture, isVideo, sha256);
+        filename, uuid, mimetype, size, isPicture, isVideo, sha256, userId,
+        tenantId);
 }
 
 } // namespace pyracms

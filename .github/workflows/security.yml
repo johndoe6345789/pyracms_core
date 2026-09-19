@@ -1,0 +1,84 @@
+name: Security scan
+
+# Static checks for the deployment surface: secrets in the tree and history,
+# Dockerfile/compose/workflow misconfiguration, vulnerable dependencies.
+# Third-party actions are pinned to full commit SHAs (renovate keeps them
+# current). No pull_request_target and no secrets are used, so fork PRs are
+# safe to run here.
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trivy:
+    name: trivy (config, secrets, deps)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      # Misconfiguration + secrets: gate on HIGH/CRITICAL.
+      - name: Trivy config and secret scan (gate)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scanners: misconfig,secret
+          scan-ref: pyracms-cpp-port
+          skip-dirs: '**/node_modules'
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+
+      # Dependency vulnerabilities: report to the Security tab (not a gate).
+      - name: Trivy dependency scan (report)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scanners: vuln
+          scan-ref: pyracms-cpp-port
+          skip-dirs: '**/node_modules'
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: sarif
+          output: trivy-fs.sarif
+          exit-code: '0'
+
+      - name: Upload SARIF
+        if: ${{ !cancelled() }}
+        uses: github/codeql-action/upload-sarif@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+  gitleaks:
+    name: gitleaks (full history)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Run the pinned CLI image directly (the gitleaks GitHub Action needs a
+      # licence key for organisation accounts).
+      - name: Scan history
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" \
+            zricethezav/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            detect --source /repo --no-banner --redact --log-opts="--all"

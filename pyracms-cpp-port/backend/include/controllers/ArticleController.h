@@ -11,18 +11,18 @@ public:
     ADD_METHOD_TO(ArticleController::listArticles, "/api/articles", drogon::Get);
     ADD_METHOD_TO(ArticleController::createArticle, "/api/articles", drogon::Post, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(ArticleController::getArticle, "/api/articles/{name}", drogon::Get);
-    ADD_METHOD_TO(ArticleController::updateArticle, "/api/articles/{name}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::deleteArticle, "/api/articles/{name}", drogon::Delete, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::updateArticle, "/api/articles/{name}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::deleteArticle, "/api/articles/{name}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(ArticleController::listRevisions, "/api/articles/{name}/revisions", drogon::Get);
     ADD_METHOD_TO(ArticleController::getRevision, "/api/articles/{name}/revisions/{revId}", drogon::Get);
-    ADD_METHOD_TO(ArticleController::revertToRevision, "/api/articles/{name}/revert/{revId}", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::switchRenderer, "/api/articles/{name}/renderer", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::togglePrivate, "/api/articles/{name}/private", drogon::Put, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::revertToRevision, "/api/articles/{name}/revert/{revId}", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::switchRenderer, "/api/articles/{name}/renderer", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::togglePrivate, "/api/articles/{name}/private", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(ArticleController::voteArticle, "/api/articles/{name}/vote", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::setTags, "/api/articles/{name}/tags", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::publishArticle, "/api/articles/{name}/publish", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::scheduleArticle, "/api/articles/{name}/schedule", drogon::Post, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(ArticleController::unpublishArticle, "/api/articles/{name}/unpublish", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(ArticleController::setTags, "/api/articles/{name}/tags", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::publishArticle, "/api/articles/{name}/publish", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::scheduleArticle, "/api/articles/{name}/schedule", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(ArticleController::unpublishArticle, "/api/articles/{name}/unpublish", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     METHOD_LIST_END
 
     void listArticles(const drogon::HttpRequestPtr &req,

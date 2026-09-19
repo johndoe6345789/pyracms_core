@@ -14,7 +14,13 @@ static std::string namedTenant(const drogon::HttpRequestPtr &req) {
     return "";
 }
 
+// PUBLIC_BASE_URL (deployment config) wins: Host headers are client input
+// and must not decide where catalog download links point.
 std::string gdBaseUrl(const drogon::HttpRequestPtr &req) {
+    if (const char *fixed = std::getenv("PUBLIC_BASE_URL")) {
+        if (*fixed)
+            return fixed;
+    }
     std::string host = req->getHeader("x-forwarded-host");
     if (host.empty())
         host = req->getHeader("host");

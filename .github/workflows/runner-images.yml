@@ -32,13 +32,18 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      packages: write
+      packages: write          # push to GHCR
+      id-token: write          # keyless build-provenance attestation
+      attestations: write
+      security-events: write   # upload Trivy SARIF
     strategy:
       fail-fast: false
       matrix:
         lang: [ python, node, go, cpp, rust, java, ruby ]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
@@ -70,8 +75,12 @@ jobs:
             type=semver,pattern={{version}}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
+          # BuildKit SBOM + max-detail provenance attestations (pushed builds)
+          sbom: ${{ github.event_name != 'pull_request' }}
+          provenance: ${{ github.event_name != 'pull_request' && 'mode=max' || 'false' }}
           context: pyracms-cpp-port/docker/${{ matrix.lang }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
@@ -79,3 +88,35 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=runner-${{ matrix.lang }}
           cache-to: type=gha,mode=max,scope=runner-${{ matrix.lang }}
+
+      # Vulnerability scan of the published image. Report-only (findings land
+      # in the Security tab): the image is already public at this point, so
+      # this is monitoring, not a gate. Pull requests get a build-only run.
+      - name: Trivy scan
+        if: github.event_name != 'pull_request'
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ steps.name.outputs.image }}@${{ steps.build.outputs.digest }}
+          format: sarif
+          output: trivy-runner-${{ matrix.lang }}.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy SARIF
+        if: github.event_name != 'pull_request' && !cancelled()
+        uses: github/codeql-action/upload-sarif@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
+        with:
+          sarif_file: trivy-runner-${{ matrix.lang }}.sarif
+          category: trivy-runner-${{ matrix.lang }}
+
+      - name: Attest build provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-name: ${{ steps.name.outputs.image }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true

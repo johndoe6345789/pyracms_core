@@ -1,0 +1,136 @@
+# Stand-alone TLS variant of nginx.conf (example). To use it:
+#   1. copy to nginx.tls.conf, set server_name, mount certs at /etc/nginx/certs
+#      (fullchain.pem / privkey.pem, e.g. from certbot or your CA),
+#   2. publish 443:443 on the nginx service and set NGINX_CONF=./nginx.tls.conf.
+# Keep the port-80 server below so plain HTTP only redirects to HTTPS.
+#
+# Behind another proxy, tell nginx which hops to trust so rate limiting and
+# logs see the real client address (uncomment and adjust the CIDR):
+#   set_real_ip_from 10.0.0.0/8;
+#   set_real_ip_from 172.16.0.0/12;
+#   real_ip_header   X-Forwarded-For;
+#   real_ip_recursive on;
+
+# -- rate limiting (per client IP) --------------------------------------
+# Credential-guessing surface only: /api/auth/me (session poll) is not limited
+# here because an empty key is exempt from limit_req.
+map $uri $pyracms_auth_key {
+    ~^/api/auth/(login|register|forgot-password|reset-password|verify-email)/?$ $binary_remote_addr;
+    default "";
+}
+limit_req_zone  $pyracms_auth_key zone=pyracms_auth:10m rate=20r/m;
+limit_req_zone  $binary_remote_addr zone=pyracms_api:10m  rate=30r/s;
+limit_conn_zone $binary_remote_addr zone=pyracms_conn:10m;
+limit_req_status  429;
+limit_conn_status 429;
+
+# WebSocket upgrade only when the client asked for it.
+map $http_upgrade $pyracms_connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+    server_tokens off;
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name example.com;   # <-- your domain
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_timeout 1d;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+
+    # Do not advertise the nginx version.
+    server_tokens off;
+
+    # -- request limits / slow-client protection ------------------------
+    client_max_body_size    1m;      # uploads are allowed 50m under /api/ only
+    client_body_timeout     30s;
+    client_header_timeout   15s;
+    send_timeout            30s;
+    keepalive_timeout       30s;
+    large_client_header_buffers 4 8k;
+    limit_conn pyracms_conn 50;
+
+    # -- security headers (the frontend adds CSP/HSTS for HTML pages) ----
+    # Hide what upstreams already set so each header is sent exactly once.
+    proxy_hide_header X-Powered-By;
+    proxy_hide_header X-Content-Type-Options;
+    proxy_hide_header X-Frame-Options;
+    proxy_hide_header Referrer-Policy;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Cross-Origin-Resource-Policy "same-origin" always;
+
+    # Never serve dotfiles (.git, .env, ...) even if something proxies them.
+    location ~ /\. {
+        return 404;
+    }
+
+    # Common proxy settings. X-Forwarded-For is *overwritten* with the
+    # address nginx sees (client-supplied values are not trusted).
+    proxy_http_version 1.1;
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Credential endpoints: strict per-IP limit (login, register, reset...).
+    location /api/auth/ {
+        limit_req zone=pyracms_auth burst=10 nodelay;
+        proxy_pass http://backend:8080;
+        proxy_read_timeout 30s;
+        proxy_send_timeout 30s;
+        add_header Cache-Control "no-store" always;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
+    # Real-time channels (collab editing, notifications).
+    location /api/ws/ {
+        limit_req zone=pyracms_api burst=20 nodelay;
+        proxy_pass http://backend:8080;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $pyracms_connection_upgrade;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+
+    location /api/ {
+        limit_req zone=pyracms_api burst=60 nodelay;
+        client_max_body_size 50m;
+        client_body_timeout  120s;
+        proxy_pass http://backend:8080;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
+    location / {
+        limit_req zone=pyracms_api burst=100 nodelay;
+        proxy_pass http://frontend:3000;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $pyracms_connection_upgrade;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 60s;
+    }
+}

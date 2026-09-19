@@ -15,10 +15,19 @@ void SocialService::followUser(const DbClientPtr &db, int followerId, int follow
     }
 
     db->execSqlAsync(
-        "INSERT INTO follows (follower_id, followed_id) "
-        "VALUES ($1, $2) ON CONFLICT DO NOTHING",
-        [cb](const drogon::orm::Result &) {
-            cb(true, "");
+        // Accounts can only follow accounts of their own site (or, for
+        // platform accounts, other platform accounts).
+        "WITH ok AS (SELECT 1 FROM users a JOIN users b ON "
+        "COALESCE(a.tenant_id, 0) = COALESCE(b.tenant_id, 0) "
+        "WHERE a.id = $1::int AND b.id = $2::int), "
+        "ins AS (INSERT INTO follows (follower_id, followed_id) "
+        "SELECT $1::int, $2::int FROM ok ON CONFLICT DO NOTHING) "
+        "SELECT COUNT(*)::int AS found FROM ok",
+        [cb](const drogon::orm::Result &result) {
+            if (result[0]["found"].as<int>() == 0)
+                cb(false, "User not found");
+            else
+                cb(true, "");
         },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
@@ -121,7 +130,8 @@ void SocialService::getActivityFeed(const DbClientPtr &db, int userId,
         "("
         "  SELECT 'article' AS type, a.id, a.display_name AS title, "
         "  '' AS summary, a.created_at "
-        "  FROM articles a WHERE a.user_id = $1"
+        "  FROM articles a WHERE a.user_id = $1 "
+        "  AND a.is_private = false AND a.status = 'published'"
         ") UNION ALL ("
         "  SELECT 'forum_post' AS type, p.id, COALESCE(p.title, '') AS title, "
         "  LEFT(p.content, 200) AS summary, p.created_at "
@@ -129,7 +139,8 @@ void SocialService::getActivityFeed(const DbClientPtr &db, int userId,
         ") UNION ALL ("
         "  SELECT 'snippet' AS type, s.id, s.title, "
         "  LEFT(s.code, 200) AS summary, s.created_at "
-        "  FROM code_snippets s WHERE s.author_id = $1"
+        "  FROM code_snippets s WHERE s.author_id = $1 "
+        "  AND s.visibility = 'public'"
         ") ORDER BY created_at DESC LIMIT $2::int OFFSET $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<ActivityItem> items;

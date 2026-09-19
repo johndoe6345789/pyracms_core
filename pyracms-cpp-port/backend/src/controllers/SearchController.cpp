@@ -1,4 +1,5 @@
 #include "controllers/SearchController.h"
+#include "filters/UserVisibility.h"
 
 namespace pyracms {
 
@@ -24,14 +25,21 @@ void SearchController::search(
         return;
     }
 
+    if (query.size() > 200) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "q is too long";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     int tenantId = std::stoi(tenantIdStr);
     auto type = req->getParameter("type");
     int limit = 20;
     int offset = 0;
     auto limitStr = req->getParameter("limit");
     auto offsetStr = req->getParameter("offset");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
-    if (!offsetStr.empty()) offset = std::stoi(offsetStr);
+    limit = clampLimit(limitStr, limit, 100);
+    offset = clampOffset(offsetStr);
 
     auto db = drogon::app().getDbClient();
 
@@ -87,7 +95,7 @@ void SearchController::autocomplete(
     int tenantId = std::stoi(tenantIdStr);
     int limit = 10;
     auto limitStr = req->getParameter("limit");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
+    limit = clampLimit(limitStr, limit, 100);
 
     auto db = drogon::app().getDbClient();
 

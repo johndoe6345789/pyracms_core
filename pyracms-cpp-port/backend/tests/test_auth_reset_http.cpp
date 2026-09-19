@@ -1,4 +1,5 @@
 #include "http_accounts.h"
+#include "security/Hash.h"
 
 using namespace harness;
 
@@ -20,7 +21,8 @@ TEST(AuthHttp, PasswordResetAndEmailVerification) {
     auto tok = uniq("rst");
     testDb()->execSqlSync("INSERT INTO password_reset_tokens (user_id, "
                           "token, expires_at) VALUES ($1, $2, NOW() + "
-                          "INTERVAL '1 hour')", s.user.id, tok);
+                          "INTERVAL '1 hour')", s.user.id,
+                          pyracms::sha256Hex(tok));
     EXPECT_EQ(post("/api/auth/reset-password", J({{"token", tok}})).status,
               400);
     EXPECT_EQ(post("/api/auth/reset-password",

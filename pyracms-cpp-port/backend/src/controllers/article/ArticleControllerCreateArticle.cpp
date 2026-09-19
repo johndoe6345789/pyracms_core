@@ -1,4 +1,6 @@
 #include "controllers/ArticleController.h"
+#include "controllers/ArticleInput.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -16,10 +18,22 @@ void ArticleController::createArticle(
         return;
     }
 
+    if (!(*json)["name"].isString() || !(*json)["displayName"].isString() ||
+        !(*json)["content"].isString() ||
+        !(*json).get("renderer", "markdown").isString()) {
+        callback(articleBad("name, displayName and content must be text"));
+        return;
+    }
     auto name = (*json)["name"].asString();
     auto displayName = (*json)["displayName"].asString();
     auto content = (*json)["content"].asString();
     auto renderer = (*json).get("renderer", "markdown").asString();
+    if (!isSafeName(name) || !isBoundedText(displayName, 256) ||
+        !isBoundedText(content, kMaxArticleBytes) ||
+        !isKnownRenderer(renderer)) {
+        callback(articleBad("Invalid article name, content or renderer"));
+        return;
+    }
     int tenantId = (*json)["tenant_id"].asInt();
     int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();

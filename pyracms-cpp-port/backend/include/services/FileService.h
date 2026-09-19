@@ -35,7 +35,8 @@ public:
                     bool isPicture,
                     bool isVideo,
                     BoolCallback cb,
-                    const std::string &sha256 = "");
+                    const std::string &sha256 = "",
+                    int userId = 0, int tenantId = 0);
 
     void getFile(const DbClientPtr &db,
                  const std::string &uuid,
@@ -45,8 +46,9 @@ public:
                     const std::string &uuid,
                     BoolCallback cb);
 
+    // scopeUser 0 = any uploader; scopeTenant < 0 = any site.
     void listFiles(const DbClientPtr &db, int limit, int offset,
-                   ListCallback cb);
+                   int scopeUser, int scopeTenant, ListCallback cb);
 
     void incrementDownloadCount(const DbClientPtr &db,
                                 const std::string &uuid,

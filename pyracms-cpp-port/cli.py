@@ -373,6 +373,11 @@ def cmd_db(args):
         success("Migrations complete")
 
     elif args.action == "seed":
+        # Dev-only: inserts a well-known admin account. Never run in production.
+        if os.environ.get("SEED_DEV") != "1" or                 os.environ.get("PYRACMS_ENV") == "production":
+            error("db seed creates a known admin account (dev only). "
+                  "Set SEED_DEV=1 to confirm; refused when PYRACMS_ENV=production.")
+            sys.exit(1)
         log("Seeding database with sample data...", CYAN)
         seed_sql = """
         -- Seed a default tenant

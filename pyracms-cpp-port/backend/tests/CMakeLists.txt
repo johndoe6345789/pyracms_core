@@ -81,6 +81,16 @@ set(TEST_SOURCES
 
     test_search_http.cpp
 
+    test_security_auth_http.cpp
+
+    test_security_content_http.cpp
+
+    test_security_edge_http.cpp
+
+    test_security_rules_1.cpp
+
+    test_security_rules_2.cpp
+
     test_services_crud_db_1.cpp
 
     test_services_crud_db_2.cpp

@@ -2,6 +2,7 @@
 
 #include "db_fixture.h"
 #include <drogon/drogon.h>
+#include <map>
 #include <thread>
 #include <trantor/net/EventLoopThread.h>
 
@@ -14,6 +15,7 @@ struct Reply {
     int status{0};
     Json::Value json;
     std::string text;
+    std::map<std::string, std::string> headers; // lower-case names
 };
 
 class Server {

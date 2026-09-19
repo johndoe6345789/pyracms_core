@@ -1,4 +1,6 @@
 #include "controllers/ArticleController.h"
+#include "controllers/ArticleInput.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -16,12 +18,17 @@ void ArticleController::switchRenderer(
         return;
     }
 
+    if (!(*json)["renderer"].isString() ||
+        !isKnownRenderer((*json)["renderer"].asString())) {
+        callback(articleBad("Unknown renderer"));
+        return;
+    }
     auto renderer = (*json)["renderer"].asString();
     int tenantId = (*json)["tenant_id"].asInt();
     auto db = drogon::app().getDbClient();
 
     // Find article by name first
-    articleService_.getArticle(
+    articleService_.findArticle(
         db, tenantId, name,
         [this, db, renderer, callback](const std::optional<ArticleDto> &article) {
             if (!article) {

@@ -1,4 +1,5 @@
 #include "controllers/CommentController.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -23,6 +24,7 @@ void CommentController::getComments(
 
     if (limit > 200) limit = 200;
     if (limit < 1) limit = 1;
+    if (offset < 0) offset = 0;
 
     commentService_.getComments(
         db, contentType, contentId, limit, offset,
@@ -64,6 +66,15 @@ void CommentController::createComment(
         return;
     }
 
+    if (!(*json)["body"].isString() || contentType.size() > 50 ||
+        !isBoundedText((*json)["body"].asString(), 10000)) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] =
+            "body must be text of at most 10000 characters";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     auto body = (*json)["body"].asString();
     if (body.empty()) {
         auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -87,7 +98,7 @@ void CommentController::createComment(
             if (!success) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                 (*resp->jsonObject())["error"] = error;
-                resp->setStatusCode(drogon::k500InternalServerError);
+                resp->setStatusCode(drogon::k400BadRequest);
                 callback(resp);
                 return;
             }
@@ -142,6 +153,15 @@ void CommentController::updateComment(
         return;
     }
 
+    if (!(*json)["body"].isString() ||
+        (*json)["body"].asString().empty() ||
+        !isBoundedText((*json)["body"].asString(), 10000)) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = "body must be 1-10000 characters";
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     auto body = (*json)["body"].asString();
     auto db = drogon::app().getDbClient();
 

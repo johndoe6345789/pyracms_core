@@ -1,5 +1,6 @@
 #include "http_harness.h"
 
+#include <algorithm>
 #include <fstream>
 
 namespace harness {
@@ -21,6 +22,8 @@ Reply call(drogon::HttpMethod m, const std::string &path,
         return r;
     r.status = res.second->statusCode();
     r.text = std::string(res.second->body());
+    for (const auto &h : res.second->headers())
+        r.headers[h.first] = h.second;
     Json::Reader().parse(r.text, r.json);
     return r;
 }
@@ -43,7 +46,9 @@ Reply del(const std::string &p, const std::string &t,
 
 Reply upload(const std::string &path, const std::string &token,
              const std::string &filename, const std::string &content) {
-    auto tmp = "/tmp/" + uniq("up") + "_" + filename;
+    std::string leaf = filename; // the client-side name may hold '/'
+    std::replace(leaf.begin(), leaf.end(), '/', '_');
+    auto tmp = "/tmp/" + uniq("up") + "_" + leaf;
     std::ofstream(tmp) << content;
     drogon::UploadFile f(tmp, filename, "file");
     auto req = drogon::HttpRequest::newFileUploadRequest({f});

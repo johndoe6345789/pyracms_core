@@ -43,13 +43,19 @@ public:
     using RevisionListCallback = std::function<void(const std::vector<ArticleRevisionDto> &)>;
     using BoolCallback = std::function<void(bool success, const std::string &error)>;
 
+    // viewerId 0 = anonymous. Private/unpublished articles only show for
+    // their author, moderators and the site owner.
     void listArticles(const DbClientPtr &db, int tenantId,
-                      int limit, int offset,
+                      int limit, int offset, int viewerId,
                       ArticleListCallback cb);
 
     void getArticle(const DbClientPtr &db, int tenantId,
-                    const std::string &name,
+                    const std::string &name, int viewerId,
                     ArticleCallback cb);
+
+    // No visibility check, no view count: for callers past OwnerFilter.
+    void findArticle(const DbClientPtr &db, int tenantId,
+                     const std::string &name, ArticleCallback cb);
 
     void createArticle(const DbClientPtr &db, int tenantId,
                        const std::string &name,
@@ -73,7 +79,7 @@ public:
     void listRevisions(const DbClientPtr &db, int articleId,
                        RevisionListCallback cb);
 
-    void getRevision(const DbClientPtr &db, int revisionId,
+    void getRevision(const DbClientPtr &db, int articleId, int revisionId,
                      RevisionCallback cb);
 
     void revertToRevision(const DbClientPtr &db, int articleId,

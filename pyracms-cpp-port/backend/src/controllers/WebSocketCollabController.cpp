@@ -2,7 +2,7 @@
 
 #include <drogon/drogon.h>
 #include <json/json.h>
-#include <jwt-cpp/traits/nlohmann-json/defaults.h>
+#include "controllers/WsAuth.h"
 
 namespace pyracms {
 
@@ -10,41 +10,26 @@ std::mutex WebSocketCollabController::roomsMutex_;
 std::unordered_map<std::string, std::vector<drogon::WebSocketConnectionPtr>>
     WebSocketCollabController::rooms_;
 
-int WebSocketCollabController::authenticateFromToken(const std::string &token) {
-    try {
-        auto jwtSecret = drogon::app().getCustomConfig()["jwt_secret"].asString();
-        if (jwtSecret.empty()) jwtSecret = "change-me-in-production";
-
-        auto decoded = jwt::decode(token);
-        auto verifier = jwt::verify()
-            .allow_algorithm(jwt::algorithm::hs256{jwtSecret})
-            .with_issuer("pyracms");
-        verifier.verify(decoded);
-
-        return std::stoi(decoded.get_subject());
-    } catch (const std::exception &) {
-        return -1;
-    }
-}
-
 void WebSocketCollabController::handleNewConnection(
     const drogon::HttpRequestPtr &req,
     const drogon::WebSocketConnectionPtr &wsConnPtr) {
 
-    auto token = req->getParameter("token");
-    if (token.empty()) {
+    auto who = wsAuthenticate(req);
+    if (!who) {
         wsConnPtr->forceClose();
         return;
     }
+    int userId = who->userId;
 
-    int userId = authenticateFromToken(token);
-    if (userId < 0) {
+    // Rooms live inside the caller's site: two sites can use the same room
+    // name without ever seeing each other's edits.
+    auto name = sanitizeRoom(req->getParameter("room"));
+    if (name.empty() && !req->getParameter("room").empty()) {
         wsConnPtr->forceClose();
         return;
     }
-
-    auto room = req->getParameter("room");
-    if (room.empty()) room = "default";
+    if (name.empty()) name = "default";
+    auto room = "t" + std::to_string(who->tenantId) + ":" + name;
 
     auto ctx = std::make_shared<ConnectionContext>();
     ctx->room = room;
@@ -72,6 +57,10 @@ void WebSocketCollabController::handleNewMessage(
     auto ctx = wsConnPtr->getContext<ConnectionContext>();
     if (!ctx) return;
 
+    if (message.size() > kMaxMessageBytes) {
+        wsConnPtr->forceClose();
+        return;
+    }
     // Relay binary Yjs messages to all other connections in the same room
     if (type == drogon::WebSocketMessageType::Binary ||
         type == drogon::WebSocketMessageType::Text) {

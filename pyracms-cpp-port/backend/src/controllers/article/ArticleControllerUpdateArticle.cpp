@@ -1,4 +1,6 @@
 #include "controllers/ArticleController.h"
+#include "controllers/ArticleInput.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -16,6 +18,13 @@ void ArticleController::updateArticle(
         return;
     }
 
+    if (!(*json)["content"].isString() ||
+        !(*json).get("summary", "").isString() ||
+        !isBoundedText((*json)["content"].asString(), kMaxArticleBytes) ||
+        !isBoundedText((*json).get("summary", "").asString(), 500)) {
+        callback(articleBad("Invalid content or summary"));
+        return;
+    }
     auto content = (*json)["content"].asString();
     auto summary = (*json).get("summary", "").asString();
     int tenantId = (*json)["tenant_id"].asInt();

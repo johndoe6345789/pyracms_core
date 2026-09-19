@@ -3,7 +3,7 @@
 using namespace harness;
 
 static std::string mkFile() {
-    auto uuid = uniq("gf");
+    auto uuid = drogon::utils::getUuid();
     testDb()->execSqlSync("INSERT INTO files (filename, uuid, size, "
                           "is_picture) VALUES ($1, $1, 10, true)", uuid);
     return uuid;

@@ -1,4 +1,5 @@
 #include "controllers/GalleryController.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -56,6 +57,14 @@ void GalleryController::createAlbum(
     auto description = (*json).isMember("description")
                            ? (*json)["description"].asString()
                            : "";
+    if (displayName.size() > 256 || !isBoundedText(displayName, 256) ||
+        !isBoundedText(description, 5000)) {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "Name or description is invalid";
+        bad->setStatusCode(drogon::k400BadRequest);
+        callback(bad);
+        return;
+    }
     int tenantId = (*json)["tenantId"].asInt();
     int userId = req->attributes()->get<int>("userId");
 
@@ -144,6 +153,14 @@ void GalleryController::updateAlbum(
     auto description = (*json).isMember("description")
                            ? (*json)["description"].asString()
                            : "";
+    if (displayName.size() > 256 || !isBoundedText(displayName, 256) ||
+        !isBoundedText(description, 5000)) {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "Name or description is invalid";
+        bad->setStatusCode(drogon::k400BadRequest);
+        callback(bad);
+        return;
+    }
 
     auto db = drogon::app().getDbClient();
     galleryService_.updateAlbum(
@@ -207,7 +224,22 @@ void GalleryController::addPicture(
     auto description = (*json).isMember("description")
                            ? (*json)["description"].asString()
                            : "";
+    if (displayName.size() > 256 || !isBoundedText(displayName, 256) ||
+        !isBoundedText(description, 5000)) {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "Name or description is invalid";
+        bad->setStatusCode(drogon::k400BadRequest);
+        callback(bad);
+        return;
+    }
     auto fileUuid = (*json)["fileUuid"].asString();
+    if (!isValidUuid(fileUuid)) {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "fileUuid must be an uploaded file";
+        bad->setStatusCode(drogon::k400BadRequest);
+        callback(bad);
+        return;
+    }
     int userId = req->attributes()->get<int>("userId");
 
     auto db = drogon::app().getDbClient();
@@ -278,6 +310,14 @@ void GalleryController::updatePicture(
     auto description = (*json).isMember("description")
                            ? (*json)["description"].asString()
                            : "";
+    if (displayName.size() > 256 || !isBoundedText(displayName, 256) ||
+        !isBoundedText(description, 5000)) {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "Name or description is invalid";
+        bad->setStatusCode(drogon::k400BadRequest);
+        callback(bad);
+        return;
+    }
 
     auto db = drogon::app().getDbClient();
     galleryService_.updatePicture(

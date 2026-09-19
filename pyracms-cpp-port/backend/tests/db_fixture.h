@@ -41,5 +41,15 @@ inline std::string uniq(const std::string &base) {
     return base + std::to_string(getpid()) + "_" + std::to_string(++n);
 }
 
+// A unique site slug (lowercase letters, digits, hyphens).
+inline std::string uslug(const std::string &base) {
+    auto s = uniq(base);
+    for (auto &c : s) {
+        if (c == '_')
+            c = '-';
+    }
+    return s;
+}
+
 #include "db_await.h"
 #include "db_rows.h"

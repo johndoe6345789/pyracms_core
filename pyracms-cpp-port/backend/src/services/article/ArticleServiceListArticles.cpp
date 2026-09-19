@@ -1,16 +1,18 @@
 #include "services/ArticleService.h"
 #include "services/DbError.h"
+#include "services/article/ArticleVisibility.h"
 
 namespace pyracms {
 
 void ArticleService::listArticles(const DbClientPtr &db, int tenantId,
-                                   int limit, int offset,
-                                   ArticleListCallback cb) {
+                                  int limit, int offset, int viewerId,
+                                  ArticleListCallback cb) {
     db->execSqlAsync(
         "SELECT a.*, u.username AS author_username "
         "FROM articles a LEFT JOIN users u ON u.id = a.user_id "
-        "WHERE a.tenant_id = $1 AND a.is_private = false "
-        "ORDER BY a.created_at DESC LIMIT " + std::to_string(limit) + " OFFSET " + std::to_string(offset),
+        "WHERE a.tenant_id = $1 AND " +
+            articleVisibleSql("$4::int") +
+            " ORDER BY a.created_at DESC LIMIT $2::int OFFSET $3::int",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<ArticleDto> articles;
             articles.reserve(result.size());
@@ -26,7 +28,7 @@ void ArticleService::listArticles(const DbClientPtr &db, int tenantId,
             LOG_ERROR << "listArticles error: " << dbError(e);
             cb({});
         },
-        tenantId);
+        tenantId, limit, offset, viewerId);
 }
 
 } // namespace pyracms

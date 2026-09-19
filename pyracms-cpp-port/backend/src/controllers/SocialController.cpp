@@ -1,4 +1,5 @@
 #include "controllers/SocialController.h"
+#include "filters/UserVisibility.h"
 
 namespace pyracms {
 
@@ -59,8 +60,8 @@ void SocialController::getFollowers(
     int limit = 20, offset = 0;
     auto limitStr = req->getParameter("limit");
     auto offsetStr = req->getParameter("offset");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
-    if (!offsetStr.empty()) offset = std::stoi(offsetStr);
+    limit = clampLimit(limitStr, limit, 100);
+    offset = clampOffset(offsetStr);
 
     auto db = drogon::app().getDbClient();
 
@@ -90,8 +91,8 @@ void SocialController::getFollowing(
     int limit = 20, offset = 0;
     auto limitStr = req->getParameter("limit");
     auto offsetStr = req->getParameter("offset");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
-    if (!offsetStr.empty()) offset = std::stoi(offsetStr);
+    limit = clampLimit(limitStr, limit, 100);
+    offset = clampOffset(offsetStr);
 
     auto db = drogon::app().getDbClient();
 
@@ -121,8 +122,8 @@ void SocialController::getActivity(
     int limit = 20, offset = 0;
     auto limitStr = req->getParameter("limit");
     auto offsetStr = req->getParameter("offset");
-    if (!limitStr.empty()) limit = std::stoi(limitStr);
-    if (!offsetStr.empty()) offset = std::stoi(offsetStr);
+    limit = clampLimit(limitStr, limit, 100);
+    offset = clampOffset(offsetStr);
 
     auto db = drogon::app().getDbClient();
 

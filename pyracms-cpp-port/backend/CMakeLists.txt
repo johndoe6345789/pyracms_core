@@ -67,7 +67,7 @@ set(LIB_SOURCES
 
     src/controllers/WebSocketNotificationController.cpp
 
-    src/controllers/WebhookController.cpp
+    src/controllers/WsAuth.cpp
 
     src/controllers/article/ArticleControllerCreateArticle.cpp
 
@@ -233,13 +233,41 @@ set(LIB_SOURCES
 
     src/controllers/user/UserControllerList.cpp
 
+    src/controllers/webhook/WebhookControllerCreate.cpp
+
+    src/controllers/webhook/WebhookControllerDelete.cpp
+
+    src/controllers/webhook/WebhookControllerDeliveries.cpp
+
+    src/controllers/webhook/WebhookControllerList.cpp
+
+    src/controllers/webhook/WebhookControllerUpdate.cpp
+
     src/filters/AdminFilter.cpp
 
     src/filters/JwtAuthFilter.cpp
 
+    src/filters/OwnerFilter.cpp
+
+    src/filters/RateLimitFilter.cpp
+
     src/filters/TenantGuard.cpp
 
     src/filters/Viewer.cpp
+
+    src/security/ClientIp.cpp
+
+    src/security/Hash.cpp
+
+    src/security/HttpSecurity.cpp
+
+    src/security/OAuthState.cpp
+
+    src/security/RateLimiter.cpp
+
+    src/security/SecurityConfig.cpp
+
+    src/security/SsrfGuard.cpp
 
     src/services/AnalyticsService.cpp
 
@@ -253,7 +281,11 @@ set(LIB_SOURCES
 
     src/services/CommentService.cpp
 
+    src/services/DbError.cpp
+
     src/services/DockerExecutionService.cpp
+
+    src/services/DockerRunArgv.cpp
 
     src/services/ElasticsearchService.cpp
 
@@ -272,6 +304,8 @@ set(LIB_SOURCES
     src/services/SettingsService.cpp
 
     src/services/SocialService.cpp
+
+    src/services/WebhookDelivery.cpp
 
     src/services/WebhookService.cpp
 
@@ -480,6 +514,8 @@ set(LIB_SOURCES
     src/services/user/UserServiceListScoped.cpp
 
     src/services/user/UserServiceListUsers.cpp
+
+    src/services/user/UserServiceRegisterAccount.cpp
 
     src/services/user/UserServiceRowToDto.cpp
 

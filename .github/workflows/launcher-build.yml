@@ -75,6 +75,8 @@ jobs:
       QT_MODE: aqt
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -275,13 +277,17 @@ jobs:
 
       - name: Manifests
         shell: bash
+        env:
+          HN_VERSION: ${{ steps.meta.outputs.version }}
+          HN_OS: ${{ matrix.hn_os }}
+          HN_ARCH: ${{ matrix.arch }}
         run: |
           URL="https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}"
           [[ "$GITHUB_REF" == refs/tags/* ]] || URL=""
           for f in dist/*; do
             [[ "$f" == *.manifest.json ]] && continue
             python pyracms-cpp-port/scripts/make_manifest.py launcher --name hypernucleus --display-name Hypernucleus \
-              --version "${{ steps.meta.outputs.version }}" --file "$f" --os ${{ matrix.hn_os }} --arch ${{ matrix.arch }} \
+              --version "$HN_VERSION" --file "$f" --os "$HN_OS" --arch "$HN_ARCH" \
               ${URL:+--url "$URL/$(basename "$f")"} --out "$f.manifest.json"
           done
           ls -la dist
@@ -310,6 +316,8 @@ jobs:
           - { runner: ubuntu-24.04-arm, hn_os: lin, arch: arm64,  experimental: false }
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -368,12 +376,16 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      id-token: write          # keyless build-provenance attestation
+      attestations: write
     env:
       # Optional. When the secrets are absent the publish step is skipped (forks, or before the backend is wired in).
       HN_API_URL: ${{ secrets.HN_API_URL }}
       HN_API_TOKEN: ${{ secrets.HN_API_TOKEN }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -391,6 +403,15 @@ jobs:
           python ../pyracms-cpp-port/scripts/make_manifest.py merge ./*.manifest.json --out catalog.json
           sha256sum $(ls | grep -v -E 'manifest.json$|catalog.json$|SHA256SUMS') > SHA256SUMS
           ls -la
+
+      - name: Attest release artifact provenance
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-path: |
+            release/*
+            !release/*.json
+            !release/SHA256SUMS
 
       - name: Attach to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')

@@ -13,4 +13,8 @@ struct Viewer {
 
 Viewer viewerOf(const drogon::HttpRequestPtr &req);
 
+// The viewer's id for reading content of `tenantId`; 0 (anonymous) when
+// the bearer belongs to a different site, so foreign tokens gain nothing.
+int viewerIdFor(const drogon::HttpRequestPtr &req, int tenantId);
+
 } // namespace pyracms

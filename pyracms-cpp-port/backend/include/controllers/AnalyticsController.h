@@ -8,10 +8,10 @@ namespace pyracms {
 class AnalyticsController : public drogon::HttpController<AnalyticsController> {
 public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(AnalyticsController::getPageViews, "/api/analytics/page-views", drogon::Get, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(AnalyticsController::getTopContent, "/api/analytics/top-content", drogon::Get, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(AnalyticsController::getTrafficSources, "/api/analytics/traffic-sources", drogon::Get, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(AnalyticsController::getSearchQueries, "/api/analytics/search-queries", drogon::Get, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(AnalyticsController::getPageViews, "/api/analytics/page-views", drogon::Get, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(AnalyticsController::getTopContent, "/api/analytics/top-content", drogon::Get, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(AnalyticsController::getTrafficSources, "/api/analytics/traffic-sources", drogon::Get, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
+    ADD_METHOD_TO(AnalyticsController::getSearchQueries, "/api/analytics/search-queries", drogon::Get, "pyracms::JwtAuthFilter", "pyracms::AdminFilter");
     ADD_METHOD_TO(AnalyticsController::trackPageView, "/api/analytics/track", drogon::Post, "pyracms::RateLimitFilter");
     METHOD_LIST_END
 

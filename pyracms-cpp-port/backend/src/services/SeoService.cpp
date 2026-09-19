@@ -153,7 +153,8 @@ void SeoService::getArticleJsonLd(const DbClientPtr &db, int tenantId,
         "   ORDER BY created_at DESC LIMIT 1) AS content "
         "FROM articles a "
         "LEFT JOIN users u ON u.id = a.user_id "
-        "WHERE a.tenant_id = $1 AND a.name = $2",
+        "WHERE a.tenant_id = $1 AND a.name = $2 AND a.is_private = false "
+        "AND a.status = 'published'",
         [baseUrl, articleName, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(Json::Value::null);
@@ -196,7 +197,8 @@ void SeoService::getOpenGraphData(const DbClientPtr &db, int tenantId,
         "   ORDER BY created_at DESC LIMIT 1) AS description "
         "FROM articles a "
         "LEFT JOIN users u ON u.id = a.user_id "
-        "WHERE a.tenant_id = $1 AND a.name = $2",
+        "WHERE a.tenant_id = $1 AND a.name = $2 AND a.is_private = false "
+        "AND a.status = 'published'",
         [baseUrl, articleName, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(Json::Value::null);

@@ -8,9 +8,10 @@ void AuthController::oauthLink(const UserDto &user, const std::string &provider,
                                const OAuthUserInfo &info, HttpCb callback) {
     oauthService_.linkAccount(
         drogon::app().getDbClient(), user.id, provider, info, accessToken,
-        [this, user, callback](bool ok, const std::string &error) {
+        [this, user, callback](bool ok, const std::string &) {
             if (!ok) {
-                sendError(callback, error, drogon::k500InternalServerError);
+                sendError(callback, "Could not link the account",
+                          drogon::k500InternalServerError);
                 return;
             }
             Json::Value result;

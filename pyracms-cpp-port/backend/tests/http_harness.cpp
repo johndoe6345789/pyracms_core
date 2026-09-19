@@ -1,11 +1,20 @@
 #include "http_harness.h"
 
+#include "security/HttpSecurity.h"
+#include "security/RateLimiter.h"
+
 namespace harness {
 
 static const int kPort = 3299;
 
 Server::Server() {
+    // Tests create many accounts from one address and call webhooks on
+    // loopback: rate limits are off and private URLs allowed (both are
+    // switched on again by the tests that exercise them).
+    pyracms::RateLimiter::setEnabled(false);
+    setenv("PYRACMS_ALLOW_PRIVATE_URLS", "1", 1);
     auto &app = drogon::app();
+    pyracms::installHttpSecurity(app);
     app.addListener("127.0.0.1", kPort)
         .setThreadNum(2)
         .setLogLevel(trantor::Logger::kError);

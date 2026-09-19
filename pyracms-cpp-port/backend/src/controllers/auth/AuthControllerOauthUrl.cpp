@@ -1,5 +1,8 @@
 #include "controllers/AuthController.h"
 #include "controllers/auth/AuthControllerInternal.h"
+#include "security/OAuthState.h"
+
+#include <ctime>
 
 namespace pyracms {
 
@@ -15,7 +18,7 @@ void AuthController::oauthUrl(
     auto url = oauthService_.getAuthorizationUrl(provider, state);
     if (url.empty()) {
         auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "Provider not configured: " + provider;
+        (*resp->jsonObject())["error"] = "Provider not configured";
         resp->setStatusCode(drogon::k400BadRequest);
         callback(resp);
         return;
@@ -23,6 +26,7 @@ void AuthController::oauthUrl(
 
     Json::Value result;
     result["url"] = url;
+    result["state"] = state;
     result["provider"] = provider;
     callback(drogon::HttpResponse::newHttpJsonResponse(result));
 }

@@ -1,5 +1,7 @@
 #include "http_accounts.h"
 
+#include <algorithm>
+
 namespace harness {
 
 Acct signup(const std::string &slug, int role) {
@@ -25,7 +27,7 @@ Acct platformAdmin() {
 }
 
 int newTenant(const Acct &admin, std::string &slug) {
-    slug = uniq("ht");
+    slug = uslug("ht");
     Json::Value b;
     b["slug"] = slug;
     b["displayName"] = "Site " + slug;

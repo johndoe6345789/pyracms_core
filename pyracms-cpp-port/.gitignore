@@ -40,3 +40,17 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# Secrets / deployment env (never commit)
+.env
+.env.*
+!.env.example
+!.env.prod.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*.kdbx
+secrets/
+certs/

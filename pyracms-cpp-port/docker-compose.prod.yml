@@ -1,0 +1,175 @@
+# PyraCMS production hardening override.
+#
+# Layer on top of EITHER base file (needs Docker Compose >= 2.24 for !reset /
+# !override):
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#     --env-file .env.prod -p pyracms-prod up -d --build
+#   docker compose -f docker-compose.ghcr.yml -f docker-compose.prod.yml \
+#     --env-file .env.prod -p pyracms-prod up -d
+#
+# What it changes versus dev:
+#   * no default credentials: compose refuses to start if a secret is unset
+#   * no database/cache/search/backend ports on the host; only nginx is
+#     published (loopback by default; put TLS in front of it)
+#   * data tier lives on an `internal` network with no route out
+#   * backend is unprivileged (uid 10001) and talks to a *filtered* docker
+#     socket proxy instead of mounting /var/run/docker.sock
+#   * read-only root filesystems, all capabilities dropped, no-new-privileges,
+#     memory/cpu/pids limits, log rotation, restart policy
+#   * demo seeding (admin/password123) disabled
+#
+# Use a fresh project name/volumes (-p pyracms-prod): an existing dev volume
+# was initialised with the dev password and will not accept the new one.
+#
+# RESIDUAL RISK, code runner: the proxy limits the Docker API surface (no
+# exec, volumes, networks, build, swarm, secrets, info...) but it cannot
+# inspect request bodies, so a compromised backend can still ask the daemon
+# for a privileged container. If you do not need "run snippet", drop the
+# docker-proxy service and the DOCKER_HOST variable. Otherwise run the runner
+# daemon on a separate/disposable host (DOCKER_HOST=ssh:// or tcp+TLS), use
+# rootless Docker, Sysbox or gVisor, or add an authorization plugin.
+# See SECURITY_AUDIT_INFRA.md.
+
+x-hardened: &hardened
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "5"
+
+networks:
+  edge: {}
+  data:
+    internal: true          # postgres/redis/elasticsearch: no egress, no ingress
+  runner-ctl:
+    internal: true          # backend <-> docker-proxy only
+
+services:
+  postgres:
+    <<: *hardened
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pyracms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      POSTGRES_DB: ${POSTGRES_DB:-pyracms}
+    ports: !reset []
+    networks: [data]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]   # entrypoint drops to `postgres`
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run/postgresql
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 300
+
+  redis:
+    <<: *hardened
+    ports: !reset []
+    networks: [data]
+    cap_add: [SETGID, SETUID, CHOWN]
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: 384m
+    cpus: 1
+    pids_limit: 100
+
+  elasticsearch:
+    <<: *hardened
+    ports: !reset []
+    networks: [data]
+    # Security stays off because the backend has no ES credential support;
+    # isolation is the network (internal, no published port).
+    mem_limit: 1536m
+    cpus: 2
+    pids_limit: 512
+
+  docker-proxy:
+    <<: *hardened
+    image: tecnativa/docker-socket-proxy:0.3.0@sha256:9e4b9e7517a6b660f2cc903a19b257b1852d5b3344794e3ea334ff00ae677ac2
+    environment:
+      # Only what `docker run --rm` needs. Everything else stays denied.
+      CONTAINERS: 1     # create/start/attach/wait/rm/logs
+      POST: 1           # allow non-GET verbs (create, start, delete) on the above
+      IMAGES: 1         # image inspect (and pull if a runner image is missing)
+      EXEC: 0
+      VOLUMES: 0
+      NETWORKS: 0
+      BUILD: 0
+      COMMIT: 0
+      CONFIGS: 0
+      SECRETS: 0
+      SERVICES: 0
+      SWARM: 0
+      TASKS: 0
+      NODES: 0
+      PLUGINS: 0
+      SYSTEM: 0
+      DISTRIBUTION: 0
+      AUTH: 0
+      INFO: 0
+      SESSION: 0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [runner-ctl]
+    # Not read_only: the image entrypoint renders haproxy.cfg into its own
+    # config dir at start. It runs no user code and has no published port.
+    mem_limit: 64m
+    pids_limit: 50
+    # No `ports:`: reachable only from the backend over the internal network.
+
+  backend:
+    <<: *hardened
+    user: "10001:10001"
+    ports: !reset []
+    networks: [edge, data, runner-ctl]   # edge: outbound OAuth/SMTP/webhooks
+    environment:
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.prod (openssl rand -hex 48)}
+      SEED_DEV: "0"
+      PYRACMS_ENV: production
+      DOCKER_HOST: tcp://docker-proxy:2375
+    volumes: !override
+      - uploads_data:/app/uploads
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      docker-proxy:
+        condition: service_started
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 512
+
+  frontend:
+    <<: *hardened
+    networks: [edge]
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 200
+
+  nginx:
+    <<: *hardened
+    networks: [edge]
+    cap_add: [CHOWN, SETGID, SETUID, NET_BIND_SERVICE]
+    # nginx is published on loopback by default; a TLS reverse proxy
+    # (CapRover, Traefik, Caddy, Cloudflare tunnel...) should sit in front.
+    ports: !override
+      - "${NGINX_BIND:-127.0.0.1}:${NGINX_PORT:-3199}:80"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    mem_limit: 128m
+    cpus: 1
+    pids_limit: 100

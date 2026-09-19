@@ -1,4 +1,6 @@
 #include "services/SearchService.h"
+
+#include <cctype>
 #include "services/ElasticsearchService.h"
 #include "services/CacheService.h"
 
@@ -100,8 +102,16 @@ void SearchService::search(
     std::istringstream stream(query);
     bool first = true;
     while (stream >> word) {
+        // Only letters/digits reach to_tsquery: its operator syntax
+        // (& | ! ( ) : * <->) must never come from the user.
+        std::string clean;
+        for (unsigned char c : word) {
+            if (std::isalnum(c) || c >= 0x80)
+                clean += static_cast<char>(c);
+        }
+        if (clean.empty()) continue;
         if (!first) tsQuery += " & ";
-        tsQuery += word + ":*";
+        tsQuery += clean + ":*";
         first = false;
     }
 
@@ -189,7 +199,8 @@ void SearchService::searchArticles(
         "ts_rank(to_tsvector('english', a.name || ' ' || a.display_name), to_tsquery('english', $2)) AS rank, "
         "a.created_at "
         "FROM articles a "
-        "WHERE a.tenant_id = $1 "
+        "WHERE a.tenant_id = $1 AND a.is_private = false "
+        "AND a.status = 'published' "
         "AND to_tsvector('english', a.name || ' ' || a.display_name) @@ to_tsquery('english', $2) "
         "ORDER BY rank DESC LIMIT $3::int OFFSET $4::int",
         [cb](const drogon::orm::Result &result) {
@@ -378,13 +389,21 @@ void SearchService::autocomplete(
     // GCOVR_EXCL_STOP
 
     // Fallback: PostgreSQL prefix search
-    auto likePattern = prefix + "%";
+    // Escape LIKE wildcards so the caller's text is matched literally
+    std::string likePattern;
+    for (char c : prefix) {
+        if (c == '%' || c == '_' || c == '\\')
+            likePattern += '\\';
+        likePattern += c;
+    }
+    likePattern += "%";
 
     db->execSqlAsync(
         "("
         "  SELECT display_name AS text, 'article' AS type, "
         "  '/articles/' || name AS url "
         "  FROM articles WHERE tenant_id = $1 AND status = 'published' "
+        "  AND is_private = false "
         "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3::int"
         ") UNION ALL ("
         "  SELECT title AS text, 'forum_post' AS type, "

@@ -2,7 +2,7 @@
 
 #include <drogon/drogon.h>
 #include <json/json.h>
-#include <jwt-cpp/traits/nlohmann-json/defaults.h>
+#include "controllers/WsAuth.h"
 
 namespace pyracms {
 
@@ -12,52 +12,24 @@ std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
 std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>>
     WebSocketNotificationController::threadSubscriptions_;
 
-int WebSocketNotificationController::authenticateFromToken(const std::string &token) {
-    try {
-        auto jwtSecret = drogon::app().getCustomConfig()["jwt_secret"].asString();
-        if (jwtSecret.empty()) {
-            jwtSecret = "change-me-in-production";
-        }
-
-        auto decoded = jwt::decode(token);
-        auto verifier = jwt::verify()
-            .allow_algorithm(jwt::algorithm::hs256{jwtSecret})
-            .with_issuer("pyracms");
-        verifier.verify(decoded);
-
-        return std::stoi(decoded.get_subject());
-    } catch (const std::exception &) {
-        return -1;
-    }
-}
-
 void WebSocketNotificationController::handleNewConnection(
     const drogon::HttpRequestPtr &req,
     const drogon::WebSocketConnectionPtr &wsConnPtr) {
 
-    // Authenticate via JWT token in query parameter
-    auto token = req->getParameter("token");
-    if (token.empty()) {
+    auto who = wsAuthenticate(req);
+    if (!who) {
         Json::Value errMsg;
-        errMsg["error"] = "Authentication required. Pass ?token=<jwt>";
+        errMsg["error"] = "Authentication required or token invalid";
         Json::StreamWriterBuilder writer;
         wsConnPtr->send(Json::writeString(writer, errMsg));
         wsConnPtr->forceClose();
         return;
     }
+    int userId = who->userId;
 
-    int userId = authenticateFromToken(token);
-    if (userId < 0) {
-        Json::Value errMsg;
-        errMsg["error"] = "Invalid or expired token";
-        Json::StreamWriterBuilder writer;
-        wsConnPtr->send(Json::writeString(writer, errMsg));
-        wsConnPtr->forceClose();
-        return;
-    }
-
-    // Store user ID in connection context
-    wsConnPtr->setContext(std::make_shared<int>(userId));
+    // Remember who this is (and which site) for later messages
+    wsConnPtr->setContext(std::make_shared<WsIdentity>(
+        WsIdentity{userId, who->tenantId}));
 
     {
         std::lock_guard<std::mutex> lock(connectionsMutex_);
@@ -124,10 +96,10 @@ void WebSocketNotificationController::handleNewMessage(
 void WebSocketNotificationController::handleConnectionClosed(
     const drogon::WebSocketConnectionPtr &wsConnPtr) {
 
-    auto ctx = wsConnPtr->getContext<int>();
+    auto ctx = wsConnPtr->getContext<WsIdentity>();
     if (!ctx) return;
 
-    int userId = *ctx;
+    int userId = ctx->userId;
 
     std::lock_guard<std::mutex> lock(connectionsMutex_);
     auto it = userConnections_.find(userId);
@@ -200,14 +172,29 @@ void WebSocketNotificationController::pushToThread(
 void WebSocketNotificationController::handleThreadSubscribe(
     const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId) {
 
-    std::lock_guard<std::mutex> lock(connectionsMutex_);
-    threadSubscriptions_[threadId].push_back(wsConnPtr);
-
-    Json::Value ack;
-    ack["type"] = "thread_subscribed";
-    ack["threadId"] = threadId;
-    Json::StreamWriterBuilder writer;
-    wsConnPtr->send(Json::writeString(writer, ack));
+    auto ctx = wsConnPtr->getContext<WsIdentity>();
+    if (!ctx || threadId <= 0) return;
+    // The thread must live on the caller's own site (platform accounts,
+    // tenant 0, may follow any). Answered asynchronously by the database.
+    drogon::app().getDbClient()->execSqlAsync(
+        "SELECT 1 FROM forum_threads t "
+        "JOIN forums f ON f.id = t.forum_id "
+        "JOIN forum_categories c ON c.id = f.category_id "
+        "WHERE t.id = $1::int AND ($2::int = 0 OR c.tenant_id = $2::int)",
+        [wsConnPtr, threadId](const drogon::orm::Result &r) {
+            if (r.empty() || !wsConnPtr->connected()) return;
+            std::lock_guard<std::mutex> lock(connectionsMutex_);
+            auto &subs = threadSubscriptions_[threadId];
+            if (subs.size() >= kMaxThreadSubscribers) return;
+            subs.push_back(wsConnPtr);
+            Json::Value ack;
+            ack["type"] = "thread_subscribed";
+            ack["threadId"] = threadId;
+            Json::StreamWriterBuilder writer;
+            wsConnPtr->send(Json::writeString(writer, ack));
+        },
+        [](const drogon::orm::DrogonDbException &) {}, threadId,
+        ctx->tenantId);
 }
 
 void WebSocketNotificationController::handleThreadUnsubscribe(
@@ -230,9 +217,21 @@ void WebSocketNotificationController::handleTypingIndicator(
     const drogon::WebSocketConnectionPtr &wsConnPtr,
     int threadId, bool isTyping) {
 
-    auto ctx = wsConnPtr->getContext<int>();
+    auto ctx = wsConnPtr->getContext<WsIdentity>();
     if (!ctx) return;
-    int userId = *ctx;
+    int userId = ctx->userId;
+
+    // Only members of a thread's audience may signal into it
+    {
+        std::lock_guard<std::mutex> lock(connectionsMutex_);
+        auto subs = threadSubscriptions_.find(threadId);
+        bool member = false;
+        if (subs != threadSubscriptions_.end()) {
+            for (auto &c : subs->second)
+                member = member || c == wsConnPtr;
+        }
+        if (!member) return;
+    }
 
     Json::Value msg;
     msg["type"] = isTyping ? "typing_start" : "typing_stop";

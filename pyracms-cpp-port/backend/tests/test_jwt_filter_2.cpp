@@ -14,7 +14,7 @@ struct Outcome {
 
 Outcome run(const drogon::HttpRequestPtr &req) {
     Outcome o;
-    stubAccountState(req->getHeader("Authorization"));
+    StubAccountState stub(req->getHeader("Authorization"));
     JwtAuthFilter f;
     f.doFilter(
         req,

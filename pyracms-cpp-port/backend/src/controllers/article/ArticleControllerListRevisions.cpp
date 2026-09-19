@@ -1,4 +1,5 @@
 #include "controllers/ArticleController.h"
+#include "filters/Viewer.h"
 
 namespace pyracms {
 
@@ -21,7 +22,7 @@ void ArticleController::listRevisions(
 
     // First find the article by name, then list revisions
     articleService_.getArticle(
-        db, tenantId, name,
+        db, tenantId, name, viewerIdFor(req, tenantId),
         [this, db, callback](const std::optional<ArticleDto> &article) {
             if (!article) {
                 auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});

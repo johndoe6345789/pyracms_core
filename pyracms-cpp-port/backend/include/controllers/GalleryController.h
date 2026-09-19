@@ -11,13 +11,13 @@ public:
     ADD_METHOD_TO(GalleryController::listAlbums, "/api/gallery/albums", drogon::Get);
     ADD_METHOD_TO(GalleryController::createAlbum, "/api/gallery/albums", drogon::Post, "pyracms::JwtAuthFilter");
     ADD_METHOD_TO(GalleryController::getAlbum, "/api/gallery/albums/{id}", drogon::Get);
-    ADD_METHOD_TO(GalleryController::updateAlbum, "/api/gallery/albums/{id}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(GalleryController::deleteAlbum, "/api/gallery/albums/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(GalleryController::addPicture, "/api/gallery/albums/{id}/pictures", drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(GalleryController::updateAlbum, "/api/gallery/albums/{id}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(GalleryController::deleteAlbum, "/api/gallery/albums/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(GalleryController::addPicture, "/api/gallery/albums/{id}/pictures", drogon::Post, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(GalleryController::getPicture, "/api/gallery/pictures/{id}", drogon::Get);
-    ADD_METHOD_TO(GalleryController::updatePicture, "/api/gallery/pictures/{id}", drogon::Put, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(GalleryController::deletePicture, "/api/gallery/pictures/{id}", drogon::Delete, "pyracms::JwtAuthFilter");
-    ADD_METHOD_TO(GalleryController::setDefaultPicture, "/api/gallery/pictures/{id}/default", drogon::Put, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(GalleryController::updatePicture, "/api/gallery/pictures/{id}", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(GalleryController::deletePicture, "/api/gallery/pictures/{id}", drogon::Delete, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(GalleryController::setDefaultPicture, "/api/gallery/pictures/{id}/default", drogon::Put, "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(GalleryController::votePicture, "/api/gallery/pictures/{id}/vote", drogon::Post, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 

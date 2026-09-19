@@ -36,7 +36,11 @@ private:
     // threadId -> set of WebSocket connections subscribed to that thread
     static std::unordered_map<int, std::vector<drogon::WebSocketConnectionPtr>> threadSubscriptions_;
 
-    int authenticateFromToken(const std::string &token);
+    struct WsIdentity {
+        int userId;
+        int tenantId;
+    };
+    static constexpr size_t kMaxThreadSubscribers = 5000;
     void handleThreadSubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
     void handleThreadUnsubscribe(const drogon::WebSocketConnectionPtr &wsConnPtr, int threadId);
     void handleTypingIndicator(const drogon::WebSocketConnectionPtr &wsConnPtr,

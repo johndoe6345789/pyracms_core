@@ -1,4 +1,5 @@
 #include "controllers/CodeSnippetController.h"
+#include "controllers/SnippetInput.h"
 #include "filters/TenantGuard.h"
 #include "filters/TenantRules.h"
 #include "filters/Viewer.h"
@@ -19,6 +20,14 @@ void CodeSnippetController::createSnippet(
         return;
     }
 
+    auto problem = snippetProblem(*json);
+    if (!problem.empty()) {
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*resp->jsonObject())["error"] = problem;
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
     auto title = (*json)["title"].asString();
     auto code = (*json)["code"].asString();
     auto language = (*json).get("language", "python").asString();

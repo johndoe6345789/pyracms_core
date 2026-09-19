@@ -19,7 +19,7 @@ void ArticleController::togglePrivate(
     int tenantId = (*json)["tenant_id"].asInt();
     auto db = drogon::app().getDbClient();
 
-    articleService_.getArticle(
+    articleService_.findArticle(
         db, tenantId, name,
         [this, db, callback](const std::optional<ArticleDto> &article) {
             if (!article) {

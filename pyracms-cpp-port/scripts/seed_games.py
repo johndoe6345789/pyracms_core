@@ -16,6 +16,7 @@ import glob
 import json
 import os
 import sys
+from urllib.parse import urlparse
 
 import hn_env
 from hn_errors import ApiError
@@ -30,7 +31,11 @@ def seed_env(environ=os.environ):
     env.setdefault("HN_API_URL", "http://localhost:8080")
     if not env.get("HN_API_TOKEN"):
         env.setdefault("HN_API_USERNAME", "admin")
-        env.setdefault("HN_API_PASSWORD", "password123")
+        # The dev seed password is only assumed for a loopback backend; any
+        # other host must be given HN_API_PASSWORD (or HN_API_TOKEN).
+        host = urlparse(env["HN_API_URL"]).hostname or ""
+        if host in ("localhost", "127.0.0.1", "::1"):
+            env.setdefault("HN_API_PASSWORD", "password123")
     return env
 
 

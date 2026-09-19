@@ -28,7 +28,7 @@ void ArticleController::revertToRevision(
     auto db = drogon::app().getDbClient();
 
     // Find article by name first
-    articleService_.getArticle(
+    articleService_.findArticle(
         db, tenantId, name,
         [this, db, revisionId, userId, callback](const std::optional<ArticleDto> &article) {
             if (!article) {

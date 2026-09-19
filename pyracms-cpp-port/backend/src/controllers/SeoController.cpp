@@ -1,6 +1,17 @@
 #include "controllers/SeoController.h"
+#include "security/SsrfGuard.h"
 
 namespace pyracms {
+
+// base_url is echoed into feeds and JSON-LD: it must be a plain http(s)
+// URL with no query, fragment, quotes or angle brackets.
+static std::string safeBaseUrl(const std::string &raw) {
+    static const std::string fallback = "http://localhost:3000";
+    if (raw.empty() || !parseHttpUrl(raw).ok ||
+        raw.find_first_of("\"'<>&?#") != std::string::npos)
+        return fallback;
+    return raw;
+}
 
 void SeoController::sitemap(
     const drogon::HttpRequestPtr &req,
@@ -16,8 +27,7 @@ void SeoController::sitemap(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    auto baseUrl = req->getParameter("base_url");
-    if (baseUrl.empty()) baseUrl = "http://localhost:3000";
+    auto baseUrl = safeBaseUrl(req->getParameter("base_url"));
 
     auto db = drogon::app().getDbClient();
 
@@ -45,8 +55,7 @@ void SeoController::rssFeed(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    auto baseUrl = req->getParameter("base_url");
-    if (baseUrl.empty()) baseUrl = "http://localhost:3000";
+    auto baseUrl = safeBaseUrl(req->getParameter("base_url"));
     auto siteTitle = req->getParameter("title");
     if (siteTitle.empty()) siteTitle = "PyraCMS";
 
@@ -76,8 +85,7 @@ void SeoController::atomFeed(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    auto baseUrl = req->getParameter("base_url");
-    if (baseUrl.empty()) baseUrl = "http://localhost:3000";
+    auto baseUrl = safeBaseUrl(req->getParameter("base_url"));
     auto siteTitle = req->getParameter("title");
     if (siteTitle.empty()) siteTitle = "PyraCMS";
 
@@ -108,8 +116,7 @@ void SeoController::articleJsonLd(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    auto baseUrl = req->getParameter("base_url");
-    if (baseUrl.empty()) baseUrl = "http://localhost:3000";
+    auto baseUrl = safeBaseUrl(req->getParameter("base_url"));
 
     auto db = drogon::app().getDbClient();
 
@@ -142,8 +149,7 @@ void SeoController::articleOpenGraph(
     }
 
     int tenantId = std::stoi(tenantIdStr);
-    auto baseUrl = req->getParameter("base_url");
-    if (baseUrl.empty()) baseUrl = "http://localhost:3000";
+    auto baseUrl = safeBaseUrl(req->getParameter("base_url"));
 
     auto db = drogon::app().getDbClient();
 

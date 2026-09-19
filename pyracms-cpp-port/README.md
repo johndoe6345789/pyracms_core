@@ -127,6 +127,31 @@ cd backend/build
 ./pyracms_server --host 0.0.0.0 --port 8080
 ```
 
+## Docker: development vs production
+
+* `docker compose up -d --build` (`docker-compose.yml`, or
+  `docker-compose.ghcr.yml` for prebuilt images) is the **development** stack:
+  UI at http://localhost:3199, every port bound to `127.0.0.1`, throwaway
+  credentials, demo data (`SEED_DEV=1`, admin/password123) and the host
+  `docker.sock` mounted for the code runner. Do not expose it to a network.
+* **Production** = base file + `docker-compose.prod.yml`, with secrets in an
+  untracked env file (see `.env.prod.example`, `./scripts/gen-env.sh`):
+
+  ```sh
+  ./scripts/gen-env.sh > .env.prod && chmod 600 .env.prod
+  docker compose -f docker-compose.ghcr.yml -f docker-compose.prod.yml     --env-file .env.prod -p pyracms-prod up -d
+  ```
+
+  It refuses to start without `POSTGRES_PASSWORD`/`JWT_SECRET`, publishes only
+  nginx (loopback), isolates data services on an internal network, runs
+  read-only, unprivileged containers and uses a filtered Docker socket proxy.
+* `nginx.conf` is HTTP-only behind your TLS terminator; `nginx.tls.conf.example`
+  is a stand-alone TLS variant.
+
+See [`../SECURITY.md`](../SECURITY.md) (hardening checklist, Proxmox/CapRover)
+and [`SECURITY_AUDIT_INFRA.md`](SECURITY_AUDIT_INFRA.md) (findings + residual
+risk).
+
 ## Development
 
 ### Backend Development

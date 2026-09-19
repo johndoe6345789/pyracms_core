@@ -1,14 +1,22 @@
 #include "services/WebhookService.h"
 #include "services/DbError.h"
 
-#include <drogon/HttpClient.h>
-#include <openssl/hmac.h>
+#include <memory>
 #include <sstream>
-#include <iomanip>
-#include <thread>
-#include <chrono>
 
 namespace pyracms {
+
+// Event names are validated (Validate.h isSafeKey) before they get here, so
+// plain quoting is a well-formed PostgreSQL array literal.
+std::string WebhookService::eventsLiteral(
+    const std::vector<std::string> &events) {
+    std::string out = "{";
+    for (size_t i = 0; i < events.size(); i++) {
+        if (i > 0) out += ",";
+        out += "\"" + events[i] + "\"";
+    }
+    return out + "}";
+}
 
 WebhookDto WebhookService::rowToDto(const drogon::orm::Row &row) {
     WebhookDto dto;
@@ -63,13 +71,7 @@ void WebhookService::createWebhook(
     const std::string &secret,
     std::function<void(bool success, int webhookId, const std::string &error)> cb) {
 
-    // Build PostgreSQL array literal
-    std::string eventsArray = "{";
-    for (size_t i = 0; i < events.size(); i++) {
-        if (i > 0) eventsArray += ",";
-        eventsArray += "\"" + events[i] + "\"";
-    }
-    eventsArray += "}";
+    auto eventsArray = eventsLiteral(events);
 
     db->execSqlAsync(
         "INSERT INTO webhooks (tenant_id, url, events, secret) "
@@ -87,21 +89,19 @@ void WebhookService::createWebhook(
 void WebhookService::updateWebhook(
     const DbClientPtr &db, int webhookId,
     const std::string &url,
-    const std::vector<std::string> &events,
+    const std::optional<std::vector<std::string>> &events,
     const std::string &secret,
-    bool active,
+    const std::optional<bool> &active,
     BoolCallback cb) {
-
-    std::string eventsArray = "{";
-    for (size_t i = 0; i < events.size(); i++) {
-        if (i > 0) eventsArray += ",";
-        eventsArray += "\"" + events[i] + "\"";
-    }
-    eventsArray += "}";
-
+    // A field that was not sent keeps its stored value.
+    auto eventsArray = events ? eventsLiteral(*events) : std::string("{}");
+    int activeFlag = active ? (*active ? 1 : 0) : -1;
     db->execSqlAsync(
-        "UPDATE webhooks SET url = $1, events = $2::text[], secret = $3, active = $4 "
-        "WHERE id = $5",
+        "UPDATE webhooks SET url = COALESCE(NULLIF($1::text, ''), url), "
+        "events = CASE WHEN $6::bool THEN $2::text[] ELSE events END, "
+        "secret = COALESCE(NULLIF($3::text, ''), secret), "
+        "active = CASE WHEN $4::int < 0 THEN active ELSE $4::int = 1 END "
+        "WHERE id = $5::int",
         [cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Webhook not found");
@@ -112,7 +112,8 @@ void WebhookService::updateWebhook(
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
         },
-        url, eventsArray, secret, active, webhookId);
+        url, eventsArray, secret, activeFlag, webhookId,
+        events.has_value());
 }
 
 void WebhookService::deleteWebhook(const DbClientPtr &db, int webhookId,
@@ -159,118 +160,6 @@ void WebhookService::getDeliveries(
             cb({});
         },
         webhookId, limit, offset);
-}
-
-std::string WebhookService::computeHmac(const std::string &payload,
-                                          const std::string &secret) {
-    unsigned char result[EVP_MAX_MD_SIZE];
-    unsigned int resultLen = 0;
-
-    HMAC(EVP_sha256(),
-         secret.c_str(), static_cast<int>(secret.size()),
-         reinterpret_cast<const unsigned char *>(payload.c_str()),
-         payload.size(),
-         result, &resultLen);
-
-    std::ostringstream ss;
-    for (unsigned int i = 0; i < resultLen; i++) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(result[i]);
-    }
-    return "sha256=" + ss.str();
-}
-
-void WebhookService::fireEvent(
-    const DbClientPtr &db, int tenantId,
-    const std::string &event, const Json::Value &data) {
-
-    // Find all active webhooks for this tenant that listen to this event
-    db->execSqlAsync(
-        "SELECT * FROM webhooks WHERE tenant_id = $1 AND active = TRUE "
-        "AND $2 = ANY(events)",
-        [this, event, data, db](const drogon::orm::Result &result) {
-            for (const auto &row : result) {
-                auto webhook = rowToDto(row);
-                Json::Value payload;
-                payload["event"] = event;
-                payload["timestamp"] = trantor::Date::now().toFormattedString(false);
-                payload["data"] = data;
-                deliverWebhook(webhook, event, payload, db, 0);
-            }
-        },
-        [](const drogon::orm::DrogonDbException &) {
-            // Silently ignore webhook lookup failures
-        },
-        tenantId, event);
-}
-
-void WebhookService::deliverWebhook(
-    const WebhookDto &webhook, const std::string &event,
-    const Json::Value &payload, const DbClientPtr &db,
-    int retryCount) {
-
-    static constexpr int MAX_RETRIES = 3;
-
-    Json::StreamWriterBuilder writer;
-    std::string payloadStr = Json::writeString(writer, payload);
-
-    // HttpClient wants the origin; the URL's path/query goes on the request.
-    auto hostStart = webhook.url.find("://");
-    auto pathStart = webhook.url.find(
-        '/', hostStart == std::string::npos ? 0 : hostStart + 3);
-    auto origin = webhook.url.substr(0, pathStart);
-    auto path = pathStart == std::string::npos ? std::string("/")
-                                               : webhook.url.substr(pathStart);
-    auto httpClient = drogon::HttpClient::newHttpClient(origin);
-    httpClient->setSockOptCallback([](int) {});
-
-    auto httpReq = drogon::HttpRequest::newHttpJsonRequest(payload);
-    httpReq->setMethod(drogon::Post);
-    httpReq->setPath(path);
-    httpReq->addHeader("Content-Type", "application/json");
-    httpReq->addHeader("X-Webhook-Event", event);
-
-    if (!webhook.secret.empty()) {
-        auto signature = computeHmac(payloadStr, webhook.secret);
-        httpReq->addHeader("X-Webhook-Signature", signature);
-    }
-
-    int webhookId = webhook.id;
-    auto webhookCopy = webhook;
-
-    httpClient->sendRequest(
-        httpReq,
-        [this, db, webhookId, event, payloadStr, webhookCopy, payload, retryCount]
-        (drogon::ReqResult reqResult, const drogon::HttpResponsePtr &resp) {
-            int statusCode = 0;
-            std::string responseBody;
-
-            if (reqResult == drogon::ReqResult::Ok && resp) {
-                statusCode = static_cast<int>(resp->getStatusCode());
-                responseBody = std::string(resp->getBody());
-            } else {
-                responseBody = "Connection failed";
-            }
-
-            // Record delivery
-            db->execSqlAsync(
-                "INSERT INTO webhook_deliveries (webhook_id, event, payload, status_code, response_body) "
-                "VALUES ($1, $2, $3::jsonb, $4, $5)",
-                [](const drogon::orm::Result &) {},
-                [](const drogon::orm::DrogonDbException &) {},
-                webhookId, event, payloadStr, statusCode, responseBody);
-
-            // Retry on failure with exponential backoff
-            bool shouldRetry = (statusCode == 0 || statusCode >= 500) && retryCount < MAX_RETRIES;
-            if (shouldRetry) {
-                int delayMs = 1000 * (1 << retryCount); // 1s, 2s, 4s
-                drogon::app().getLoop()->runAfter(
-                    static_cast<double>(delayMs) / 1000.0,
-                    [this, webhookCopy, event, payload, db, retryCount]() {
-                        deliverWebhook(webhookCopy, event, payload, db, retryCount + 1);
-                    });
-            }
-        },
-        5.0); // 5 second timeout
 }
 
 } // namespace pyracms

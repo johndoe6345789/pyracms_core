@@ -2,6 +2,7 @@
 
 #include <drogon/drogon.h>
 #include <functional>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -43,9 +44,9 @@ public:
 
     void updateWebhook(const DbClientPtr &db, int webhookId,
                        const std::string &url,
-                       const std::vector<std::string> &events,
+                       const std::optional<std::vector<std::string>> &events,
                        const std::string &secret,
-                       bool active,
+                       const std::optional<bool> &active,
                        BoolCallback cb);
 
     void deleteWebhook(const DbClientPtr &db, int webhookId, BoolCallback cb);
@@ -56,7 +57,17 @@ public:
     void fireEvent(const DbClientPtr &db, int tenantId,
                    const std::string &event, const Json::Value &data);
 
+    // PostgreSQL text[] literal of pre-validated event names.
+    static std::string eventsLiteral(const std::vector<std::string> &events);
+
+    // Longest response body kept in the delivery log.
+    static constexpr size_t kMaxLoggedBody = 1024;
+
 private:
+    void sendWebhook(const WebhookDto &webhook, const std::string &event,
+                     const Json::Value &payload,
+                     const std::string &payloadStr, const DbClientPtr &db,
+                     int retryCount);
     void deliverWebhook(const WebhookDto &webhook, const std::string &event,
                         const Json::Value &payload, const DbClientPtr &db,
                         int retryCount = 0);

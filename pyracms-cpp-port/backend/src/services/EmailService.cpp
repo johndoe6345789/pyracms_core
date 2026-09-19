@@ -19,6 +19,42 @@ EmailService::EmailService() {
     smtpFrom_ = from ? from : "noreply@pyracms.com";
 }
 
+// A header value must never carry a line break (header injection).
+static std::string headerSafe(const std::string &v) {
+    std::string out;
+    for (unsigned char c : v) {
+        if (c >= 0x20 && c != 0x7f)
+            out += static_cast<char>(c);
+    }
+    return out;
+}
+
+static std::string htmlEscape(const std::string &v) {
+    std::string out;
+    for (char c : v) {
+        switch (c) {
+        case '&': out += "&amp;"; break;
+        case '<': out += "&lt;"; break;
+        case '>': out += "&gt;"; break;
+        case '"': out += "&quot;"; break;
+        case '\'': out += "&#39;"; break;
+        default: out += c;
+        }
+    }
+    return out;
+}
+
+// Links in mail point at the configured site, never at a request header.
+static std::string fillBaseUrl(std::string body) {
+    const char *env = std::getenv("PUBLIC_BASE_URL");
+    std::string base = env && *env ? env : "http://localhost:3000";
+    const std::string key = "{{BASE_URL}}";
+    for (auto pos = body.find(key); pos != std::string::npos;
+         pos = body.find(key, pos + base.size()))
+        body.replace(pos, key.size(), base);
+    return body;
+}
+
 struct UploadContext {
     std::string data;
     size_t offset;
@@ -41,9 +77,9 @@ std::string EmailService::buildMimeMessage(const std::string &to,
                                             const std::string &subject,
                                             const std::string &htmlBody) {
     std::ostringstream msg;
-    msg << "From: " << smtpFrom_ << "\r\n";
-    msg << "To: " << to << "\r\n";
-    msg << "Subject: " << subject << "\r\n";
+    msg << "From: " << headerSafe(smtpFrom_) << "\r\n";
+    msg << "To: " << headerSafe(to) << "\r\n";
+    msg << "Subject: " << headerSafe(subject) << "\r\n";
     msg << "MIME-Version: 1.0\r\n";
     msg << "Content-Type: text/html; charset=UTF-8\r\n";
     msg << "\r\n";
@@ -62,6 +98,10 @@ void EmailService::sendEmail(const std::string &to,
     auto user = smtpUser_;
     auto pass = smtpPass_;
 
+    if (to.find_first_of("\r\n<>\"") != std::string::npos) {
+        cb(false, "Invalid recipient");
+        return;
+    }
     drogon::app().getLoop()->runInLoop(
         [smtpUrl, mimeMsg, fromAddr, to, user, pass, cb]() {
             // Use a separate thread for blocking curl operations
@@ -172,9 +212,9 @@ std::string EmailService::notificationEmailTemplate(const std::string &subject,
 <html>
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h2 style="color: #333;">)html" + subject + R"html(</h2>
+    <h2 style="color: #333;">)html" + htmlEscape(subject) + R"html(</h2>
     <div style="background-color: #f5f5f5; padding: 16px; border-radius: 4px; margin: 20px 0;">
-        <p style="margin: 0;">)html" + message + R"html(</p>
+        <p style="margin: 0;">)html" + htmlEscape(message) + R"html(</p>
     </div>
     <p style="color: #666; font-size: 12px;">
         You received this notification from PyraCMS.
@@ -189,14 +229,14 @@ void EmailService::sendVerificationEmail(const std::string &to,
                                           const std::string &token,
                                           BoolCallback cb) {
     sendEmail(to, "Verify Your Email - PyraCMS",
-              verificationEmailTemplate(token), std::move(cb));
+              fillBaseUrl(verificationEmailTemplate(token)), std::move(cb));
 }
 
 void EmailService::sendPasswordResetEmail(const std::string &to,
                                            const std::string &token,
                                            BoolCallback cb) {
     sendEmail(to, "Password Reset - PyraCMS",
-              passwordResetEmailTemplate(token), std::move(cb));
+              fillBaseUrl(passwordResetEmailTemplate(token)), std::move(cb));
 }
 
 void EmailService::sendNotificationEmail(const std::string &to,

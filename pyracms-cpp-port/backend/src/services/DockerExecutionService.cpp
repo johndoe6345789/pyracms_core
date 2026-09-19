@@ -1,12 +1,9 @@
 #include "services/DockerExecutionService.h"
 
-#include <array>
+#include <atomic>
 #include <chrono>
-#include <cstdio>
-#include <sstream>
-#include <thread>
-
 #include <cstdlib>
+#include <thread>
 
 namespace pyracms {
 
@@ -33,94 +30,46 @@ DockerExecutionService::DockerExecutionService() {
     }
 }
 
-bool DockerExecutionService::isLanguageSupported(const std::string &language) const {
+bool DockerExecutionService::isLanguageSupported(
+    const std::string &language) const {
     return languageImages_.find(language) != languageImages_.end();
 }
 
+// Never blocks the event loop and never runs more than kMaxConcurrent
+// sandboxes at once (each is a container on the host daemon).
 void DockerExecutionService::executeCode(
     const std::string &language, const std::string &code,
     std::function<void(const ExecutionResult &)> cb) {
-
+    static std::atomic<int> running{0};
     auto it = languageImages_.find(language);
     if (it == languageImages_.end()) {
-        cb({1, "Unsupported language: " + language, 0});
+        cb({1, "Unsupported language", 0});
         return;
     }
-
-    const std::string &image = it->second;
-
-    // Run in a separate thread to avoid blocking the event loop
-    std::thread([image, code, cb]() {
-        auto startTime = std::chrono::steady_clock::now();
-
-        // Escape single quotes in code for shell safety
-        std::string escapedCode;
-        for (char c : code) {
-            if (c == '\'') {
-                escapedCode += "'\\''";
-            } else {
-                escapedCode += c;
-            }
-        }
-
-        // Build docker command with security constraints
-        std::ostringstream cmdStream;
-        cmdStream << "docker run --rm"
-                  << " --network=none"
-                  << " --memory=512m"
-                  << " --cpus=1"
-                  << " --pids-limit=256"
-                  << " --read-only"
-                  << " --tmpfs /tmp:rw,exec,nosuid,size=256m"
-                  << " --security-opt=no-new-privileges"
-                  << " " << image
-                  << " '" << escapedCode << "'"
-                  << " 2>&1";
-
-        std::string cmd = cmdStream.str();
-
-        // Execute with timeout using the timeout command
-        std::string timeoutCmd = "timeout 30 " + cmd;
-
-        std::array<char, 4096> buffer;
+    if (code.size() > kMaxCodeBytes) {
+        cb({1, "Code is too large to run", 0});
+        return;
+    }
+    if (running.fetch_add(1) >= kMaxConcurrent) {
+        running.fetch_sub(1);
+        cb({1, "Too many runs in progress, try again shortly", 0});
+        return;
+    }
+    std::thread([image = it->second, code, cb]() {
+        auto start = std::chrono::steady_clock::now();
         std::string output;
-        int exitCode = 0;
-
-        FILE *pipe = popen(timeoutCmd.c_str(), "r");
-        if (!pipe) {
-            auto endTime = std::chrono::steady_clock::now();
-            int durationMs = static_cast<int>(
-                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count());
-            cb({1, "Failed to spawn Docker container", durationMs});
-            return;
-        }
-
-        while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe) != nullptr) {
-            output += buffer.data();
-            // Cap output at 64KB
-            if (output.size() > 65536) {
-                output = output.substr(0, 65536) + "\n... output truncated (64KB limit)";
-                break;
-            }
-        }
-
-        int rawStatus = pclose(pipe);
-        if (WIFEXITED(rawStatus)) {
-            exitCode = WEXITSTATUS(rawStatus);
-        } else {
+        int exitCode = runArgv(buildArgv(image, code), kMaxOutputBytes,
+                               output);
+        if (exitCode < 0) {
             exitCode = 1;
+            output = "Failed to start the sandbox";
+        } else if (exitCode == 124 || exitCode == 137) {
+            output += "\nExecution timed out (30 second limit)";
         }
-
-        // Exit code 124 means timeout killed the process
-        if (exitCode == 124) {
-            output += "\nExecution timed out (10 second limit)";
-        }
-
-        auto endTime = std::chrono::steady_clock::now();
-        int durationMs = static_cast<int>(
-            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count());
-
-        cb({exitCode, output, durationMs});
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - start);
+        running.fetch_sub(1);
+        cb({exitCode, output, static_cast<int>(ms.count())});
     }).detach();
 }
 
