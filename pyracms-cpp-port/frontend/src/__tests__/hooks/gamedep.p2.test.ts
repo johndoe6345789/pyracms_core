@@ -1,10 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { type GameDepItem } from '@/hooks/useGameDepList'
 import { useGameDepEditor } from '@/hooks/useGameDepEditor'
-
-const mk = (n: string, l: number, v: number, d: string, t: string[]) =>
-  ({ name: n, displayName: n, description: `about ${n}`, tags: t,
-    likes: l, dislikes: 0, views: v, created: d }) as GameDepItem
 
 describe('useGameDepEditor', () => {
   it('adds normalized unique tags and deletes', () => {

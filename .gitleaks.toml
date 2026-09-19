@@ -7,4 +7,6 @@ useDefault = true
 description = "fake secrets used by unit tests"
 paths = [
   '''pyracms-cpp-port/backend/tests/.*''',
+  # curl --user "${SMTP_USER}:${SMTP_PASS}": env var references, no secret.
+  '''pyracms-cpp-port/scripts/test-mail\.sh''',
 ]
