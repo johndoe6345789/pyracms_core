@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
 import AlbumPage from '@/app/site/[slug]/(tenant)/gallery/[albumId]/page'
-import PicturePage
-  from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
+import PicturePage from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
 
 const push = jest.fn()
-jest.mock('@/components/common/CommentSection',
-  () => require('../helpers/commentMock').commentSectionMock())
+jest.mock('@/components/common/CommentSection', () =>
+  require('../helpers/commentMock').commentSectionMock(),
+)
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's', albumId: '4', pictureId: '9' }),
@@ -18,22 +18,43 @@ jest.mock('@/hooks/useSiteSession', () => ({ useSiteSession: () => true }))
 let manage = true
 jest.mock('@/hooks/useCanManage', () => ({ useCanManage: () => manage }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { put: jest.fn(), delete: jest.fn() },
+  __esModule: true,
+  default: { put: jest.fn(), delete: jest.fn() },
 }))
 jest.mock('@/hooks/useGalleryAlbum', () => ({
-  useGalleryAlbum: () => ({ albumName: 'Trip', albumDescription: 'd',
-    ownerId: 1, refresh: jest.fn(), pictures: [] }),
+  useGalleryAlbum: () => ({
+    albumName: 'Trip',
+    albumDescription: 'd',
+    ownerId: 1,
+    refresh: jest.fn(),
+    pictures: [],
+  }),
 }))
 jest.mock('@/hooks/useGalleryPicture', () => ({
-  useGalleryPicture: () => ({ handleLike: jest.fn(),
-    handleDislike: jest.fn(), handleSetCover: jest.fn(),
-    refresh: jest.fn(), picture: { title: 'Pic', description: 'd',
-      src: '/s', tags: [], likes: 1, dislikes: 0, isVideo: false,
-      albumId: '4', albumName: 'Trip', ownerId: 1 } }),
+  useGalleryPicture: () => ({
+    handleLike: jest.fn(),
+    handleDislike: jest.fn(),
+    handleSetCover: jest.fn().mockResolvedValue(undefined),
+    refresh: jest.fn(),
+    picture: {
+      title: 'Pic',
+      description: 'd',
+      src: '/s',
+      tags: [],
+      likes: 1,
+      dislikes: 0,
+      isVideo: false,
+      albumId: '4',
+      albumName: 'Trip',
+      ownerId: 1,
+    },
+  }),
 }))
 
 describe('gallery owner controls', () => {
-  beforeEach(() => { manage = true })
+  beforeEach(() => {
+    manage = true
+  })
   it('deletes a picture after confirmation', async () => {
     ;(api.delete as jest.Mock).mockResolvedValue({})
     render(<PicturePage />)
@@ -41,8 +62,7 @@ describe('gallery owner controls', () => {
     fireEvent.click(screen.getByTestId('set-cover-btn'))
     fireEvent.click(screen.getByTestId('delete-picture-btn'))
     fireEvent.click(await screen.findByTestId('gallery-delete-confirm'))
-    await waitFor(() => expect(push).toHaveBeenCalledWith(
-      '/site/s/gallery/4'))
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/site/s/gallery/4'))
     expect(api.delete).toHaveBeenCalledWith('/api/gallery/pictures/9')
   })
 
