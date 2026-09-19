@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, TextField,
+  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField,
 } from '@mui/material'
+import GalleryDeleteDialog from './GalleryDeleteDialog'
 import { useGalleryManage } from '@/hooks/useGalleryManage'
 
 export type ManageDialog = 'edit' | 'delete' | null
@@ -59,26 +60,10 @@ export default function GalleryManageDialogs(p: Props) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={p.open === 'delete'} onClose={close}
-        data-testid="gallery-delete-dialog">
-        <DialogTitle>Delete {noun}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Delete &quot;{p.name}&quot;?
-            {p.kind === 'albums' ? ' Its pictures go with it.' : ''}
-            {' '}This cannot be undone.
-          </DialogContentText>
-          {err}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={close}>Cancel</Button>
-          <Button color="error" variant="contained" disabled={g.busy}
-            data-testid="gallery-delete-confirm"
-            onClick={() => g.remove(() => { p.onClose(); p.onDeleted() })}>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <GalleryDeleteDialog open={p.open === 'delete'} noun={noun}
+        name={p.name} albums={p.kind === 'albums'} busy={g.busy}
+        err={err} onClose={close}
+        onConfirm={() => g.remove(() => { p.onClose(); p.onDeleted() })} />
     </>
   )
 }

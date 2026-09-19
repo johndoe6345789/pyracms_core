@@ -10,7 +10,9 @@ const assign = jest.fn()
 jest.mock('@/lib/navigate', () => ({ goTo: (u: string) => assign(u) }))
 
 describe('OAuthButtons', () => {
-  beforeEach(() => { get.mockReset(); assign.mockReset(); sessionStorage.clear() })
+  beforeEach(() => {
+    get.mockReset(); assign.mockReset(); sessionStorage.clear()
+  })
 
   it('renders nothing when no provider is configured', async () => {
     get.mockRejectedValue(new Error('400'))

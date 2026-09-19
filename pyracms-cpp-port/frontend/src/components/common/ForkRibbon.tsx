@@ -35,7 +35,9 @@ export default function ForkRibbon(
       sx={{
         position: 'absolute', top: 0, right: 0, width: size, height: size,
         zIndex: 2, color: 'background.paper', ...printOff,
-        '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main' },
+        '&:focus-visible': {
+          outline: '3px solid', outlineColor: 'primary.main',
+        },
         '&:hover .tri': { opacity: 0.85 },
       }}>
       <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
