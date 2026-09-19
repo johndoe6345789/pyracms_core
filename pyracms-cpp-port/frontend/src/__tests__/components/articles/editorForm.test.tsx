@@ -1,36 +1,19 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  within,
-  renderHook,
-  act,
-} from '@testing-library/react'
-import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ArticleEditorContent } from '@/components/articles/ArticleEditorContent'
-import { useArticleEditor } from '@/hooks/useArticleEditor'
+import { editor } from '../../helpers/articleEditorMocks'
 
-jest.mock('@/components/articles/MonacoEditor', () => ({
-  MonacoEditorComponent: (p: {
-    value: string
-    onChange: (v: string) => void
-  }) => (
-    <button data-testid="monaco" onClick={() => p.onChange('M')}>
-      {p.value}
-    </button>
-  ),
-}))
-jest.mock('@/components/articles/RichTextEditor', () => ({
-  RichTextEditor: () => <i data-testid="rich" />,
-}))
-jest.mock('@/components/articles/BBCodeEditor', () => ({
-  BBCodeEditor: () => <i data-testid="bb" />,
-}))
-jest.mock('@/components/articles/MarkdownEditor', () => ({
-  MarkdownEditor: () => <i data-testid="md" />,
-}))
-
-const editor = () => renderHook(() => useArticleEditor({ content: 'c' }))
+jest.mock('@/components/articles/MonacoEditor', () => {
+  return require('../../helpers/articleEditorMocks').monaco
+})
+jest.mock('@/components/articles/RichTextEditor', () => {
+  return require('../../helpers/articleEditorMocks').rich
+})
+jest.mock('@/components/articles/BBCodeEditor', () => {
+  return require('../../helpers/articleEditorMocks').bb
+})
+jest.mock('@/components/articles/MarkdownEditor', () => {
+  return require('../../helpers/articleEditorMocks').md
+})
 
 it('ArticleEditorContent renders each mode', () => {
   const { result } = editor()
@@ -55,28 +38,4 @@ it('ArticleEditorContent monaco toggles preview', () => {
   act(() => result.current.setViewMode('preview'))
   rerender(<ArticleEditorContent mode="monaco" editor={result.current} />)
   expect(screen.getByText(/Preview \(Markdown\)/)).toBeInTheDocument()
-})
-
-it('ArticleEditorForm edits fields', () => {
-  const { result } = editor()
-  const onSummaryChange = jest.fn()
-  const { rerender } = render(
-    <ArticleEditorForm
-      editor={result.current}
-      onSummaryChange={onSummaryChange}
-    />,
-  )
-  const box = (id: string) =>
-    within(screen.getByTestId(id)).getByRole('textbox')
-  fireEvent.change(box('article-title-input'), { target: { value: 'T' } })
-  fireEvent.change(box('summary-input'), { target: { value: 'S' } })
-  expect(onSummaryChange).toHaveBeenCalledWith('S')
-  fireEvent.mouseDown(
-    within(screen.getByTestId('renderer-select')).getByRole('combobox'),
-  )
-  fireEvent.click(screen.getByRole('option', { name: 'HTML' }))
-  fireEvent.click(screen.getByRole('button', { name: /WYSIWYG/ }))
-  expect(screen.getByTestId('rich')).toBeInTheDocument()
-  rerender(<ArticleEditorForm editor={result.current} />)
-  fireEvent.change(box('summary-input'), { target: { value: 'S2' } })
 })

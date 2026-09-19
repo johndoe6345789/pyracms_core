@@ -5,6 +5,8 @@ import {
   mockApiRoutes,
 } from '../support/site-admin-helpers-1'
 
+const OPTIONS = 'menu permissions select has public/authenticated/admin options'
+
 test.describe('Admin Menus', () => {
   test.beforeEach(async ({ page }) => {
     await mockApiRoutes(page)
@@ -23,9 +25,7 @@ test.describe('Admin Menus', () => {
     await expect(page.getByTestId('menu-permissions-select')).toBeVisible()
   })
 
-  test('menu permissions select has public/authenticated/admin options', async ({
-    page,
-  }) => {
+  test(OPTIONS, async ({ page }) => {
     const select = page.getByTestId('menu-permissions-select')
     await select.click()
     await expect(page.getByRole('option', { name: 'public' })).toBeVisible()

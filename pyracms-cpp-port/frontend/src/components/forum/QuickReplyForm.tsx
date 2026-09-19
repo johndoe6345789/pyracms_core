@@ -1,9 +1,8 @@
 'use client'
 
-import { Paper, Typography, Button, Alert } from '@mui/material'
-import { SendOutlined } from '@mui/icons-material'
+import { Paper, Typography, Alert } from '@mui/material'
 import { replyNotice } from './ReplyNotice'
-import { MentionTextField } from '../common/MentionTextField'
+import { ReplyFormBody } from './ReplyFormBody'
 
 interface QuickReplyFormProps {
   value: string
@@ -41,40 +40,14 @@ export function QuickReplyForm({
           {notice}
         </Alert>
       ) : (
-        <>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }} data-testid="reply-error">
-              {error}
-            </Alert>
-          )}
-          <MentionTextField
-            fullWidth
-            multiline
-            minRows={3}
-            maxRows={8}
-            placeholder="Write your reply..."
-            value={value}
-            onValue={(v) => {
-              onChange(v)
-              onTyping?.()
-            }}
-            sx={{ mb: 2 }}
-            inputProps={{
-              'aria-label': 'Reply content',
-              'data-testid': 'quick-reply-input',
-            }}
-          />
-          <Button
-            variant="contained"
-            endIcon={<SendOutlined />}
-            onClick={onSubmit}
-            disabled={!value.trim() || submitting}
-            aria-label="Submit reply"
-            data-testid="quick-reply-submit"
-          >
-            {submitting ? 'Posting...' : 'Submit Reply'}
-          </Button>
-        </>
+        <ReplyFormBody
+          value={value}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onTyping={onTyping}
+          submitting={submitting}
+          error={error}
+        />
       )}
     </Paper>
   )

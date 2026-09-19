@@ -4,7 +4,7 @@ import { Box } from '@mui/material'
 import Editor from '@monaco-editor/react'
 import TemplatePreview from './TemplatePreview'
 import type { TemplateSection } from './defaultTemplates'
-import { EDITOR_OPTIONS } from '@/app/site/[slug]/(admin)/admin/templates/templateEditorOptions'
+import { EDITOR_OPTIONS } from './templateEditorOptions'
 
 interface Props {
   section: TemplateSection

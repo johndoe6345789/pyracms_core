@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useActionError } from '@/hooks/useActionError'
-import type { Notification } from '@/components/common/notification/notificationIcons'
+import type { Notification } from '@/components/common/notification'
 import {
   fetchNotifications,
   markNotificationRead,

@@ -1,12 +1,10 @@
 'use client'
 
 import { Paper, Box } from '@mui/material'
-import { VoteButtons } from './VoteButtons'
-import { QuoteButton } from './QuoteButton'
 import { PostBody } from './PostBody'
 import { PostCardHeader } from './PostCardHeader'
 import { PostDeleteDialog } from './PostDeleteDialog'
-import { PostReactions } from './PostReactions'
+import { PostFooter } from './PostFooter'
 import { PostAuthorInfo } from './PostAuthorInfo'
 import { usePostCardState } from './usePostCardState'
 import { MentionTextField } from '../common/MentionTextField'
@@ -79,34 +77,12 @@ export function PostCard({
         ) : (
           <PostBody content={post.content} />
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 1,
-          }}
-        >
-          <VoteButtons
-            likes={post.likes}
-            dislikes={post.dislikes}
-            disabled={!canVote}
-            onVote={(l) => onVote?.(post.id, l)}
-          />
-          <PostReactions
-            postId={post.id}
-            disabled={!canVote}
-            {...(post.reactions ? { reactions: post.reactions } : {})}
-          />
-          {onQuote && (
-            <QuoteButton
-              author={post.author}
-              content={post.content}
-              onQuote={() => onQuote(post.author, post.content)}
-            />
-          )}
-        </Box>
+        <PostFooter
+          post={post}
+          canVote={canVote}
+          onVote={onVote}
+          onQuote={onQuote}
+        />
       </Box>
       <PostDeleteDialog
         open={s.confirmDel}

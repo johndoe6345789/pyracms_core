@@ -8,7 +8,7 @@ import { getUserRole, UserRole } from '@/types'
 import SuperAdminSidebar from '@/components/super-admin/SuperAdminSidebar'
 import SuperAdminAppBar from '@/components/super-admin/SuperAdminAppBar'
 import SuperAdminGuard from '@/components/super-admin/SuperAdminGuard'
-import SuperAdminBreadcrumbs from '@/components/super-admin/SuperAdminBreadcrumbs'
+import Breadcrumbs from '@/components/super-admin/SuperAdminBreadcrumbs'
 
 export default function SuperAdminLayout({
   children,
@@ -55,7 +55,7 @@ export default function SuperAdminLayout({
             isMobile={isMobile}
             onMenuClick={() => setDrawerOpen(true)}
           />
-          <SuperAdminBreadcrumbs />
+          <Breadcrumbs />
           <Box
             component="main"
             id="super-admin-main"

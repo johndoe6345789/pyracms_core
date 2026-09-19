@@ -39,6 +39,9 @@ added idempotently by `sql/070_file_storage.sql`; existing rows are `local`).
 New uploads go to `STORAGE_BACKEND`; existing files are read from wherever
 their row says, so **switching the backend never breaks old files** as long as
 both stores stay reachable (keep the `uploads_data` volume mounted).
+The S3 store is opened whenever `S3_ENDPOINT` is set, even with
+`STORAGE_BACKEND=local`, so rows already in S3 keep working after switching back;
+without an endpoint they answer `503`.
 
 Failures are mapped without leaking internals: store unreachable or timed out
 gives `503`, any other store error (bad key, 5xx) gives `502`, both with a

@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { Box, Typography } from '@mui/material'
 import {
   StarOutlined,
@@ -12,6 +13,23 @@ interface UserStatsProps {
   postCount: number
   reputation: number
   rankColor: string
+}
+
+const ICON = { fontSize: 14, color: 'text.secondary' }
+
+function Row({ children }: { children: ReactNode }) {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 0.5,
+        alignItems: 'center',
+        justifyContent: { md: 'center' },
+      }}
+    >
+      {children}
+    </Box>
+  )
 }
 
 export function UserStats({
@@ -28,66 +46,27 @@ export function UserStats({
         flexWrap: 'wrap',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          alignItems: 'center',
-          justifyContent: { md: 'center' },
-        }}
-      >
-        <CalendarTodayOutlined
-          sx={{
-            fontSize: 14,
-            color: 'text.secondary',
-          }}
-        />
+      <Row>
+        <CalendarTodayOutlined sx={ICON} />
         <Typography variant="caption" color="text.secondary">
           {joinDate}
         </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          alignItems: 'center',
-          justifyContent: { md: 'center' },
-        }}
-      >
-        <ForumOutlined
-          sx={{
-            fontSize: 14,
-            color: 'text.secondary',
-          }}
-        />
+      </Row>
+      <Row>
+        <ForumOutlined sx={ICON} />
         <Typography variant="caption" color="text.secondary">
           {postCount.toLocaleString()} posts
         </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          alignItems: 'center',
-          justifyContent: { md: 'center' },
-        }}
-      >
-        <StarOutlined
-          sx={{
-            fontSize: 14,
-            color: rankColor,
-          }}
-        />
+      </Row>
+      <Row>
+        <StarOutlined sx={{ fontSize: 14, color: rankColor }} />
         <Typography
           variant="caption"
-          sx={{
-            color: rankColor,
-            fontWeight: 600,
-          }}
+          sx={{ color: rankColor, fontWeight: 600 }}
         >
           {reputation.toLocaleString()} rep
         </Typography>
-      </Box>
+      </Row>
     </Box>
   )
 }

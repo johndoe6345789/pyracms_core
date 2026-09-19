@@ -46,6 +46,10 @@ TEST(StorageConfig, ReadsEnvironment) {
     EXPECT_EQ(startupStorageError(), ""); // dev: creds optional
     BlobRegistry::reset();
     EXPECT_STREQ(BlobRegistry::active()->name(), "s3");
+    setenv("STORAGE_BACKEND", "local", 1); // s3 stays readable, not active
+    BlobRegistry::reset();
+    EXPECT_STREQ(BlobRegistry::active()->name(), "local");
+    ASSERT_NE(BlobRegistry::named("s3"), nullptr);
     for (auto v : {"STORAGE_BACKEND", "S3_ENDPOINT", "S3_ACCESS_KEY",
                    "S3_TIMEOUT_S"})
         unsetenv(v);

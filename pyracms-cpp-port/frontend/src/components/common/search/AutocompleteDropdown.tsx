@@ -1,33 +1,8 @@
 'use client'
 
-import {
-  Paper,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Popper,
-  Chip,
-} from '@mui/material'
-import {
-  SearchOutlined,
-  ArticleOutlined,
-  ForumOutlined,
-  CodeOutlined,
-  SportsEsportsOutlined,
-} from '@mui/icons-material'
+import { Paper, List, Popper } from '@mui/material'
+import AutocompleteItem, { type Result } from './AutocompleteItem'
 
-interface Result {
-  text: string
-  type: string
-  url: string
-}
-const ICONS: Record<string, React.ReactNode> = {
-  article: <ArticleOutlined fontSize="small" />,
-  forum_post: <ForumOutlined fontSize="small" />,
-  snippet: <CodeOutlined fontSize="small" />,
-  gamedep: <SportsEsportsOutlined fontSize="small" />,
-}
 interface Props {
   open: boolean
   anchorEl: HTMLElement | null
@@ -58,27 +33,7 @@ export default function AutocompleteDropdown({
       >
         <List dense>
           {results.map((r, i) => (
-            <ListItem
-              key={i}
-              onClick={() => onSelect(r)}
-              data-testid={`autocomplete-item-${i}`}
-              sx={{
-                cursor: 'pointer',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 32 }}>
-                {ICONS[r.type] || <SearchOutlined fontSize="small" />}
-              </ListItemIcon>
-              <ListItemText primary={r.text} />
-              <Chip
-                label={r.type}
-                size="small"
-                sx={{ height: 20, fontSize: '0.6rem' }}
-              />
-            </ListItem>
+            <AutocompleteItem key={i} r={r} i={i} onSelect={onSelect} />
           ))}
         </List>
       </Paper>

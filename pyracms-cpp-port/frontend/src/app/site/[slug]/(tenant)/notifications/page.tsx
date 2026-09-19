@@ -1,23 +1,11 @@
 'use client'
 
-import NextLink from 'next/link'
-import {
-  Container,
-  Typography,
-  Button,
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Link,
-} from '@mui/material'
-import { DeleteOutline } from '@mui/icons-material'
+import { Container, Typography, Button, Box, List } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import { useNotificationPage } from '@/hooks/useNotificationPage'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
-import { safeHref } from '@/lib/safeUrl'
+import NotificationRow from './NotificationRow'
 
 export default function NotificationsPage() {
   const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
@@ -45,46 +33,14 @@ export default function NotificationsPage() {
         <Typography color="text.secondary">No notifications.</Typography>
       )}
       <List>
-        {items.map((n) => {
-          const href = safeHref(n.link)
-          return (
-            <ListItem
-              key={n.id}
-              divider
-              data-testid={`note-${n.id}`}
-              secondaryAction={
-                <IconButton aria-label="Delete" onClick={() => remove(n.id)}>
-                  <DeleteOutline />
-                </IconButton>
-              }
-            >
-              <ListItemText
-                primary={
-                  href ? (
-                    <Link component={NextLink} href={href}>
-                      {n.title}
-                    </Link>
-                  ) : (
-                    n.title
-                  )
-                }
-                secondary={n.message}
-                primaryTypographyProps={{
-                  fontWeight: n.is_read ? 400 : 700,
-                }}
-              />
-              {!n.is_read && (
-                <Button
-                  size="small"
-                  onClick={() => markRead(n.id)}
-                  sx={{ mr: 4 }}
-                >
-                  Mark read
-                </Button>
-              )}
-            </ListItem>
-          )
-        })}
+        {items.map((n) => (
+          <NotificationRow
+            key={n.id}
+            n={n}
+            markRead={markRead}
+            remove={remove}
+          />
+        ))}
       </List>
     </Container>
   )

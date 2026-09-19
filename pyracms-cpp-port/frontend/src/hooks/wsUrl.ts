@@ -4,3 +4,12 @@ export function buildWsUrl(url: string, token: string): string {
   const base = url.replace(/^http/, 'ws')
   return base + separator + 'token=' + encodeURIComponent(token)
 }
+
+/** Parses a frame as JSON, falling back to the raw payload. */
+export function parseWsData(raw: string): unknown {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return raw
+  }
+}

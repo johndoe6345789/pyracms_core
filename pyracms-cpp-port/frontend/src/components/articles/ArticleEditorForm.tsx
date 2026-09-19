@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, TextField, MenuItem } from '@mui/material'
-import { RENDERERS, type ArticleEditorState } from '@/hooks/useArticleEditor'
-import { EditorModeSelector, type EditorMode } from './EditorModeSelector'
+import { Box, TextField } from '@mui/material'
+import type { ArticleEditorState } from '@/hooks/useArticleEditor'
+import type { EditorMode } from './EditorModeSelector'
+import { ArticleEditorToolbar } from './ArticleEditorToolbar'
 import { ArticleEditorContent } from './ArticleEditorContent'
 import { ArticleTagEditor } from './ArticleTagEditor'
 
@@ -37,30 +38,11 @@ export function ArticleEditorForm({
         placeholder="Enter a title..."
         data-testid="article-title-input"
       />
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 2,
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        <TextField
-          label="Renderer"
-          select
-          value={editor.renderer}
-          onChange={(e) => editor.setRenderer(e.target.value)}
-          sx={{ maxWidth: 200 }}
-          data-testid="renderer-select"
-        >
-          {RENDERERS.map((r) => (
-            <MenuItem key={r} value={r}>
-              {r}
-            </MenuItem>
-          ))}
-        </TextField>
-        <EditorModeSelector mode={mode} onModeChange={setMode} />
-      </Box>
+      <ArticleEditorToolbar
+        editor={editor}
+        mode={mode}
+        onModeChange={setMode}
+      />
       <ArticleEditorContent mode={mode} editor={editor} />
       <ArticleTagEditor
         tagsInput={editor.tagsInput}

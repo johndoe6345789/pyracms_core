@@ -18,20 +18,20 @@ struct State {
 std::mutex gMu;
 State gState;
 
-// Caller holds gMu. A bad configuration is refused at startup; here it just
-// leaves S3 unavailable.
+// Caller holds gMu. S3 is reachable whenever an endpoint is configured, even
+// while new uploads go to disk, so files already in S3 stay readable. A bad
+// configuration is refused at startup; here it just leaves S3 unavailable.
 void init() {
     if (gState.ready)
         return;
     gState = State{};
     gState.local = std::make_shared<LocalDiskStorage>();
     auto cfg = storageConfigFromEnv();
-    if (cfg.backend == "s3" && storageConfigError(cfg, false).empty()) {
+    auto asS3 = cfg;
+    asS3.backend = "s3";
+    if (storageConfigError(asS3, false).empty())
         gState.s3 = std::make_shared<S3Storage>(cfg);
-        gState.active = "s3";
-    } else {
-        gState.active = "local";
-    }
+    gState.active = cfg.backend == "s3" && gState.s3 ? "s3" : "local";
     gState.ready = true;
 }
 

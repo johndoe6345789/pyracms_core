@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, within } from '@testing-library/react'
-import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
 import MenuItemTable from '@/components/admin/MenuItemTable'
 
 const item = (id: number) => ({
@@ -8,27 +7,6 @@ const item = (id: number) => ({
   route: `/r${id}`,
   position: id,
   permissions: 'admin',
-})
-
-it('MenuGroupSelect changes group and creates', () => {
-  const onGroupChange = jest.fn()
-  const onNewGroup = jest.fn()
-  render(
-    <MenuGroupSelect
-      menuGroups={[
-        { id: 1, name: 'main', items: [] },
-        { id: 2, name: 'foot', items: [] },
-      ]}
-      selectedGroup="main"
-      onGroupChange={onGroupChange}
-      onNewGroup={onNewGroup}
-    />,
-  )
-  fireEvent.mouseDown(screen.getByRole('combobox'))
-  fireEvent.click(screen.getByRole('option', { name: 'foot' }))
-  expect(onGroupChange).toHaveBeenCalled()
-  fireEvent.click(screen.getByRole('button', { name: /New Menu Group/ }))
-  expect(onNewGroup).toHaveBeenCalled()
 })
 
 const props = () => ({

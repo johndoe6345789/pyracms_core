@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Box, Button } from '@mui/material'
 import {
   ForkRightOutlined,
@@ -10,6 +9,7 @@ import {
 } from '@mui/icons-material'
 import { RunButton } from './RunButton'
 import { OwnerButtons } from './OwnerButtons'
+import { useCopyFeedback } from './useCopyFeedback'
 
 interface Props {
   runnable: boolean
@@ -32,17 +32,7 @@ export function SnippetToolbar({
   onEdit,
   onDelete,
 }: Props) {
-  const [copied, setCopied] = useState('')
-
-  const copy = (what: string, text: string) => {
-    navigator.clipboard
-      ?.writeText(text)
-      .then(() => {
-        setCopied(what)
-        setTimeout(() => setCopied(''), 1500)
-      })
-      .catch(() => {})
-  }
+  const { copied, copy } = useCopyFeedback()
 
   return (
     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>

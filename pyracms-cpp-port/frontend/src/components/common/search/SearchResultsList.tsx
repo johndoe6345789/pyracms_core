@@ -1,14 +1,8 @@
 'use client'
 
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material'
-import { ICONS, COLORS, type SearchResult } from './searchIcons'
+import { Box, Typography, List } from '@mui/material'
+import type { SearchResult } from './searchIcons'
+import SearchResultRow from './SearchResultRow'
 
 export type { SearchResult }
 
@@ -60,42 +54,7 @@ export default function SearchResultsList({ results, query, onSelect }: Props) {
           </Typography>
           <List disablePadding>
             {items.map((r) => (
-              <ListItem
-                key={r.id}
-                onClick={() => onSelect(r)}
-                data-testid={`search-result-${r.id}`}
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                  px: 2,
-                  py: 1,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 36,
-                    color: COLORS[r.type],
-                  }}
-                >
-                  {ICONS[r.type]}
-                </ListItemIcon>
-                <ListItemText
-                  primary={r.title}
-                  secondary={
-                    r.snippet.substring(0, 80) +
-                    (r.snippet.length > 80 ? '...' : '')
-                  }
-                  primaryTypographyProps={{
-                    variant: 'body2',
-                    fontWeight: 600,
-                  }}
-                  secondaryTypographyProps={{
-                    variant: 'caption',
-                  }}
-                />
-              </ListItem>
+              <SearchResultRow key={r.id} r={r} onSelect={onSelect} />
             ))}
           </List>
         </Box>

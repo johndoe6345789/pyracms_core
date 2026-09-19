@@ -3,7 +3,7 @@
 import { Box, Typography, Button } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import Link from 'next/link'
-import TenantManagementTable from '@/components/super-admin/TenantManagementTable'
+import Table from '@/components/super-admin/TenantManagementTable'
 
 export default function SuperAdminTenantsPage() {
   return (
@@ -30,7 +30,7 @@ export default function SuperAdminTenantsPage() {
           New Site
         </Button>
       </Box>
-      <TenantManagementTable />
+      <Table />
     </Box>
   )
 }

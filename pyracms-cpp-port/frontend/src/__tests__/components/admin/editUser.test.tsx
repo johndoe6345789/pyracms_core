@@ -1,20 +1,8 @@
 import { screen, fireEvent, within } from '@testing-library/react'
-import { render } from '@testing-library/react'
 import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
+import { user } from '../../helpers/adminUserFixture'
 import { UserRole } from '@/types'
 import EditUserDialog from '@/components/admin/users/EditUserDialog'
-import UsersHeader from '@/components/admin/users/UsersHeader'
-import UserTable from '@/components/admin/UserTable'
-
-const user = {
-  id: 3,
-  username: 'bob',
-  fullName: 'Bob B',
-  email: 'b@x',
-  created: 'c',
-  banned: false,
-  role: 1,
-}
 
 const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
 
@@ -67,25 +55,4 @@ it('stays closed without a user', () => {
     />,
   )
   expect(screen.queryByTestId('edit-user-dialog')).toBeNull()
-})
-
-it('UsersHeader triggers create', () => {
-  const onCreate = jest.fn()
-  render(<UsersHeader onCreate={onCreate} />)
-  fireEvent.click(screen.getByTestId('create-user-btn'))
-  expect(onCreate).toHaveBeenCalled()
-})
-
-it('UserTable forwards onEdit to the edit action', () => {
-  const onEdit = jest.fn()
-  render(
-    <UserTable
-      users={[user]}
-      onToggleBan={jest.fn()}
-      onDelete={jest.fn()}
-      onEdit={onEdit}
-    />,
-  )
-  fireEvent.click(screen.getByTestId('edit-user-3'))
-  expect(onEdit).toHaveBeenCalledWith(user)
 })

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Dialog, DialogTitle, DialogContent, Alert } from '@mui/material'
 import type { UserRow } from '@/hooks/admin/userRow'
 import type { UserProfileFields } from '@/hooks/admin/useUserEdit'
@@ -6,6 +5,7 @@ import EditUserFields from './EditUserFields'
 import EditUserRole from './EditUserRole'
 import EditUserActions from './EditUserActions'
 import { useCurrentRole } from '@/hooks/useCurrentRole'
+import { useEditUserForm } from './useEditUserForm'
 
 interface Props {
   user: UserRow | null
@@ -22,16 +22,9 @@ export default function EditUserDialog({
   onClose,
   onSave,
 }: Props) {
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState(1)
+  const { fullName, setFullName, email, setEmail, role, setRole } =
+    useEditUserForm(user)
   const actorRole = useCurrentRole()
-
-  useEffect(() => {
-    setFullName(user?.fullName ?? '')
-    setEmail(user?.email ?? '')
-    setRole(user?.role ?? 1)
-  }, [user])
 
   return (
     <Dialog

@@ -1,13 +1,9 @@
 'use client'
 
 import { apiOrigin } from '@/lib/apiOrigin'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useWebSocket } from './useWebSocket'
-
-interface TypingUser {
-  userId: number
-  timestamp: number
-}
+import { useTypingUsers } from './useTypingUsers'
 
 interface UseThreadLiveOptions {
   threadId: number
@@ -15,33 +11,15 @@ interface UseThreadLiveOptions {
 }
 
 export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
-  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
+  const { typingUsers, handleTyping } = useTypingUsers()
 
   const handleMessage = useCallback(
     (data: unknown) => {
       const msg = data as Record<string, unknown>
-      if (msg.type === 'typing_start') {
-        setTypingUsers((prev) => {
-          const filtered = prev.filter(
-            (u) => u.userId !== (msg.userId as number),
-          )
-          return [
-            ...filtered,
-            {
-              userId: msg.userId as number,
-              timestamp: Date.now(),
-            },
-          ]
-        })
-      } else if (msg.type === 'typing_stop') {
-        setTypingUsers((prev) =>
-          prev.filter((u) => u.userId !== (msg.userId as number)),
-        )
-      } else if (msg.type === 'new_post') {
-        onNewPost?.(msg)
-      }
+      handleTyping(msg)
+      if (msg.type === 'new_post') onNewPost?.(msg)
     },
-    [onNewPost],
+    [onNewPost, handleTyping],
   )
 
   const { connected, send } = useWebSocket({
@@ -59,16 +37,6 @@ export function useThreadLive({ threadId, onNewPost }: UseThreadLiveOptions) {
       send({ type: 'thread_unsubscribe', threadId })
     }
   }, [connected, threadId, send])
-
-  // Clean up stale typing indicators (older than 5 seconds)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTypingUsers((prev) =>
-        prev.filter((u) => Date.now() - u.timestamp < 5000),
-      )
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
 
   const sendTypingStart = useCallback(() => {
     send({ type: 'typing_start', threadId })

@@ -1,14 +1,8 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import {
-  TextField,
-  InputAdornment,
-  Chip,
-  Dialog,
-  DialogContent,
-} from '@mui/material'
-import { SearchOutlined } from '@mui/icons-material'
+import { Dialog, DialogContent } from '@mui/material'
+import SearchDialogInput from './SearchDialogInput'
 import type { SearchResult } from './SearchResultsList'
 import SearchResultsList from './SearchResultsList'
 
@@ -50,41 +44,11 @@ export default function SearchDialog({
       }}
     >
       <DialogContent sx={{ p: 0 }}>
-        <TextField
+        <SearchDialogInput
           inputRef={ref}
-          fullWidth
-          placeholder="Search articles, posts..."
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && query) onSearchPage()
-          }}
-          data-testid="search-dialog-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchOutlined />
-              </InputAdornment>
-            ),
-            ...(query
-              ? {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Chip
-                        label="Enter to search all"
-                        size="small"
-                        variant="outlined"
-                        sx={{ height: 22, fontSize: '0.7rem' }}
-                      />
-                    </InputAdornment>
-                  ),
-                }
-              : {}),
-          }}
-          sx={{
-            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-            '& .MuiInputBase-root': { py: 1.5 },
-          }}
+          query={query}
+          onQueryChange={onQueryChange}
+          onSearchPage={onSearchPage}
         />
         <SearchResultsList
           results={results}

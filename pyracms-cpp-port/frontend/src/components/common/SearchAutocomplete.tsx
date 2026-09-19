@@ -1,16 +1,11 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useRef } from 'react'
 import { TextField, InputAdornment } from '@mui/material'
 import { SearchOutlined } from '@mui/icons-material'
-import api from '@/lib/api'
 import AutocompleteDropdown from './search/AutocompleteDropdown'
+import { useAutocomplete } from './search/useAutocomplete'
 
-interface Result {
-  text: string
-  type: string
-  url: string
-}
 interface Props {
   tenantId?: number | null
   onSelect?: (url: string) => void
@@ -23,37 +18,8 @@ export default function SearchAutocomplete({
   onSearch,
   placeholder = 'Search...',
 }: Props) {
-  const [q, setQ] = useState('')
-  const [res, setRes] = useState<Result[]>([])
-  const [open, setOpen] = useState(false)
+  const { q, setQ, res, open, setOpen, chg } = useAutocomplete(tenantId)
   const ref = useRef<HTMLInputElement>(null)
-  const tm = useRef<NodeJS.Timeout>(null)
-  const chg = useCallback(
-    (v: string) => {
-      setQ(v)
-      if (tm.current) clearTimeout(tm.current)
-      if (v.length < 2 || !tenantId) {
-        setRes([])
-        setOpen(false)
-        return
-      }
-      tm.current = setTimeout(async () => {
-        try {
-          const u =
-            '/api/search/autocomplete?q=' +
-            encodeURIComponent(v) +
-            `&tenant_id=${tenantId}&limit=8`
-          const r = await api.get(u)
-          setRes(r.data || [])
-          setOpen((r.data || []).length > 0)
-        } catch {
-          setRes([])
-          setOpen(false)
-        }
-      }, 200)
-    },
-    [tenantId],
-  )
   return (
     <div style={{ position: 'relative' }}>
       <TextField

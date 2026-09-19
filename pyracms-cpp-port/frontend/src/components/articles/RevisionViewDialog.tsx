@@ -7,9 +7,9 @@ import {
   DialogContent,
   DialogActions,
   Typography,
-  Paper,
 } from '@mui/material'
 import type { Revision } from '@/hooks/useRevisions'
+import { RevisionContent } from './RevisionContent'
 
 interface RevisionViewDialogProps {
   open: boolean
@@ -55,21 +55,7 @@ export function RevisionViewDialog({
         >
           {revision?.date}
         </Typography>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2,
-            maxHeight: 400,
-            overflow: 'auto',
-          }}
-        >
-          <div
-            data-testid="revision-content"
-            dangerouslySetInnerHTML={{
-              __html: sanitizedContent,
-            }}
-          />
-        </Paper>
+        <RevisionContent html={sanitizedContent} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} data-testid="close-revision-dialog">

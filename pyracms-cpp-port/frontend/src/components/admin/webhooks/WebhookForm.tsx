@@ -7,17 +7,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
-  Switch,
 } from '@mui/material'
-import {
-  WEBHOOK_EVENTS,
-  type Webhook,
-  type WebhookDraft,
-} from '@/hooks/admin/webhookApi'
+import WebhookFields from './WebhookFields'
+import type { Webhook, WebhookDraft } from '@/hooks/admin/webhookApi'
 
 interface Props {
   open: boolean
@@ -54,44 +46,11 @@ export default function WebhookForm(p: Props) {
     >
       <DialogTitle>{p.webhook ? 'Edit webhook' : 'New webhook'}</DialogTitle>
       <DialogContent>
-        <TextField
-          label="Payload URL"
-          fullWidth
-          margin="dense"
-          value={d.url}
-          onChange={(e) => setD({ ...d, url: e.target.value })}
-        />
-        <TextField
-          label="Secret"
-          fullWidth
-          margin="dense"
-          type="password"
-          value={d.secret}
-          helperText={p.webhook ? 'Leave blank to keep current' : ''}
-          onChange={(e) => setD({ ...d, secret: e.target.value })}
-        />
-        <FormGroup>
-          {WEBHOOK_EVENTS.map((ev) => (
-            <FormControlLabel
-              key={ev}
-              label={ev}
-              control={
-                <Checkbox
-                  checked={d.events.includes(ev)}
-                  onChange={() => toggle(ev)}
-                />
-              }
-            />
-          ))}
-        </FormGroup>
-        <FormControlLabel
-          label="Active"
-          control={
-            <Switch
-              checked={d.active}
-              onChange={(_, v) => setD({ ...d, active: v })}
-            />
-          }
+        <WebhookFields
+          d={d}
+          setD={setD}
+          editing={!!p.webhook}
+          toggle={toggle}
         />
       </DialogContent>
       <DialogActions>

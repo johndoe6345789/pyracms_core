@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { currentToken } from '@/lib/session'
-import { buildWsUrl } from './wsUrl'
+import { buildWsUrl, parseWsData } from './wsUrl'
 
 interface UseWebSocketOptions {
   url: string
@@ -34,13 +34,7 @@ export function useWebSocket({
       onConnect?.()
     }
     ws.onmessage = (event) => {
-      let data: unknown
-      try {
-        data = JSON.parse(event.data)
-      } catch {
-        data = event.data
-      }
-      onMessage?.(data)
+      onMessage?.(parseWsData(event.data))
     }
     ws.onclose = () => {
       setConnected(false)

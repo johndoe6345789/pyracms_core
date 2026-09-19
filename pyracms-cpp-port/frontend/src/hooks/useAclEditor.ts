@@ -3,23 +3,9 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { useActionError } from './useActionError'
+import { url, parseRules, type AclRule } from './aclRules'
 
-export interface AclRule {
-  id: number
-  action: 'Allow' | 'Deny'
-  principal: string
-  permission: string
-}
-
-const url = (t: number) => `/api/settings/acl_rules?tenant_id=${t}`
-
-function parseRules(value: string | undefined): AclRule[] {
-  try {
-    return JSON.parse(value || '[]')
-  } catch {
-    return []
-  }
-}
+export type { AclRule }
 
 export function useAclEditor(tenantId: number | null) {
   const [rules, setRules] = useState<AclRule[]>([])

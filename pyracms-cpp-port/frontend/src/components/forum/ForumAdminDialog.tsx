@@ -8,10 +8,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
-  Typography,
 } from '@mui/material'
 import type { ForumAdminState } from '@/hooks/useForumAdmin'
+import { ForumAdminFields } from './ForumAdminFields'
 
 export function ForumAdminDialog({ s }: { s: ForumAdminState }) {
   const d = s.dialog
@@ -52,33 +51,14 @@ export function ForumAdminDialog({ s }: { s: ForumAdminState }) {
             {s.error}
           </Alert>
         )}
-        {del ? (
-          <Typography data-testid="forum-admin-confirm">
-            Delete {noun} &quot;{d.name}&quot;? This cannot be undone.
-          </Typography>
-        ) : (
-          <>
-            <TextField
-              label="Name"
-              size="small"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              inputProps={{ 'data-testid': 'forum-admin-name' }}
-            />
-            {d.kind === 'forum' && (
-              <TextField
-                label="Description"
-                size="small"
-                multiline
-                minRows={2}
-                value={desc}
-                onChange={(e) => setDesc(e.target.value)}
-                inputProps={{ 'data-testid': 'forum-admin-desc' }}
-              />
-            )}
-          </>
-        )}
+        <ForumAdminFields
+          d={d}
+          noun={noun}
+          name={name}
+          desc={desc}
+          setName={setName}
+          setDesc={setDesc}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={s.close} data-testid="forum-admin-cancel">

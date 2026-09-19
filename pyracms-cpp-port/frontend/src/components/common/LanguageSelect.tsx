@@ -24,7 +24,8 @@ export default function LanguageSelect() {
   const router = useRouter()
 
   const handleChange = (code: string) => {
-    document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=${YEAR}; samesite=lax`
+    const attrs = `path=/; max-age=${YEAR}; samesite=lax`
+    document.cookie = `${LOCALE_COOKIE}=${code}; ${attrs}`
     setAnchorEl(null)
     router.refresh()
   }

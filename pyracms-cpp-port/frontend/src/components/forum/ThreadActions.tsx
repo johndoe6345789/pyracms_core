@@ -4,8 +4,7 @@ import { useState } from 'react'
 import { IconButton } from '@mui/material'
 import { MoreVertOutlined } from '@mui/icons-material'
 import { ThreadActionsMenu } from './ThreadActionsMenu'
-import { MoveThreadDialog } from './MoveThreadDialog'
-import { DeleteThreadDialog } from './DeleteThreadDialog'
+import { ThreadActionDialogs } from './ThreadActionDialogs'
 
 interface ThreadActionsProps {
   threadId: string
@@ -75,25 +74,16 @@ export function ThreadActions({
           setDelOpen(true)
         }}
       />
-      <MoveThreadDialog
-        open={moveOpen}
-        onClose={() => setMoveOpen(false)}
-        onConfirm={(id) => {
-          if (id) onMove?.(id)
-          setMoveOpen(false)
-          setMoveTo('')
-        }}
+      <ThreadActionDialogs
+        moveOpen={moveOpen}
+        setMoveOpen={setMoveOpen}
+        moveTo={moveTo}
+        setMoveTo={setMoveTo}
+        delOpen={delOpen}
+        setDelOpen={setDelOpen}
         forums={forums}
-        targetForum={moveTo}
-        onTargetForumChange={setMoveTo}
-      />
-      <DeleteThreadDialog
-        open={delOpen}
-        onClose={() => setDelOpen(false)}
-        onConfirm={() => {
-          onDelete?.()
-          setDelOpen(false)
-        }}
+        onMove={onMove}
+        onDelete={onDelete}
       />
     </>
   )

@@ -1,8 +1,7 @@
 'use client'
 
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material'
-import Link from 'next/link'
-import { langColor } from '@/lib/snippets'
+import { Card, CardContent } from '@mui/material'
+import { SnippetCardTitle } from './SnippetCardTitle'
 import { SnippetCardMeta } from './SnippetCardMeta'
 import { SnippetPreview } from './SnippetPreview'
 import { SnippetCardActions } from './SnippetCardActions'
@@ -32,7 +31,6 @@ export function SnippetCard({
   onFork,
   onShare,
 }: SnippetCardProps) {
-  const color = langColor(language)
   const snippetUrl = `/site/${siteSlug}/snippets/${id}`
 
   const handleShare = () => {
@@ -52,40 +50,12 @@ export function SnippetCard({
       }}
     >
       <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            mb: 1,
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            component={Link}
-            href={snippetUrl}
-            data-testid={`snippet-link-${id}`}
-            sx={{
-              fontWeight: 600,
-              textDecoration: 'none',
-              color: 'text.primary',
-              '&:hover': { color: 'primary.main' },
-            }}
-          >
-            {title}
-          </Typography>
-          <Chip
-            label={language}
-            size="small"
-            sx={{
-              bgcolor: color + '20',
-              color,
-              fontWeight: 600,
-              fontSize: '0.7rem',
-              height: 22,
-            }}
-          />
-        </Box>
+        <SnippetCardTitle
+          id={id}
+          title={title}
+          language={language}
+          href={snippetUrl}
+        />
         <SnippetPreview code={code} />
         <SnippetCardMeta author={author} date={date} runCount={runCount} />
       </CardContent>

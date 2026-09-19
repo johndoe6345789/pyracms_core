@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test'
 import { BASE, MOCK_TENANT } from '../support/tenant-data-1'
 import { MOCK_REVISIONS } from '../support/tenant-data-3'
 
-test.describe('Article revisions — /site/demo/articles/hello-world/revisions', () => {
+const PAGE = '/site/demo/articles/hello-world/revisions'
+
+test.describe(`Article revisions — ${PAGE}`, () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/tenants**', (route) =>
       route.fulfill({ json: MOCK_TENANT }),

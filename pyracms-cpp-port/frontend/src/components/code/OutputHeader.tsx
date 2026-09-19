@@ -1,20 +1,15 @@
 'use client'
 
 import { Box, Chip, Typography } from '@mui/material'
-import {
-  CheckCircleOutlined,
-  ErrorOutlined,
-  TimerOutlined,
-} from '@mui/icons-material'
+import { CheckCircleOutlined, ErrorOutlined } from '@mui/icons-material'
+import { ExecutionTime, formatTime } from './ExecutionTime'
 
 interface Props {
   exitCode?: number | null | undefined
   executionTime?: number | null | undefined
 }
 
-export function formatTime(ms: number): string {
-  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`
-}
+export { formatTime }
 
 export function OutputHeader({ exitCode, executionTime }: Props) {
   const ok = exitCode === 0
@@ -77,24 +72,7 @@ export function OutputHeader({ exitCode, executionTime }: Props) {
           }}
         />
       )}
-      {executionTime != null && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            ml: 'auto',
-          }}
-        >
-          <TimerOutlined
-            sx={{ fontSize: 14, color: '#64748b' }}
-            aria-label="Execution time"
-          />
-          <Typography variant="caption" color="text.secondary">
-            {formatTime(executionTime)}
-          </Typography>
-        </Box>
-      )}
+      {executionTime != null && <ExecutionTime ms={executionTime} />}
     </Box>
   )
 }

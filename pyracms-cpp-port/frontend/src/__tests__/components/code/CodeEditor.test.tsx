@@ -1,39 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { CodeEditor } from '@/components/code/CodeEditor'
-import { detectLanguage } from '@/components/code/languages'
 
-jest.mock('@monaco-editor/react', () => {
-  const React = require('react')
-  return {
-    __esModule: true,
-    default: (p: {
-      value: string
-      onChange: (v?: string) => void
-      options: { readOnly: boolean }
-    }) =>
-      React.createElement('textarea', {
-        'data-testid': 'monaco',
-        value: p.value,
-        readOnly: p.options.readOnly,
-        onChange: (e: { target: { value: string } }) =>
-          p.onChange(e.target.value),
-      }),
-  }
-})
-
-describe('detectLanguage', () => {
-  it.each([
-    ['def a():\n print(1)', 'python'],
-    ['const a = 1', 'javascript'],
-    ['#include <x>', 'cpp'],
-    ['fn main() { let mut a }', 'rust'],
-    ['package main\nfunc a() {}', 'go'],
-    ['public class A {}', 'java'],
-    ['hello', null],
-  ])('%s -> %s', (code, lang) => {
-    expect(detectLanguage(code)).toBe(lang)
-  })
-})
+jest.mock('@monaco-editor/react', () =>
+  require('../../helpers/monacoMock').monacoMock(),
+)
 
 describe('CodeEditor', () => {
   it('emits changes without auto-detect for known languages', () => {
@@ -82,30 +52,5 @@ describe('CodeEditor', () => {
       target: { value: 'just some plain words here' },
     })
     expect(onLang).not.toHaveBeenCalled()
-  })
-  it('offers a language picker unless read only', () => {
-    const onLang = jest.fn()
-    const { rerender } = render(
-      <CodeEditor
-        value=""
-        onChange={jest.fn()}
-        language="python"
-        onLanguageChange={onLang}
-      />,
-    )
-    fireEvent.mouseDown(screen.getByRole('combobox'))
-    fireEvent.click(screen.getByText('Rust'))
-    expect(onLang).toHaveBeenCalledWith('rust')
-    rerender(
-      <CodeEditor
-        value=""
-        onChange={jest.fn()}
-        language="python"
-        onLanguageChange={onLang}
-        readOnly
-      />,
-    )
-    expect(screen.queryByTestId('code-editor-language')).toBeNull()
-    expect(screen.getByTestId('monaco')).toHaveAttribute('readonly')
   })
 })

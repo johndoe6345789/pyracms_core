@@ -1,13 +1,10 @@
 'use client'
 
 import { useParams, useSearchParams } from 'next/navigation'
-import { Container, Typography, Box, Alert } from '@mui/material'
-import Link from 'next/link'
-import { useCreateThread } from '@/hooks/useCreateThread'
+import { Container, Typography, Box } from '@mui/material'
 import { useTenantId } from '@/hooks/useTenantId'
-import { useForumUser } from '@/hooks/useForumUser'
-import { CreateThreadForm } from '@/components/forum/CreateThreadForm'
 import { ForumBreadcrumbs } from '@/components/forum/ForumBreadcrumbs'
+import CreateThreadBody from './CreateThreadBody'
 
 export default function CreateThreadPage() {
   const params = useParams()
@@ -16,50 +13,6 @@ export default function CreateThreadPage() {
   const forumId = searchParams.get('forumId') || ''
   const base = `/site/${slug}/forum`
   const { tenantId } = useTenantId(slug)
-  const { isAuthenticated } = useForumUser()
-  const {
-    title,
-    setTitle,
-    description,
-    setDescription,
-    content,
-    setContent,
-    loading,
-    error,
-    handleSubmit,
-  } = useCreateThread(forumId, slug, tenantId)
-
-  let body
-  if (!forumId) {
-    body = (
-      <Alert severity="warning">
-        No forum selected. <Link href={base}>Pick a forum</Link> and use its New
-        Thread button.
-      </Alert>
-    )
-  } else if (!isAuthenticated) {
-    body = (
-      <Alert severity="info">
-        <Link href="/auth/login">Sign in</Link> to create a thread.
-      </Alert>
-    )
-  } else {
-    body = (
-      <CreateThreadForm
-        slug={slug}
-        cancelHref={`${base}/${forumId}`}
-        title={title}
-        setTitle={setTitle}
-        description={description}
-        setDescription={setDescription}
-        content={content}
-        setContent={setContent}
-        loading={loading}
-        error={error}
-        onSubmit={handleSubmit}
-      />
-    )
-  }
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }} data-testid="create-thread-page">
@@ -80,7 +33,12 @@ export default function CreateThreadPage() {
           Start a new discussion topic in the forum.
         </Typography>
       </Box>
-      {body}
+      <CreateThreadBody
+        slug={slug}
+        forumId={forumId}
+        base={base}
+        tenantId={tenantId}
+      />
     </Container>
   )
 }

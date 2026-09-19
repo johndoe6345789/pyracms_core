@@ -1,15 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { Divider } from '@mui/material'
 import type { useThread } from '@/hooks/useThread'
-import { useThreadLive } from '@/hooks/useThreadLive'
 import { useForumUser } from '@/hooks/useForumUser'
 import { PostList } from './PostList'
 import { ThreadHeader } from './ThreadHeader'
 import { TypingIndicator } from './TypingIndicator'
 import { QuickReplyForm } from './QuickReplyForm'
-import { useTypingSender } from './useTypingSender'
+import { useThreadContentState } from './useThreadContentState'
 import { ThreadModActions } from './ThreadModActions'
 
 interface Props {
@@ -28,16 +26,8 @@ export function ThreadContent({
 }: Props) {
   const { isAuthenticated, isModerator } = useForumUser()
   const { thread } = t
-  const live = useThreadLive({
-    threadId: Number(threadId) || 0,
-    onNewPost: () => {
-      t.refresh()
-    },
-  })
-  const [page, setPage] = useState(1)
-  const onTyping = useTypingSender(live.sendTypingStart)
-  // Jump to the last page after posting (the new reply is at the end).
-  const onSubmit = () => t.handleSubmitReply().then(() => setPage(9999))
+  const { live, page, setPage, onTyping, onSubmit } =
+    useThreadContentState(t, threadId)
   return (
     <>
       <ThreadHeader

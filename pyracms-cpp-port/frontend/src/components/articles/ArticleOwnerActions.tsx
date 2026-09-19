@@ -1,19 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material'
+import { Alert, Box, Button, Chip } from '@mui/material'
 import type { Article } from '@/hooks/useArticle'
 import ArticleSchedule from './ArticleSchedule'
+import ArticleDeleteDialog from './ArticleDeleteDialog'
 import { useArticleAdmin } from '@/hooks/useArticleAdmin'
 
 interface Props {
@@ -92,33 +83,15 @@ export default function ArticleOwnerActions(p: Props) {
           {a.error}
         </Alert>
       )}
-      <Dialog
+      <ArticleDeleteDialog
         open={confirm}
+        title={p.article.title}
         onClose={() => setConfirm(false)}
-        data-testid="article-delete-dialog"
-      >
-        <DialogTitle>Delete article</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Delete &quot;{p.article.title}&quot; and all its revisions? This
-            cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirm(false)}>Cancel</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={() => {
-              setConfirm(false)
-              a.remove()
-            }}
-            data-testid="article-delete-confirm"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={() => {
+          setConfirm(false)
+          a.remove()
+        }}
+      />
     </Box>
   )
 }

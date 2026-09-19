@@ -5,11 +5,10 @@ import {
   FormatListNumbered,
   Code,
   FormatQuote,
-  Link as LinkIcon,
-  Image as ImageIcon,
   Title,
 } from '@mui/icons-material'
 import type { Editor } from '@tiptap/react'
+import { getInsertItems } from './richTextInsertItems'
 
 export interface RichToolbarItem {
   icon: React.ReactNode
@@ -72,23 +71,6 @@ export function getRichToolbarItems(
       active: editor.isActive('blockquote'),
     },
     null,
-    {
-      icon: <LinkIcon />,
-      label: 'Link',
-      action: () => {
-        const url = window.prompt('Enter URL:')
-        if (url) editor.chain().focus().setLink({ href: url }).run()
-      },
-      active: editor.isActive('link'),
-    },
-    {
-      icon: <ImageIcon />,
-      label: 'Image',
-      action: () => {
-        const url = window.prompt('Enter image URL:')
-        if (url) editor.chain().focus().setImage({ src: url }).run()
-      },
-      active: false,
-    },
+    ...getInsertItems(editor),
   ]
 }

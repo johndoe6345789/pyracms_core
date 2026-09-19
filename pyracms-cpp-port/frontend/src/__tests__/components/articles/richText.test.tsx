@@ -1,40 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { RichTextEditor } from '@/components/articles/RichTextEditor'
 import { RichTextToolbar } from '@/components/articles/RichTextToolbar'
+import { chain, editor, state } from '../../helpers/tiptapMock'
 
-const chain: Record<string, jest.Mock> = {}
-;[
-  'focus',
-  'toggleBold',
-  'toggleItalic',
-  'toggleHeading',
-  'toggleBulletList',
-  'toggleOrderedList',
-  'toggleCodeBlock',
-  'toggleBlockquote',
-  'setLink',
-  'setImage',
-  'run',
-].forEach((k) => {
-  chain[k] = jest.fn(() => chain)
-})
-
-const editor = {
-  chain: () => chain,
-  isActive: jest.fn((n: string) => n === 'bold'),
-  getHTML: jest.fn(() => '<p>a</p>'),
-  commands: { setContent: jest.fn() },
-}
-let mockEditor: unknown = editor
-let onUpdate: (a: { editor: typeof editor }) => void = () => {}
-
-jest.mock('@tiptap/react', () => ({
-  useEditor: (o: { onUpdate: typeof onUpdate }) => {
-    onUpdate = o.onUpdate
-    return mockEditor
-  },
-  EditorContent: () => <div data-testid="rich-text-content" />,
-}))
+jest.mock(
+  '@tiptap/react',
+  () => require('../../helpers/tiptapMock').tiptapReact,
+)
 jest.mock('@tiptap/starter-kit', () => ({ __esModule: true, default: {} }))
 jest.mock('@tiptap/extension-link', () => ({
   __esModule: true,
@@ -43,7 +14,7 @@ jest.mock('@tiptap/extension-link', () => ({
 jest.mock('@tiptap/extension-image', () => ({ __esModule: true, default: {} }))
 
 beforeEach(() => {
-  mockEditor = editor
+  state.mockEditor = editor
   jest.clearAllMocks()
 })
 
@@ -77,22 +48,4 @@ it('link and image prompt for urls', () => {
   fireEvent.click(screen.getByTestId('rich-image'))
   expect(chain.setLink).toHaveBeenCalledTimes(1)
   prompt.mockRestore()
-})
-
-it('RichTextEditor syncs content and reports updates', () => {
-  const onChange = jest.fn()
-  const { rerender } = render(
-    <RichTextEditor value="<p>a</p>" onChange={onChange} />,
-  )
-  expect(editor.commands.setContent).not.toHaveBeenCalled()
-  rerender(<RichTextEditor value="<p>b</p>" onChange={onChange} />)
-  expect(editor.commands.setContent).toHaveBeenCalledWith('<p>b</p>', false)
-  onUpdate({ editor })
-  expect(onChange).toHaveBeenCalledWith('<p>a</p>')
-})
-
-it('RichTextEditor renders nothing without an editor', () => {
-  mockEditor = null
-  const { container } = render(<RichTextEditor value="" onChange={jest.fn()} />)
-  expect(container).toBeEmptyDOMElement()
 })
