@@ -51,7 +51,9 @@ export function mapUserRow(u: Raw): GlobalUserRow {
     email: String(u.email || ''),
     role,
     roleLabel: USER_ROLE_LABELS[role],
-    isActive: Boolean(u.isActive ?? true),
+    // The API reports `banned` (admins only); older shapes used isActive
+    isActive: u.banned !== undefined
+      ? !u.banned : Boolean(u.isActive ?? true),
     createdAt: day(u.createdAt),
   }
 }

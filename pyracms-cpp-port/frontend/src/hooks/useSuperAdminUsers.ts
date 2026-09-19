@@ -32,9 +32,11 @@ export function useSuperAdminUsers() {
     if (!target) return
     const isActive = !target.isActive
     // Side effect stays out of the state updater (it may run twice).
-    api.put(`/api/users/${id}`, { isActive }).catch(() => {})
-    setUsers((prev) => prev.map((u) =>
-      u.id === id ? { ...u, isActive } : u))
+    const set = (active: boolean) => setUsers((prev) => prev.map((u) =>
+      u.id === id ? { ...u, isActive: active } : u))
+    set(isActive)
+    api.put(`/api/users/${id}/ban`, { banned: !isActive })
+      .catch(() => set(!isActive)) // roll back when the API refuses
   }
 
   return { users, loading, updateRole, toggleBan }

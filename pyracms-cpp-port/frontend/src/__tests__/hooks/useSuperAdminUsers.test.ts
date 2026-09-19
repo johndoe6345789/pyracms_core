@@ -309,8 +309,8 @@ describe('useSuperAdminUsers — toggleBan', () => {
     })
 
     expect(mockApi.put).toHaveBeenCalledWith(
-      '/api/users/1',
-      { isActive: false },
+      '/api/users/1/ban',
+      { banned: true },
     )
   })
 
@@ -330,8 +330,8 @@ describe('useSuperAdminUsers — toggleBan', () => {
     })
 
     expect(mockApi.put).toHaveBeenCalledWith(
-      '/api/users/2',
-      { isActive: true },
+      '/api/users/2/ban',
+      { banned: false },
     )
   })
 
@@ -346,7 +346,7 @@ describe('useSuperAdminUsers — toggleBan', () => {
     expect(mockApi.put).not.toHaveBeenCalled()
   })
 
-  it('keeps optimistic update when PUT fails', async () => {
+  it('rolls the update back when PUT fails', async () => {
     mockApi.get.mockResolvedValueOnce({ data: RAW_USERS })
     mockApi.put.mockRejectedValueOnce(new Error('Server error'))
     const { result } = renderHook(() => useSuperAdminUsers())
@@ -358,8 +358,8 @@ describe('useSuperAdminUsers — toggleBan', () => {
     // Give microtasks time to settle
     await act(async () => {})
 
-    // Optimistic update is not rolled back on failure (admin UI trade-off)
-    expect(result.current.users[0]!.isActive).toBe(false)
+    // A refused ban must not look applied
+    expect(result.current.users[0]!.isActive).toBe(true)
   })
 
   it('does not affect other users when toggling one', async () => {
