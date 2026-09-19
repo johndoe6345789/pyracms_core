@@ -10,7 +10,9 @@ interface UseCollabEditorOptions {
   enabled?: boolean
 }
 
-export function useCollabEditor({ roomName, enabled = true }: UseCollabEditorOptions) {
+export function useCollabEditor(
+  { roomName, enabled = true }: UseCollabEditorOptions,
+) {
   const ydocRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<WebsocketProvider | null>(null)
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 #include <QRect>
 #include <QString>
 
@@ -9,6 +10,7 @@ namespace Hypernucleus {
 // Server / platform / window settings (first half of SettingsManager).
 class SettingsBase : public QObject {
     Q_OBJECT
+    QML_ANONYMOUS
     Q_PROPERTY(
         QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY repoUrlChanged)
     Q_PROPERTY(QString osName READ osName WRITE setOsName NOTIFY osNameChanged)

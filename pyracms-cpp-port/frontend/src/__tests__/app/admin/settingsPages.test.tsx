@@ -1,0 +1,60 @@
+import {
+  render, screen, fireEvent, waitFor, within,
+} from '@testing-library/react'
+import AdminAclPage from '@/app/site/[slug]/(admin)/admin/acl/page'
+import AdminSettingsPage from '@/app/site/[slug]/(admin)/admin/settings/page'
+import AdminFeaturesPage from '@/app/site/[slug]/(admin)/admin/features/page'
+import { m } from '../../helpers/scopeApi'
+import { routeGet } from '../../helpers/scopeMocks'
+
+jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
+jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
+jest.mock('@/hooks/useTenantId',
+  () => require('../../helpers/scopeMocks').tenantMock)
+
+const box = (id: string) =>
+  within(screen.getByTestId(id)).getByRole('textbox')
+
+beforeEach(() => {
+  jest.resetAllMocks()
+  m.put.mockResolvedValue({ data: {} })
+  m.delete.mockResolvedValue({})
+})
+
+it('ACL page adds and deletes rules', async () => {
+  routeGet({ acl_rules: { value: '[]' } })
+  render(<AdminAclPage />)
+  fireEvent.change(box('acl-principal-input'), { target: { value: 'p' } })
+  fireEvent.change(box('acl-permission-input'), { target: { value: 'x' } })
+  fireEvent.click(screen.getByTestId('add-acl-rule-btn'))
+  expect(screen.getByTestId('acl-row-1')).toBeInTheDocument()
+  fireEvent.click(screen.getByTestId('delete-acl-1'))
+  expect(screen.queryByTestId('acl-row-1')).toBeNull()
+  await waitFor(() => expect(m.put).toHaveBeenCalledTimes(2))
+})
+
+it('settings page edits and adds settings', async () => {
+  routeGet({ '/api/settings': [{ id: 1, name: 'k', value: 'v' }] })
+  render(<AdminSettingsPage />)
+  await screen.findByText('k')
+  fireEvent.click(screen.getByTestId('edit-setting-btn'))
+  const input = box('setting-value-input')
+  fireEvent.change(input, { target: { value: 'n' } })
+  fireEvent.click(screen.getByTestId('save-setting-btn'))
+  await screen.findByText('n')
+  fireEvent.click(screen.getByTestId('delete-setting-btn'))
+  await waitFor(() => expect(screen.queryByText('n')).toBeNull())
+  fireEvent.change(box('setting-key-input'), { target: { value: 'a' } })
+  fireEvent.change(box('setting-value-input'), { target: { value: 'b' } })
+  fireEvent.click(screen.getByTestId('add-setting-btn'))
+  await screen.findByText('a')
+})
+
+it('features page toggles and saves', async () => {
+  routeGet({ '/api/settings': [{ name: 'feature_forum', value: 'true' }] })
+  render(<AdminFeaturesPage />)
+  fireEvent.click(await screen.findByTestId('feature-toggle-articles'))
+  fireEvent.click(screen.getByTestId('save-features-btn'))
+  await screen.findByText(/saved successfully/)
+  expect(m.put).toHaveBeenCalledTimes(5)
+})

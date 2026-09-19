@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 #include <QString>
 
 namespace Hypernucleus {
@@ -10,6 +11,7 @@ class SettingsManager;
 
 class AuthService : public QObject {
     Q_OBJECT
+    QML_ANONYMOUS
     Q_PROPERTY(
         bool authenticated READ isAuthenticated NOTIFY authenticatedChanged)
     Q_PROPERTY(QString username READ username NOTIFY usernameChanged)

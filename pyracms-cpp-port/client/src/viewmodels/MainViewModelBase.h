@@ -1,11 +1,9 @@
 #pragma once
 
-#include <QObject>
 #include <QStringList>
 #include <QVariantMap>
 #include <QtQml/qqmlregistration.h>
 
-// Complete types are required by moc for pointer-typed Q_PROPERTYs.
 #include "models/DependencyModel.h"
 #include "models/GameFilterModel.h"
 #include "services/AuthService.h"
@@ -19,17 +17,19 @@
 
 namespace Hypernucleus {
 
-// The properties QML binds to; actions live in MainViewModel.
 class MainViewModelBase : public Hypernucleus::ServiceHolder {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("Base of MainViewModel")
+    QML_UNCREATABLE("Base")
     Q_PROPERTY(Hypernucleus::GameFilterModel* library READ library CONSTANT)
     Q_PROPERTY(Hypernucleus::GameFilterModel* store READ store CONSTANT)
-    Q_PROPERTY(Hypernucleus::DependencyModel* dependencies READ dependencies CONSTANT)
+    Q_PROPERTY(Hypernucleus::DependencyModel* dependencies READ
+                   dependencies CONSTANT)
     Q_PROPERTY(Hypernucleus::DownloadCenter* downloads READ downloads CONSTANT)
-    Q_PROPERTY(Hypernucleus::DeepLinkController* deepLinks READ deepLinks CONSTANT)
-    Q_PROPERTY(Hypernucleus::SettingsViewModel* settingsEditor READ settingsEditor CONSTANT)
+    Q_PROPERTY(Hypernucleus::DeepLinkController* deepLinks READ
+                   deepLinks CONSTANT)
+    Q_PROPERTY(Hypernucleus::SettingsViewModel* settingsEditor
+                   READ settingsEditor CONSTANT)
     Q_PROPERTY(Hypernucleus::SettingsManager* settings READ settings CONSTANT)
     Q_PROPERTY(Hypernucleus::AuthService* auth READ auth CONSTANT)
     Q_PROPERTY(Hypernucleus::GameManager* games READ games CONSTANT)
@@ -44,7 +44,6 @@ class MainViewModelBase : public Hypernucleus::ServiceHolder {
     Q_PROPERTY(QString gameLog READ gameLog NOTIFY gameLogChanged)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
     Q_PROPERTY(QString osName READ osName CONSTANT)
-
 public:
     explicit MainViewModelBase(QObject* parent);
     GameFilterModel* library() const { return m_library; }
@@ -66,14 +65,12 @@ public:
     QString gameLog() const;
     QString appVersion() const;
     QString osName() const;
-
 signals:
     void categoriesChanged();
     void loadingChanged();
     void catalogErrorChanged();
     void selectedChanged();
     void gameLogChanged();
-
 protected:
     QString m_catalogError;
     QString m_selectedName;

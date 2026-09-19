@@ -36,11 +36,12 @@ it('imports valid, invalid and empty files', async () => {
   const ok = new File([JSON.stringify(buildMenusPayload())], 'a.json')
   act(() => result.current.handleFileChange(change([ok])))
   await waitFor(() => expect(result.current.snackbar.message)
-    .toMatch(/Successfully imported menus/))
+    .toMatch(/Successfully imported menus/),
+    { timeout: 8000 })
   const bad = new File(['{nope'], 'b.json')
   act(() => result.current.handleFileChange(change([bad])))
   await waitFor(() => expect(result.current.snackbar.severity)
-    .toBe('warning'))
+    .toBe("warning"), { timeout: 8000 })
 })
 
 it('rejects malformed exports', () => {

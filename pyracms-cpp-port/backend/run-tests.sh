@@ -25,7 +25,16 @@ gcovr -r /app --object-directory /app/build \
   --filter '/app/src/' --exclude '/app/src/main.cpp' \
   --print-summary --txt /coverage.txt >/dev/null 2>&1 || true
 echo "=== coverage: per file (<80%) ==="
-awk 'NF>=4 && $2+0>0 && $3+0*1>=0 && $4 ~ /%/ && $4+0<80   {print $1, $2, $3, $4}' /coverage.txt
+gcovr -r /app --object-directory /app/build --filter '/app/src/'   --exclude '/app/src/main.cpp' --json-summary /cov.json >/dev/null 2>&1   || true
+python3 - <<'PY'
+import json
+d = json.load(open("/cov.json"))["files"]
+rows = [(f["line_total"] - f["line_covered"], f["line_total"],
+         f["line_percent"], f["filename"]) for f in d
+        if f["line_percent"] < 80]
+for miss, tot, pct, n in sorted(rows, reverse=True):
+    print(f"{n} {tot} {pct:.0f}% (missing {miss})")
+PY
 echo "=== coverage: whole backend ==="; tail -n 4 /coverage.txt
 echo "=== coverage: filters, auth, user, tenant, forum, menu, snippet ==="
 gcovr -r /app --object-directory /app/build \

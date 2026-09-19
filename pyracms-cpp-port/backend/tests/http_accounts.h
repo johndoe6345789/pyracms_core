@@ -18,4 +18,12 @@ Acct signup(const std::string &tenantSlug, int role = 1);
 int newTenant(const Acct &platformAdmin, std::string &slugOut);
 Acct platformAdmin();
 
+struct Site {
+    int id{0};
+    std::string slug;
+    Acct admin; // site admin
+    Acct user;  // plain member
+};
+Site makeSite();
+
 } // namespace harness

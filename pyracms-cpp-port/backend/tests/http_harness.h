@@ -41,6 +41,25 @@ Reply put(const std::string &path, const Json::Value &b,
 Reply del(const std::string &path, const std::string &token = "",
           const Json::Value &b = Json::Value());
 
+using KV = std::initializer_list<std::pair<const char *, Json::Value>>;
+inline Json::Value J(KV kv) {
+    Json::Value j(Json::objectValue);
+    for (const auto &p : kv)
+        j[p.first] = p.second;
+    return j;
+}
+inline Json::Value A(std::initializer_list<const char *> items) {
+    Json::Value j(Json::arrayValue);
+    for (const char *i : items)
+        j.append(i);
+    return j;
+}
+inline bool ok(const Reply &r) { return r.status >= 200 && r.status < 300; }
+
+// Multipart file upload (field "file").
+Reply upload(const std::string &path, const std::string &token,
+             const std::string &filename, const std::string &content);
+
 } // namespace harness
 
 #define REQUIRE_SERVER()                                                       \

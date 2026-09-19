@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 #include <QString>
 
 namespace Hypernucleus {
@@ -14,6 +15,7 @@ namespace Hypernucleus {
 // installed at a time and the version is tracked in installed.json.
 class PathManager : public QObject {
     Q_OBJECT
+    QML_ANONYMOUS
     Q_PROPERTY(QString dataDir READ dataDir NOTIFY pathsChanged)
     Q_PROPERTY(QString gamesDir READ gamesDir NOTIFY pathsChanged)
     Q_PROPERTY(QString depsDir READ depsDir NOTIFY pathsChanged)

@@ -160,6 +160,7 @@ target_link_libraries(hypernucleus_lib
     PUBLIC
     Qt6::Core
     Qt6::Network
+    Qt6::Qml
     QuaZip::QuaZip
 )
 target_include_directories(hypernucleus_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

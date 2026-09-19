@@ -28,6 +28,7 @@ export default function AdminFilesPage() {
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    uploadFiles,
   } = useFileManager(tenantId)
 
   return (
@@ -51,6 +52,7 @@ export default function AdminFilesPage() {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onFilesSelected={uploadFiles}
       />
       <FileGrid
         files={files}

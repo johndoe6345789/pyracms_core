@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { currentToken } from '@/lib/session'
+import { buildWsUrl } from './wsUrl'
 
 interface UseWebSocketOptions {
   url: string
@@ -13,61 +14,45 @@ interface UseWebSocketOptions {
 }
 
 export function useWebSocket({
-  url,
-  onMessage,
-  onConnect,
-  onDisconnect,
-  autoReconnect = true,
-  reconnectInterval = 3000,
+  url, onMessage, onConnect, onDisconnect,
+  autoReconnect = true, reconnectInterval = 3000,
 }: UseWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>(null)
+  const timerRef = useRef<NodeJS.Timeout>(null)
   const [connected, setConnected] = useState(false)
 
   const connect = useCallback(() => {
     const token = currentToken()
     if (!token) return
-
-    const separator = url.includes('?') ? '&' : '?'
-    const wsUrl = url.replace(/^http/, 'ws') + separator + 'token=' + token
-    const ws = new WebSocket(wsUrl)
-
-    ws.onopen = () => {
-      setConnected(true)
-      onConnect?.()
-    }
-
+    const ws = new WebSocket(buildWsUrl(url, token))
+    ws.onopen = () => { setConnected(true); onConnect?.() }
     ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        onMessage?.(data)
-      } catch {
-        onMessage?.(event.data)
-      }
+      let data: unknown
+      try { data = JSON.parse(event.data) } catch { data = event.data }
+      onMessage?.(data)
     }
-
     ws.onclose = () => {
       setConnected(false)
       onDisconnect?.()
       if (autoReconnect) {
-        reconnectTimeoutRef.current = setTimeout(connect, reconnectInterval)
+        timerRef.current = setTimeout(connect, reconnectInterval)
       }
     }
-
-    ws.onerror = () => {
-      ws.close()
-    }
-
+    ws.onerror = () => { ws.close() }
     wsRef.current = ws
-  }, [url, onMessage, onConnect, onDisconnect, autoReconnect, reconnectInterval])
+  }, [url, onMessage, onConnect, onDisconnect,
+    autoReconnect, reconnectInterval])
 
   useEffect(() => {
     connect()
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      const ws = wsRef.current
+      if (ws) {
+        // Detach first so closing here never schedules a reconnect.
+        ws.onclose = null
+        ws.close()
       }
-      wsRef.current?.close()
     }
   }, [connect])
 

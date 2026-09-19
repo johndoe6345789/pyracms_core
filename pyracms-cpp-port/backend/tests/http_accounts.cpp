@@ -33,4 +33,13 @@ int newTenant(const Acct &admin, std::string &slug) {
     return get("/api/tenants/" + slug).json["id"].asInt();
 }
 
+Site makeSite() {
+    static Acct pa = platformAdmin();
+    Site s;
+    s.id = newTenant(pa, s.slug);
+    s.admin = signup(s.slug, 3);
+    s.user = signup(s.slug, 1);
+    return s;
+}
+
 } // namespace harness

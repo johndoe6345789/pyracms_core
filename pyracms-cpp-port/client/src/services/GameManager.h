@@ -3,6 +3,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 #include <QProcess>
 #include <QProcessEnvironment>
 
@@ -21,6 +22,7 @@ class ModuleInstaller;
 // that matches the OS. Output is captured to logs/<game>.log.
 class GameManager : public QObject {
     Q_OBJECT
+    QML_ANONYMOUS
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
     Q_PROPERTY(QString currentGame READ currentGame NOTIFY currentGameChanged)
     Q_PROPERTY(QString log READ log NOTIFY logChanged)

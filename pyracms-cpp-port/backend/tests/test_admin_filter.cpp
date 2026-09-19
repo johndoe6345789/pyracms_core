@@ -14,6 +14,12 @@ struct Outcome {
 };
 
 Outcome run(std::optional<int> role, bool authed = true) {
+    // Restore the real DB lookup afterwards: HTTP tests share the process.
+    auto saved = AdminFilter::roleLookup();
+    struct Restore {
+        AdminFilter::RoleLookup keep;
+        ~Restore() { AdminFilter::roleLookup() = keep; }
+    } restore{saved};
     AdminFilter::roleLookup() =
         [role](int, std::function<void(std::optional<int>)> cb) { cb(role); };
     auto req = drogon::HttpRequest::newHttpRequest();

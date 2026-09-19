@@ -43,7 +43,7 @@ const MAPPED_USERS: GlobalUserRow[] = [
     username: 'alice',
     email: 'alice@example.com',
     role: UserRole.SiteAdmin,
-    roleLabel: 'Site Admin',
+    roleLabel: 'Administrator',
     isActive: true,
     createdAt: '2024-01-10',
   },
@@ -52,7 +52,7 @@ const MAPPED_USERS: GlobalUserRow[] = [
     username: 'bob',
     email: 'bob@example.com',
     role: UserRole.User,
-    roleLabel: 'User',
+    roleLabel: 'Normal User',
     isActive: false,
     createdAt: '2024-03-05',
   },
@@ -139,7 +139,7 @@ describe('useSuperAdminUsers — role mapping from numeric field', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.users[0]!.role).toBe(UserRole.SuperAdmin)
-    expect(result.current.users[0]!.roleLabel).toBe('Super Admin')
+    expect(result.current.users[0]!.roleLabel).toBe('Platform Owner')
   })
 })
 
@@ -161,7 +161,7 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.users[0]!.role).toBe(UserRole.SiteAdmin)
-    expect(result.current.users[0]!.roleLabel).toBe('Site Admin')
+    expect(result.current.users[0]!.roleLabel).toBe('Administrator')
   })
 
   it('maps isAdmin=false to User when role is undefined', async () => {
@@ -178,7 +178,7 @@ describe('useSuperAdminUsers — legacy isAdmin fallback', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.users[0]!.role).toBe(UserRole.User)
-    expect(result.current.users[0]!.roleLabel).toBe('User')
+    expect(result.current.users[0]!.roleLabel).toBe('Normal User')
   })
 
   it('defaults createdAt to empty string when absent', async () => {
@@ -231,7 +231,7 @@ describe('useSuperAdminUsers — updateRole (success)', () => {
       '/api/users/1',
       { role: UserRole.SuperAdmin },
     )
-    expect(result.current.users[0]!.roleLabel).toBe('Super Admin')
+    expect(result.current.users[0]!.roleLabel).toBe('Platform Owner')
   })
 
   it('does not mutate other users when updating one', async () => {
@@ -272,7 +272,7 @@ describe('useSuperAdminUsers — updateRole (error)', () => {
     await act(async () => {})
 
     expect(result.current.users[0]!.role).toBe(UserRole.SiteAdmin)
-    expect(result.current.users[0]!.roleLabel).toBe('Site Admin')
+    expect(result.current.users[0]!.roleLabel).toBe('Administrator')
   })
 })
 

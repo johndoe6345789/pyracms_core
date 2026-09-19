@@ -77,19 +77,19 @@ describe('USER_ROLE_LABELS', () => {
   })
 
   it('maps User to "User"', () => {
-    expect(USER_ROLE_LABELS[UserRole.User]).toBe('User')
+    expect(USER_ROLE_LABELS[UserRole.User]).toBe('Normal User')
   })
 
   it('maps Moderator to "Moderator"', () => {
     expect(USER_ROLE_LABELS[UserRole.Moderator]).toBe('Moderator')
   })
 
-  it('maps SiteAdmin to "Site Admin"', () => {
-    expect(USER_ROLE_LABELS[UserRole.SiteAdmin]).toBe('Site Admin')
+  it('maps SiteAdmin to "Administrator"', () => {
+    expect(USER_ROLE_LABELS[UserRole.SiteAdmin]).toBe('Administrator')
   })
 
-  it('maps SuperAdmin to "Super Admin"', () => {
-    expect(USER_ROLE_LABELS[UserRole.SuperAdmin]).toBe('Super Admin')
+  it('maps SuperAdmin to "Platform Owner"', () => {
+    expect(USER_ROLE_LABELS[UserRole.SuperAdmin]).toBe('Platform Owner')
   })
 
   it('contains exactly 5 entries — one per role', () => {

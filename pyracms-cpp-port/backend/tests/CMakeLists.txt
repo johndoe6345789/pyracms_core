@@ -23,6 +23,10 @@ set(TEST_SOURCES
 
     test_admin_filter.cpp
 
+    test_article_http_1.cpp
+
+    test_article_http_2.cpp
+
     test_auth_service.cpp
 
     test_auth_tenant_claim.cpp
@@ -32,6 +36,10 @@ set(TEST_SOURCES
     test_forum_flow_db_2.cpp
 
     test_forum_flow_db_3.cpp
+
+    test_forum_http_1.cpp
+
+    test_forum_http_2.cpp
 
     test_forum_scope_db_1.cpp
 
@@ -54,6 +62,8 @@ set(TEST_SOURCES
     test_services_crud_db_1.cpp
 
     test_services_crud_db_2.cpp
+
+    test_snippet_menu_http.cpp
 
     test_snippet_scope_db_1.cpp
 
