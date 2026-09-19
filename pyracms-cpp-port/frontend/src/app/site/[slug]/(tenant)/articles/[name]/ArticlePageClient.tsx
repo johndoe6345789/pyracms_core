@@ -1,9 +1,12 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Container, Divider } from '@mui/material'
 import { useArticle } from '@/hooks/useArticle'
 import { useTenantId } from '@/hooks/useTenantId'
+import { useSiteSession } from '@/hooks/useSiteSession'
+import ArticleOwnerActions
+  from '@/components/articles/ArticleOwnerActions'
 import {
   ArticleContent,
 } from '@/components/articles/ArticleContent'
@@ -18,7 +21,9 @@ export default function ArticlePageClient() {
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
-  const { article, handleVote } = useArticle(name, tenantId)
+  const { article, handleVote, refresh } = useArticle(name, tenantId)
+  const signedIn = useSiteSession(slug)
+  const router = useRouter()
 
   if (!article) return null
 
@@ -34,6 +39,11 @@ export default function ArticlePageClient() {
           data-testid="article-content-wrapper"
         >
           <ArticleHeader article={article} slug={slug} name={name} />
+          {signedIn && (
+            <ArticleOwnerActions article={article} name={name}
+              tenantId={tenantId} onChanged={refresh}
+              onDeleted={() => router.push(`/site/${slug}/articles`)} />
+          )}
           <Divider sx={{ mb: 4 }} />
           <section aria-label="Article body">
             <ArticleContent

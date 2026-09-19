@@ -11,6 +11,10 @@ jest.mock('@/hooks/useForumUser', () => ({
   useForumUser: () => ({ isAuthenticated: true, isModerator: false }),
 }))
 let tenant: number | null = 1
+let canAdmin = false
+jest.mock('@/hooks/useTenantNav', () => ({
+  useTenantNav: () => ({ canAdmin }),
+}))
 let cats = { categories: [] as unknown[], loading: false, error: '' }
 let list = {
   forum: { name: 'F', description: 'D' }, threads: [] as unknown[],
@@ -25,6 +29,7 @@ jest.mock('@/hooks/useThreadList', () => ({
 
 beforeEach(() => {
   tenant = 1
+  canAdmin = false
   cats = { categories: [], loading: false, error: '' }
   list = { forum: { name: 'F', description: 'D' }, threads: [],
     loading: false, error: '' }
@@ -44,6 +49,18 @@ describe('ForumPage', () => {
     cats.categories = [{ id: '1', name: 'Cat', forums: [] }]
     rerender(<ForumPage />)
     expect(screen.getByText('Cat')).toBeInTheDocument()
+  })
+  it('offers admins a create-first-category call to action', () => {
+    canAdmin = true
+    render(<ForumPage />)
+    expect(screen.getByText('No categories yet')).toBeInTheDocument()
+    expect(screen.getByTestId('add-category-btn')).toBeInTheDocument()
+  })
+  it('hides admin controls from non-admins', () => {
+    cats.categories = [{ id: '1', name: 'Cat', forums: [] }]
+    render(<ForumPage />)
+    expect(screen.queryByTestId('add-category-btn')).toBeNull()
+    expect(screen.queryByTestId('add-forum-1')).toBeNull()
   })
   it('reports an unknown site', () => {
     tenant = null

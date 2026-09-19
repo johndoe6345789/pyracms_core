@@ -55,7 +55,8 @@ export default function LoginForm({ redirectTo, tenant }: Props) {
           data-testid="password-input"
           sx={{ mb: 3 }}
         />
-        <LoginActions loading={loading} onTurbo={handleTurboLogin} />
+        <LoginActions loading={loading} onTurbo={handleTurboLogin}
+          tenant={tenant} />
       </form>
       <LoginFooter tenant={tenant} />
     </>

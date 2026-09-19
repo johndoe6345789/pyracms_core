@@ -83,11 +83,17 @@ describe('tenant pages', () => {
 
   it('edit page saves and navigates', async () => {
     put.mockResolvedValue({})
+    ;(api.get as jest.Mock).mockResolvedValue({ data: {
+      name: 'g', displayName: 'Real Game', description: 'd',
+      tags: ['x'], revisions: [] } })
     render(<EditGamePage />)
-    fireEvent.click(screen.getByText('Save Changes'))
+    fireEvent.click(await screen.findByText('Save Changes'))
     await waitFor(() =>
       expect(push).toHaveBeenCalledWith('/site/demo/games/g'))
-    expect(put.mock.calls[0][0]).toBe('/api/gamedep/game/item/g')
+    expect(put.mock.calls[0]).toEqual(['/api/gamedep/game/g',
+      { displayName: 'Real Game', description: 'd' }])
+    expect(put.mock.calls[1]).toEqual(
+      ['/api/gamedep/game/g/tags', { tags: ['x'] }])
   })
 })
 

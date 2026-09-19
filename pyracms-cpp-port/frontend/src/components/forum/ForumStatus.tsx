@@ -23,7 +23,9 @@ export function ForumError({ message }: { message: string }) {
 }
 
 export function ForumEmpty(
-  { title, hint }: { title: string; hint?: string },
+  { title, hint, children }: {
+    title: string; hint?: string; children?: React.ReactNode
+  },
 ) {
   return (
     <Box
@@ -33,6 +35,7 @@ export function ForumEmpty(
       <ForumOutlined sx={{ fontSize: 48, mb: 1 }} aria-hidden="true" />
       <Typography variant="h6">{title}</Typography>
       {hint && <Typography variant="body2">{hint}</Typography>}
+      {children}
     </Box>
   )
 }

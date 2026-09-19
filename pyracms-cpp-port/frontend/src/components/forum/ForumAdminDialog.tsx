@@ -1,0 +1,68 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField, Typography,
+} from '@mui/material'
+import type { ForumAdminState } from '@/hooks/useForumAdmin'
+
+export function ForumAdminDialog({ s }: { s: ForumAdminState }) {
+  const d = s.dialog
+  const [name, setName] = useState('')
+  const [desc, setDesc] = useState('')
+  const [seen, setSeen] = useState<unknown>(null)
+  if (d !== seen) {
+    setSeen(d)
+    setName(d?.name ?? '')
+    setDesc(d?.description ?? '')
+  }
+  if (!d) return null
+  const del = d.mode === 'delete'
+  const noun = d.kind === 'category' ? 'category' : 'forum'
+  const verb = { create: 'Add', edit: 'Rename', delete: 'Delete' }[d.mode]
+  return (
+    <Dialog open onClose={s.close} maxWidth="sm" fullWidth
+      data-testid="forum-admin-dialog" aria-labelledby="forum-admin-title">
+      <DialogTitle id="forum-admin-title">{verb} {noun}</DialogTitle>
+      <DialogContent sx={{
+        display: 'flex', flexDirection: 'column', gap: 2,
+        pt: '16px !important',
+      }}>
+        {s.error && (
+          <Alert severity="error" data-testid="forum-admin-error">
+            {s.error}
+          </Alert>
+        )}
+        {del ? (
+          <Typography data-testid="forum-admin-confirm">
+            Delete {noun} &quot;{d.name}&quot;? This cannot be undone.
+          </Typography>
+        ) : (
+          <>
+            <TextField label="Name" size="small" required value={name}
+              onChange={(e) => setName(e.target.value)}
+              inputProps={{ 'data-testid': 'forum-admin-name' }} />
+            {d.kind === 'forum' && (
+              <TextField label="Description" size="small" multiline
+                minRows={2} value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                inputProps={{ 'data-testid': 'forum-admin-desc' }} />
+            )}
+          </>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={s.close} data-testid="forum-admin-cancel">
+          Cancel
+        </Button>
+        <Button variant="contained" color={del ? 'error' : 'primary'}
+          disabled={s.busy || (!del && !name.trim())}
+          onClick={() => s.submit(name, desc)}
+          data-testid="forum-admin-submit">
+          {s.busy ? 'Saving...' : del ? 'Delete' : 'Save'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}

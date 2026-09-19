@@ -1,10 +1,13 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { Container, Typography, Box } from '@mui/material'
+import { Container, Typography, Box, Button } from '@mui/material'
 import { useForumCategories } from '@/hooks/useForumCategories'
+import { useForumAdmin } from '@/hooks/useForumAdmin'
+import { useTenantNav } from '@/hooks/useTenantNav'
 import { useTenantId } from '@/hooks/useTenantId'
 import { CategoryAccordion } from '@/components/forum/CategoryAccordion'
+import { ForumAdminDialog } from '@/components/forum/ForumAdminDialog'
 import {
   ForumLoading, ForumError, ForumEmpty,
 } from '@/components/forum/ForumStatus'
@@ -13,8 +16,17 @@ export default function ForumPage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId, loading: tenantLoading } = useTenantId(slug)
-  const { categories, loading, error } = useForumCategories(tenantId)
+  const { categories, loading, error, refresh } = useForumCategories(tenantId)
+  const { canAdmin } = useTenantNav()
+  const admin = useForumAdmin(tenantId, refresh)
   const busy = tenantLoading || loading
+  const addCategory = () => admin.open({ kind: 'category', mode: 'create' })
+  const addBtn = canAdmin && (
+    <Button variant="contained" onClick={addCategory}
+      data-testid="add-category-btn" sx={{ mt: 2 }}>
+      Add category
+    </Button>
+  )
 
   let body
   if (busy) {
@@ -22,7 +34,12 @@ export default function ForumPage() {
   } else if (error || !tenantId) {
     body = <ForumError message={error || 'Site not found.'} />
   } else if (categories.length === 0) {
-    body = (
+    body = canAdmin ? (
+      <ForumEmpty title="No categories yet"
+        hint="Create the first category to start organising forums.">
+        {addBtn}
+      </ForumEmpty>
+    ) : (
       <ForumEmpty
         title="No forums yet"
         hint="An administrator has not created any forums for this site."
@@ -30,7 +47,8 @@ export default function ForumPage() {
     )
   } else {
     body = categories.map((category) => (
-      <CategoryAccordion key={category.id} category={category} slug={slug} />
+      <CategoryAccordion key={category.id} category={category} slug={slug}
+        admin={canAdmin ? admin : undefined} />
     ))
   }
 
@@ -44,8 +62,10 @@ export default function ForumPage() {
           Join discussions, ask questions, and share knowledge with the
           community.
         </Typography>
+        {categories.length > 0 && addBtn}
       </Box>
       {body}
+      <ForumAdminDialog s={admin} />
     </Container>
   )
 }

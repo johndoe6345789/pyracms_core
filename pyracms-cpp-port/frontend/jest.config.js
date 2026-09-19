@@ -1,7 +1,8 @@
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  // Path to the Next.js app, to load next.config.js and .env files
+  // in the test environment
   dir: './',
 })
 
@@ -29,5 +30,6 @@ const customJestConfig = {
   },
 }
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+// createJestConfig is exported this way so next/jest can load the
+// (async) Next.js config
 module.exports = createJestConfig(customJestConfig)

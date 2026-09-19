@@ -4,6 +4,7 @@ import Link from 'next/link'
 interface Props {
   loading: boolean
   onTurbo: () => void
+  tenant?: string | undefined
 }
 
 const submitSx = {
@@ -20,12 +21,14 @@ const linkStyle = {
 } as const
 
 /** Forgot-password link, submit button and Turbologin button. */
-export default function LoginActions({ loading, onTurbo }: Props) {
+export default function LoginActions({ loading, onTurbo, tenant }: Props) {
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
         <Link
-          href="/auth/forgot-password"
+          href={tenant
+            ? `/auth/forgot-password?tenant=${encodeURIComponent(tenant)}`
+            : '/auth/forgot-password'}
           data-testid="forgot-password-link"
           aria-label="Forgot your password?"
           style={linkStyle}

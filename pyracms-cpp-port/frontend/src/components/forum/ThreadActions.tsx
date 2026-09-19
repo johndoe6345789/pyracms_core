@@ -51,8 +51,8 @@ export function ThreadActions({
       isLocked={isLocked}
       onPin={() => { onPin?.(); close() }}
       onLock={() => { onLock?.(); close() }}
-      onMove={() => {
-        close(); setMoveOpen(true) }}
+      onMove={onMove ? () => {
+        close(); setMoveOpen(true) } : undefined}
       onDelete={() => {
         close(); setDelOpen(true) }} />
     <MoveThreadDialog open={moveOpen}

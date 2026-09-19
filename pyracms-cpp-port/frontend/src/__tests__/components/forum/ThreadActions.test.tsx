@@ -55,3 +55,10 @@ it('cancels a move', () => {
   fireEvent.click(screen.getByTestId('thread-action-move'))
   fireEvent.click(screen.getByTestId('move-thread-cancel'))
 })
+
+it('hides Move when no move handler exists (no backend endpoint)', () => {
+  render(<ThreadActions {...props} isModerator />)
+  fireEvent.click(screen.getByTestId('thread-actions-4'))
+  expect(screen.queryByTestId('thread-action-move')).toBeNull()
+  expect(screen.getByTestId('thread-action-delete')).toBeInTheDocument()
+})

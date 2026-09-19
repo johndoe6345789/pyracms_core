@@ -9,6 +9,9 @@ jest.mock('@/lib/api', () => ({
 }))
 const get = api.get as jest.Mock
 let mobile = false
+jest.mock('@/hooks/useSiteSession', () => ({
+  useSiteSession: () => true,
+}))
 jest.mock('@mui/material/useMediaQuery', () => ({
   __esModule: true, default: () => mobile,
 }))

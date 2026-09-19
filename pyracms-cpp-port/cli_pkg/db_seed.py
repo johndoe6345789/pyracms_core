@@ -1,0 +1,45 @@
+"""Dev-only sample data for `db seed`."""
+
+SEED_HASH = (
+    "$2b$12$LJ3m4ys3Rl0pT0sZWVKPleM7R.L8flGQ0Btwb8E7gHJKN5FKxMHy2"
+)
+
+SEED_SQL = "\n".join([
+    "",
+    "        -- Seed a default tenant",
+    "        INSERT INTO tenants (name, domain, settings)",
+    "        VALUES ('Default', 'localhost', '{}')",
+    "        ON CONFLICT DO NOTHING;",
+    "",
+    "        -- Seed an admin user (password: admin123)",
+    "        INSERT INTO users (username, email, password_hash,",
+    "                           role, tenant_id)",
+    "        VALUES ('admin', 'admin@localhost', '" + SEED_HASH + "',",
+    "                'admin', 1)",
+    "        ON CONFLICT DO NOTHING;",
+    "",
+    "        -- Seed some achievements (already done in migration)",
+    "        INSERT INTO achievements",
+    "            (name, display_name, description, icon) VALUES",
+    "            ('first_post', 'First Post',",
+    "             'Created your first forum post', 'forum'),",
+    "            ('first_article', 'Author',",
+    "             'Published your first article', 'article'),",
+    "            ('first_snippet', 'Coder',",
+    "             'Created your first code snippet', 'code')",
+    "        ON CONFLICT (name) DO NOTHING;",
+    "",
+    "        -- Seed a sample article",
+    "        INSERT INTO articles (name, display_name, is_private,",
+    "                              tenant_id, user_id, renderer_name,",
+    "                              view_count)",
+    "        VALUES ('welcome', 'Welcome to PyraCMS', false, 1, 1,",
+    "                'markdown', 0)",
+    "        ON CONFLICT DO NOTHING;",
+    "",
+    "        -- Seed a forum category",
+    "        INSERT INTO forum_categories (name, tenant_id)",
+    "        VALUES ('General Discussion', 1)",
+    "        ON CONFLICT DO NOTHING;",
+    "        ",
+])

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
 
 export interface Forum {
@@ -35,6 +35,8 @@ export function useForumCategories(tenantId: number | null) {
   const [categories, setCategories] = useState<ForumCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [tick, setTick] = useState(0)
+  const refresh = useCallback(() => setTick((t) => t + 1), [])
 
   useEffect(() => {
     if (!tenantId) return
@@ -57,7 +59,7 @@ export function useForumCategories(tenantId: number | null) {
       })
       .catch(() => setError('Could not load the forum. Please try again.'))
       .finally(() => setLoading(false))
-  }, [tenantId])
+  }, [tenantId, tick])
 
-  return { categories, loading, error }
+  return { categories, loading, error, refresh }
 }

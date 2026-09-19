@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
 
 export interface GalleryPicture {
@@ -26,6 +26,8 @@ export function useGalleryAlbum(albumId: string) {
   const [albumName, setAlbumName] = useState('')
   const [pictures, setPictures] = useState<GalleryPicture[]>([])
   const [loading, setLoading] = useState(true)
+  const [tick, setTick] = useState(0)
+  const refresh = useCallback(() => setTick((t) => t + 1), [])
 
   useEffect(() => {
     if (!albumId) return
@@ -38,7 +40,7 @@ export function useGalleryAlbum(albumId: string) {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [albumId])
+  }, [albumId, tick])
 
-  return { albumName, pictures, loading }
+  return { albumName, pictures, loading, refresh }
 }

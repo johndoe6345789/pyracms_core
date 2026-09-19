@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: '/dashboard', destination: '/admin', permanent: true },
+      // Links in the e-mails sent by the backend
+      {
+        source: '/reset-password',
+        destination: '/auth/reset-password',
+        permanent: false,
+      },
+      {
+        source: '/verify-email',
+        destination: '/auth/verify-email',
+        permanent: false,
+      },
     ]
   },
 }

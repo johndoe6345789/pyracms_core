@@ -11,40 +11,79 @@ jest.mock('next/navigation', () => ({
   useParams: () => ({ slug: 's', name: 'sdl2' }),
 }))
 jest.mock('@/lib/api', () => ({
-  __esModule: true, default: { put: jest.fn() },
+  __esModule: true, default: { get: jest.fn(), put: jest.fn() },
 }))
+let signedIn = true
+jest.mock('@/hooks/useSiteSession', () => ({
+  useSiteSession: () => signedIn,
+}))
+const get = api.get as jest.Mock
 const put = api.put as jest.Mock
-beforeEach(() => { push.mockReset(); put.mockReset() })
+const row = {
+  name: 'sdl2', displayName: 'SDL2', description: 'lib', tags: ['audio'],
+  revisions: [{ version: '2.28.5', published: true, createdAt: '2024-01-02' }],
+}
+beforeEach(() => {
+  push.mockReset(); put.mockReset(); get.mockReset(); signedIn = true
+})
 
 describe('dependencies list page', () => {
-  it('filters the list through the search bar', () => {
+  it('lists real dependencies and filters them', async () => {
+    get.mockResolvedValue({ data: [row] })
     render(<DepsPage />)
-    expect(screen.getByText('SDL2')).toBeInTheDocument()
+    expect(await screen.findByText('SDL2')).toBeInTheDocument()
+    expect(get).toHaveBeenCalledWith('/api/gamedep/dep?limit=100')
+    expect(screen.getByTestId('new-dep-btn'))
+      .toHaveAttribute('href', '/site/s/dependencies/new')
     fireEvent.change(screen.getByPlaceholderText('Search dependencies...'),
       { target: { value: 'zzzz-nothing' } })
     expect(screen.queryByText('SDL2')).toBeNull()
   })
+  it('offers a call to action when empty, none for guests', async () => {
+    get.mockResolvedValue({ data: [] })
+    const { unmount } = render(<DepsPage />)
+    expect(await screen.findByTestId('deps-empty'))
+      .toHaveTextContent('create the first')
+    unmount()
+    signedIn = false
+    render(<DepsPage />)
+    expect(await screen.findByTestId('deps-empty'))
+      .toHaveTextContent('published yet')
+    expect(screen.queryByTestId('new-dep-btn')).toBeNull()
+  })
+  it('shows a load error', async () => {
+    get.mockRejectedValue(new Error('x'))
+    render(<DepsPage />)
+    expect(await screen.findByText('Could not load the list.'))
+      .toBeInTheDocument()
+  })
 })
 
 describe('dependency detail page', () => {
-  it('walks through every tab', () => {
+  it('loads the dependency and walks through the tabs', async () => {
+    get.mockResolvedValue({ data: row })
     render(<DepPage />)
-    expect(screen.getByTestId('edit-button'))
+    expect(await screen.findByTestId('edit-button'))
       .toHaveAttribute('href', '/site/s/dependencies/sdl2/edit')
+    expect(get).toHaveBeenCalledWith('/api/gamedep/dep/sdl2')
     expect(screen.getByText('2.28.5')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('tab-binaries'))
-    expect(screen.getAllByText('Windows').length).toBeGreaterThan(0)
     fireEvent.click(screen.getByTestId('tab-dependencies'))
-    expect(screen.getByText('Math Library')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('tab-screenshots'))
-    expect(screen.getByAltText('Screenshot 1')).toBeInTheDocument()
+  })
+  it('reports a missing dependency', async () => {
+    get.mockRejectedValue(new Error('404'))
+    render(<DepPage />)
+    expect(await screen.findByTestId('item-not-found')).toBeInTheDocument()
   })
 })
 
 describe('dependency edit page', () => {
-  it('saves and returns to the detail page', async () => {
+  it('saves page fields and tags, then returns to the detail', async () => {
+    get.mockResolvedValue({ data: row })
     put.mockResolvedValue({})
     render(<EditDepPage />)
+    expect(await screen.findByLabelText('Display Name')).toHaveValue('SDL2')
     fireEvent.change(screen.getByLabelText('Display Name'),
       { target: { value: 'SDL3' } })
     fireEvent.change(screen.getByPlaceholderText('Add tag...'),
@@ -53,16 +92,18 @@ describe('dependency edit page', () => {
     fireEvent.click(screen.getByText('Save Changes'))
     await waitFor(() => expect(push).toHaveBeenCalledWith(
       '/site/s/dependencies/sdl2'))
-    expect(put.mock.calls[0][1]).toMatchObject({ displayName: 'SDL3' })
-    expect(put.mock.calls[0][1].tags).toContain('fast')
+    expect(put.mock.calls[0]).toEqual(['/api/gamedep/dep/sdl2',
+      { displayName: 'SDL3', description: 'lib' }])
+    expect(put.mock.calls[1][1].tags).toEqual(['audio', 'fast'])
   })
 
-  it('stays put when saving fails', async () => {
-    put.mockRejectedValue(new Error('x'))
+  it('shows the API error and stays put when saving fails', async () => {
+    get.mockResolvedValue({ data: row })
+    put.mockRejectedValue({ response: { data: { error: 'Forbidden' } } })
     render(<EditDepPage />)
-    fireEvent.click(screen.getByText('Save Changes'))
-    await waitFor(() => expect(screen.getByText('Save Changes'))
-      .not.toBeDisabled())
+    fireEvent.click(await screen.findByText('Save Changes'))
+    expect(await screen.findByTestId('save-error'))
+      .toHaveTextContent('Forbidden')
     expect(push).not.toHaveBeenCalled()
   })
 })

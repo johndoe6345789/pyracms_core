@@ -6,6 +6,7 @@ import {
 } from '@mui/material'
 import { useGameLibrary } from '@/hooks/useGameLibrary'
 import { useGameDetail } from '@/hooks/useGameDetail'
+import { useSiteSession } from '@/hooks/useSiteSession'
 import LibrarySidebar from './LibrarySidebar'
 import LibraryHeader, { type LibraryView } from './LibraryHeader'
 import SampleNotice from './SampleNotice'
@@ -21,6 +22,7 @@ const shellSx = {
 
 export default function GameLibrary({ slug, initialName }: Props) {
   const lib = useGameLibrary()
+  const signedIn = useSiteSession(slug)
   const theme = useTheme()
   const mobile = useMediaQuery(theme.breakpoints.down('md'))
   const [view, setView] = useState<LibraryView>(
@@ -57,7 +59,8 @@ export default function GameLibrary({ slug, initialName }: Props) {
       </Drawer>
       <Box sx={{ flex: 1, p: { xs: 1.5, md: 3 }, minWidth: 0 }}>
         <LibraryHeader mobile={mobile} view={view} onView={setView}
-          onOpenDrawer={() => setDrawer(true)} />
+          onOpenDrawer={() => setDrawer(true)}
+          newHref={signedIn ? `/site/${slug}/games/new` : undefined} />
         {lib.sample && <SampleNotice />}
         {lib.loading && <Typography>Loading...</Typography>}
         {view === 'browse' ? (

@@ -10,6 +10,8 @@ import {
   ExpandMoreOutlined,
 } from '@mui/icons-material'
 import { ForumCard } from './ForumCard'
+import { CategoryAdminBar, ForumAdminBar } from './ForumAdminBars'
+import type { ForumAdminState } from '@/hooks/useForumAdmin'
 import type {
   ForumCategory,
 } from '@/hooks/useForumCategories'
@@ -17,10 +19,11 @@ import type {
 interface CategoryAccordionProps {
   category: ForumCategory
   slug: string
+  admin?: ForumAdminState | undefined
 }
 
 export function CategoryAccordion(
-  { category, slug }: CategoryAccordionProps,
+  { category, slug, admin }: CategoryAccordionProps,
 ) {
   return (
     <Accordion
@@ -50,18 +53,23 @@ export function CategoryAccordion(
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0 }}>
+        {admin && (
+          <CategoryAdminBar category={category} admin={admin} />
+        )}
         {category.forums.map(
           (forum, index) => (
-            <ForumCard
-              key={forum.id}
-              forum={forum}
-              slug={slug}
-              isFirst={index === 0}
-              isLast={
-                index
-                === category.forums.length - 1
-              }
-            />
+            <div key={forum.id}>
+              <ForumCard
+                forum={forum}
+                slug={slug}
+                isFirst={index === 0}
+                isLast={
+                  index
+                  === category.forums.length - 1
+                }
+              />
+              {admin && <ForumAdminBar forum={forum} admin={admin} />}
+            </div>
           ),
         )}
       </AccordionDetails>

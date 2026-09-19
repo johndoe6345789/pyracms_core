@@ -13,15 +13,17 @@ export function buildCsp(apiUrl?: string, dev = false): string {
   // Cloudflare injects its web-analytics beacon on proxied sites
   const cfScript = 'https://static.cloudflareinsights.com'
   const cfConnect = 'https://cloudflareinsights.com'
+  const scriptSrc = `'self' 'unsafe-inline' ${cdn} ${cfScript}`
+  const connectSrc = `'self' ${api} ${ws} ${cdn} ${cfConnect}`
   const d = [
     ["default-src", "'self'"],
     // Next.js emits inline bootstrap scripts; nonces would need middleware
-    ['script-src', `'self' 'unsafe-inline' ${cdn} ${cfScript}${dev ? " 'unsafe-eval'" : ''}`],
+    ['script-src', `${scriptSrc}${dev ? " 'unsafe-eval'" : ''}`],
     ['style-src', `'self' 'unsafe-inline' ${cdn} https://fonts.googleapis.com`],
     ['font-src', `'self' data: ${cdn} https://fonts.gstatic.com`],
     ['img-src', "'self' data: blob: https:"],
     ['media-src', "'self' blob: https:"],
-    ['connect-src', `'self' ${api} ${ws} ${cdn} ${cfConnect}${dev ? ' ws:' : ''}`.trim()],
+    ['connect-src', `${connectSrc}${dev ? ' ws:' : ''}`.trim()],
     ['worker-src', "'self' blob:"],
     ['frame-src', "'none'"],
     ['object-src', "'none'"],

@@ -15,6 +15,9 @@ export interface Article {
   dislikes: number
   tags: string[]
   revisionCount: number
+  /** draft | published | scheduled */
+  status?: string
+  isPrivate?: boolean
 }
 
 function mapArticle(a: Record<string, any>): Article {
@@ -29,6 +32,8 @@ function mapArticle(a: Record<string, any>): Article {
     dislikes: a.dislikes || 0,
     tags: a.tags || [],
     revisionCount: a.revisionCount || 0,
+    status: a.status || 'published',
+    isPrivate: Boolean(a.isPrivate),
   }
 }
 
@@ -38,6 +43,7 @@ export function useArticle(
 ) {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
+  const [tick, setTick] = useState(0)
 
   useEffect(() => {
     if (!name || !tenantId) return
@@ -46,7 +52,7 @@ export function useArticle(
       .then((res) => setArticle(mapArticle(res.data)))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [name, tenantId])
+  }, [name, tenantId, tick])
 
   const handleVote = (isLike: boolean) => {
     if (!tenantId) return
@@ -61,5 +67,7 @@ export function useArticle(
       .catch(() => {})
   }
 
-  return { article, loading, handleVote }
+  const refresh = () => setTick((t) => t + 1)
+
+  return { article, loading, handleVote, refresh }
 }

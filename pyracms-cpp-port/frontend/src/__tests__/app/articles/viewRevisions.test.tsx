@@ -15,6 +15,10 @@ jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
 jest.mock('@/hooks/useTenantId',
   () => require('../../helpers/scopeMocks').tenantMock)
+let signedIn = false
+jest.mock('@/hooks/useSiteSession', () => ({
+  useSiteSession: () => signedIn,
+}))
 jest.mock('@/lib/metadata', () => ({
   generateArticleMetadata: jest.fn().mockResolvedValue({ title: 'T' }),
   fetchArticleJsonLd: jest.fn(),
@@ -42,6 +46,18 @@ it('article page renders and votes', async () => {
     .toHaveTextContent('2'))
   expect(screen.getByTestId('tag-chip-t')).toHaveAttribute(
     'href', '/search?site=s&q=t')
+  expect(screen.queryByTestId('article-owner-actions')).toBeNull()
+})
+
+it('article page shows owner actions to signed-in users', async () => {
+  signedIn = true
+  routeGet({ '/api/articles/n': { name: 'n', displayName: 'Title',
+    content: '', status: 'draft' } })
+  render(<ArticlePageClient />)
+  expect(await screen.findByTestId('article-owner-actions'))
+    .toBeInTheDocument()
+  expect(screen.getByTestId('article-status')).toHaveTextContent('draft')
+  signedIn = false
 })
 
 it('article page renders nothing before load', () => {

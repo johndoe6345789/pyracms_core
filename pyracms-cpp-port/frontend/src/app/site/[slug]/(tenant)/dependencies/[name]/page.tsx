@@ -10,15 +10,28 @@ import BinaryMatrix from '@/components/gamedep/BinaryMatrix'
 import DependencyList from '@/components/gamedep/DependencyList'
 import ScreenshotGrid from '@/components/gamedep/ScreenshotGrid'
 import TabPanel from '@/components/common/TabPanel'
-import { useGameDepDetail } from '@/hooks/useGameDepDetail'
-import { PLACEHOLDER_DEP_DETAIL } from '@/hooks/data/depPlaceholders'
+import {
+  useGameDepDetail, type GameDepDetailData,
+} from '@/hooks/useGameDepDetail'
+import { useGameDepItem } from '@/hooks/useGameDepItem'
+import ItemGate from '@/components/gamedep/ItemGate'
 
 export default function DependencyDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const name = params.name as string
-  const { detail, tabIndex, setTabIndex } =
-    useGameDepDetail(PLACEHOLDER_DEP_DETAIL)
+  const { item, loading } = useGameDepItem('dep', name)
+  return (
+    <ItemGate loading={loading} found={!!item}>
+      {item && <DepView slug={slug} name={name} data={item} />}
+    </ItemGate>
+  )
+}
+
+function DepView(
+  { slug, name, data }: { slug: string; name: string; data: GameDepDetailData },
+) {
+  const { detail, tabIndex, setTabIndex } = useGameDepDetail(data)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
