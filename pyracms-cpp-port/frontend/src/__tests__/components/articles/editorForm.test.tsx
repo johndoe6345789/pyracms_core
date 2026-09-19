@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { ArticleEditorContent } from '../../helpers/imports/articleEditorContent'
+import { ArticleEditorContent } from '../../helpers/imports/editorContent'
 import { editor } from '../../helpers/articleEditorMocks'
 
 jest.mock('@/components/articles/MonacoEditor', () => {

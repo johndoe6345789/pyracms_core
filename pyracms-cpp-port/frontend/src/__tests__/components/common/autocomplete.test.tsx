@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import SearchAutocomplete from '@/components/common/SearchAutocomplete'
-import { AutocompleteDropdown } from '../../helpers/imports/autocompleteDropdown'
+import { AutocompleteDropdown } from '../../helpers/imports/dropdown'
 import api from '@/lib/api'
 import { items, input } from '../../helpers/autocompleteFixture'
 
