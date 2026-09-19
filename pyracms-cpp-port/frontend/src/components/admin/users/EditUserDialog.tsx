@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import {
-  Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, Alert,
+  Dialog, DialogTitle, DialogContent,
+  Alert,
 } from '@mui/material'
 import type { UserRow } from '@/hooks/admin/userRow'
 import type { UserProfileFields } from '@/hooks/admin/useUserEdit'
 import EditUserFields from './EditUserFields'
+import EditUserRole from './EditUserRole'
+import EditUserActions from './EditUserActions'
+import { useCurrentRole } from '@/hooks/useCurrentRole'
 
 interface Props {
   user: UserRow | null
@@ -20,10 +23,13 @@ export default function EditUserDialog({
 }: Props) {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState(1)
+  const actorRole = useCurrentRole()
 
   useEffect(() => {
     setFullName(user?.fullName ?? '')
     setEmail(user?.email ?? '')
+    setRole(user?.role ?? 1)
   }, [user])
 
   return (
@@ -55,22 +61,20 @@ export default function EditUserDialog({
           onFullName={setFullName}
           onEmail={setEmail}
         />
+        <EditUserRole
+          actorRole={actorRole}
+          value={role}
+          onChange={setRole}
+        />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} data-testid="cancel-edit-user-btn">
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disabled={saving || !email.trim()}
-          onClick={() => onSave({
-            fullName: fullName.trim(), email: email.trim(),
-          })}
-          data-testid="save-edit-user-btn"
-        >
-          {saving ? 'Saving...' : 'Save'}
-        </Button>
-      </DialogActions>
+      <EditUserActions
+        saving={saving}
+        canSave={!!email.trim()}
+        onClose={onClose}
+        onSave={() => onSave({
+          fullName: fullName.trim(), email: email.trim(), role,
+        })}
+      />
     </Dialog>
   )
 }

@@ -153,6 +153,18 @@ set(TEST_SOURCES
 
     test_tenant_service.cpp
 
+    test_user_admin_http_1.cpp
+
+    test_user_admin_http_2.cpp
+
+    test_user_admin_http_3.cpp
+
+    test_user_admin_http_4.cpp
+
+    test_user_admin_rules.cpp
+
+    test_user_admin_rules_2.cpp
+
     test_user_scope_db_1.cpp
 
     test_user_scope_db_2.cpp

@@ -1,18 +1,21 @@
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { screen, fireEvent, within } from '@testing-library/react'
+import { render } from '@testing-library/react'
+import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
+import { UserRole } from '@/types'
 import EditUserDialog from '@/components/admin/users/EditUserDialog'
 import UsersHeader from '@/components/admin/users/UsersHeader'
 import UserTable from '@/components/admin/UserTable'
 
 const user = { id: 3, username: 'bob', fullName: 'Bob B', email: 'b@x',
-  created: 'c', banned: false }
+  created: 'c', banned: false, role: 1 }
 
 const box = (id: string) =>
   within(screen.getByTestId(id)).getByRole('textbox')
 
 const setup = (over = {}) => {
   const p = { onClose: jest.fn(), onSave: jest.fn() }
-  render(<EditUserDialog user={user} saving={false} error="" {...p}
-    {...over} />)
+  renderWithStore(<EditUserDialog user={user} saving={false} error="" {...p}
+    {...over} />, makeUser({ role: UserRole.SiteAdmin }))
   return p
 }
 
@@ -22,7 +25,8 @@ it('prefills and saves trimmed profile fields', () => {
   fireEvent.change(box('edit-fullname-input'), { target: { value: ' Rob ' } })
   fireEvent.change(box('edit-email-input'), { target: { value: ' r@x ' } })
   fireEvent.click(screen.getByTestId('save-edit-user-btn'))
-  expect(p.onSave).toHaveBeenCalledWith({ fullName: 'Rob', email: 'r@x' })
+  expect(p.onSave).toHaveBeenCalledWith(
+    { fullName: 'Rob', email: 'r@x', role: 1 })
   fireEvent.click(screen.getByTestId('cancel-edit-user-btn'))
   expect(p.onClose).toHaveBeenCalled()
 })
@@ -41,7 +45,7 @@ it('shows the saving label and errors', () => {
 })
 
 it('stays closed without a user', () => {
-  render(<EditUserDialog user={null} saving={false} error=""
+  renderWithStore(<EditUserDialog user={null} saving={false} error=""
     onClose={jest.fn()} onSave={jest.fn()} />)
   expect(screen.queryByTestId('edit-user-dialog')).toBeNull()
 })

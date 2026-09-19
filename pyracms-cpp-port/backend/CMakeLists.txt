@@ -227,11 +227,23 @@ set(LIB_SOURCES
 
     src/controllers/tenant/TenantControllerRemove.cpp
 
+    src/controllers/user/UserAdminGate.cpp
+
+    src/controllers/user/UserAdminSteps.cpp
+
+    src/controllers/user/UserAdminUpdate.cpp
+
+    src/controllers/user/UserControllerBan.cpp
+
     src/controllers/user/UserControllerChangePassword.cpp
+
+    src/controllers/user/UserControllerDelete.cpp
 
     src/controllers/user/UserControllerGetById.cpp
 
     src/controllers/user/UserControllerList.cpp
+
+    src/controllers/user/UserControllerRole.cpp
 
     src/controllers/user/UserControllerUpdate.cpp
 
@@ -514,6 +526,12 @@ set(LIB_SOURCES
     src/services/tenant/TenantServiceNormalizeSlug.cpp
 
     src/services/tenant/TenantServiceRowToDto.cpp
+
+    src/services/user/UserAdminServiceLoadTarget.cpp
+
+    src/services/user/UserAdminServiceSetBanned.cpp
+
+    src/services/user/UserAdminServiceSetRole.cpp
 
     src/services/user/UserServiceCountUsers.cpp
 

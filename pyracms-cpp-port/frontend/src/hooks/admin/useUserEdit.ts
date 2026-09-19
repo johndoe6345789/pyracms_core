@@ -3,17 +3,19 @@
 import { useState } from 'react'
 import api from '@/lib/api'
 import type { UserRow } from './userRow'
+import { apiError } from './apiError'
 
 export interface UserProfileFields {
   fullName: string
   email: string
+  role: number
 }
 
 type SetUsers = React.Dispatch<React.SetStateAction<UserRow[]>>
 
 /**
  * Edit-profile dialog state for the admin user list.
- * The API exposes profile fields only; roles are not editable.
+ * Name and email always go along; the role only when it changed.
  * @param setUsers - State setter for the user list.
  */
 export function useUserEdit(setUsers: SetUsers) {
@@ -33,14 +35,16 @@ export function useUserEdit(setUsers: SetUsers) {
     const id = editUser.id
     setSaving(true)
     setEditError('')
-    api.put(`/api/users/${id}`, fields)
+    const { role, ...profile } = fields
+    const body = role === editUser.role ? profile : fields
+    api.put(`/api/users/${id}`, body)
       .then(() => {
         setUsers((prev) => prev.map((u) =>
           u.id === id ? { ...u, ...fields } : u))
         setEditUser(null)
       })
       .catch((err) => setEditError(
-        err?.response?.data?.error || 'Failed to update user'))
+        apiError(err, 'Failed to update user')))
       .finally(() => setSaving(false))
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Box } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
 import UserTable from '@/components/admin/UserTable'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
@@ -19,6 +19,12 @@ export default function AdminUsersPage() {
   return (
     <Box data-testid="admin-users-page">
       <UsersHeader onCreate={() => create.setOpen(true)} />
+      {u.actionError && (
+        <Alert severity="error" sx={{ mb: 2 }}
+          data-testid="users-action-error">
+          {u.actionError}
+        </Alert>
+      )}
       <UserTable
         users={u.users}
         onToggleBan={u.handleToggleBan}

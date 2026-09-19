@@ -38,8 +38,14 @@ TEST(SecurityUsers, ProfileUpdatesCannotTouchPrivilegedFields) {
     REQUIRE_SERVER();
     auto s = makeSite();
     auto path = "/api/users/" + std::to_string(s.user.id);
-    auto r = put(path, J({{"aboutme", "hi"}, {"role", 4}, {"banned", true},
-                          {"tenant_id", s.id}, {"password_hash", "x"}}),
+    // Asking for role/banned on one's own account is refused outright.
+    auto bad = put(path, J({{"aboutme", "no"}, {"role", 4}}), s.user.token);
+    EXPECT_EQ(bad.status, 403);
+    bad = put(path, J({{"aboutme", "no"}, {"banned", true}}), s.user.token);
+    EXPECT_EQ(bad.status, 403);
+    // Other columns are simply not writable.
+    auto r = put(path, J({{"aboutme", "hi"}, {"tenant_id", s.id},
+                          {"password_hash", "x"}}),
                  s.user.token);
     EXPECT_EQ(r.status, 200);
     auto row = testDb()->execSqlSync(

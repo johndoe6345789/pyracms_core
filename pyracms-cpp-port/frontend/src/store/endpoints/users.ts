@@ -1,5 +1,7 @@
 import type { ApiBuilder } from '../apiBase'
 import type { User, ChangePasswordRequest } from '@/types'
+import { adoptFreshToken, type PasswordChangeReply } from './freshToken'
+import type { RootState } from '../store'
 
 export const userEndpoints = (builder: ApiBuilder) => ({
   getUsers: builder.query<User[], void>({
@@ -28,12 +30,21 @@ export const userEndpoints = (builder: ApiBuilder) => ({
     ],
   }),
   changePassword: builder.mutation<
-    void, { id: number; data: ChangePasswordRequest }
+    PasswordChangeReply, { id: number; data: ChangePasswordRequest }
   >({
     query: ({ id, data }) => ({
       url: `/users/${id}/password`,
       method: 'PUT',
       body: data,
     }),
+    async onQueryStarted(_arg, { dispatch, getState, queryFulfilled }) {
+      try {
+        const { data } = await queryFulfilled
+        const { user } = (getState() as RootState).auth
+        adoptFreshToken(data, user, dispatch)
+      } catch {
+        // a failed change leaves the session as it was
+      }
+    },
   }),
 })

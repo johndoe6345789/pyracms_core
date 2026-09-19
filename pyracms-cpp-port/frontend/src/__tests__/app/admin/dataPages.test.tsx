@@ -7,6 +7,7 @@ import AdminUsersPage from '@/app/site/[slug]/(admin)/admin/users/page'
 import AdminBackupPage from '@/app/site/[slug]/(admin)/admin/backup/page'
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
+import { renderWithStore } from '../../helpers/renderWithStore'
 
 jest.mock('@/lib/api', () => require('../../helpers/apiMock').apiMock)
 jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
@@ -48,7 +49,7 @@ it('menus page renders groups and adds an item', async () => {
 
 it('users page bans, deletes and opens create dialog', async () => {
   routeGet({ '/api/users': [{ id: 1, username: 'bob', banned: false }] })
-  render(<AdminUsersPage />)
+  renderWithStore(<AdminUsersPage />)
   await screen.findByTestId('user-row-1')
   fireEvent.click(screen.getByTestId('ban-user-1'))
   await screen.findByText('Banned')

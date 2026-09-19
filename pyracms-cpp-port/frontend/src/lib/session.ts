@@ -56,3 +56,13 @@ export function clearToken(scope: string | null): void {
   const key = activeKey(scope)
   if (key) localStorage.removeItem(key)
 }
+
+/**
+ * Swap in a fresh token (e.g. after a password change) in the slot the
+ * scope is really using, which may be the platform token.
+ */
+export function replaceToken(scope: string | null, token: string): void {
+  const key = activeKey(scope)
+  if (key) localStorage.setItem(key, token)
+  else setToken(scope, token)
+}

@@ -35,6 +35,7 @@ void UserController::list(
                                         u.tenantId)) {
                             item["email"] = u.email;
                             item["banned"] = u.banned;
+                            item["role"] = static_cast<int>(u.role);
                         }
                         out.append(item);
                     }

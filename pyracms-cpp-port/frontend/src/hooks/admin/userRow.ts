@@ -5,6 +5,8 @@ export interface UserRow {
   email: string
   created: string
   banned: boolean
+  /** Numeric UserRole; Normal User when the API does not say. */
+  role: number
 }
 
 /** Maps a raw API user record to a UserRow. */
@@ -18,5 +20,6 @@ export function mapUser(u: Record<string, unknown>): UserRow {
     created:
       typeof created === 'string' ? created.split('T')[0] ?? '' : '',
     banned: (u.banned as boolean) || false,
+    role: typeof u.role === 'number' ? u.role : 1,
   }
 }
