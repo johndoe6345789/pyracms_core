@@ -37,7 +37,15 @@ void TstUiLinks::registersUrlSchemeForCurrentUser()
     QSignalSpy note(a.vm, &MainViewModel::notify);
     a.vm->registerUrlScheme();
     QCOMPARE(note.count(), 1);
-#ifdef Q_OS_LINUX // a .desktop entry is only how Linux registers schemes
+    // Each OS registers the scheme differently; assert the real behaviour.
+#if defined(Q_OS_WIN) // HKCU/Software/Classes/pyracms
+    QSettings reg("HKEY_CURRENT_USER\\Software\\Classes\\pyracms",
+                  QSettings::NativeFormat);
+    QVERIFY(reg.childKeys().contains("URL Protocol"));
+#elif defined(Q_OS_MACOS) // declared in the bundle's Info.plist, not at runtime
+    QVERIFY(note.at(0).at(1).toBool());
+    QVERIFY(note.at(0).at(0).toString().contains("Info.plist"));
+#else // Linux: ~/.local/share/applications/hypernucleus-url.desktop
     QVERIFY(QFileInfo::exists(
         QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
         "/applications/hypernucleus-url.desktop"));

@@ -172,7 +172,11 @@ qt_add_executable(hypernucleus src/main.cpp)
 # macOS: a real .app bundle. Without it the binary is build/hypernucleus, which collides on
 # case-insensitive filesystems with the QML module directory build/Hypernucleus.
 set_target_properties(hypernucleus PROPERTIES MACOSX_BUNDLE ON
-    MACOSX_BUNDLE_GUI_IDENTIFIER org.pyracms.hypernucleus)
+    MACOSX_BUNDLE_GUI_IDENTIFIER org.pyracms.hypernucleus
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_INFO_PLIST
+    ${CMAKE_CURRENT_SOURCE_DIR}/packaging/Info.plist.in)
 target_link_libraries(hypernucleus PRIVATE
     hypernucleus_lib
     Qt6::Gui

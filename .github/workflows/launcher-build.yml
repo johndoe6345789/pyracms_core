@@ -53,6 +53,8 @@ env:
 jobs:
   launcher:
     name: launcher ${{ matrix.hn_os }}-${{ matrix.arch }}
+    permissions:
+      contents: read
     runs-on: ${{ matrix.runner }}
     # Experimental entries may fail without blocking the release (see the notes on each entry).
     continue-on-error: ${{ matrix.experimental }}
@@ -319,6 +321,8 @@ jobs:
 
   games:
     name: games ${{ matrix.hn_os }}-${{ matrix.arch }}
+    permissions:
+      contents: read
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
