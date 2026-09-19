@@ -1,21 +1,18 @@
 #include <QtTest>
 #include <QTemporaryDir>
 
+#include "FakeExe.h"
 #include "services/PathManager.h"
 #include "services/PipInstaller.h"
 
 using namespace Hypernucleus;
 
 // A stand-in interpreter: prints its arguments, then behaves as told.
-static QString fakePython(const QTemporaryDir& d, const QString& body)
+static QString fakePython(const QTemporaryDir& d, const QString& echo,
+                          int exitCode = 0, int sleepSeconds = 0)
 {
-    const QString path = d.filePath("fakepython");
-    QFile f(path);
-    f.open(QIODevice::WriteOnly);
-    f.write("#!/bin/sh\necho \"ARGS: $@\"\n" + body.toUtf8() + "\n");
-    f.close();
-    f.setPermissions(f.permissions() | QFile::ExeOwner);
-    return path;
+    FakeExe::configure(echo, exitCode, sleepSeconds);
+    return FakeExe::install(d.filePath("fakepython.exe"));
 }
 
 class TstPipRun : public QObject {
@@ -31,8 +28,8 @@ void TstPipRun::runsPipWithTargetAndRequirements()
     QTemporaryDir d;
     PathManager paths(d.filePath("data"));
     PipInstaller pip(&paths);
-    pip.setPythonPath(fakePython(d, "exit 0"));
-    QCOMPARE(pip.pythonPath(), d.filePath("fakepython"));
+    pip.setPythonPath(fakePython(d, ""));
+    QCOMPARE(pip.pythonPath(), d.filePath("fakepython.exe"));
     QDir().mkpath(d.filePath("game"));
     QFile req(d.filePath("game/requirements.txt"));
     req.open(QIODevice::WriteOnly);
@@ -58,7 +55,7 @@ void TstPipRun::nonZeroExitIsReportedWithLastLine()
     QTemporaryDir d;
     PathManager paths(d.filePath("data"));
     PipInstaller pip(&paths);
-    pip.setPythonPath(fakePython(d, "echo 'No matching distribution'; exit 1"));
+    pip.setPythonPath(fakePython(d, "No matching distribution", 1));
     QSignalSpy bad(&pip, &PipInstaller::failed);
     pip.install("g", d.path(), {"nosuchpackage"});
     QTRY_COMPARE_WITH_TIMEOUT(bad.count(), 1, 5000);

@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Box, Drawer, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useGameLibrary } from '@/hooks/useGameLibrary'
 import { useGameDetail } from '@/hooks/useGameDetail'
 import { useSiteSession } from '@/hooks/useSiteSession'
 import LibrarySidebar from './LibrarySidebar'
-import LibraryHeader, { type LibraryView } from './LibraryHeader'
-import BrowseGrid from './BrowseGrid'
-import GameDetailView from './GameDetailView'
+import LibraryHeader from './LibraryHeader'
+import LibraryNav from './LibraryNav'
+import LibraryContent from './LibraryContent'
+import { useLibrarySelection } from './useLibrarySelection'
 
 interface Props {
   slug: string
@@ -27,28 +27,14 @@ export default function GameLibrary({ slug, initialName }: Props) {
   const signedIn = useSiteSession(slug)
   const theme = useTheme()
   const mobile = useMediaQuery(theme.breakpoints.down('md'))
-  const [view, setView] = useState<LibraryView>(
-    initialName ? 'library' : 'browse',
-  )
-  const [selected, setSelected] = useState(initialName ?? null)
-  const [drawer, setDrawer] = useState(false)
-  const detail = useGameDetail(selected)
+  const sel = useLibrarySelection(lib.visible, initialName)
+  const detail = useGameDetail(sel.selected)
 
-  useEffect(() => {
-    if (!selected && view === 'library' && lib.visible[0])
-      setSelected(lib.visible[0].name)
-  }, [selected, view, lib.visible])
-
-  const select = (name: string) => {
-    setSelected(name)
-    setView('library')
-    setDrawer(false)
-  }
   const sidebar = (
     <LibrarySidebar
       games={lib.visible}
-      selected={selected}
-      onSelect={select}
+      selected={sel.selected}
+      onSelect={sel.select}
       search={lib.search}
       onSearch={lib.setSearch}
       filter={lib.filter}
@@ -62,48 +48,29 @@ export default function GameLibrary({ slug, initialName }: Props) {
   )
   return (
     <Box data-testid="game-library" sx={shellSx}>
-      {!mobile && (
-        <Box
-          sx={{
-            width: 280,
-            flexShrink: 0,
-            bgcolor: '#1b2838',
-            borderRight: '1px solid #2a475e',
-          }}
-        >
-          {sidebar}
-        </Box>
-      )}
-      <Drawer open={drawer} onClose={() => setDrawer(false)}>
-        <Box sx={{ width: 300, height: '100%' }}>{sidebar}</Box>
-      </Drawer>
+      <LibraryNav
+        mobile={mobile}
+        drawer={sel.drawer}
+        onCloseDrawer={() => sel.setDrawer(false)}
+        sidebar={sidebar}
+      />
       <Box sx={{ flex: 1, p: { xs: 1.5, md: 3 }, minWidth: 0 }}>
         <LibraryHeader
           mobile={mobile}
-          view={view}
-          onView={setView}
-          onOpenDrawer={() => setDrawer(true)}
+          view={sel.view}
+          onView={sel.setView}
+          onOpenDrawer={() => sel.setDrawer(true)}
           newHref={signedIn ? `/site/${slug}/games/new` : undefined}
           downloadHref={`/site/${slug}/download`}
         />
         {lib.loading && <Typography>Loading...</Typography>}
-        {view === 'browse' ? (
-          <BrowseGrid games={lib.visible} onSelect={select} />
-        ) : detail ? (
-          <GameDetailView
-            slug={slug}
-            detail={detail}
-            installedVersion={lib.installed[detail.name]}
-            isFav={!!lib.favs[detail.name]}
-            onToggleFav={() => lib.toggleFav(detail.name)}
-            onInstalled={(v) => lib.markInstalled(detail.name, v)}
-            onUninstall={() => lib.unmark(detail.name)}
-          />
-        ) : (
-          <Typography color="text.secondary">
-            Select a game from the library.
-          </Typography>
-        )}
+        <LibraryContent
+          slug={slug}
+          lib={lib}
+          detail={detail}
+          view={sel.view}
+          onSelect={sel.select}
+        />
       </Box>
     </Box>
   )

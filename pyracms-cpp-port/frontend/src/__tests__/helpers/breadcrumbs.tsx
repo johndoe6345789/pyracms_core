@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { usePathname } from 'next/navigation'
 import { asMockedFunction } from './mockFunction'
-import { SuperAdminBreadcrumbs } from 'pages/SuperAdminBreadcrumbs'
+import { SuperAdminBreadcrumbs } from './pages/SuperAdminBreadcrumbs'
 
 const mockUsePathname = asMockedFunction(usePathname)
 

@@ -1,6 +1,6 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import NotificationBell from '@/components/common/notification'
-import { mapNotificationList } from '@/components/common/notification/notificationApi'
+import { mapNotificationList } from '../../helpers/imports/notificationApi'
 import { makeUser } from '../../helpers/renderWithStore'
 import { renderPlain as renderWithStore } from '../../helpers/plainStore'
 import api from '@/lib/api'

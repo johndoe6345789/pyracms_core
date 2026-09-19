@@ -143,6 +143,9 @@ target_include_directories(hypernucleus_ui_test PUBLIC
     ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/models
     ${CMAKE_SOURCE_DIR}/src/viewmodels)
 
+# Helper the process-launching suites run instead of shell scripts.
+add_executable(fakeexe tools/fakeexe.cpp)
+
 foreach(test_src ${QT_TEST_SOURCES})
     get_filename_component(test_name ${test_src} NAME_WE)
     add_executable(${test_name} ${test_src})
@@ -150,6 +153,9 @@ foreach(test_src ${QT_TEST_SOURCES})
     if(test_name MATCHES "^qtst_Ui")
         target_link_libraries(${test_name} PRIVATE hypernucleus_ui_test)
     endif()
+    add_dependencies(${test_name} fakeexe)
+    target_compile_definitions(${test_name} PRIVATE
+        FAKEEXE_PATH="$<TARGET_FILE:fakeexe>")
     add_test(NAME ${test_name} COMMAND ${test_name})
     # The suites use their own QSettings / data folders, never the user's.
     set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

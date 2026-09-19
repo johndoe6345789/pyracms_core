@@ -7,9 +7,7 @@ export function formatTime(ms: number): string {
 
 export function ExecutionTime({ ms }: { ms: number }) {
   return (
-    <Box
-      sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}
-    >
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
       <TimerOutlined
         sx={{ fontSize: 14, color: '#64748b' }}
         aria-label="Execution time"

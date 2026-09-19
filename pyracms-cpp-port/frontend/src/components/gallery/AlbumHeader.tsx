@@ -1,5 +1,5 @@
 import { Typography, Box, Button } from '@mui/material'
-import { UploadOutlined } from '@mui/icons-material'
+import AlbumUploadButton from './AlbumUploadButton'
 
 interface Props {
   albumName: string
@@ -63,28 +63,7 @@ export default function AlbumHeader({
           </Button>
         )}
         {canUpload && (
-          <Button
-            variant="contained"
-            startIcon={<UploadOutlined />}
-            size="large"
-            component="label"
-            data-testid="upload-picture-btn"
-            aria-label="Upload pictures"
-            disabled={uploading}
-          >
-            {uploading ? 'Uploading...' : 'Upload'}
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              multiple
-              data-testid="upload-file-input"
-              onChange={(e) => {
-                if (e.target.files?.length) onFiles?.(e.target.files)
-                e.target.value = ''
-              }}
-            />
-          </Button>
+          <AlbumUploadButton uploading={uploading} onFiles={onFiles} />
         )}
       </Box>
     </Box>

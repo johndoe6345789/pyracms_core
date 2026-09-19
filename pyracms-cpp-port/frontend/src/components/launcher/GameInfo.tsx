@@ -1,8 +1,9 @@
-import { Box, Typography, Paper, Chip, Button } from '@mui/material'
+import { Box, Typography, Chip, Button } from '@mui/material'
 import Link from 'next/link'
 import BinaryMatrix from '@/components/gamedep/BinaryMatrix'
 import TagChips from '@/components/common/TagChips'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
+import { Section, Screenshots } from './GameInfoParts'
 
 export default function GameInfo({
   detail,
@@ -50,46 +51,8 @@ export default function GameInfo({
         )}
       </Section>
       {detail.screenshots.length > 0 && (
-        <Section title="Screenshots">
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1.5,
-              overflowX: 'auto',
-              scrollSnapType: 'x mandatory',
-              pb: 1,
-            }}
-          >
-            {detail.screenshots.map((s) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={s.id}
-                src={s.src}
-                alt={s.title}
-                height={180}
-                style={{ borderRadius: 4, scrollSnapAlign: 'start' }}
-              />
-            ))}
-          </Box>
-        </Section>
+        <Screenshots shots={detail.screenshots} />
       )}
     </Box>
-  )
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {title}
-      </Typography>
-      {children}
-    </Paper>
   )
 }

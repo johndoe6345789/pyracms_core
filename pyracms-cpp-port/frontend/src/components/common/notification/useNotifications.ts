@@ -7,6 +7,7 @@ import { apiErrorMessage } from '@/lib/apiError'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import type { Notification } from './NotificationList'
 import { mapNotificationList } from './notificationApi'
+import { wsNotification } from './wsNotification'
 
 export function useNotifications() {
   const [items, setItems] = useState<Notification[]>([])
@@ -18,20 +19,7 @@ export function useNotifications() {
     const m = data as Record<string, unknown>
     if (m.type !== 'notification') return
     setUnread((c) => c + 1)
-    setItems((p) =>
-      [
-        {
-          id: m.id as number,
-          type: (m.notificationType as string) || 'system',
-          title: (m.title as string) || '',
-          message: (m.message as string) || '',
-          link: m.link as string | null,
-          is_read: false,
-          created_at: new Date().toISOString(),
-        },
-        ...p,
-      ].slice(0, 20),
-    )
+    setItems((p) => [wsNotification(m), ...p].slice(0, 20))
   }, [])
   useWebSocket({
     url: isAuth ? apiOrigin() + '/api/ws/notifications' : '',

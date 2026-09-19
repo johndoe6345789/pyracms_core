@@ -9,7 +9,7 @@
 #include <quazip/quazipfile.h>
 
 // Builds a zip in memory-free fashion for tests.
-// entries: archive path -> content. Paths ending in ".sh" get mode 0755.
+// entries: archive path -> content. Paths ending in ".sh"/".exe" get mode 0755.
 inline bool buildZip(const QString& zipPath,
                      const QMap<QString, QByteArray>& entries)
 {
@@ -17,7 +17,8 @@ inline bool buildZip(const QString& zipPath,
     if (!zip.open(QuaZip::mdCreate)) return false;
     for (auto it = entries.cbegin(); it != entries.cend(); ++it) {
         QuaZipNewInfo info(it.key());
-        if (it.key().endsWith(".sh")) info.externalAttr = 0100755u << 16;
+        if (it.key().endsWith(".sh") || it.key().endsWith(".exe"))
+            info.externalAttr = 0100755u << 16;
         QuaZipFile out(&zip);
         if (!out.open(QIODevice::WriteOnly, info)) return false;
         out.write(it.value());

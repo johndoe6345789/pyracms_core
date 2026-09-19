@@ -1,14 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Typography, Avatar } from '@mui/material'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store/store'
+import { Box, Avatar } from '@mui/material'
 import type { Comment } from './types'
-import CommentForm from './CommentForm'
+import ReplyBox from './ReplyBox'
 import CommentHeader from './CommentHeader'
-import EditForm from './EditForm'
-import CommentActions from './CommentActions'
+import CommentBodyView from './CommentBodyView'
+import CommentActionsBar from './CommentActionsBar'
 import CommentChildren from './CommentChildren'
 import DeleteCommentDialog from './DeleteCommentDialog'
 import { ErrorAlert } from '../ErrorAlert'
@@ -30,8 +28,6 @@ export default function CommentItem({
 }: Props) {
   const [replying, setReplying] = useState(false)
   const [exp, setExp] = useState(true)
-  const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
-  const usr = useSelector((s: RootState) => s.auth.user)
   const a = useCommentActions(c.id, c.body, onRefresh)
   return (
     <Box sx={{ ml: depth > 0 ? 3 : 0, mt: 2 }}>
@@ -42,40 +38,19 @@ export default function CommentItem({
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentHeader comment={c} />
           <ErrorAlert error={a.error} testId="comment-action-error" />
-          {a.editing ? (
-            <EditForm
-              editText={a.editTxt}
-              setEditText={a.setEditTxt}
-              onSave={a.saveEdit}
-              submitting={a.saving}
-              onCancel={a.cancelEdit}
-            />
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{ mb: 0.5, whiteSpace: 'pre-wrap' }}
-            >
-              {c.body}
-            </Typography>
-          )}
-          <CommentActions
+          <CommentBodyView comment={c} a={a} />
+          <CommentActionsBar
             comment={c}
-            isAuthenticated={isAuth}
-            isOwner={usr?.id === c.userId}
+            a={a}
             depth={depth}
-            onVote={(v) => a.vote(v, isAuth)}
             onReply={() => setReplying(!replying)}
-            onEdit={() => a.setEditing(true)}
-            onDelete={() => a.setDelOpen(true)}
           />
           {replying && (
-            <CommentForm
+            <ReplyBox
               contentType={contentType}
               contentId={contentId}
               parentId={c.id}
-              placeholder="Write a reply..."
-              submitLabel="Reply"
-              onSubmitted={() => {
+              onDone={() => {
                 setReplying(false)
                 onRefresh()
               }}

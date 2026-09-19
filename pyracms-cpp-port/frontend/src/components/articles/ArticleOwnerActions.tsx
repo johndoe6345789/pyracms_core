@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Alert, Box, Button, Chip } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import type { Article } from '@/hooks/useArticle'
 import ArticleSchedule from './ArticleSchedule'
+import ArticleStatusRow from './ArticleStatusRow'
 import ArticleDeleteDialog from './ArticleDeleteDialog'
 import { useArticleAdmin } from '@/hooks/useArticleAdmin'
 
@@ -19,52 +20,13 @@ interface Props {
 export default function ArticleOwnerActions(p: Props) {
   const a = useArticleAdmin(p.name, p.tenantId, p.onChanged, p.onDeleted)
   const [confirm, setConfirm] = useState(false)
-  const published = p.article.status === 'published'
   return (
     <Box sx={{ mb: 3 }} data-testid="article-owner-actions">
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 1,
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        <Chip
-          size="small"
-          label={p.article.status ?? 'published'}
-          color={published ? 'success' : 'default'}
-          data-testid="article-status"
-        />
-        {p.article.isPrivate && (
-          <Chip size="small" label="private" data-testid="article-private" />
-        )}
-        <Button
-          size="small"
-          disabled={a.busy}
-          onClick={published ? a.unpublish : a.publish}
-          data-testid="article-publish-btn"
-        >
-          {published ? 'Unpublish' : 'Publish'}
-        </Button>
-        <Button
-          size="small"
-          disabled={a.busy}
-          onClick={a.togglePrivate}
-          data-testid="article-private-btn"
-        >
-          {p.article.isPrivate ? 'Make public' : 'Make private'}
-        </Button>
-        <Button
-          size="small"
-          color="error"
-          disabled={a.busy}
-          onClick={() => setConfirm(true)}
-          data-testid="article-delete-btn"
-        >
-          Delete
-        </Button>
-      </Box>
+      <ArticleStatusRow
+        article={p.article}
+        a={a}
+        onDelete={() => setConfirm(true)}
+      />
       <ArticleSchedule
         status={p.article.status ?? 'published'}
         busy={a.busy}

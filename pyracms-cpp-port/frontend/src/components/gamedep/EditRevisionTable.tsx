@@ -9,10 +9,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Switch,
-  IconButton,
 } from '@mui/material'
-import { AddOutlined, DeleteOutlined } from '@mui/icons-material'
+import { AddOutlined } from '@mui/icons-material'
+import RevisionRow from './RevisionRow'
 import type { Revision } from '@/hooks/useGameDepDetail'
 
 interface EditRevisionTableProps {
@@ -58,27 +57,11 @@ export default function EditRevisionTable({
           </TableHead>
           <TableBody>
             {revisions.map((rev) => (
-              <TableRow key={rev.version}>
-                <TableCell>
-                  <Typography variant="body2" fontWeight={600}>
-                    {rev.version}
-                  </Typography>
-                </TableCell>
-                <TableCell>{new Date(rev.date).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <Switch defaultChecked={rev.published} size="small" />
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    color="error"
-                    aria-label={`Delete ${rev.version}`}
-                    onClick={() => onDeleteRevision?.(rev.version)}
-                  >
-                    <DeleteOutlined fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+              <RevisionRow
+                key={rev.version}
+                rev={rev}
+                onDelete={onDeleteRevision}
+              />
             ))}
           </TableBody>
         </Table>

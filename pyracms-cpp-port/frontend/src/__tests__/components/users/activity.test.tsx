@@ -3,8 +3,6 @@ import { ActivityItem } from '@/components/users/ActivityItem'
 import { ActivityTimeline } from '@/components/users/ActivityTimeline'
 import { ActivityFilter } from '@/components/users/ActivityFilter'
 import { getTypeIcon } from '@/components/users/activityIcons'
-import { AchievementCard } from '@/components/users/AchievementCard'
-import { ico } from '@/components/users/achievementIcons'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -54,29 +52,5 @@ describe('activity', () => {
     fireEvent.mouseDown(screen.getByRole('combobox'))
     fireEvent.click(screen.getByRole('option', { name: 'Posts' }))
     expect(screen.getByText('No activity found.')).toBeInTheDocument()
-  })
-})
-
-describe('AchievementCard', () => {
-  const a = {
-    id: 1,
-    name: 'n',
-    displayName: 'Nice',
-    description: 'd',
-    icon: 'code',
-    earned: true,
-    earnedAt: '2024-01-02T00:00:00Z',
-  }
-
-  it('shows the earned date only when earned', () => {
-    const { rerender } = render(<AchievementCard a={a} />)
-    expect(screen.getByText('Nice')).toBeInTheDocument()
-    expect(screen.getByTestId('achievement-n').textContent).toMatch(/\d/)
-    rerender(<AchievementCard a={{ ...a, earned: false, icon: 'zzz' }} />)
-    expect(screen.getByTestId('achievement-n').textContent).toBe('Nice')
-  })
-
-  it('has a default icon', () => {
-    expect(ico.default).toBeDefined()
   })
 })

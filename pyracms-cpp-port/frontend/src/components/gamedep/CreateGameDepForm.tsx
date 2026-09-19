@@ -1,14 +1,8 @@
 'use client'
 
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Alert, Box, Button, Container, Typography } from '@mui/material'
 import Link from 'next/link'
+import CreateGameDepFields from './CreateGameDepFields'
 import { useCreateGameDep } from '@/hooks/useCreateGameDep'
 import { GAMEDEP_SECTION } from '@/hooks/useSaveGameDep'
 import type { GameDepType } from '@/hooks/useGameDepItem'
@@ -33,34 +27,7 @@ export default function CreateGameDepForm({ type, slug }: Props) {
             {s.error}
           </Alert>
         )}
-        <TextField
-          fullWidth
-          required
-          margin="normal"
-          label="Name (URL id)"
-          value={s.name}
-          onChange={(e) => s.setName(e.target.value)}
-          helperText="Letters, digits, dot, dash and underscore"
-          inputProps={{ 'data-testid': 'gd-name' }}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Display name"
-          value={s.displayName}
-          onChange={(e) => s.setDisplayName(e.target.value)}
-          inputProps={{ 'data-testid': 'gd-display' }}
-        />
-        <TextField
-          fullWidth
-          multiline
-          minRows={3}
-          margin="normal"
-          label="Description"
-          value={s.description}
-          onChange={(e) => s.setDescription(e.target.value)}
-          inputProps={{ 'data-testid': 'gd-description' }}
-        />
+        <CreateGameDepFields s={s} />
         <Box
           sx={{
             display: 'flex',

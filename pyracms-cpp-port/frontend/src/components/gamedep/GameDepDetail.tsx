@@ -1,9 +1,10 @@
 import { Box, Typography, Button, Divider } from '@mui/material'
 import Link from 'next/link'
-import { EditOutlined, VisibilityOutlined } from '@mui/icons-material'
+import { EditOutlined } from '@mui/icons-material'
 import VoteButtons from '@/components/common/VoteButtons'
 import TagChips from '@/components/common/TagChips'
 import GameDepTabs from './GameDepTabs'
+import GameDepMeta from './GameDepMeta'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
 
 interface GameDepDetailProps {
@@ -44,26 +45,7 @@ export default function GameDepDetail({
           Edit
         </Button>
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 3,
-          mb: 2,
-          color: 'text.secondary',
-        }}
-      >
-        <Typography variant="body2">By {detail.owner}</Typography>
-        <Typography variant="body2">
-          Created {new Date(detail.created).toLocaleDateString()}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <VisibilityOutlined fontSize="small" />
-          <Typography variant="body2">
-            {detail.views.toLocaleString()} views
-          </Typography>
-        </Box>
-      </Box>
+      <GameDepMeta detail={detail} />
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {detail.description}
       </Typography>

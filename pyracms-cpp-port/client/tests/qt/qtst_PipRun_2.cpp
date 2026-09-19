@@ -1,21 +1,18 @@
 #include <QtTest>
 #include <QTemporaryDir>
 
+#include "FakeExe.h"
 #include "services/PathManager.h"
 #include "services/PipInstaller.h"
 
 using namespace Hypernucleus;
 
 // A stand-in interpreter: prints its arguments, then behaves as told.
-static QString fakePython(const QTemporaryDir& d, const QString& body)
+static QString fakePython(const QTemporaryDir& d, const QString& echo,
+                          int exitCode = 0, int sleepSeconds = 0)
 {
-    const QString path = d.filePath("fakepython");
-    QFile f(path);
-    f.open(QIODevice::WriteOnly);
-    f.write("#!/bin/sh\necho \"ARGS: $@\"\n" + body.toUtf8() + "\n");
-    f.close();
-    f.setPermissions(f.permissions() | QFile::ExeOwner);
-    return path;
+    FakeExe::configure(echo, exitCode, sleepSeconds);
+    return FakeExe::install(d.filePath("fakepython.exe"));
 }
 
 class TstPipRun : public QObject {
@@ -31,7 +28,7 @@ void TstPipRun::cancelKillsTheProcess()
     QTemporaryDir d;
     PathManager paths(d.filePath("data"));
     PipInstaller pip(&paths);
-    pip.setPythonPath(fakePython(d, "sleep 30"));
+    pip.setPythonPath(fakePython(d, "", 0, 30));
     QSignalSpy started(&pip, &PipInstaller::started);
     QSignalSpy gone(&pip, &PipInstaller::cancelled);
     pip.install("g", d.path(), {"slow"});
@@ -47,7 +44,7 @@ void TstPipRun::secondCallWhileBusyFails()
     QTemporaryDir d;
     PathManager paths(d.filePath("data"));
     PipInstaller pip(&paths);
-    pip.setPythonPath(fakePython(d, "sleep 30"));
+    pip.setPythonPath(fakePython(d, "", 0, 30));
     pip.install("g", d.path(), {"slow"});
     QSignalSpy bad(&pip, &PipInstaller::failed);
     pip.install("h", d.path(), {"slow"});

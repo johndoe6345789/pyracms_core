@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Box, Button, Typography, Snackbar } from '@mui/material'
 import type { Binary, Revision } from '@/hooks/useGameDepDetail'
-import { deepLink, detectOs, pickBinary } from '@/lib/launcher'
-import { actionState, MSG_WITH_BINARY, MSG_NO_BINARY } from './gameActionState'
+import { actionState } from './gameActionState'
 import PrimaryActionButton from './PrimaryActionButton'
 import VersionSelect from './VersionSelect'
 import GetLauncherLink from './GetLauncherLink'
-import { safeHref } from '@/lib/safeUrl'
+import { useGamePlay } from './useGamePlay'
 
 interface Props {
   slug: string
@@ -22,21 +21,12 @@ interface Props {
 export default function GameActions(p: Props) {
   const st = actionState(p.revisions, p.installedVersion)
   const [version, setVersion] = useState(st.latest)
-  const [msg, setMsg] = useState('')
   const chosen = version || st.latest
-  const bin = pickBinary(p.binaries, detectOs())
-
-  const run = () => {
-    const kind = st.isInstalled && !st.needsUpdate ? 'launch' : 'install'
-    window.location.href = deepLink(kind, p.slug, p.name)
-    const dl = bin && safeHref(bin.url)
-    if (dl)
-      window.setTimeout(() => {
-        window.location.href = dl
-      }, 1500)
-    p.onInstalled(chosen)
-    setMsg(bin ? MSG_WITH_BINARY : MSG_NO_BINARY)
-  }
+  const { run, msg, setMsg } = useGamePlay({
+    ...p,
+    launch: st.isInstalled && !st.needsUpdate,
+    version: chosen,
+  })
 
   return (
     <Box data-testid="game-actions">

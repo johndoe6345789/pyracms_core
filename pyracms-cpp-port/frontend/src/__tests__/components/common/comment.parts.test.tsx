@@ -1,23 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { buildTree } from '@/components/common/comment/types'
-import CommentActions from '@/components/common/comment/CommentActions'
+import { render, screen } from '@testing-library/react'
+import { buildTree, timeAgo } from '@/components/common/comment/types'
 import CommentHeader from '@/components/common/comment/CommentHeader'
-import { timeAgo, type Comment } from '@/components/common/comment/types'
-
-const c: Comment = {
-  id: 1,
-  userId: 1,
-  username: 'bob',
-  contentType: 'a',
-  contentId: 1,
-  body: 'hi',
-  parentId: null,
-  likes: 3,
-  dislikes: 1,
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-  children: [],
-}
+import { c } from '../../helpers/commentPartsFixture'
 
 describe('timeAgo', () => {
   const ago = (ms: number) => timeAgo(new Date(Date.now() - ms).toISOString())
@@ -36,51 +20,6 @@ describe('CommentHeader', () => {
     expect(screen.queryByText('(edited)')).toBeNull()
     rerender(<CommentHeader comment={{ ...c, updatedAt: 'later' }} />)
     expect(screen.getByText('(edited)')).toBeInTheDocument()
-  })
-})
-
-describe('CommentActions', () => {
-  const p = {
-    comment: c,
-    isAuthenticated: true,
-    isOwner: true,
-    depth: 0,
-    onVote: jest.fn(),
-    onReply: jest.fn(),
-    onEdit: jest.fn(),
-    onDelete: jest.fn(),
-  }
-
-  it('fires every action for an owner', () => {
-    render(<CommentActions {...p} />)
-    fireEvent.click(screen.getByTestId('comment-upvote-btn'))
-    fireEvent.click(screen.getByTestId('comment-downvote-btn'))
-    fireEvent.click(screen.getByTestId('comment-reply-btn'))
-    fireEvent.click(screen.getByTestId('comment-edit-btn'))
-    fireEvent.click(screen.getByTestId('comment-delete-btn'))
-    expect(p.onVote).toHaveBeenNthCalledWith(1, true)
-    expect(p.onVote).toHaveBeenNthCalledWith(2, false)
-    expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByTestId('comment-dislikes')).toHaveTextContent('1')
-  })
-
-  it('hides reply/owner controls for guests and deep replies', () => {
-    render(
-      <CommentActions
-        {...p}
-        isAuthenticated={false}
-        isOwner={false}
-        comment={c}
-      />,
-    )
-    expect(screen.queryByTestId('comment-reply-btn')).toBeNull()
-    expect(screen.queryByTestId('comment-edit-btn')).toBeNull()
-    expect(screen.getByTestId('comment-upvote-btn')).toBeDisabled()
-  })
-
-  it('hides reply at max depth', () => {
-    render(<CommentActions {...p} depth={4} />)
-    expect(screen.queryByTestId('comment-reply-btn')).toBeNull()
   })
 })
 

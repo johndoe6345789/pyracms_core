@@ -1,6 +1,7 @@
 #include <QtTest>
 #include <QTemporaryDir>
 
+#include "FakeExe.h"
 #include "MiniHttp.h"
 #include "ZipBuilder.h"
 #include "services/ApiClient.h"
@@ -43,10 +44,11 @@ private slots:
 
 void TstLaunchFlow::nativeNonZeroExitIsLaunchFailure()
 {
+    FakeExe::configure("oops", 3);
     QVERIFY(buildZip(m_dir.filePath("n.zip"),
-                     {{"bad.sh", "#!/bin/sh\necho oops\nexit 3\n"}}));
+                     {{"bad.exe", FakeExe::bytes()}}));
     m_http.routes["/n.zip"] = readAll(m_dir.filePath("n.zip"));
-    install("bad", "/n.zip", true, "bad.sh");
+    install("bad", "/n.zip", true, "bad.exe");
     QSignalSpy err(m_games, &GameManager::gameError);
     m_games->launchGame("bad");
     QTRY_COMPARE_WITH_TIMEOUT(err.count(), 1, 5000);
@@ -59,7 +61,7 @@ void TstLaunchFlow::init()
     m_paths = new PathManager(m_dir.filePath("data"));
     m_inst = new ModuleInstaller(&m_api, m_paths);
     m_games = new GameManager(m_paths, m_inst);
-    m_games->setPlatform("linux");
+    m_games->setPlatform(FakeExe::hostOs());
 }
 
 void TstLaunchFlow::cleanup()

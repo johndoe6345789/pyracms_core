@@ -1,6 +1,7 @@
 #include <QtTest>
 #include <QTemporaryDir>
 
+#include "FakeExe.h"
 #include "MiniHttp.h"
 #include "ZipBuilder.h"
 #include "services/ApiClient.h"
@@ -43,10 +44,11 @@ private slots:
 
 void TstLaunchFlow::runsNativeGameAndCapturesLog()
 {
+    FakeExe::configure("hello-native");
     QVERIFY(buildZip(m_dir.filePath("n.zip"),
-                     {{"nat/nat.sh", "#!/bin/sh\necho hello-native\n"}}));
+                     {{"nat/nat.exe", FakeExe::bytes()}}));
     m_http.routes["/n.zip"] = readAll(m_dir.filePath("n.zip"));
-    install("nat", "/n.zip", true, "nat.sh");
+    install("nat", "/n.zip", true, "nat.exe");
 
     QSignalSpy started(m_games, &GameManager::gameStarted);
     QSignalSpy stopped(m_games, &GameManager::gameStopped);
@@ -64,7 +66,7 @@ void TstLaunchFlow::init()
     m_paths = new PathManager(m_dir.filePath("data"));
     m_inst = new ModuleInstaller(&m_api, m_paths);
     m_games = new GameManager(m_paths, m_inst);
-    m_games->setPlatform("linux");
+    m_games->setPlatform(FakeExe::hostOs());
 }
 
 void TstLaunchFlow::cleanup()

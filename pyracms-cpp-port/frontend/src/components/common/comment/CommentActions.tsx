@@ -5,10 +5,9 @@ import {
   ThumbUpOutlined,
   ThumbDownOutlined,
   ReplyOutlined,
-  EditOutlined,
-  DeleteOutlined,
 } from '@mui/icons-material'
 import type { Comment } from './types'
+import CommentOwnerButtons from './CommentOwnerButtons'
 
 interface Props {
   comment: Comment
@@ -65,24 +64,7 @@ export default function CommentActions(p: Props) {
         </Button>
       )}
       {p.isOwner && (
-        <>
-          <IconButton
-            size="small"
-            onClick={p.onEdit}
-            aria-label="Edit comment"
-            data-testid="comment-edit-btn"
-          >
-            <EditOutlined fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={p.onDelete}
-            aria-label="Delete comment"
-            data-testid="comment-delete-btn"
-          >
-            <DeleteOutlined fontSize="small" />
-          </IconButton>
-        </>
+        <CommentOwnerButtons onEdit={p.onEdit} onDelete={p.onDelete} />
       )}
     </Box>
   )

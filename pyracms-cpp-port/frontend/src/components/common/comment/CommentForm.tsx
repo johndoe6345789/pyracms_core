@@ -1,11 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Box, TextField } from '@mui/material'
-import api from '@/lib/api'
-import { apiErrorMessage } from '@/lib/apiError'
 import { ErrorAlert } from '../ErrorAlert'
 import CommentFormButtons from './CommentFormButtons'
+import { useCommentSubmit } from './useCommentSubmit'
 import { MentionAutocomplete } from '../MentionAutocomplete'
 
 interface CommentFormProps {
@@ -32,27 +31,13 @@ export default function CommentForm({
   onSubmitted,
   onCancel,
 }: CommentFormProps) {
-  const [text, setText] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const { text, setText, submitting, error, handleSubmit } = useCommentSubmit(
+    contentType,
+    contentId,
+    parentId,
+    onSubmitted,
+  )
   const ref = useRef<HTMLTextAreaElement>(null)
-
-  const handleSubmit = async () => {
-    if (!text.trim()) return
-    setSubmitting(true)
-    setError('')
-    try {
-      await api.post(`/api/comments/${contentType}/${contentId}`, {
-        body: text,
-        ...(parentId ? { parentId } : {}),
-      })
-      setText('')
-      onSubmitted()
-    } catch (e) {
-      setError(apiErrorMessage(e, 'Could not post comment'))
-    }
-    setSubmitting(false)
-  }
 
   return (
     <Box sx={{ mb: onCancel ? 1 : 3 }}>

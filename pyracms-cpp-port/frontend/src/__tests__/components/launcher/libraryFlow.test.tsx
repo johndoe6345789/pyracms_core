@@ -49,8 +49,10 @@ beforeEach(() => {
   )
 })
 
+const install = 'installs, shows and dismisses the notice, then clears the mark'
+
 describe('GameLibrary install flow', () => {
-  it('installs, shows and dismisses the notice, then clears the mark', async () => {
+  it(install, async () => {
     render(<GameLibrary slug="s" initialName="a" />)
     const primary = await screen.findByTestId('game-actions')
     fireEvent.click(primary.querySelector('button')!)

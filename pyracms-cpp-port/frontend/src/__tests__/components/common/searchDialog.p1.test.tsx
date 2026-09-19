@@ -1,5 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react'
-import SearchDialog from '@/components/common/search/SearchDialog'
+import { render, screen, fireEvent } from '@testing-library/react'
 import SearchResultsList from '@/components/common/search/SearchResultsList'
 
 const push = jest.fn()
@@ -47,44 +46,5 @@ describe('SearchResultsList', () => {
     expect(screen.getByText(/x{80}\.\.\./)).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('search-result-2'))
     expect(onSelect).toHaveBeenCalled()
-  })
-})
-
-describe('SearchDialog', () => {
-  const p = {
-    open: true,
-    query: 'q',
-    results: [],
-    onClose: jest.fn(),
-    onQueryChange: jest.fn(),
-    onSelect: jest.fn(),
-    onSearchPage: jest.fn(),
-  }
-
-  it('reports typing and Enter, focusing on open', () => {
-    jest.useFakeTimers()
-    render(<SearchDialog {...p} />)
-    act(() => {
-      jest.advanceTimersByTime(150)
-    })
-    const input = screen
-      .getByTestId('search-dialog-input')
-      .querySelector('input')!
-    expect(input).toHaveFocus()
-    fireEvent.change(input, { target: { value: 'z' } })
-    fireEvent.keyDown(input, { key: 'Enter' })
-    fireEvent.keyDown(input, { key: 'a' })
-    expect(p.onQueryChange).toHaveBeenCalledWith('z')
-    expect(p.onSearchPage).toHaveBeenCalledTimes(1)
-    jest.useRealTimers()
-  })
-
-  it('ignores Enter without a query', () => {
-    render(<SearchDialog {...p} query="" />)
-    fireEvent.keyDown(
-      screen.getByTestId('search-dialog-input').querySelector('input')!,
-      { key: 'Enter' },
-    )
-    expect(p.onSearchPage).not.toHaveBeenCalled()
   })
 })

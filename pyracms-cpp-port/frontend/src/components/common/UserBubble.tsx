@@ -2,22 +2,13 @@
 
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import {
-  Avatar,
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-} from '@mui/material'
-import { LogoutOutlined } from '@mui/icons-material'
+import { Avatar, IconButton } from '@mui/material'
 import { useParams, usePathname } from 'next/navigation'
 import { useSignOut } from '@/hooks/useSignOut'
 import { hasMinRole, UserRole } from '@/types'
 import type { RootState } from '@/store/store'
 import GuestChip from './GuestChip'
-import UserMenuHeader from './UserMenuHeader'
+import UserBubbleMenu from './UserBubbleMenu'
 import { siteMenuItems, portalMenuItems } from './userMenuItems'
 
 const avatarSx = {
@@ -63,25 +54,13 @@ export default function UserBubble() {
       >
         <Avatar sx={avatarSx}>{init}</Avatar>
       </IconButton>
-      <Menu
-        anchorEl={el}
-        open={Boolean(el)}
+      <UserBubbleMenu
+        anchor={el}
+        user={user}
+        links={links}
         onClose={close}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: { minWidth: 220, mt: 1 } } }}
-      >
-        <UserMenuHeader user={user} />
-        <Divider />
-        {links}
-        <Divider />
-        <MenuItem onClick={doLogout} data-testid="logout-btn">
-          <ListItemIcon>
-            <LogoutOutlined fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Sign Out</ListItemText>
-        </MenuItem>
-      </Menu>
+        onLogout={doLogout}
+      />
     </>
   )
 }

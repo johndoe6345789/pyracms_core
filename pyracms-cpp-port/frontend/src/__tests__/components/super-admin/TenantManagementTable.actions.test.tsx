@@ -3,7 +3,7 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import TenantManagementTable from '@/components/super-admin/TenantManagementTable'
+import { TenantManagementTable } from '../../helpers/imports/tenantTable'
 import {
   mockHookState,
   resetHook,

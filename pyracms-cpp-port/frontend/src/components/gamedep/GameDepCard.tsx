@@ -6,11 +6,7 @@ import {
   Box,
 } from '@mui/material'
 import Link from 'next/link'
-import {
-  ThumbUpOutlined,
-  ThumbDownOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material'
+import GameDepStats from './GameDepStats'
 import TagChips from '@/components/common/TagChips'
 import type { GameDepItem } from '@/hooks/useGameDepList'
 
@@ -50,38 +46,9 @@ export default function GameDepCard({
           <Box sx={{ mb: 2 }}>
             <TagChips tags={item.tags} />
           </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              color: 'text.secondary',
-            }}
-          >
-            <Stat
-              icon={<ThumbUpOutlined fontSize="small" />}
-              value={item.likes}
-            />
-            <Stat
-              icon={<ThumbDownOutlined fontSize="small" />}
-              value={item.dislikes}
-            />
-            <Stat
-              icon={<VisibilityOutlined fontSize="small" />}
-              value={item.views}
-            />
-          </Box>
+          <GameDepStats item={item} />
         </CardContent>
       </CardActionArea>
     </Card>
-  )
-}
-
-function Stat({ icon, value }: { icon: React.ReactNode; value: number }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      {icon}
-      <Typography variant="caption">{value}</Typography>
-    </Box>
   )
 }

@@ -13,6 +13,9 @@ function pick(role: UserRole) {
   )
 }
 
+const noClick =
+  'onChange is not called when dropdown is opened but no option clicked'
+
 describe('RoleSelectCell', () => {
   it('onChange is called with the new UserRole when selection changes', () => {
     const onChange = jest.fn()
@@ -36,7 +39,7 @@ describe('RoleSelectCell', () => {
     expect(onChange).toHaveBeenCalledWith(UserRole.Moderator)
   })
 
-  it('onChange is not called when dropdown is opened but no option clicked', () => {
+  it(noClick, () => {
     const onChange = jest.fn()
     renderCell({ onChange })
     openMenu()

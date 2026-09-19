@@ -39,10 +39,11 @@ void TstSingleInstance::secondInstanceForwardsMessage()
     QSignalSpy got(&primary, &SingleInstance::messageReceived);
 
     SingleInstance second(key);
-    QTimer::singleShot(0, [&]() {
+    std::thread sender([&]() {
         second.sendToPrimary("pyracms://launch/acme/tetris", 3000);
     });
     QTRY_COMPARE_WITH_TIMEOUT(got.count(), 1, 5000);
+    sender.join();
     QCOMPARE(got.at(0).at(0).toString(),
              QString("pyracms://launch/acme/tetris"));
 }

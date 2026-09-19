@@ -1,19 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import FacetSidebar from '@/components/search/FacetSidebar'
-import { SearchResultRow } from '@/components/search/SearchResultRow'
-import { SearchResultTitle } from '@/components/search/SearchResultTitle'
 import { highlightMatch } from '@/components/search/highlightMatch'
 import { TYPE_CONFIG } from '@/components/search/facetConfig'
-
-const result = {
-  type: 'article',
-  id: 1,
-  title: 'Hello',
-  snippet: 'a needle here',
-  url: '/a/1',
-  rank: 1,
-  createdAt: '',
-}
 
 describe('highlightMatch', () => {
   it('wraps matches in mark and escapes regex chars', () => {
@@ -52,37 +40,5 @@ describe('FacetSidebar', () => {
       screen.getByText('Snippets').closest('[role=button]'),
     ).toHaveAttribute('aria-disabled', 'true')
     expect(Object.keys(TYPE_CONFIG)).toHaveLength(4)
-  })
-})
-
-describe('SearchResultRow', () => {
-  it('links and highlights the snippet', () => {
-    render(
-      <SearchResultRow index={0} last={false} query="needle" result={result} />,
-    )
-    expect(screen.getByTestId('search-result-0')).toHaveAttribute(
-      'href',
-      '/a/1',
-    )
-    expect(document.querySelector('mark')).toHaveTextContent('needle')
-  })
-
-  it('falls back for unknown types and empty snippets', () => {
-    render(
-      <SearchResultRow
-        index={1}
-        last
-        query=""
-        result={{ ...result, type: 'other', snippet: '' }}
-      />,
-    )
-    expect(screen.getByText('other')).toBeInTheDocument()
-  })
-})
-
-describe('SearchResultTitle', () => {
-  it('uses a neutral color for unknown types', () => {
-    render(<SearchResultTitle result={{ ...result, type: 'x' }} />)
-    expect(screen.getByText('Hello')).toBeInTheDocument()
   })
 })

@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useActionError } from '@/hooks/useActionError'
-import type { Notification } from '@/components/common/notification'
 import {
   fetchNotifications,
   markNotificationRead,
   markAllNotificationsRead,
   deleteNotification,
 } from '@/components/common/notification/notificationApi'
+
+type Notification = Awaited<ReturnType<typeof fetchNotifications>>[number]
 
 /** State and actions for the full notifications page. */
 export function useNotificationPage(enabled: boolean) {

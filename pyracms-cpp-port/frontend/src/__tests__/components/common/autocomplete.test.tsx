@@ -1,7 +1,8 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import SearchAutocomplete from '@/components/common/SearchAutocomplete'
-import AutocompleteDropdown from '@/components/common/search/AutocompleteDropdown'
+import { AutocompleteDropdown } from '../../helpers/imports/autocompleteDropdown'
 import api from '@/lib/api'
+import { items, input } from '../../helpers/autocompleteFixture'
 
 jest.mock('@/lib/api', () => ({
   __esModule: true,
@@ -9,16 +10,6 @@ jest.mock('@/lib/api', () => ({
 }))
 const get = api.get as jest.Mock
 beforeEach(() => get.mockReset())
-
-const items = [
-  { text: 'A', type: 'article', url: '/a' },
-  { text: 'F', type: 'forum_post', url: '/f' },
-  { text: 'S', type: 'snippet', url: '/s' },
-  { text: 'G', type: 'gamedep', url: '/g' },
-  { text: 'O', type: 'other', url: '/o' },
-]
-const input = () =>
-  screen.getByTestId('search-autocomplete-input').querySelector('input')!
 
 describe('AutocompleteDropdown', () => {
   it('lists results with type icons and selects', () => {
@@ -53,37 +44,5 @@ describe('SearchAutocomplete', () => {
     expect(get.mock.calls[0][0]).toContain('tenant_id=3')
     fireEvent.click(await screen.findByTestId('autocomplete-item-0'))
     expect(onSelect).toHaveBeenCalledWith('/a')
-  })
-
-  it('searches on Enter and closes on blur', async () => {
-    const onSearch = jest.fn()
-    render(<SearchAutocomplete onSearch={onSearch} tenantId={1} />)
-    fireEvent.change(input(), { target: { value: 'q' } })
-    fireEvent.keyDown(input(), { key: 'Enter' })
-    expect(onSearch).toHaveBeenCalledWith('q')
-    fireEvent.focus(input())
-    fireEvent.blur(input())
-  })
-
-  it('handles errors and empty responses', async () => {
-    get
-      .mockRejectedValueOnce(new Error('x'))
-      .mockResolvedValueOnce({ data: null })
-    render(<SearchAutocomplete tenantId={1} />)
-    fireEvent.change(input(), { target: { value: 'ab' } })
-    await waitFor(() => expect(get).toHaveBeenCalledTimes(1))
-    fireEvent.change(input(), { target: { value: 'abc' } })
-    await waitFor(() => expect(get).toHaveBeenCalledTimes(2))
-    expect(screen.queryByTestId('autocomplete-item-0')).toBeNull()
-  })
-
-  it('reopens on focus when results exist', async () => {
-    get.mockResolvedValue({ data: items })
-    render(<SearchAutocomplete tenantId={1} />)
-    fireEvent.change(input(), { target: { value: 'ab' } })
-    await screen.findByTestId('autocomplete-item-0')
-    fireEvent.keyDown(input(), { key: 'Enter' })
-    fireEvent.focus(input())
-    expect(screen.getByTestId('autocomplete-item-1')).toBeInTheDocument()
   })
 })

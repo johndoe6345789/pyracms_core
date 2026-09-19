@@ -1,18 +1,8 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  renderHook,
-  act,
-} from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import ThemeToggle from '@/components/common/ThemeToggle'
 import NotificationBell from '@/components/common/notification'
-import PasswordStrengthBar from '@/components/auth/PasswordStrengthBar'
-import { useCommentActions } from '@/components/common/comment/useCommentActions'
 import { renderPlain } from '../../helpers/plainStore'
 import { setColorMode } from '@/store/slices/uiSlice'
-import api from '@/lib/api'
 
 jest.mock('@/hooks/useWebSocket', () => ({ useWebSocket: jest.fn() }))
 jest.mock('@/lib/api', () => ({
@@ -44,40 +34,5 @@ describe('menus close on Escape', () => {
       key: 'Escape',
     })
     await waitFor(() => expect(screen.queryByText('Notifications')).toBeNull())
-  })
-})
-
-describe('PasswordStrengthBar', () => {
-  it('has no label for a zero-strength password', () => {
-    render(<PasswordStrengthBar password="  " />)
-    expect(screen.getByTestId('password-strength')).toHaveAttribute(
-      'aria-label',
-      'Password strength: none',
-    )
-    expect(screen.queryByTestId('password-strength-label')).toBeNull()
-  })
-})
-
-describe('useCommentActions', () => {
-  it('ignores guest votes and sends like/dislike', async () => {
-    ;(api.post as jest.Mock).mockResolvedValue({})
-    const onRefresh = jest.fn()
-    const { result } = renderHook(() => useCommentActions(3, 'x', onRefresh))
-    await act(async () => {
-      await result.current.vote(true, false)
-    })
-    expect(api.post).not.toHaveBeenCalled()
-    await act(async () => {
-      await result.current.vote(true, true)
-    })
-    expect(api.post).toHaveBeenLastCalledWith('/api/comments/3/vote', {
-      isLike: true,
-    })
-    await act(async () => {
-      await result.current.vote(false, true)
-    })
-    expect(api.post).toHaveBeenLastCalledWith('/api/comments/3/vote', {
-      isLike: false,
-    })
   })
 })

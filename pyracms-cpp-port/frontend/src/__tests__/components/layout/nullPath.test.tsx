@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { renderPlain } from '../../helpers/plainStore'
 import AppDrawer from '@/components/layout/AppDrawer'
 import AppTopBar from '@/components/layout/AppTopBar'
-import SuperAdminBreadcrumbs from '@/components/super-admin/SuperAdminBreadcrumbs'
+import { SuperAdminBreadcrumbs } from '../../helpers/imports/saCrumbs'
 
 jest.mock('next/navigation', () => ({
   usePathname: () => null,

@@ -1,15 +1,8 @@
 'use client'
 
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Box,
-  Typography,
-  CircularProgress,
-} from '@mui/material'
-import { icons, type Notification } from './notificationIcons'
+import { List, Box, Typography, CircularProgress } from '@mui/material'
+import type { Notification } from './notificationIcons'
+import NotificationItem from './NotificationItem'
 
 export type { Notification }
 
@@ -50,34 +43,7 @@ export default function NotificationList({
   return (
     <List dense sx={{ p: 0 }}>
       {ns.map((n) => (
-        <ListItem
-          key={n.id}
-          onClick={() => onMarkRead(n.id)}
-          data-testid={`notification-item-${n.id}`}
-          sx={{
-            cursor: 'pointer',
-            bgcolor: n.is_read ? 'transparent' : 'action.hover',
-            '&:hover': {
-              bgcolor: 'action.selected',
-            },
-          }}
-        >
-          <ListItemIcon sx={{ minWidth: 36 }}>
-            {icons[n.type] || icons.system}
-          </ListItemIcon>
-          <ListItemText
-            primary={n.title}
-            secondary={n.message}
-            primaryTypographyProps={{
-              fontWeight: n.is_read ? 400 : 600,
-              fontSize: 14,
-            }}
-            secondaryTypographyProps={{
-              fontSize: 12,
-              noWrap: true,
-            }}
-          />
-        </ListItem>
+        <NotificationItem key={n.id} n={n} onMarkRead={onMarkRead} />
       ))}
     </List>
   )

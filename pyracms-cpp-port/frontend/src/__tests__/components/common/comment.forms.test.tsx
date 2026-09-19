@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import EditForm from '@/components/common/comment/EditForm'
 import CommentForm from '@/components/common/comment/CommentForm'
-import DeleteCommentDialog from '@/components/common/comment/DeleteCommentDialog'
+import { DeleteCommentDialog } from '../../helpers/imports/DeleteCommentDialog'
 import api from '@/lib/api'
 
 jest.mock('@/lib/api', () => ({

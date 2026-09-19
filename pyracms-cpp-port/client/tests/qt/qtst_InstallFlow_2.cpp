@@ -37,15 +37,15 @@ void TstInstallFlow::installsSingleFileAsExecutable()
     ModuleInstaller inst(&api, &paths);
     http.routes["/bin"] = "#!/bin/sh\necho hi\n";
     QJsonObject t = target("/bin", true);
-    t["executable"] = "run.sh";
+    t["executable"] = "run.exe";
     QSignalSpy ok(&inst, &ModuleInstaller::installComplete);
     inst.install("nat", "1", t, "game");
     QTRY_COMPARE_WITH_TIMEOUT(ok.count(), 1, 5000);
-    const QFileInfo fi(paths.gameDir("nat") + "/run.sh");
+    const QFileInfo fi(paths.gameDir("nat") + "/run.exe");
     QVERIFY(fi.exists());
     QVERIFY(fi.isExecutable());
     QCOMPARE(inst.record("nat").kind, QString("native"));
-    QCOMPARE(inst.record("nat").executable, QString("run.sh"));
+    QCOMPARE(inst.record("nat").executable, QString("run.exe"));
 }
 
 void TstInstallFlow::checksumMismatchInstallsNothing()

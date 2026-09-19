@@ -26,8 +26,10 @@ export function ThreadContent({
 }: Props) {
   const { isAuthenticated, isModerator } = useForumUser()
   const { thread } = t
-  const { live, page, setPage, onTyping, onSubmit } =
-    useThreadContentState(t, threadId)
+  const { live, page, setPage, onTyping, onSubmit } = useThreadContentState(
+    t,
+    threadId,
+  )
   return (
     <>
       <ThreadHeader

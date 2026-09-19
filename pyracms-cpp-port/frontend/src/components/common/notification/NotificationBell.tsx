@@ -5,21 +5,11 @@ import NextLink from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { slugFromPath } from '@/lib/siteSlug'
-import {
-  IconButton,
-  Badge,
-  Popover,
-  Typography,
-  Box,
-  Button,
-  Divider,
-} from '@mui/material'
-import {
-  NotificationsOutlined,
-  MarkEmailReadOutlined,
-} from '@mui/icons-material'
+import { IconButton, Badge, Popover, Box, Button, Divider } from '@mui/material'
+import { NotificationsOutlined } from '@mui/icons-material'
 import { ErrorAlert } from '../ErrorAlert'
 import NotificationList from './NotificationList'
+import NotificationHeader from './NotificationHeader'
 import { useNotifications } from './useNotifications'
 
 export default function NotificationBell() {
@@ -50,37 +40,13 @@ export default function NotificationBell() {
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{
-          paper: {
-            sx: {
-              width: 380,
-              maxHeight: 480,
-            },
-          },
-        }}
+        slotProps={{ paper: { sx: { width: 380, maxHeight: 480 } } }}
       >
-        <Box
-          sx={{
-            p: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h6" fontWeight={700}>
-            {t('title')}
-          </Typography>
-          {unread > 0 && (
-            <Button
-              size="small"
-              startIcon={<MarkEmailReadOutlined />}
-              onClick={markAll}
-              data-testid="mark-all-read-btn"
-            >
-              Mark all read
-            </Button>
-          )}
-        </Box>
+        <NotificationHeader
+          title={t('title')}
+          unread={unread}
+          onMarkAll={markAll}
+        />
         <Divider />
         <ErrorAlert error={error} testId="notification-error" mb={0} />
         <NotificationList

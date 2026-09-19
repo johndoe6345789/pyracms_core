@@ -23,7 +23,7 @@ jest.mock(
   () => require('../../helpers/scopeMocks').tenantMock,
 )
 
-let signedIn = false
+const signedIn = false
 
 jest.mock('@/hooks/useSiteSession', () => ({
   useSiteSession: () => signedIn,

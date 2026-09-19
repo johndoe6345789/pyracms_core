@@ -1,9 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { IconButton } from '@mui/material'
-import { MoreVertOutlined } from '@mui/icons-material'
-import { ThreadActionsMenu } from './ThreadActionsMenu'
+import { ThreadActionsControls } from './ThreadActionsControls'
 import { ThreadActionDialogs } from './ThreadActionDialogs'
 
 interface ThreadActionsProps {
@@ -29,50 +27,22 @@ export function ThreadActions({
   onMove,
   onDelete,
 }: ThreadActionsProps) {
-  const [anchor, setAnchor] = useState<null | HTMLElement>(null)
   const [delOpen, setDelOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
   const [moveTo, setMoveTo] = useState('')
 
   if (!isModerator) return null
 
-  const close = () => setAnchor(null)
-
   return (
     <>
-      <IconButton
-        size="small"
-        onClick={(e) => setAnchor(e.currentTarget)}
-        aria-label="Thread actions"
-        data-testid={`thread-actions-${threadId}`}
-      >
-        <MoreVertOutlined />
-      </IconButton>
-      <ThreadActionsMenu
-        anchorEl={anchor}
-        onClose={close}
+      <ThreadActionsControls
+        threadId={threadId}
         isPinned={isPinned}
         isLocked={isLocked}
-        onPin={() => {
-          onPin?.()
-          close()
-        }}
-        onLock={() => {
-          onLock?.()
-          close()
-        }}
-        onMove={
-          onMove
-            ? () => {
-                close()
-                setMoveOpen(true)
-              }
-            : undefined
-        }
-        onDelete={() => {
-          close()
-          setDelOpen(true)
-        }}
+        onPin={onPin}
+        onLock={onLock}
+        onMove={onMove ? () => setMoveOpen(true) : undefined}
+        onDelete={() => setDelOpen(true)}
       />
       <ThreadActionDialogs
         moveOpen={moveOpen}

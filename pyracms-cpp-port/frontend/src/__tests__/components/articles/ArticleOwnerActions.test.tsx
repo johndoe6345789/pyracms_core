@@ -2,7 +2,6 @@ import { screen, fireEvent, waitFor } from '@testing-library/react'
 import {
   m,
   changed,
-  deleted,
   mount,
   click,
   resetAll,
