@@ -5,7 +5,7 @@ import type { RootState } from '../store'
 
 export const userEndpoints = (builder: ApiBuilder) => ({
   getUsers: builder.query<User[], void>({
-    query: () => '/users',
+    query: () => '/api/users',
     providesTags: (result) =>
       result
         ? [
@@ -15,12 +15,12 @@ export const userEndpoints = (builder: ApiBuilder) => ({
         : [{ type: 'User', id: 'LIST' }],
   }),
   getUserById: builder.query<User, number>({
-    query: (id) => `/users/${id}`,
+    query: (id) => `/api/users/${id}`,
     providesTags: (_result, _error, id) => [{ type: 'User', id }],
   }),
   updateUser: builder.mutation<User, { id: number; data: Partial<User> }>({
     query: ({ id, data }) => ({
-      url: `/users/${id}`,
+      url: `/api/users/${id}`,
       method: 'PUT',
       body: data,
     }),
@@ -33,7 +33,7 @@ export const userEndpoints = (builder: ApiBuilder) => ({
     PasswordChangeReply, { id: number; data: ChangePasswordRequest }
   >({
     query: ({ id, data }) => ({
-      url: `/users/${id}/password`,
+      url: `/api/users/${id}/password`,
       method: 'PUT',
       body: data,
     }),

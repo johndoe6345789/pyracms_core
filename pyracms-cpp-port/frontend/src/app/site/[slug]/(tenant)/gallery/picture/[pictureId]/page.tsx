@@ -10,6 +10,8 @@ import PictureInfo from '@/components/gallery/PictureInfo'
 import GalleryBreadcrumbs
   from '@/components/gallery/GalleryBreadcrumbs'
 import { useGalleryPicture } from '@/hooks/useGalleryPicture'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { useGuardedAction } from '@/components/gallery/useGuardedAction'
 
 export default function PictureViewPage() {
   const params = useParams()
@@ -19,11 +21,11 @@ export default function PictureViewPage() {
   const {
     picture, handleLike, handleDislike, handleSetCover, handleDelete,
   } = useGalleryPicture(pictureId)
+  const { error, guard } = useGuardedAction()
 
   if (!picture) return null
 
   const albumUrl = `/site/${slug}/gallery/${picture.albumId}`
-
   return (
     <Container
       maxWidth="lg"
@@ -60,17 +62,18 @@ export default function PictureViewPage() {
         description={picture.description}
         tags={picture.tags}
       />
+      <ErrorAlert error={error} testId="picture-error" />
       <Divider sx={{ mb: 3 }} />
       <PictureFooter
         likes={picture.likes}
         dislikes={picture.dislikes}
-        onLike={handleLike}
-        onDislike={handleDislike}
-        onSetCover={() => handleSetCover().catch(() => {})}
-        onDelete={() =>
-          handleDelete()
-            .then(() => router.push(albumUrl))
-            .catch(() => {})}
+        onLike={() => guard(handleLike, 'Failed to record vote')}
+        onDislike={() => guard(handleDislike, 'Failed to record vote')}
+        onSetCover={() =>
+          guard(handleSetCover, 'Failed to set cover')}
+        onDelete={() => guard(
+          () => handleDelete().then(() => router.push(albumUrl)),
+          'Failed to delete picture')}
       />
     </Container>
   )

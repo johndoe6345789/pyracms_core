@@ -13,3 +13,7 @@ pyracms.egg-info
 *.p12
 *.pfx
 id_rsa*
+
+# Python bytecode
+__pycache__/
+*.py[cod]

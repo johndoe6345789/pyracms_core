@@ -10,6 +10,7 @@ import MenuItemTable from
   '@/components/admin/MenuItemTable'
 import AddMenuItemCard from
   '@/components/admin/menus/AddMenuItemCard'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import CreateGroupDialog from
   '@/components/admin/menus/CreateGroupDialog'
 
@@ -31,6 +32,7 @@ export default function AdminMenusPage() {
       >
         Manage navigation menus and menu items.
       </Typography>
+      <ErrorAlert error={editor.error} testId="menu-editor-error" />
       <MenuGroupSelect
         menuGroups={editor.menuGroups}
         selectedGroup={editor.selectedGroup}

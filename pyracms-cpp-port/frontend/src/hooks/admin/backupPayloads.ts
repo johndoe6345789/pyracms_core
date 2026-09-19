@@ -1,3 +1,7 @@
+import type { Setting } from './settingsApi'
+import type { MenuGroup } from './menuData'
+import { putSetting } from './settingsApi'
+
 /** Downloads an object as a formatted JSON file. */
 export function downloadJson(data: object, filename: string) {
   const json = JSON.stringify(data, null, 2)
@@ -12,61 +16,54 @@ export function downloadJson(data: object, filename: string) {
   URL.revokeObjectURL(url)
 }
 
-/** Builds the stub settings export payload. */
-export function buildSettingsPayload() {
+/** Builds the settings export payload from real settings. */
+export function buildSettingsPayload(settings: Setting[]) {
+  const data: Record<string, string> = {}
+  for (const s of settings) data[s.key] = s.value
   return {
     exportType: 'settings',
     exportedAt: new Date().toISOString(),
-    data: {
-      site_name: 'PyraCMS',
-      site_description: 'A modern multi-tenant CMS',
-      max_upload_size: '10485760',
-      default_language: 'en',
-      smtp_host: 'smtp.example.com',
-      smtp_port: '587',
-      registration_enabled: 'true',
-    },
+    data,
   }
 }
 
-const item = (
-  name: string,
-  route: string,
-  position: number,
-  permissions = 'public',
-) => ({ name, route, position, permissions })
-
-/** Builds the stub menus export payload. */
-export function buildMenusPayload() {
+/** Builds the menus export payload from real menu groups. */
+export function buildMenusPayload(groups: MenuGroup[]) {
   return {
     exportType: 'menus',
     exportedAt: new Date().toISOString(),
-    data: [
-      {
-        name: 'main',
-        items: [
-          item('Home', '/', 0),
-          item('Articles', '/articles', 1),
-          item('Forum', '/forum', 2, 'authenticated'),
-        ],
-      },
-      {
-        name: 'footer',
-        items: [
-          item('About', '/about', 0),
-          item('Contact', '/contact', 1),
-        ],
-      },
-    ],
+    data: groups.map((g) => ({
+      name: g.name,
+      items: g.items.map(({ name, route, position, permissions }) =>
+        ({ name, route, position, permissions })),
+    })),
   }
 }
 
-/** Parses an import file, returning a success message. */
-export function parseImport(text: string): string {
+export interface ParsedImport {
+  exportType: string
+  data: unknown
+}
+
+/** Parses and validates an import file. */
+export function parseImport(text: string): ParsedImport {
   const parsed = JSON.parse(text)
   if (!parsed || typeof parsed !== 'object'
     || !parsed.exportType || !parsed.data) {
     throw new Error('Invalid format')
   }
-  return `Successfully imported ${parsed.exportType} data.`
+  return parsed
+}
+
+/** Writes imported settings to the tenant; returns the count. */
+export async function applySettings(
+  data: unknown,
+  tenantId: number,
+): Promise<number> {
+  const entries = Object.entries(
+    (data && typeof data === 'object' ? data : {}) as object)
+  for (const [key, value] of entries) {
+    await putSetting(key, String(value), tenantId)
+  }
+  return entries.length
 }

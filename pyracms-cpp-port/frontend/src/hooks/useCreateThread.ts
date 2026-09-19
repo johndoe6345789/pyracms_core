@@ -21,6 +21,10 @@ export function useCreateThread(
       setError('Choose a forum first.')
       return
     }
+    if (!tenantId) {
+      setError('The site is still loading; try again in a moment.')
+      return
+    }
     if (!title.trim() || !content.trim()) {
       setError('Title and content are required')
       return
@@ -32,7 +36,7 @@ export function useCreateThread(
       description: description.trim(),
       content: content.trim(),
       forumId: Number(forumId),
-      tenantId: tenantId ?? 0,
+      tenantId,
     })
       .then(res => {
         const id = res.data?.id

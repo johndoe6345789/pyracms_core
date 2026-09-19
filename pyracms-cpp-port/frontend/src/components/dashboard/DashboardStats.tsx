@@ -3,13 +3,15 @@
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material'
 import { useDashboardStats } from './useDashboardStats'
 
-export default function DashboardStats() {
-  const stats = useDashboardStats()
+export default function DashboardStats(
+  { tenantId }: { tenantId: number | null },
+) {
+  const stats = useDashboardStats(tenantId)
 
   return (
     <Grid container spacing={3} sx={{ mb: 4 }}>
       {stats.map((stat, index) => (
-        <Grid item xs={12} sm={6} md={3} key={index}>
+        <Grid item xs={12} sm={6} md={4} key={index}>
           <Card sx={{
             height: '100%',
             background: `linear-gradient(135deg, ${stat.color}15 0%, `

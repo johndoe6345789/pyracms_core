@@ -65,6 +65,7 @@ it('backup page exports and imports', async () => {
   URL.createObjectURL = jest.fn(() => 'blob:x')
   URL.revokeObjectURL = jest.fn()
   jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation()
+  routeGet({ '/api/menu-groups': [] })
   render(<AdminBackupPage />)
   fireEvent.click(screen.getByRole('button', { name: 'Export Menus' }))
   await screen.findByText(/Menus exported/)

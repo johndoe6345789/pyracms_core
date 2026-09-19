@@ -8,10 +8,13 @@ import {
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
+import { apiErrorMessage } from '@/lib/apiError'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 
 export function FollowButton({ userId }: { userId: number }) {
   const [following, setFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const isAuth = useSelector((s: RootState) => s.auth.isAuthenticated)
   const me = useSelector((s: RootState) => s.auth.user?.id)
 
@@ -34,15 +37,18 @@ export function FollowButton({ userId }: { userId: number }) {
 
   const handleToggle = async () => {
     setLoading(true)
+    setError('')
     try {
       if (following) await api.delete(`/api/users/${userId}/follow`)
       else await api.post(`/api/users/${userId}/follow`)
       setFollowing(!following)
-    } catch { /* ignore */ }
+    } catch (e) {
+      setError(apiErrorMessage(e, 'Could not update follow'))
+    }
     setLoading(false)
   }
 
-  return (
+  return (<>
     <Button
       variant={following ? 'outlined' : 'contained'}
       size="small" onClick={handleToggle} disabled={loading}
@@ -51,5 +57,6 @@ export function FollowButton({ userId }: { userId: number }) {
     >
       {following ? 'Unfollow' : 'Follow'}
     </Button>
-  )
+    <ErrorAlert error={error} testId="follow-error" mb={0} />
+  </>)
 }

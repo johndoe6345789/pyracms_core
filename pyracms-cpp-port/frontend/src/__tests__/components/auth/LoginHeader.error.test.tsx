@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import LoginHeader from '@/components/auth/LoginHeader'
 
 describe('LoginHeader', () => {
-  describe('error alert – absent when error is empty string', () => {
+  describe('error alert - absent when error is empty string', () => {
     it('does not render the error alert', () => {
       render(<LoginHeader error="" />)
       expect(
@@ -22,7 +22,7 @@ describe('LoginHeader', () => {
     })
   })
 
-  describe('error alert – present when error is non-empty', () => {
+  describe('error alert - present when error is non-empty', () => {
     const ERROR_MSG = 'Invalid username or password'
 
     it('renders the error alert with the correct message', () => {

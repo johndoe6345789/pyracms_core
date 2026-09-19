@@ -6,6 +6,7 @@ import {
   FileItem, formatFileSize, mapFileRecord,
 } from './admin/fileData'
 import { useFileUpload } from './admin/useFileUpload'
+import { useActionError } from './useActionError'
 
 export type { FileItem }
 export { formatFileSize }
@@ -22,6 +23,7 @@ export function useFileManager(tenantId: number | null) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] =
     useState<FileItem | null>(null)
+  const del = useActionError()
   const upload = useFileUpload(tenantId, setFiles)
 
   useEffect(() => {
@@ -48,16 +50,18 @@ export function useFileManager(tenantId: number | null) {
     const target = selectedFile
     handleDeleteCancel()
     if (!target) return
+    del.setError('')
     api
       .delete(`/api/files/${target.uuid}`)
       .then(() => {
         setFiles((prev) => prev.filter((f) => f.id !== target.id))
       })
-      .catch(() => {})
+      .catch(del.fail(`Could not delete ${target.name}`))
   }
 
   return {
     files, loading, deleteDialogOpen, selectedFile,
+    error: del.error || upload.uploadError,
     handleDeleteClick, handleDeleteConfirm, handleDeleteCancel,
     ...upload,
   }

@@ -6,7 +6,7 @@ import type {
 export const authEndpoints = (builder: ApiBuilder) => ({
   login: builder.mutation<AuthResponse, LoginRequest>({
     query: (credentials) => ({
-      url: '/auth/login',
+      url: '/api/auth/login',
       method: 'POST',
       body: credentials,
     }),
@@ -14,13 +14,13 @@ export const authEndpoints = (builder: ApiBuilder) => ({
   }),
   register: builder.mutation<AuthResponse, RegisterRequest>({
     query: (data) => ({
-      url: '/auth/register',
+      url: '/api/auth/register',
       method: 'POST',
       body: data,
     }),
   }),
   getMe: builder.query<User, void>({
-    query: () => '/auth/me',
+    query: () => '/api/auth/me',
     providesTags: ['Me'],
   }),
 })

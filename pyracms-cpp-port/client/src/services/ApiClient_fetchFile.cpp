@@ -39,7 +39,8 @@ void ApiClient::fetchFile(const QString& uuid)
 
 void ApiClient::fetchThumbnail(const QString& uuid)
 {
-    auto* reply = m_nam->get(createRequest("/api/thumbnails/" + uuid));
+    auto* reply = m_nam->get(
+        createRequest("/api/files/" + uuid + "/thumbnail"));
 
     connect(reply, &QNetworkReply::finished, this, [this, reply, uuid]() {
         reply->deleteLater();

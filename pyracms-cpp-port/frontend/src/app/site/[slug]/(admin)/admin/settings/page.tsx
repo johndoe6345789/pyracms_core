@@ -8,6 +8,7 @@ import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 import AddSettingForm from
   '@/components/admin/AddSettingForm'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import SettingsTable from
   '@/components/admin/SettingsTable'
 
@@ -17,6 +18,7 @@ export default function AdminSettingsPage() {
   const { tenantId } = useTenantId(slug)
   const {
     settings,
+    error,
     editingId,
     editValue,
     setEditValue,
@@ -47,6 +49,7 @@ export default function AdminSettingsPage() {
         Manage key-value configuration
         settings.
       </Typography>
+      <ErrorAlert error={error} testId="settings-error" />
       <AddSettingForm
         newKey={newKey}
         newValue={newValue}

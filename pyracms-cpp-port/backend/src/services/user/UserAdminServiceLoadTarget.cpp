@@ -2,12 +2,15 @@
 
 namespace pyracms {
 
-void UserAdminService::loadTarget(const DbClientPtr &db, int id, TargetCb cb) {
+void UserAdminService::loadTarget(const DbClientPtr &db, int id, TargetCb cb,
+                                  int actorId) {
     db->execSqlAsync(
         "SELECT COALESCE(u.role, 1) AS role, u.banned, "
         "COALESCE(u.tenant_id, 0) AS tenant_id, "
         "EXISTS (SELECT 1 FROM tenants t WHERE t.id = u.tenant_id "
         "AND t.owner_id = u.id) AS site_owner, "
+        "EXISTS (SELECT 1 FROM tenants t WHERE t.id = u.tenant_id "
+        "AND t.owner_id = $2::int) AS actor_owns, "
         "(u.role = 4 AND NOT EXISTS (SELECT 1 FROM users o "
         "WHERE o.role = 4 AND NOT o.banned AND o.id <> u.id)) AS last_owner "
         "FROM users u WHERE u.id = $1",
@@ -20,12 +23,13 @@ void UserAdminService::loadTarget(const DbClientPtr &db, int id, TargetCb cb) {
             t.tenant = r[0]["tenant_id"].as<int>();
             t.siteOwner = r[0]["site_owner"].as<bool>();
             t.lastPlatformOwner = r[0]["last_owner"].as<bool>();
+            t.actorOwnsTenant = r[0]["actor_owns"].as<bool>();
             cb(t, r[0]["banned"].as<bool>());
         },
         [cb](const drogon::orm::DrogonDbException &) {
             cb(std::nullopt, false);
         },
-        id);
+        id, actorId);
 }
 
 } // namespace pyracms

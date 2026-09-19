@@ -26,8 +26,11 @@ TEST(UserAdminHttp, DemotionTakesEffectOnExistingToken) {
               200);
     EXPECT_EQ(put(path(s.admin, "/role"), J({{"role", 1}}), pa.token).status,
               200);
-    EXPECT_EQ(put(path(victim, "/ban"), ban(false), s.admin.token).status,
-              403);
+    // Denied either way: 401 when the demotion already revoked the old
+    // token (clock second rolled over), 403 when it is still accepted but
+    // the account is no longer an administrator.
+    int st = put(path(victim, "/ban"), ban(false), s.admin.token).status;
+    EXPECT_TRUE(st == 401 || st == 403) << st;
 }
 
 TEST(UserAdminHttp, SiteOwnerProtectedFromNonOwners) {

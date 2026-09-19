@@ -10,6 +10,9 @@ jest.mock('next/navigation', () => require('../../helpers/scopeMocks').navMock)
 jest.mock('@/hooks/useAdminGate', () => ({
   useAdminGate: () => ({ slug: 's', allowed: true, checking: false }),
 }))
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 3, loading: false }),
+}))
 jest.mock('@/components/common/TenantBreadcrumbs', () => () => <i />)
 jest.mock('@/components/common/NotificationBell', () => () => <i />)
 jest.mock('@/components/common/ThemeToggle', () => () => <i />)

@@ -77,6 +77,14 @@ set(TEST_SOURCES
 
     test_menu_tenant_db_2.cpp
 
+    test_owner_admin_content_http.cpp
+
+    test_owner_admin_forum_http.cpp
+
+    test_owner_admin_users_http_1.cpp
+
+    test_owner_admin_users_http_2.cpp
+
     test_owner_scope_forum_http.cpp
 
     test_owner_scope_menu_http.cpp
@@ -172,6 +180,8 @@ set(TEST_SOURCES
     test_user_admin_rules.cpp
 
     test_user_admin_rules_2.cpp
+
+    test_user_admin_rules_3.cpp
 
     test_user_scope_db_1.cpp
 

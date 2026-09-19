@@ -41,16 +41,17 @@ it('TopContentChart loads when tenant given', async () => {
   await waitFor(() => expect(m.get).toHaveBeenCalledTimes(4))
 })
 
-it('TrafficPieChart loads and falls back', async () => {
-  m.get.mockResolvedValue({ data: { traffic: [{ name: 'Forum', count: 2 },
-    { name: 'Zed', value: 1 }] } })
-  const { rerender } = render(<TrafficPieChart tenantId={1} />)
-  await waitFor(() => expect(m.get).toHaveBeenCalled())
-  m.get.mockResolvedValue({ data: {} })
-  rerender(<TrafficPieChart tenantId={2} />)
-  m.get.mockRejectedValue(new Error('x'))
-  rerender(<TrafficPieChart tenantId={3} />)
-  await waitFor(() => expect(m.get.mock.calls.length).toBeGreaterThan(6))
-  rerender(<TrafficPieChart />)
+it('TrafficPieChart counts real content, never /api/analytics', async () => {
+  m.get.mockResolvedValue({ data: [1, 2] })
+  render(<TrafficPieChart tenantId={7} />)
+  await waitFor(() => expect(m.get).toHaveBeenCalledTimes(4))
+  const urls = m.get.mock.calls.map((c) => c[0] as string)
+  expect(urls.some((u) => u.startsWith('/api/analytics?'))).toBe(false)
+  expect(urls).toContain('/api/articles?tenant_id=7')
   expect(screen.getByTestId('traffic-pie-chart')).toBeInTheDocument()
+})
+
+it('TrafficPieChart makes no request without a tenant', () => {
+  render(<TrafficPieChart />)
+  expect(m.get).not.toHaveBeenCalled()
 })

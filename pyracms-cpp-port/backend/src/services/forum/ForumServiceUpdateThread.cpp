@@ -11,7 +11,7 @@ void ForumService::updateThread(const DbClientPtr &db, int id, int userId,
     db->execSqlAsync(
         std::string("UPDATE forum_threads SET name = $2, description = $3 "
                     "WHERE id = $4 AND ") +
-            kOwnerOrMod,
+            kThreadOwnerOrMod,
         [cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Thread not found or not permitted");

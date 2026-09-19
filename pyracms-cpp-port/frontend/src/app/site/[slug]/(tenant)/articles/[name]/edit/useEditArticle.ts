@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useArticleEditor } from '@/hooks/useArticleEditor'
 import api from '@/lib/api'
-import { saveArticle } from './saveArticle'
+import { saveArticle, PartialSaveError } from './saveArticle'
 import {
   buildRevisionSummary, matchRenderer, type ArticleEditSnapshot,
 } from './editSummary'
@@ -65,8 +65,9 @@ export function useEditArticle(
         renderer: editor.renderer, origRenderer,
       })
       router.push(`/site/${slug}/articles/${name}`)
-    } catch {
-      setError('Failed to save article')
+    } catch (e) {
+      setError(e instanceof PartialSaveError
+        ? e.message : 'Failed to save article')
     } finally {
       setSaving(false)
     }

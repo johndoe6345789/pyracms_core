@@ -13,13 +13,13 @@ interface Result {
   text: string; type: string; url: string
 }
 interface Props {
-  tenantId?: number
+  tenantId?: number | null
   onSelect?: (url: string) => void
   onSearch?: (query: string) => void
   placeholder?: string
 }
 export default function SearchAutocomplete({
-  tenantId = 1, onSelect, onSearch,
+  tenantId, onSelect, onSearch,
   placeholder = 'Search...',
 }: Props) {
   const [q, setQ] = useState('')
@@ -30,7 +30,7 @@ export default function SearchAutocomplete({
   const chg = useCallback((v: string) => {
     setQ(v)
     if (tm.current) clearTimeout(tm.current)
-    if (v.length < 2) {
+    if (v.length < 2 || !tenantId) {
       setRes([]); setOpen(false); return }
     tm.current = setTimeout(async () => {
       try {

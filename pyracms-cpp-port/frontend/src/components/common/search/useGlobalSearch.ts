@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import api from '@/lib/api'
+import { useTenantId } from '@/hooks/useTenantId'
 import type { SearchResult } from './searchIcons'
 
 export function useGlobalSearch() {
+  const slug = /^\/site\/([^/]+)/.exec(usePathname() ?? '')?.[1] ?? ''
+  const { tenantId } = useTenantId(slug)
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const [res, setRes] = useState<SearchResult[]>([])
@@ -21,12 +25,12 @@ export function useGlobalSearch() {
     if (!open) { setQ(''); setRes([]) }
   }, [open])
   useEffect(() => {
-    if (q.length < 2) { setRes([]); return }
+    // Search is per site: without a resolved tenant there is nothing to query
+    if (q.length < 2 || !tenantId) { setRes([]); return }
     if (t.current) clearTimeout(t.current)
     t.current = setTimeout(() => {
-      const m = window.location.pathname.match(/\/site\/([^/]+)/)
-      const tp = m ? '&tenant_id=1' : ''
-      const u = '/api/search/autocomplete?q=' + encodeURIComponent(q) + tp
+      const u = '/api/search/autocomplete?q=' + encodeURIComponent(q)
+        + `&tenant_id=${tenantId}`
       api.get(u).then(r => {
         const d = r.data.items || r.data || []
         setRes(d.map((i: Record<string, unknown>) => ({
@@ -38,6 +42,6 @@ export function useGlobalSearch() {
         })))
       }).catch(() => setRes([]))
     }, 300)
-  }, [q])
+  }, [q, tenantId])
   return { open, setOpen, q, setQ, res }
 }

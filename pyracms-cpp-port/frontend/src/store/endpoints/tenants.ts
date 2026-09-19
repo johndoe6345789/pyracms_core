@@ -3,7 +3,7 @@ import type { Tenant, CreateTenantRequest } from '@/types'
 
 export const tenantEndpoints = (builder: ApiBuilder) => ({
   getTenants: builder.query<Tenant[], void>({
-    query: () => '/tenants',
+    query: () => '/api/tenants',
     providesTags: (result) =>
       result
         ? [
@@ -13,12 +13,12 @@ export const tenantEndpoints = (builder: ApiBuilder) => ({
         : [{ type: 'Tenant', id: 'LIST' }],
   }),
   getTenantBySlug: builder.query<Tenant, string>({
-    query: (slug) => `/tenants/${slug}`,
+    query: (slug) => `/api/tenants/${slug}`,
     providesTags: (_result, _error, slug) => [{ type: 'Tenant', id: slug }],
   }),
   createTenant: builder.mutation<Tenant, CreateTenantRequest>({
     query: (data) => ({
-      url: '/tenants',
+      url: '/api/tenants',
       method: 'POST',
       body: data,
     }),

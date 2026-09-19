@@ -52,10 +52,18 @@ it('creates a thread and navigates to it', async () => {
 
 it('falls back to the forum page without an id', async () => {
   mock.post.mockResolvedValue({ data: {} })
-  const { result } = renderHook(() => useCreateThread('2', 's', null))
+  const { result } = renderHook(() => useCreateThread('2', 's', 1))
   fill(result)
   act(() => result.current.handleSubmit())
   await waitFor(() => expect(push).toHaveBeenCalledWith('/site/s/forum/2'))
+})
+
+it('never posts a made-up tenant when the site is unknown', () => {
+  const { result } = renderHook(() => useCreateThread('2', 's', null))
+  fill(result)
+  act(() => result.current.handleSubmit())
+  expect(mock.post).not.toHaveBeenCalled()
+  expect(result.current.error).toMatch(/site/)
 })
 
 it('shows server errors', async () => {

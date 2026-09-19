@@ -9,7 +9,8 @@
 namespace pyracms {
 
 // Credential-like settings (names such as *secret*, *password*, *key*) are
-// shown to site administrators only; everything else is public site config.
+// shown to site administrators and the site's owner only; everything else
+// is public site config.
 inline void withAdminFlag(const drogon::HttpRequestPtr &req, int tenantId,
                           std::function<void(bool)> next) {
     int viewer = viewerIdFor(req, tenantId);
@@ -17,8 +18,11 @@ inline void withAdminFlag(const drogon::HttpRequestPtr &req, int tenantId,
         next(false);
         return;
     }
-    AdminFilter::roleLookup()(viewer, [next](std::optional<int> role) {
-        next(role && *role >= static_cast<int>(UserRole::SiteAdmin));
+    AdminFilter::roleLookup()(viewer, [=](std::optional<int> role) {
+        if (role && *role >= static_cast<int>(UserRole::SiteAdmin))
+            return next(true);
+        // The site's owner keeps the stored role User.
+        AdminFilter::ownerLookup()(viewer, tenantId, next);
     });
 }
 

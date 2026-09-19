@@ -1,4 +1,5 @@
 #include "controllers/FileController.h"
+#include "filters/AdminFilter.h"
 #include "filters/RoleRules.h"
 #include "filters/TenantGuard.h"
 #include "filters/UserVisibility.h"
@@ -32,7 +33,8 @@ void FileController::remove(
 }
 
 // Members see their own uploads; a site admin sees the site's; the
-// platform admin sees everything.
+// platform admin sees everything. A site owner (platform token) names the
+// site with ?tenant_id= to see all of its files.
 void FileController::list(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
@@ -42,28 +44,19 @@ void FileController::list(
     int role = req->attributes()->get<int>("role");
     int tenant = tokenTenantOf(req);
     bool admin = roleAllows(role, UserRole::SiteAdmin);
-    int scopeUser = admin ? 0 : actor;
-    int scopeTenant = (admin && tenant != 0) ? tenant : -1;
-    fileService_.listFiles(
-        drogon::app().getDbClient(), limit, offset, scopeUser, scopeTenant,
-        [callback](const std::vector<FileDto> &files) {
-            Json::Value result(Json::arrayValue);
-            for (const auto &f : files) {
-                Json::Value item;
-                item["id"] = f.id;
-                item["filename"] = f.filename;
-                item["uuid"] = f.uuid;
-                item["mimetype"] = f.mimetype;
-                item["size"] = static_cast<Json::Int64>(f.size);
-                item["sha256"] = f.sha256;
-                item["createdAt"] = f.createdAt;
-                item["isPicture"] = f.isPicture;
-                item["isVideo"] = f.isVideo;
-                item["downloadCount"] = f.downloadCount;
-                result.append(item);
-            }
-            callback(drogon::HttpResponse::newHttpJsonResponse(result));
-        });
+    int named = firstNamedTenant(namedTenants(req));
+    auto run = [=, this](bool owns) {
+        int scopeUser = (admin || owns) ? 0 : actor;
+        int scopeTenant = owns ? named : (admin && tenant != 0) ? tenant : -1;
+        fileService_.listFiles(
+            drogon::app().getDbClient(), limit, offset, scopeUser,
+            scopeTenant, [callback](const std::vector<FileDto> &files) {
+                callback(filesJson(files));
+            });
+    };
+    if (admin || named == 0 || (tenant != 0 && tenant != named))
+        return run(false);
+    AdminFilter::ownerLookup()(actor, named, run);
 }
 
 } // namespace pyracms

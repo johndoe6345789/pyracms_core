@@ -61,13 +61,13 @@ describe('gallery pages', () => {
       '/site/s/gallery/4'))
   })
 
-  it('swallows picture action failures', async () => {
-    h.handleSetCover.mockRejectedValue(new Error('x'))
-    h.handleDelete.mockRejectedValue(new Error('x'))
+  it('shows picture action failures', async () => {
+    h.handleSetCover.mockRejectedValue(
+      { response: { data: { error: 'no cover' } } })
     render(<PicturePage />)
     fireEvent.click(screen.getByTestId('set-cover-btn'))
-    fireEvent.click(screen.getByTestId('delete-picture-btn'))
-    await waitFor(() => expect(h.handleDelete).toHaveBeenCalled())
+    expect(await screen.findByRole('alert'))
+      .toHaveTextContent('no cover')
   })
 
   it('renders nothing before the picture loads', () => {

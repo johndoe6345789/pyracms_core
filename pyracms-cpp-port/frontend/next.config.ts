@@ -16,9 +16,8 @@ const nextConfig: NextConfig = {
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],
   },
-  env: {
-    API_URL: process.env.API_URL || 'http://localhost:8080',
-  },
+  // API_URL is deliberately NOT inlined via `env`: that froze the build-time
+  // value (localhost) into the server bundle. It is read at runtime.
   poweredByHeader: false,
   async headers() {
     const api = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL

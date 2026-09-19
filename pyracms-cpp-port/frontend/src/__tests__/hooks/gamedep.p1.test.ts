@@ -1,9 +1,7 @@
 import { renderHook, act } from '@testing-library/react'
 import { useGameDepList, type GameDepItem } from '@/hooks/useGameDepList'
 import { useGameDepDetail } from '@/hooks/useGameDepDetail'
-import {
-  PLACEHOLDER_DEPS, PLACEHOLDER_DEP_DETAIL,
-} from '@/hooks/data/depPlaceholders'
+import { DEP_DETAIL } from '../helpers/depDetailFixture'
 
 const mk = (n: string, l: number, v: number, d: string, t: string[]) =>
   ({ name: n, displayName: n, description: `about ${n}`, tags: t,
@@ -35,17 +33,10 @@ describe('useGameDepList', () => {
   })
 })
 
-describe('placeholder data', () => {
-  it('exposes deps and detail', () => {
-    expect(PLACEHOLDER_DEPS.length).toBeGreaterThan(0)
-    expect(PLACEHOLDER_DEP_DETAIL.screenshots).toHaveLength(4)
-  })
-})
-
 describe('useGameDepDetail', () => {
   it('tracks the tab', () => {
     const { result } = renderHook(
-      () => useGameDepDetail(PLACEHOLDER_DEP_DETAIL))
+      () => useGameDepDetail(DEP_DETAIL))
     act(() => result.current.setTabIndex(2))
     expect(result.current.tabIndex).toBe(2)
   })

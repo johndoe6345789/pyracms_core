@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
+import { siteOrigin } from '@/lib/siteOrigin'
 
-export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+export default async function robots(): Promise<MetadataRoute.Robots> {
   return {
     rules: {
       userAgent: '*',
@@ -10,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         '/admin', '/super-admin', '/site/*/admin', '/auth/', '/api/',
       ],
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: `${await siteOrigin()}/sitemap.xml`,
   }
 }

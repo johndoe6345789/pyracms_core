@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Setting, putSetting } from './settingsApi'
+import { useActionError } from '../useActionError'
 
 type SetSettings = React.Dispatch<React.SetStateAction<Setting[]>>
 
@@ -18,11 +19,13 @@ export function useSettingAdd(
 ) {
   const [newKey, setNewKey] = useState('')
   const [newValue, setNewValue] = useState('')
+  const { error: addError, setError, fail } = useActionError()
 
   const handleAdd = () => {
     const key = newKey.trim()
     const value = newValue.trim()
     if (!key || !value || !tenantId) return
+    setError('')
     putSetting(key, value, tenantId)
       .then((res) => {
         const fallback =
@@ -32,8 +35,9 @@ export function useSettingAdd(
         setNewKey('')
         setNewValue('')
       })
-      .catch(() => {})
+      .catch(fail('Could not add setting'))
   }
 
-  return { newKey, setNewKey, newValue, setNewValue, handleAdd }
+  return { newKey, setNewKey, newValue, setNewValue, handleAdd,
+    addError }
 }

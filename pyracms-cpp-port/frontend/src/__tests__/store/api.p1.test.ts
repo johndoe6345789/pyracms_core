@@ -30,7 +30,7 @@ const run = async (
 describe('rtk-query api', () => {
   it('sends the bearer token when signed in', async () => {
     const req = await run(() => api.endpoints.getMe.initiate(), true)
-    expect(req.url).toBe('http://api.test/auth/me')
+    expect(req.url).toBe('http://api.test/api/auth/me')
     expect(req.headers.get('Authorization')).toBe('Bearer tok')
     expect(req.headers.get('Content-Type')).toBe('application/json')
   })
@@ -42,23 +42,23 @@ describe('rtk-query api', () => {
 
   it.each([
     ['login', () => api.endpoints.login.initiate(
-      { username: 'a', password: 'b' }), 'POST', '/auth/login'],
+      { username: 'a', password: 'b' }), 'POST', '/api/auth/login'],
     ['register', () => api.endpoints.register.initiate(
       { username: 'a', email: 'e', password: 'p' }), 'POST',
-    '/auth/register'],
+    '/api/auth/register'],
     ['getUserById', () => api.endpoints.getUserById.initiate(4), 'GET',
-      '/users/4'],
+      '/api/users/4'],
     ['updateUser', () => api.endpoints.updateUser.initiate(
-      { id: 4, data: {} }), 'PUT', '/users/4'],
+      { id: 4, data: {} }), 'PUT', '/api/users/4'],
     ['changePassword', () => api.endpoints.changePassword.initiate(
       { id: 4, data: { currentPassword: 'a', newPassword: 'b' } }), 'PUT',
-    '/users/4/password'],
+    '/api/users/4/password'],
     ['getTenants', () => api.endpoints.getTenants.initiate(), 'GET',
-      '/tenants'],
+      '/api/tenants'],
     ['getTenantBySlug', () => api.endpoints.getTenantBySlug.initiate('x'),
-      'GET', '/tenants/x'],
+      'GET', '/api/tenants/x'],
     ['createTenant', () => api.endpoints.createTenant.initiate(
-      { name: 'n', slug: 's' }), 'POST', '/tenants'],
+      { name: 'n', slug: 's' }), 'POST', '/api/tenants'],
   ])('%s hits the right endpoint', async (_n, make, method, path) => {
     const req = await run(() => make())
     expect(req.method).toBe(method)

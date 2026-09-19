@@ -333,14 +333,16 @@ Creates without a row (categories, menu groups, settings, webhooks,
 analytics) still name their tenant, which is inherent. Also fixed: owners can
 now delete any file on their own site (`OwnerFilter`, files).
 
-Remaining owner/admin mismatches (frontend `canAdmin` = role >= Administrator
-OR owner; API answers 403 to an owner with stored role User):
+Owner/admin mismatches (frontend `canAdmin` = role >= Administrator OR
+owner). All but the last are fixed: the owner of the row's own site now gets
+the Administrator-level answer, and only for that site.
 
-| Area | API check | Effect for an owner |
-|---|---|---|
-| `PUT/DELETE /api/users/{id}[/ban,/role]` | actor role (UserAdminRules) | cannot manage members |
-| `GET /api/files` list | role >= 3 sees the site | owner sees only own files |
-| Forum threads/posts, thread flags | author or `users.role >= 2` | owner cannot moderate |
-| Gamedep pages/revisions (GdWithPage) | page owner or role >= 3 | owner cannot edit others' pages |
-| `GET /api/settings` credential-like names | role >= 3 | owner writes but cannot read secrets |
-| Articles (OwnerFilter) | needs `tenant_id` (by-name) | inherent; client must name it |
+| Area | Status |
+|---|---|
+| `PUT/DELETE /api/users/{id}[/ban,/role]` | Fixed. `canAdminister` treats the owner of the target account's tenant (`AdminTarget.actorOwnsTenant`, loaded by `UserAdminService::loadTarget`) as an administrator over that tenant's accounts: may edit/ban/delete and grant roles up to Administrator (3), never Platform Owner; never on self, another site owner, a role-4 account or the last Platform Owner. Other sites' and platform accounts -> 403 (404 for role-3 admins, as before). |
+| `GET /api/users`, `GET /api/users/{id}` | Fixed. A platform-token owner names the site with `?tenant_id=`; when they own it the list is that site's accounts with email/role/banned. Naming a site they do not own falls back to the default scope (nothing of it shown); by-id read of another site's account stays 404. |
+| `GET /api/files` list | Fixed. Owner with `?tenant_id=` of an owned site sees every file of it; otherwise own files only. |
+| Forum threads/posts, thread flags | Fixed. Edit/delete/pin-lock also accept the owner of the site the thread/post lives in (thread -> forum -> category -> tenant). Note: `users.role >= 2` moderators are still not tenant-scoped in these queries (pre-existing, unchanged). |
+| Gamedep pages/revisions (`gdWithPage`) | Fixed. The owner of the page's tenant counts as administrator; scope still comes from token/named tenant, so another site's owner gets 404/403. |
+| `GET /api/settings[/{name}]` credential-like names | Fixed. `withAdminFlag` accepts role >= 3 or ownership of the tenant, matching the write side. |
+| Articles (OwnerFilter) | Accepted. Looked up by name, so the client must send `tenant_id`; inherent. |

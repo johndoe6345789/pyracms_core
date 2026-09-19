@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import api from '@/lib/api'
+import { useActionError } from '../useActionError'
 import {
   MenuItemRow, SetGroups, updateGroupItems,
 } from './menuData'
@@ -17,6 +18,7 @@ export function useMenuItemEdit(
 ) {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editRow, setEditRow] = useState<MenuItemRow | null>(null)
+  const { error: editError, setError, fail } = useActionError()
 
   const handleCancelEdit = () => {
     setEditingId(null)
@@ -31,6 +33,7 @@ export function useMenuItemEdit(
   const handleSaveEdit = () => {
     if (!editRow) return
     const { name, route, position, permissions } = editRow
+    setError('')
     api
       .put(`/api/menus/${editRow.id}`, {
         name, route, position, permissions,
@@ -41,10 +44,11 @@ export function useMenuItemEdit(
             items.map((i) => (i.id === editRow.id ? editRow : i))))
         handleCancelEdit()
       })
-      .catch(() => {})
+      .catch(fail('Could not save menu item'))
   }
 
   const handleDelete = (id: number) => {
+    setError('')
     api
       .delete(`/api/menus/${id}`)
       .then(() => {
@@ -52,11 +56,11 @@ export function useMenuItemEdit(
           updateGroupItems(prev, selectedGroup, (items) =>
             items.filter((i) => i.id !== id)))
       })
-      .catch(() => {})
+      .catch(fail('Could not delete menu item'))
   }
 
   return {
     editingId, editRow, setEditRow, handleCancelEdit,
-    handleStartEdit, handleSaveEdit, handleDelete,
+    handleStartEdit, handleSaveEdit, handleDelete, editError,
   }
 }

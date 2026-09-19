@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Alert,
   Box,
   Container,
   Grid,
@@ -30,11 +31,18 @@ export default function SearchPage() {
 
         <Box sx={{ mb: 4, maxWidth: 600 }} data-testid="search-box">
           <SearchAutocomplete
+            tenantId={Number(search.tenantId) || null}
             onSearch={search.handleSearch}
             onSelect={(url) => search.router.push(url)}
             placeholder="Search everything..."
           />
         </Box>
+
+        {!search.tenantId && (
+          <Alert severity="info" sx={{ mb: 3 }} data-testid="search-no-site">
+            Search works per site: open it from a site, or add ?site=slug.
+          </Alert>
+        )}
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>

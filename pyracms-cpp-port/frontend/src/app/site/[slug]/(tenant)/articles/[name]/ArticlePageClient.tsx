@@ -13,6 +13,7 @@ import {
 import {
   ArticleVoteButtons,
 } from '@/components/articles/ArticleVoteButtons'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import PageTransition from '@/components/common/PageTransition'
 import ArticleHeader from './ArticleHeader'
 
@@ -21,7 +22,8 @@ export default function ArticlePageClient() {
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
-  const { article, handleVote, refresh } = useArticle(name, tenantId)
+  const { article, voteError, handleVote, refresh } =
+    useArticle(name, tenantId)
   const signedIn = useSiteSession(slug)
   const router = useRouter()
 
@@ -53,6 +55,7 @@ export default function ArticlePageClient() {
           </section>
           <Divider sx={{ mb: 3 }} />
           <section aria-label="Article voting">
+            <ErrorAlert error={voteError} testId="article-vote-error" />
             <ArticleVoteButtons
               likes={article.likes}
               dislikes={article.dislikes}

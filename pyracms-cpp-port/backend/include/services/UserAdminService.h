@@ -19,8 +19,10 @@ class UserAdminService {
     using BoolCb = std::function<void(bool ok, const std::string &error)>;
 
     // Role, tenant, site-owner and last-platform-owner facts of one
-    // account; nullopt when it does not exist.
-    void loadTarget(const DbClientPtr &db, int id, TargetCb cb);
+    // account (and whether `actorId` owns its tenant); nullopt when it
+    // does not exist.
+    void loadTarget(const DbClientPtr &db, int id, TargetCb cb,
+                    int actorId = 0);
 
     // Both stamp token_valid_after, ending the account's old sessions.
     void setBanned(const DbClientPtr &db, int id, bool banned, BoolCb cb);

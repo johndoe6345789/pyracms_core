@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import api from '@/lib/api'
 import { FileItem, fileFromUpload } from './fileData'
+import { useActionError } from '../useActionError'
 
 type SetFiles = React.Dispatch<React.SetStateAction<FileItem[]>>
 
@@ -16,10 +17,12 @@ export function useFileUpload(
   setFiles: SetFiles,
 ) {
   const [dragOver, setDragOver] = useState(false)
+  const { error: uploadError, setError, fail } = useActionError()
 
   const uploadFiles = useCallback(
     (fileList: FileList) => {
       if (!tenantId) return
+      setError('')
       Array.from(fileList).forEach((file) => {
         const formData = new FormData()
         formData.append('file', file)
@@ -32,10 +35,10 @@ export function useFileUpload(
             const item = fileFromUpload(res.data, file)
             setFiles((prev) => [...prev, item])
           })
-          .catch(() => {})
+          .catch(fail(`Could not upload ${file.name}`))
       })
     },
-    [tenantId, setFiles],
+    [tenantId, setFiles, setError, fail],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -60,6 +63,6 @@ export function useFileUpload(
 
   return {
     dragOver, handleDragOver, handleDragLeave, handleDrop,
-    uploadFiles,
+    uploadFiles, uploadError,
   }
 }

@@ -9,7 +9,7 @@ void ForumService::deletePost(const DbClientPtr &db, int postId, int userId,
     // Get thread_id before deleting (also checks permission)
     db->execSqlAsync(
         std::string("SELECT thread_id FROM forum_posts WHERE id = $2 AND ") +
-            kOwnerOrMod,
+            kPostOwnerOrMod,
         [db, postId, cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(false, "Post not found or not permitted");

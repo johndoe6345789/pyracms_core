@@ -21,16 +21,6 @@ export const DEFAULT_DATA: TrafficEntry[] = [
 
 type Obj = Record<string, unknown>
 
-export function mapTraffic(
-  traffic: Obj[],
-): TrafficEntry[] {
-  return traffic.map((t) => ({
-    name: t.name as string,
-    value: (t.value || t.count) as number,
-    color: C[t.name as keyof typeof C] ?? C.Other,
-  }))
-}
-
 function countPosts(cats: Obj[]): number {
   return cats.reduce(
     (sum: number, c: Obj) =>

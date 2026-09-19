@@ -10,11 +10,12 @@ import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
 import TenantTableRow from './TenantTableRow'
 import TenantDeleteDialog from './TenantDeleteDialog'
 import TenantFilter from './TenantFilter'
+import { ErrorAlert } from '../common/ErrorAlert'
 
 export default function TenantManagementTable() {
   const {
     tenants, loading, confirmDeleteId,
-    handleDelete, confirmDelete, cancelDelete,
+    handleDelete, confirmDelete, cancelDelete, deleteError,
   } = useSuperAdminTenants()
 
   const [filter, setFilter] = useState('')
@@ -34,6 +35,7 @@ export default function TenantManagementTable() {
 
   return (
     <>
+      <ErrorAlert error={deleteError} testId="tenant-delete-error" />
       <TenantFilter value={filter} onChange={setFilter} />
       <TableContainer
         component={Paper}

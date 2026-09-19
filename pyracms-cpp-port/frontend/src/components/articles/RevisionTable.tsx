@@ -10,6 +10,7 @@ import {
   Paper,
 } from '@mui/material'
 import type { Revision } from '@/hooks/useRevisions'
+import { ErrorAlert } from '../common/ErrorAlert'
 import { RevisionViewDialog } from './RevisionViewDialog'
 import { RevertConfirmDialog } from './RevertConfirmDialog'
 import { RevisionRow } from './RevisionRow'
@@ -36,6 +37,7 @@ export function RevisionTable({
 
   return (
     <>
+      <ErrorAlert error={d.error} testId="revision-error" />
       <TableContainer component={Paper} variant="outlined">
         <Table data-testid="revision-table">
           <TableHead>

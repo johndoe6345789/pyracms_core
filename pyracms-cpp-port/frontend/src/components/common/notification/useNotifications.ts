@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
+import { apiErrorMessage } from '@/lib/apiError'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import type { Notification }
   from './NotificationList'
@@ -12,6 +13,7 @@ export function useNotifications() {
     useState<Notification[]>([])
   const [unread, setUnread] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const isAuth = useSelector(
     (s: RootState) => s.auth.isAuthenticated)
   const onWs = useCallback(
@@ -43,33 +45,36 @@ export function useNotifications() {
   const fetchList = async () => {
     setLoading(true)
     try {
-      const r = await api.get(
-        '/api/notifications?limit=20')
+      const r = await api.get('/api/notifications?limit=20')
       setItems(r.data.notifications || [])
     } catch { /* ignore */ }
     setLoading(false)
   }
   const markAll = async () => {
+    setError('')
     try {
-      await api.put(
-        '/api/notifications/read-all')
+      await api.put('/api/notifications/read-all')
       setItems((p) => p.map(
         (n) => ({ ...n, is_read: true })))
       setUnread(0)
-    } catch { /* ignore */ }
+    } catch (e) {
+      setError(apiErrorMessage(e, 'Could not mark all read'))
+    }
   }
   const markOne = async (id: number) => {
+    setError('')
     try {
-      await api.put(
-        `/api/notifications/${id}/read`)
+      await api.put(`/api/notifications/${id}/read`)
       setItems((p) => p.map((n) =>
         n.id === id
           ? { ...n, is_read: true } : n))
       setUnread((c) => Math.max(0, c - 1))
-    } catch { /* ignore */ }
+    } catch (e) {
+      setError(apiErrorMessage(e, 'Could not mark as read'))
+    }
   }
   return {
-    items, unread, loading, isAuth,
+    items, unread, loading, isAuth, error,
     fetchList, markAll, markOne,
   }
 }

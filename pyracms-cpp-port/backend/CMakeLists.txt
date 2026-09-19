@@ -143,6 +143,8 @@ set(LIB_SOURCES
 
     src/controllers/file/FileControllerHelpers.cpp
 
+    src/controllers/file/FileControllerJson.cpp
+
     src/controllers/file/FileControllerManage.cpp
 
     src/controllers/file/FileControllerUpload.cpp

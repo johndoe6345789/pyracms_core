@@ -30,7 +30,7 @@ describe('bbcode', () => {
 
 describe('other helpers', () => {
   it('escapes JSON-LD', () => {
-    const s = jsonLdString({ a: '</script><script>x</script>& ' })
+    const s = jsonLdString({ a: '</script><script>x</script>&\u2028' })
     expect(s).not.toContain('<')
     expect(JSON.parse(s).a).toContain('</script>')
   })

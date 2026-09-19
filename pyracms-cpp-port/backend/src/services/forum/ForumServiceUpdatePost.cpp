@@ -10,7 +10,7 @@ void ForumService::updatePost(const DbClientPtr &db, int postId, int userId,
     db->execSqlAsync(
         std::string("UPDATE forum_posts SET title = $2, content = $3 "
                     "WHERE id = $4 AND ") +
-            kOwnerOrMod,
+            kPostOwnerOrMod,
         [cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Post not found or not permitted");

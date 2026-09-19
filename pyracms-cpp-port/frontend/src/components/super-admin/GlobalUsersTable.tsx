@@ -10,9 +10,10 @@ import {
   useSuperAdminUsers,
 } from '@/hooks/useSuperAdminUsers'
 import GlobalUserRowView from './GlobalUserRowView'
+import { ErrorAlert } from '../common/ErrorAlert'
 
 export default function GlobalUsersTable() {
-  const { users, loading, updateRole } =
+  const { users, loading, error, updateRole } =
     useSuperAdminUsers()
 
   if (loading) {
@@ -23,7 +24,8 @@ export default function GlobalUsersTable() {
     )
   }
 
-  return (
+  return (<>
+    <ErrorAlert error={error} testId="global-users-error" />
     <TableContainer
       component={Paper}
       variant="outlined"
@@ -56,5 +58,5 @@ export default function GlobalUsersTable() {
         </TableBody>
       </Table>
     </TableContainer>
-  )
+  </>)
 }

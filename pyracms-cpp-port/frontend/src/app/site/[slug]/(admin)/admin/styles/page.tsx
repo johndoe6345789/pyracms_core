@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Container, Typography, Grid } from '@mui/material'
+import { Alert, Container, Typography, Grid } from '@mui/material'
 import ThemeActions from '@/components/admin/styles/ThemeActions'
 import ThemeControls from '@/components/admin/styles/ThemeControls'
 import ThemePreview from '@/components/admin/styles/ThemePreview'
@@ -32,9 +32,13 @@ export default function StyleEditorPage() {
       >
         Customize your site theme and appearance.
       </Typography>
+      <Alert severity="info" sx={{ mb: 3 }}>
+        Saving themes is not available yet: the backend has no
+        theme route. Changes here are a local preview; use Export
+        JSON to keep them.
+      </Alert>
       <ThemeActions
         onReset={() => setTheme(DEFAULT_THEME)}
-        onSave={() => console.log('Saving theme:', theme)}
         onExport={() => exportTheme(theme)}
         onImport={() => importTheme(setTheme)}
       />

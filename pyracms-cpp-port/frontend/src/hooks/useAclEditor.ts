@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { useActionError } from './useActionError'
 
 export interface AclRule {
   id: number
@@ -10,8 +11,7 @@ export interface AclRule {
   permission: string
 }
 
-const url = (t: number) =>
-  `/api/settings/acl_rules?tenant_id=${t}`
+const url = (t: number) => `/api/settings/acl_rules?tenant_id=${t}`
 
 function parseRules(value: string | undefined): AclRule[] {
   try {
@@ -24,10 +24,10 @@ function parseRules(value: string | undefined): AclRule[] {
 export function useAclEditor(tenantId: number | null) {
   const [rules, setRules] = useState<AclRule[]>([])
   const [loading, setLoading] = useState(true)
-  const [newAction, setNewAction] =
-    useState<'Allow' | 'Deny'>('Allow')
+  const [newAction, setNewAction] = useState<'Allow' | 'Deny'>('Allow')
   const [newPrincipal, setNewPrincipal] = useState('')
   const [newPermission, setNewPermission] = useState('')
+  const { error, setError, fail } = useActionError()
 
   useEffect(() => {
     if (!tenantId) return
@@ -40,10 +40,12 @@ export function useAclEditor(tenantId: number | null) {
 
   const saveRules = (updated: AclRule[]) => {
     if (!tenantId) return
+    setError('')
     api.put(url(tenantId), {
       name: 'acl_rules',
       value: JSON.stringify(updated),
-    }).catch(() => {})
+      tenantId,
+    }).catch(fail('Could not save ACL rules'))
   }
 
   const handleAdd = () => {
@@ -69,7 +71,7 @@ export function useAclEditor(tenantId: number | null) {
   }
 
   return {
-    rules, loading,
+    rules, loading, error,
     newAction, setNewAction,
     newPrincipal, setNewPrincipal,
     newPermission, setNewPermission,

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  PeopleOutlined, ArticleOutlined,
-  DashboardOutlined, SettingsOutlined,
+  PeopleOutlined, ArticleOutlined, SettingsOutlined,
 } from '@mui/icons-material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import api from '@/lib/api'
@@ -14,45 +13,36 @@ export interface Stat {
 }
 
 function buildStats(
-  users: string, items: string, tenants: string, settings: string,
+  users: string, items: string, settings: string,
 ): Stat[] {
   return [
     { title: 'Total Users', value: users,
       icon: PeopleOutlined, color: '#667eea' },
     { title: 'Content Items', value: items,
       icon: ArticleOutlined, color: '#f093fb' },
-    { title: 'Tenants', value: tenants,
-      icon: DashboardOutlined, color: '#4facfe' },
     { title: 'Settings', value: settings,
       icon: SettingsOutlined, color: '#43e97b' },
   ]
 }
 
+/** Row count of a list route, or 'N/A' when the request fails. */
 const count = (path: string) =>
-  api.get(path).then((r) => (r.data || []).length).catch(() => 0)
+  api.get(path).then((r) => String((r.data || []).length))
+    .catch(() => 'N/A')
 
-export function useDashboardStats() {
+/** Real per-tenant counts; never shows fabricated zeros. */
+export function useDashboardStats(tenantId: number | null) {
   const [stats, setStats] = useState<Stat[]>(
-    buildStats('...', '...', '...', '...'))
+    buildStats('...', '...', '...'))
 
   useEffect(() => {
+    if (tenantId == null) return
     Promise.all([
       count('/api/users'),
-      api.get('/api/tenants').then((r) => {
-        const tenants = r.data || []
-        return { n: tenants.length, id: tenants[0]?.id }
-      }).catch(() => ({ n: 0, id: null })),
-    ]).then(async ([users, { n, id }]) => {
-      let articles = 0
-      let settings = 0
-      if (id) {
-        articles = await count(`/api/articles?tenant_id=${id}`)
-        settings = await count(`/api/settings?tenant_id=${id}`)
-      }
-      setStats(buildStats(
-        String(users), String(articles), String(n), String(settings)))
-    })
-  }, [])
+      count(`/api/articles?tenant_id=${tenantId}`),
+      count(`/api/settings?tenant_id=${tenantId}`),
+    ]).then(([u, a, s]) => setStats(buildStats(u, a, s)))
+  }, [tenantId])
 
   return stats
 }

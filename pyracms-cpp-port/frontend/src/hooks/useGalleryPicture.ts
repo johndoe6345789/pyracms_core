@@ -46,7 +46,6 @@ export function useGalleryPicture(pictureId: string) {
       .then(() => {
         setPicture(prev => prev ? { ...prev, [key]: prev[key] + 1 } : prev)
       })
-      .catch(() => {})
 
   const handleLike = () => vote(true, 'likes')
   const handleDislike = () => vote(false, 'dislikes')

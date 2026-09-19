@@ -6,7 +6,7 @@ import EditActions from '@/components/gamedep/EditActions'
 import EditCrumbs from '@/components/gamedep/EditCrumbs'
 import GameDepDetail from '@/components/gamedep/GameDepDetail'
 import GameDepTabs from '@/components/gamedep/GameDepTabs'
-import { PLACEHOLDER_DEP_DETAIL } from '@/hooks/data/depDetail'
+import { DEP_DETAIL } from '../../helpers/depDetailFixture'
 
 describe('gamedep forms', () => {
   it('BasicInfoForm reports edits', () => {
@@ -60,7 +60,7 @@ describe('gamedep forms', () => {
 
   it('GameDepDetail renders detail and tab changes', () => {
     const onTab = jest.fn()
-    render(<GameDepDetail detail={PLACEHOLDER_DEP_DETAIL}
+    render(<GameDepDetail detail={DEP_DETAIL}
       editHref="/e" tabIndex={0} onTabChange={onTab}><p>kid</p>
     </GameDepDetail>)
     expect(screen.getByText('kid')).toBeInTheDocument()

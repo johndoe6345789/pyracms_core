@@ -2,7 +2,7 @@ import {
   fetchTopContent, mapArticles,
 } from '@/components/admin/charts/topContentFetcher'
 import {
-  mapTraffic, fetchFallback,
+  fetchFallback,
 } from '@/components/admin/charts/trafficFetcher'
 import { renderLabel } from '@/components/admin/charts/trafficLabel'
 import { m } from '../../helpers/scopeApi'
@@ -33,7 +33,6 @@ it('fetchTopContent maps, rejects non-arrays, falls back', async () => {
 })
 
 it('traffic helpers compute values', async () => {
-  expect(mapTraffic([{ name: 'Zed', value: 3 }])[0]!.color).toBe('#757575')
   expect(renderLabel({ name: 'A', percent: 0.256 })).toBe('A 26%')
   m.get.mockImplementation((url: string) => {
     if (url.includes('forum')) {

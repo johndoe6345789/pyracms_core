@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import api from '@/lib/api'
+import { useActionError } from '../useActionError'
 import {
   MenuGroup, MenuItemRow, SetGroups, updateGroupItems,
 } from './menuData'
@@ -21,6 +22,7 @@ export function useMenuAddItem(
   const [newRoute, setNewRoute] = useState('')
   const [newPosition, setNewPosition] = useState('')
   const [newPermissions, setNewPermissions] = useState('public')
+  const { error: addError, setError, fail } = useActionError()
 
   const handleAddItem = () => {
     const name = newName.trim()
@@ -28,6 +30,7 @@ export function useMenuAddItem(
     if (!name || !route || !currentGroup) return
     const position = parseInt(newPosition, 10) || 0
     const permissions = newPermissions
+    setError('')
     api
       .post(`/api/menu-groups/${currentGroup.id}/items`, {
         name, route, position, permissions,
@@ -44,12 +47,12 @@ export function useMenuAddItem(
         setNewPosition('')
         setNewPermissions('public')
       })
-      .catch(() => {})
+      .catch(fail('Could not add menu item'))
   }
 
   return {
     newName, setNewName, newRoute, setNewRoute,
     newPosition, setNewPosition,
-    newPermissions, setNewPermissions, handleAddItem,
+    newPermissions, setNewPermissions, handleAddItem, addError,
   }
 }

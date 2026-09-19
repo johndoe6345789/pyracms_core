@@ -50,6 +50,7 @@ class FileController : public drogon::HttpController<FileController> {
     static std::string getUploadDir();
     static std::string mimeFor(const std::string &filename);
     static std::string sha256Hex(const std::string &data);
+    static drogon::HttpResponsePtr filesJson(const std::vector<FileDto> &);
 };
 
 } // namespace pyracms

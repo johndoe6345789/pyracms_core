@@ -3,16 +3,20 @@
 import {
   Box, Divider, Snackbar, Alert, Typography,
 } from '@mui/material'
+import { useParams } from 'next/navigation'
 import { useBackupRestore } from '@/hooks/useBackupRestore'
+import { useTenantId } from '@/hooks/useTenantId'
 import ExportButtons from '@/components/admin/ExportButtons'
 import ImportSection from '@/components/admin/ImportSection'
 
 export default function AdminBackupPage() {
+  const slug = useParams().slug as string
+  const { tenantId } = useTenantId(slug)
   const {
     snackbar, fileInputRef,
     handleExportSettings, handleExportMenus,
     handleImportClick, handleFileChange, handleCloseSnackbar,
-  } = useBackupRestore()
+  } = useBackupRestore(tenantId)
 
   return (
     <Box>

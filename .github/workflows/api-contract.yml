@@ -1,0 +1,37 @@
+name: API contract
+
+# Every API call made by the web frontend, the Qt client and the scripts
+# must hit a route the backend controllers actually serve (and with a
+# verb they accept). Run locally:
+#   python pyracms-cpp-port/scripts/check_api_contract.py
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Check client calls against backend routes
+        run: python3 pyracms-cpp-port/scripts/check_api_contract.py
+
+      - name: Test the checker
+        run: |
+          python3 -m pip install pytest
+          cd pyracms-cpp-port/scripts
+          python3 -m pytest tests/test_api_contract.py -q

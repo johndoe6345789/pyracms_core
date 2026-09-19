@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { mapTenantRow, type TenantRow } from './superAdminRows'
+import { useActionError } from './useActionError'
 
 export type { TenantRow }
 
@@ -18,6 +19,7 @@ export function useSuperAdminTenants() {
   const [confirmDeleteId, setConfirmDeleteId] =
     useState<number | null>(null)
   const [createError, setCreateError] = useState<string | null>(null)
+  const { error: deleteError, setError, fail } = useActionError()
 
   useEffect(() => {
     api.get('/api/tenants')
@@ -32,13 +34,14 @@ export function useSuperAdminTenants() {
 
   const confirmDelete = () => {
     if (confirmDeleteId === null) return
+    setError('')
     api.delete(`/api/tenants/${confirmDeleteId}`)
       .then(() => {
         setTenants((prev) =>
           prev.filter((t) => t.id !== confirmDeleteId),
         )
       })
-      .catch(() => {})
+      .catch(fail('Could not delete site'))
       .finally(() => setConfirmDeleteId(null))
   }
 
@@ -68,5 +71,6 @@ export function useSuperAdminTenants() {
     cancelDelete,
     createTenant,
     createError,
+    deleteError,
   }
 }

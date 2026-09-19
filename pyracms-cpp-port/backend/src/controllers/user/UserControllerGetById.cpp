@@ -1,4 +1,5 @@
 #include "controllers/UserController.h"
+#include "filters/AdminFilter.h"
 #include "filters/UserVisibility.h"
 
 namespace pyracms {
@@ -27,24 +28,36 @@ void UserController::getById(
             int raw = static_cast<int>(role.value_or(UserRole::User));
             userService_.findById(
                 db, id, [=](const std::optional<UserDto> &user) {
-                    if (!user || !canViewUser(tenant, raw, user->tenantId)) {
+                    if (!user) {
                         notFound(callback);
                         return;
                     }
-                    Json::Value out;
-                    out["id"] = user->id;
-                    out["username"] = user->username;
-                    out["fullName"] = user->fullName;
-                    out["website"] = user->website;
-                    out["aboutme"] = user->aboutme;
-                    out["createdAt"] = user->createdAt;
-                    if (canSeeEmail(raw, viewerId, tenant, user->id,
-                                    user->tenantId)) {
-                        out["email"] = user->email;
-                        out["timezone"] = user->timezone;
-                        out["banned"] = user->banned;
-                    }
-                    callback(drogon::HttpResponse::newHttpJsonResponse(out));
+                    auto show = [=](bool owner) {
+                        if (!owner &&
+                            !canViewUser(tenant, raw, user->tenantId))
+                            return notFound(callback);
+                        Json::Value out;
+                        out["id"] = user->id;
+                        out["username"] = user->username;
+                        out["fullName"] = user->fullName;
+                        out["website"] = user->website;
+                        out["aboutme"] = user->aboutme;
+                        out["createdAt"] = user->createdAt;
+                        if (owner || canSeeEmail(raw, viewerId, tenant,
+                                                 user->id, user->tenantId)) {
+                            out["email"] = user->email;
+                            out["timezone"] = user->timezone;
+                            out["banned"] = user->banned;
+                        }
+                        callback(
+                            drogon::HttpResponse::newHttpJsonResponse(out));
+                    };
+                    // A site's owner reads its accounts in full.
+                    if (canViewUser(tenant, raw, user->tenantId) ||
+                        user->tenantId == 0)
+                        return show(false);
+                    AdminFilter::ownerLookup()(viewerId, user->tenantId,
+                                               show);
                 });
         });
 }

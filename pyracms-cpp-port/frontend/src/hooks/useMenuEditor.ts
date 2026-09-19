@@ -55,6 +55,7 @@ export function useMenuEditor(tenantId: number | null) {
   return {
     menuGroups, loading, selectedGroup, currentItems,
     handleGroupChange,
+    error: edit.editError || add.addError || create.groupError,
     ...edit, ...add, ...create,
   }
 }

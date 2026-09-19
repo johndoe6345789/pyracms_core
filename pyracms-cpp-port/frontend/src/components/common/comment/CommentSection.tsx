@@ -7,6 +7,8 @@ import { Box, Typography, Divider } from '@mui/material'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store/store'
 import api from '@/lib/api'
+import { apiErrorMessage } from '@/lib/apiError'
+import { ErrorAlert } from '../ErrorAlert'
 import type {
   Comment, CommentSectionProps,
 } from './types'
@@ -21,6 +23,7 @@ export default function CommentSection({
     Comment[]
   >([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const isAuthenticated = useSelector(
     (s: RootState) => s.auth.isAuthenticated
@@ -32,7 +35,10 @@ export default function CommentSection({
         `/api/comments/${contentType}/${contentId}`
       const res = await api.get(url)
       setComments(res.data.comments || [])
-    } catch { /* ignore */ }
+      setError('')
+    } catch (e) {
+      setError(apiErrorMessage(e, 'Could not load comments'))
+    }
     setLoading(false)
   }, [contentType, contentId])
 
@@ -50,6 +56,7 @@ export default function CommentSection({
         Comments
       </Typography>
       <Divider sx={{ mb: 2 }} />
+      <ErrorAlert error={error} testId="comments-error" />
       {isAuthenticated && (
         <CommentForm
           contentType={contentType}

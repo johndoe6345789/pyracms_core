@@ -11,6 +11,8 @@ jest.mock('next/navigation',
 jest.mock('@/lib/api', () => require('../helpers/tenantPagesMocks').apiMock())
 jest.mock('@/components/common/TenantBreadcrumbs',
   () => require('../helpers/tenantPagesMocks').crumbsMock())
+jest.mock('@/hooks/useTenantId',
+  () => ({ useTenantId: () => ({ tenantId: 1, loading: false }) }))
 jest.mock('@/hooks/useTenant',
   () => require('../helpers/tenantPagesMocks').tenantMock())
 

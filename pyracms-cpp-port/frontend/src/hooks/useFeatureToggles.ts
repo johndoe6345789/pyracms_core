@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { useActionError } from './useActionError'
 import {
   Feature, FEATURE_DEFS, featuresFromSettings,
 } from './admin/featureDefs'
@@ -14,6 +15,7 @@ export function useFeatureToggles(tenantId: number | null) {
   )
   const [loading, setLoading] = useState(true)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const { error, setError, fail } = useActionError()
 
   useEffect(() => {
     if (!tenantId) return
@@ -31,20 +33,21 @@ export function useFeatureToggles(tenantId: number | null) {
 
   const handleSave = () => {
     if (!tenantId) return
+    setError('')
     const promises = features.map(f =>
       api.put(
         `/api/settings/feature_${f.id}?tenant_id=${tenantId}`,
-        { name: `feature_${f.id}`, value: String(f.enabled) },
+        { name: `feature_${f.id}`, value: String(f.enabled), tenantId },
       ))
     Promise.all(promises)
       .then(() => setSnackbarOpen(true))
-      .catch(() => {})
+      .catch(fail('Could not save feature toggles'))
   }
 
   const handleCloseSnackbar = () => setSnackbarOpen(false)
 
   return {
-    features, loading, snackbarOpen,
+    features, loading, snackbarOpen, error,
     handleToggle, handleSave, handleCloseSnackbar,
   }
 }

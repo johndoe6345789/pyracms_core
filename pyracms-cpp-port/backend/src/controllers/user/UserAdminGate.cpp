@@ -12,12 +12,17 @@ AdminActor actorOf(const drogon::HttpRequestPtr &req) {
 void withAdminTarget(const drogon::HttpRequestPtr &req, int id, ReplyFn reply,
                      std::function<void(const AdminCtx &)> go) {
     auto actor = actorOf(req);
-    if (!isAdminRole(actor.role) && actor.id != id)
-        return reply(filterError("Administrator role required",
-                                 drogon::k403Forbidden));
+    bool admin = isAdminRole(actor.role) || actor.id == id;
     static UserAdminService svc;
     svc.loadTarget(drogon::app().getDbClient(), id,
                    [=](const std::optional<AdminTarget> &t, bool banned) {
+                       // Neither an admin nor the site's owner: refuse
+                       // without revealing whether the account exists.
+                       if (!admin && !(t && t->actorOwnsTenant)) {
+                           reply(filterError("Administrator role required",
+                                             drogon::k403Forbidden));
+                           return;
+                       }
                        // Foreign accounts look absent (404 from the rules).
                        if (!t) {
                            reply(filterError("User not found",
@@ -25,7 +30,8 @@ void withAdminTarget(const drogon::HttpRequestPtr &req, int id, ReplyFn reply,
                            return;
                        }
                        go({actor, *t, banned});
-                   });
+                   },
+                   actor.id);
 }
 
 void replyVerdict(const AdminVerdict &v, const ReplyFn &reply) {

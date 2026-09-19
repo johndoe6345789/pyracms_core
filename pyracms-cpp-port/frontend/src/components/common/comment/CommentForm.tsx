@@ -3,15 +3,14 @@
 import { useState } from 'react'
 import { Box, TextField, Button } from '@mui/material'
 import api from '@/lib/api'
+import { apiErrorMessage } from '@/lib/apiError'
+import { ErrorAlert } from '../ErrorAlert'
 
 interface CommentFormProps {
-  contentType: string
-  contentId: number
+  contentType: string; contentId: number
   parentId?: number | null
-  placeholder?: string
-  submitLabel?: string
-  onSubmitted: () => void
-  onCancel?: () => void
+  placeholder?: string; submitLabel?: string
+  onSubmitted: () => void; onCancel?: () => void
 }
 
 export default function CommentForm({
@@ -25,21 +24,25 @@ export default function CommentForm({
 }: CommentFormProps) {
   const [text, setText] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async () => {
     if (!text.trim()) return
-    setSubmitting(true)
+    setSubmitting(true); setError('')
     try {
-      const url = `/api/comments/${contentType}/${contentId}`
-      await api.post(url, { content: text, parent_id: parentId })
+      await api.post(`/api/comments/${contentType}/${contentId}`,
+        { content: text, parent_id: parentId })
       setText('')
       onSubmitted()
-    } catch { /* ignore */ }
+    } catch (e) {
+      setError(apiErrorMessage(e, 'Could not post comment'))
+    }
     setSubmitting(false)
   }
 
   return (
     <Box sx={{ mb: onCancel ? 1 : 3 }}>
+      <ErrorAlert error={error} testId="comment-error" />
       <TextField
         fullWidth
         multiline
@@ -50,9 +53,8 @@ export default function CommentForm({
         onChange={(e) => setText(e.target.value)}
         data-testid="comment-input"
       />
-      <Box sx={{
-        display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1,
-      }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end',
+        gap: 1, mt: 1 }}>
         {onCancel && (
           <Button
             size="small"

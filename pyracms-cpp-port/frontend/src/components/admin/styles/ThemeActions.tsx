@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material'
+import { Box, Button, Tooltip } from '@mui/material'
 import {
   SaveOutlined, RestoreOutlined,
   FileUploadOutlined, FileDownloadOutlined,
@@ -6,7 +6,6 @@ import {
 
 interface Props {
   onReset: () => void
-  onSave: () => void
   onExport: () => void
   onImport: () => void
 }
@@ -21,13 +20,17 @@ export default function ThemeActions(p: Props) {
       >
         Reset
       </Button>
-      <Button
-        variant="contained"
-        startIcon={<SaveOutlined />}
-        onClick={p.onSave}
-      >
-        Save
-      </Button>
+      <Tooltip title="Saving themes is not available yet">
+        <span>
+          <Button
+            variant="contained"
+            startIcon={<SaveOutlined />}
+            disabled
+          >
+            Save
+          </Button>
+        </span>
+      </Tooltip>
       <Button
         variant="outlined"
         startIcon={<FileDownloadOutlined />}

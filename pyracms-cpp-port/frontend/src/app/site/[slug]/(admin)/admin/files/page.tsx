@@ -10,6 +10,7 @@ import UploadDropzone from
   '@/components/admin/UploadDropzone'
 import FileGrid from
   '@/components/admin/FileGrid'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import ConfirmDialog from
   '@/components/admin/ConfirmDialog'
 
@@ -19,6 +20,7 @@ export default function AdminFilesPage() {
   const { tenantId } = useTenantId(slug)
   const {
     files,
+    error,
     deleteDialogOpen,
     selectedFile,
     dragOver,
@@ -47,6 +49,7 @@ export default function AdminFilesPage() {
         Upload and manage files across
         the platform.
       </Typography>
+      <ErrorAlert error={error} testId="files-error" />
       <UploadDropzone
         dragOver={dragOver}
         onDragOver={handleDragOver}

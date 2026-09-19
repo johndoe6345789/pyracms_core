@@ -8,6 +8,8 @@ import { PostBody } from './PostBody'
 import { PostCardHeader } from './PostCardHeader'
 import { PostDeleteDialog } from './PostDeleteDialog'
 import type { Post } from '@/hooks/useThread'
+import { apiErrorMessage } from '@/lib/apiError'
+import { ErrorAlert } from '../common/ErrorAlert'
 
 interface PostCardProps {
   post: Post
@@ -24,15 +26,19 @@ export function PostCard({
   const [editing, setEditing] = useState(false)
   const [editContent, setEditContent] = useState(post.content)
   const [confirmDel, setConfirmDel] = useState(false)
+  const [error, setError] = useState('')
+  const fail = (m: string) => (e: unknown) =>
+    setError(apiErrorMessage(e, m))
   const handleSave = () => {
+    setError('')
     onEdit?.(post.id, editContent)
       .then(() => setEditing(false))
-      .catch(() => {})
+      .catch(fail('Could not save post'))
   }
   const handleDelete = () => {
-    onDelete?.(post.id)
-      .then(() => setConfirmDel(false))
-      .catch(() => {})
+    setError('')
+    setConfirmDel(false)
+    onDelete?.(post.id).catch(fail('Could not delete post'))
   }
   const cancelEdit = () => {
     setEditing(false)
@@ -48,6 +54,7 @@ export function PostCard({
         onSave={handleSave} onCancelEdit={cancelEdit}
         onStartEdit={() => setEditing(true)}
         onDelete={() => setConfirmDel(true)} />
+      <ErrorAlert error={error} testId="post-error" />
       {editing ? (
         <TextField fullWidth multiline minRows={3} value={editContent}
           onChange={e => setEditContent(e.target.value)}

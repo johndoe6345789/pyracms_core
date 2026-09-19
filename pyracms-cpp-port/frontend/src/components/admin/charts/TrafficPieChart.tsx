@@ -6,10 +6,9 @@ import {
   PieChart, Pie, Cell, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
-import api from '@/lib/api'
 import {
   TrafficEntry, DEFAULT_DATA,
-  mapTraffic, fetchFallback,
+  fetchFallback,
 } from './trafficFetcher'
 import { renderLabel } from './trafficLabel'
 
@@ -21,20 +20,7 @@ export function TrafficPieChart({ tenantId }: {
 
   useEffect(() => {
     if (!tenantId) return
-    const url =
-      `/api/analytics?tenant_id=${tenantId}`
-    api.get(url)
-      .then((res) => {
-        if (res.data?.traffic) {
-          setData(
-            mapTraffic(res.data.traffic),
-          )
-        }
-      })
-      .catch(() => {
-        fetchFallback(tenantId)
-          .then(setData)
-      })
+    fetchFallback(tenantId).then(setData)
   }, [tenantId])
 
   return (

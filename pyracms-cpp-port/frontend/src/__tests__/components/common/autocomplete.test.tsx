@@ -47,7 +47,7 @@ describe('SearchAutocomplete', () => {
 
   it('searches on Enter and closes on blur', async () => {
     const onSearch = jest.fn()
-    render(<SearchAutocomplete onSearch={onSearch} />)
+    render(<SearchAutocomplete onSearch={onSearch} tenantId={1} />)
     fireEvent.change(input(), { target: { value: 'q' } })
     fireEvent.keyDown(input(), { key: 'Enter' })
     expect(onSearch).toHaveBeenCalledWith('q')
@@ -58,7 +58,7 @@ describe('SearchAutocomplete', () => {
   it('handles errors and empty responses', async () => {
     get.mockRejectedValueOnce(new Error('x'))
       .mockResolvedValueOnce({ data: null })
-    render(<SearchAutocomplete />)
+    render(<SearchAutocomplete tenantId={1} />)
     fireEvent.change(input(), { target: { value: 'ab' } })
     await waitFor(() => expect(get).toHaveBeenCalledTimes(1))
     fireEvent.change(input(), { target: { value: 'abc' } })
@@ -68,7 +68,7 @@ describe('SearchAutocomplete', () => {
 
   it('reopens on focus when results exist', async () => {
     get.mockResolvedValue({ data: items })
-    render(<SearchAutocomplete />)
+    render(<SearchAutocomplete tenantId={1} />)
     fireEvent.change(input(), { target: { value: 'ab' } })
     await screen.findByTestId('autocomplete-item-0')
     fireEvent.keyDown(input(), { key: 'Enter' })

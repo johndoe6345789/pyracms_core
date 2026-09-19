@@ -8,6 +8,7 @@ import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
 import AddAclRuleForm from
   '@/components/admin/AddAclRuleForm'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import AclRuleTable from
   '@/components/admin/AclRuleTable'
 
@@ -17,6 +18,7 @@ export default function AdminAclPage() {
   const { tenantId } = useTenantId(slug)
   const {
     rules,
+    error,
     newAction,
     setNewAction,
     newPrincipal,
@@ -43,6 +45,7 @@ export default function AdminAclPage() {
         Manage access control list rules
         for the platform.
       </Typography>
+      <ErrorAlert error={error} testId="acl-error" />
       <AddAclRuleForm
         newAction={newAction}
         newPrincipal={newPrincipal}

@@ -17,6 +17,8 @@ export function useSearchPage() {
   const siteSlug = searchParams.get('site') ?? ''
   const tenantParam = searchParams.get('tenant_id') ?? ''
   const { tenantId: siteTenantId } = useTenantId(siteSlug)
+  // Search is per site: no fixed default tenant is ever assumed
+  const tenantId = tenantParam || (siteTenantId ? String(siteTenantId) : '')
   const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState<SearchResult[]>([])
   const [totalCount, setTotalCount] = useState(0)
@@ -30,7 +32,7 @@ export function useSearchPage() {
     type: string,
     pg: number,
   ) => {
-    if (!q) {
+    if (!q || !tenantId) {
       setResults([])
       setTotalCount(0)
       setFacets({})
@@ -38,8 +40,6 @@ export function useSearchPage() {
     }
     setLoading(true)
     try {
-      const tenantId = tenantParam
-        || (siteTenantId ? String(siteTenantId) : '1')
       const data = await fetchSearch(q, tenantId, type, pg)
       setResults(data.items)
       setTotalCount(data.totalCount)
@@ -48,7 +48,7 @@ export function useSearchPage() {
       setResults([])
     }
     setLoading(false)
-  }, [siteTenantId, tenantParam])
+  }, [tenantId])
 
   useEffect(() => {
     if (initialQuery) {
@@ -75,6 +75,6 @@ export function useSearchPage() {
 
   return {
     activeType, facets, handleSearch, handleTypeChange, loading,
-    page, query, results, router, setPage, totalCount,
+    page, query, results, router, setPage, tenantId, totalCount,
   }
 }

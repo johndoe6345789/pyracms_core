@@ -9,6 +9,7 @@ import {
   NotificationsOutlined,
   MarkEmailReadOutlined,
 } from '@mui/icons-material'
+import { ErrorAlert } from '../ErrorAlert'
 import NotificationList from './NotificationList'
 import { useNotifications } from './useNotifications'
 
@@ -16,7 +17,7 @@ export default function NotificationBell() {
   const [anchor, setAnchor] =
     useState<null | HTMLElement>(null)
   const {
-    items, unread, loading, isAuth,
+    items, unread, loading, isAuth, error,
     fetchList, markAll, markOne,
   } = useNotifications()
   const open = async (
@@ -55,6 +56,7 @@ export default function NotificationBell() {
           Mark all read</Button>}
       </Box>
       <Divider />
+      <ErrorAlert error={error} testId="notification-error" mb={0} />
       <NotificationList notifications={items}
         loading={loading} isAuthenticated={isAuth}
         onMarkRead={markOne} />

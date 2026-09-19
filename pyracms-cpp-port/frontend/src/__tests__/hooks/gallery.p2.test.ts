@@ -27,14 +27,16 @@ describe('useGalleryPicture', () => {
       { likes: 2, dislikes: 1 })
   })
 
-  it('fills defaults, ignores vote errors, cover and delete', async () => {
+  it('fills defaults, rejects failed votes, cover and delete', async () => {
     m.get!.mockResolvedValue({ data: {} })
     m.post!.mockRejectedValue(new Error('x'))
     m.put!.mockResolvedValue({}); m.delete!.mockResolvedValue({})
     const { result } = renderHook(() => useGalleryPicture('7'))
     await waitFor(() => expect(result.current.picture).not.toBeNull())
     expect(result.current.picture!.src).toContain('fullview')
-    await act(async () => { await result.current.handleLike() })
+    await act(async () => {
+      await expect(result.current.handleLike()).rejects.toThrow('x')
+    })
     expect(result.current.picture!.likes).toBe(0)
     await result.current.handleSetCover()
     await result.current.handleDelete()

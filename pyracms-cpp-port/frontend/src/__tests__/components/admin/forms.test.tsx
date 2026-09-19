@@ -1,24 +1,9 @@
 import { render, screen, fireEvent, within } from '@testing-library/react'
-import AddMenuItemBar from '@/components/admin/AddMenuItemBar'
 import AddSettingForm from '@/components/admin/AddSettingForm'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 
 const box = (id: string) =>
   within(screen.getByTestId(id)).getByRole('textbox')
-
-it('AddMenuItemBar emits and gates add', () => {
-  const p = { onLabelChange: jest.fn(), onUrlChange: jest.fn(),
-    onAdd: jest.fn() }
-  const { rerender } = render(<AddMenuItemBar label="" url="" {...p} />)
-  expect(screen.getByTestId('add-menu-item-btn')).toBeDisabled()
-  rerender(<AddMenuItemBar label="a" url="/b" {...p} />)
-  fireEvent.change(box('new-label-input'), { target: { value: 'x' } })
-  fireEvent.change(box('new-url-input'), { target: { value: '/y' } })
-  fireEvent.click(screen.getByTestId('add-menu-item-btn'))
-  expect(p.onLabelChange).toHaveBeenCalledWith('x')
-  expect(p.onUrlChange).toHaveBeenCalledWith('/y')
-  expect(p.onAdd).toHaveBeenCalled()
-})
 
 it('AddSettingForm emits and gates add', () => {
   const p = { onKeyChange: jest.fn(), onValueChange: jest.fn(),

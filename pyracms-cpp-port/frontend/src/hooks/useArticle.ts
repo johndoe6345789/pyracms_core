@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { formatDay } from './articleDate'
+import { useActionError } from './useActionError'
 
 export interface Article {
   title: string
@@ -44,6 +45,7 @@ export function useArticle(
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
+  const { error: voteError, setError, fail } = useActionError()
 
   useEffect(() => {
     if (!name || !tenantId) return
@@ -56,7 +58,9 @@ export function useArticle(
 
   const handleVote = (isLike: boolean) => {
     if (!tenantId) return
-    api.post(`/api/articles/${name}/vote`, { like: isLike })
+    setError('')
+    api.post(`/api/articles/${name}/vote`,
+      { is_like: isLike, tenant_id: tenantId })
       .then(() => {
         setArticle((prev) => prev ? {
           ...prev,
@@ -64,10 +68,10 @@ export function useArticle(
           dislikes: prev.dislikes + (isLike ? 0 : 1),
         } : prev)
       })
-      .catch(() => {})
+      .catch(fail('Could not record vote'))
   }
 
   const refresh = () => setTick((t) => t + 1)
 
-  return { article, loading, handleVote, refresh }
+  return { article, loading, voteError, handleVote, refresh }
 }

@@ -20,10 +20,21 @@ const char *kThreadCols =
     "AS forum_name ";
 const char *kThreadFrom =
     "FROM forum_threads t LEFT JOIN users u ON u.id = t.user_id ";
-// $1 = acting user id: owner of the row, or moderator (role >= 2).
-const char *kOwnerOrMod =
+// $1 = acting user id: author of the row, a moderator (role >= 2) or the
+// owner of the site the row lives in.
+const char *kThreadOwnerOrMod =
     "(user_id = $1::int OR EXISTS "
-    "(SELECT 1 FROM users mu WHERE mu.id = $1::int AND mu.role >= 2))";
+    "(SELECT 1 FROM users mu WHERE mu.id = $1::int AND mu.role >= 2) "
+    "OR EXISTS (SELECT 1 FROM forums xf JOIN forum_categories xc "
+    "ON xc.id = xf.category_id JOIN tenants xt ON xt.id = xc.tenant_id "
+    "WHERE xf.id = forum_threads.forum_id AND xt.owner_id = $1::int))";
+const char *kPostOwnerOrMod =
+    "(user_id = $1::int OR EXISTS "
+    "(SELECT 1 FROM users mu WHERE mu.id = $1::int AND mu.role >= 2) "
+    "OR EXISTS (SELECT 1 FROM forum_threads xh JOIN forums xf "
+    "ON xf.id = xh.forum_id JOIN forum_categories xc "
+    "ON xc.id = xf.category_id JOIN tenants xt ON xt.id = xc.tenant_id "
+    "WHERE xh.id = forum_posts.thread_id AND xt.owner_id = $1::int))";
 } // namespace
 
 } // namespace pyracms

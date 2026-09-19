@@ -7,6 +7,7 @@ import { SaveOutlined } from '@mui/icons-material'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useParams } from 'next/navigation'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import FeatureToggleCard from
   '@/components/admin/FeatureToggleCard'
 
@@ -15,7 +16,7 @@ export default function AdminFeaturesPage() {
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
   const {
-    features, snackbarOpen, handleToggle,
+    features, snackbarOpen, error, handleToggle,
     handleSave, handleCloseSnackbar,
   } = useFeatureToggles(tenantId)
 
@@ -31,6 +32,7 @@ export default function AdminFeaturesPage() {
       >
         Enable or disable features across the platform.
       </Typography>
+      <ErrorAlert error={error} testId="features-error" />
       <Box
         sx={{
           display: 'flex',

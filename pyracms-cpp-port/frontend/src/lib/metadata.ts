@@ -1,26 +1,24 @@
 import type { Metadata } from 'next'
+import { serverApiOrigin, siteOrigin, tenantIdOf } from './siteOrigin'
 
-const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
-  || 'http://localhost:8080'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
-function articleUrl(
-  kind: 'opengraph' | 'jsonld', slug: string, name: string, tenantId: number,
-) {
-  return `${API_URL}/api/articles/${name}/${kind}`
-    + `?tenant_id=${tenantId}&base_url=${SITE_URL}/site/${slug}`
+async function articleUrl(
+  kind: 'opengraph' | 'jsonld', slug: string, name: string,
+): Promise<string | null> {
+  const tenantId = await tenantIdOf(slug)
+  if (!tenantId) return null
+  const base = encodeURIComponent(`${await siteOrigin()}/site/${slug}`)
+  return `${serverApiOrigin()}/api/articles/${encodeURIComponent(name)}`
+    + `/${kind}?tenant_id=${tenantId}&base_url=${base}`
 }
 
 export async function generateArticleMetadata(
   slug: string,
   name: string,
-  tenantId: number = 1
 ): Promise<Metadata> {
   try {
-    const res = await fetch(
-      articleUrl('opengraph', slug, name, tenantId),
-      { next: { revalidate: 3600 } }
-    )
+    const url = await articleUrl('opengraph', slug, name)
+    if (!url) return { title: name }
+    const res = await fetch(url, { next: { revalidate: 3600 } })
 
     if (!res.ok) return {}
 
@@ -33,7 +31,8 @@ export async function generateArticleMetadata(
         type: 'article',
         title: og['og:title'] || name,
         description: og['og:description'] || '',
-        url: og['og:url'] || `${SITE_URL}/site/${slug}/articles/${name}`,
+        url: og['og:url']
+          || `${await siteOrigin()}/site/${slug}/articles/${name}`,
         publishedTime: og['article:published_time'],
         authors: og['article:author'] ? [og['article:author']] : undefined,
       },
@@ -46,13 +45,11 @@ export async function generateArticleMetadata(
 export async function fetchArticleJsonLd(
   slug: string,
   name: string,
-  tenantId: number = 1
 ): Promise<Record<string, unknown> | null> {
   try {
-    const res = await fetch(
-      articleUrl('jsonld', slug, name, tenantId),
-      { next: { revalidate: 3600 } }
-    )
+    const url = await articleUrl('jsonld', slug, name)
+    if (!url) return null
+    const res = await fetch(url, { next: { revalidate: 3600 } })
     if (!res.ok) return null
     return await res.json()
   } catch {

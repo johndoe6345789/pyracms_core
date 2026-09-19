@@ -9,7 +9,7 @@ void ForumService::deleteThread(const DbClientPtr &db, int id, int userId,
     // Permission check first
     db->execSqlAsync(
         std::string("SELECT id FROM forum_threads WHERE id = $2 AND ") +
-            kOwnerOrMod,
+            kThreadOwnerOrMod,
         [db, id, cb](const drogon::orm::Result &check) {
             if (check.empty()) {
                 cb(false, "Thread not found or not permitted");

@@ -11,6 +11,7 @@ import EditForm from './EditForm'
 import CommentActions from './CommentActions'
 import CommentChildren from './CommentChildren'
 import DeleteCommentDialog from './DeleteCommentDialog'
+import { ErrorAlert } from '../ErrorAlert'
 import { useCommentActions } from './useCommentActions'
 
 interface Props {
@@ -36,6 +37,7 @@ export default function CommentItem({
           {c.username[0]?.toUpperCase()}</Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentHeader comment={c} />
+          <ErrorAlert error={a.error} testId="comment-action-error" />
           {a.editing
             ? <EditForm editText={a.editTxt}
                 setEditText={a.setEditTxt}

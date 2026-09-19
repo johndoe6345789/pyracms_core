@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { Typography, Box, Grid } from '@mui/material'
+import { useTenantId } from '@/hooks/useTenantId'
 import DashboardStats from
   '@/components/dashboard/DashboardStats'
 import QuickLinkCard from
@@ -12,6 +13,7 @@ import { buildQuickLinks } from
 export default function TenantAdminDashboardPage() {
   const params = useParams()
   const slug = params.slug as string
+  const { tenantId } = useTenantId(slug)
 
   return (
     <Box data-testid="admin-dashboard">
@@ -25,7 +27,7 @@ export default function TenantAdminDashboardPage() {
       >
         Overview of your {slug} site.
       </Typography>
-      <DashboardStats />
+      <DashboardStats tenantId={tenantId} />
       <Typography variant="h4" sx={{ mb: 3 }}>
         Quick Links
       </Typography>
