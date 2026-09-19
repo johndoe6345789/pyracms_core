@@ -6,7 +6,9 @@ jest.mock(
   '@tiptap/react',
   () => jest.requireActual('../../helpers/tiptapMock').tiptapReact,
 )
-const starterConfigure = jest.fn(() => ({ name: 'starter-kit' }))
+const starterConfigure = jest.fn<{ name: string }, [unknown]>(() => ({
+  name: 'starter-kit',
+}))
 jest.mock('@tiptap/starter-kit', () => ({
   __esModule: true,
   default: { configure: (o: unknown) => starterConfigure(o) },

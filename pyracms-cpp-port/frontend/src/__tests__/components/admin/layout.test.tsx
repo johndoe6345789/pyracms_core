@@ -6,7 +6,6 @@ import AdminTopBar from '@/components/admin/layout/AdminTopBar'
 import SkipLink from '@/components/admin/layout/SkipLink'
 import { buildQuickLinks } from '@/components/admin/dashboard/quickLinks'
 
-
 it('drawer content links navigate', () => {
   const onNavigate = jest.fn()
   render(<AdminDrawerContent slug="s" onNavigate={onNavigate} />)
