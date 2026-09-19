@@ -11,7 +11,9 @@ describe('robots', () => {
   it('disallows admin and api and links the sitemap', () => {
     const r = robots()
     expect(r.sitemap).toBe('http://localhost:3000/sitemap.xml')
-    expect(r.rules).toMatchObject({ disallow: ['/admin/', '/api/'] })
+    expect(r.rules).toMatchObject({
+      disallow: expect.arrayContaining(['/admin', '/super-admin', '/api/']),
+    })
   })
 })
 

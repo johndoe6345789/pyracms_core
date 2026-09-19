@@ -27,6 +27,7 @@ export function sanitizeHtml(html: string, allowStyle = false): string {
   return DOMPurify.sanitize(html, {
     FORBID_TAGS,
     FORBID_ATTR: allowStyle ? FORBID_ATTR : [...FORBID_ATTR, 'style'],
+    ADD_ATTR: ['target'],
     USE_PROFILES: { html: true },
   }) as string
 }

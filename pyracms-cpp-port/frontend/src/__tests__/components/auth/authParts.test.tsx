@@ -49,7 +49,8 @@ describe('TurboErrorDialog', () => {
     fireEvent.click(screen.getByText('Close'))
     expect(onClose).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Open Vault'))
-    expect(open).toHaveBeenCalledWith('https://vault.wardcrew.com', '_blank')
+    expect(open).toHaveBeenCalledWith(
+      'https://vault.wardcrew.com', '_blank', 'noopener,noreferrer')
     open.mockRestore()
   })
 })

@@ -38,7 +38,7 @@ export default function BinaryMatrix({ binaries }: BinaryMatrixProps) {
                 <Button
                   size="small"
                   startIcon={<DownloadOutlined />}
-                  href={safeHref(bin.url)}
+                  href={safeHref(bin.url) ?? '#'}
                 >
                   Download
                 </Button>

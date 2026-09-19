@@ -7,3 +7,6 @@ playwright-report
 *.log
 .env*
 !.env.example
+.git
+*.pem
+*.key

@@ -66,7 +66,13 @@ describe('bbcode', () => {
       + '[img]https://a.b/x.png" onerror="alert(1)[/img]'
       + '[color=red;position:fixed]y[/color][size=9;x]z[/size]',
     )
-    expect(out).not.toMatch(/javascript:|onerror=|position/i)
+    const d = document.createElement('div')
+    d.innerHTML = out
+    expect(out).not.toMatch(/javascript:/i)
+    d.querySelectorAll('*').forEach((el) => {
+      expect(el.getAttribute('style') ?? '').not.toMatch(/position/)
+      expect(el.getAttributeNames().some((n) => n.startsWith('on'))).toBe(false)
+    })
   })
   it('renders safe urls', () => {
     expect(renderBBCode('[url]https://a.b[/url]')).toContain('href="https://a.b"')
@@ -89,7 +95,7 @@ describe('other helpers', () => {
     expect(({} as Record<string, unknown>).x).toBeUndefined()
   })
   it('rejects open redirects', () => {
-    for (const v of ['//e.com', '/\e.com', 'https://e.com', '/a\nb', 'x'])
+    for (const v of ['//e.com', '/\\e.com', 'https://e.com', '/a\nb', 'x'])
       expect(safeRedirect(v)).toBeUndefined()
     expect(safeRedirect('/site/a?x=1')).toBe('/site/a?x=1')
   })
