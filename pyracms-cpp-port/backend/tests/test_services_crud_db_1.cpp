@@ -20,9 +20,6 @@ TEST(UserCrudDb, FindByIdEmailListUpdatePasswordDelete) {
         [&](auto cb) { svc.findByEmail(db, t, name + "@t.test", cb); }));
     EXPECT_FALSE(awaitValue<U>(
         [&](auto cb) { svc.findByEmail(db, 0, name + "@t.test", cb); }));
-    auto all = awaitValue<std::vector<UserDto>>(
-        [&](auto cb) { svc.listUsers(db, 5, 0, cb); });
-    EXPECT_FALSE(all.empty());
     Json::Value upd;
     upd["website"] = "https://x.test";
     upd["aboutme"] = "hi";

@@ -37,8 +37,6 @@ class UserService {
     void findById(const DbClientPtr &db, int id, Callback cb);
     void findByEmail(const DbClientPtr &db, int tenantId,
                      const std::string &email, Callback cb);
-    void listUsers(const DbClientPtr &db, int limit, int offset,
-                   ListCallback cb);
     // Scoped listing: scope -1 = all accounts, else one tenant (0 = platform).
     // `search` matches username/full name; `username` is an exact match.
     void listUsersScoped(const DbClientPtr &db, int scope,
@@ -55,13 +53,9 @@ class UserService {
                     std::function<void(const std::optional<std::string> &)> cb);
     void updatePassword(const DbClientPtr &db, int id,
                         const std::string &newHash, BoolCallback cb);
-    void countUsers(const DbClientPtr &db, int tenantId,
-                    std::function<void(int)> cb);
     // Role management — persists role as integer in the `role` column.
     // The role column stores the int cast of UserRole (0–4).
     using RoleCallback = std::function<void(const std::optional<UserRole> &)>;
-    void setUserRole(const DbClientPtr &db, int userId, UserRole role,
-                     BoolCallback cb);
     void getUserRole(const DbClientPtr &db, int userId, RoleCallback cb);
 
   private:

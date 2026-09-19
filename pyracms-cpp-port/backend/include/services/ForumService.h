@@ -68,7 +68,6 @@ class ForumService {
                   BoolCallback cb);
 
   private:
-    ForumCategoryDto rowToCategoryDto(const drogon::orm::Row &row);
     ForumDto rowToForumDto(const drogon::orm::Row &row);
     ForumThreadDto rowToThreadDto(const drogon::orm::Row &row);
     ForumPostDto rowToPostDto(const drogon::orm::Row &row);

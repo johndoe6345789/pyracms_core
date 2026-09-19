@@ -31,9 +31,4 @@ inline bool hasMinRole(UserRole actual, UserRole minimum) {
     return static_cast<int>(actual) >= static_cast<int>(minimum);
 }
 
-// Migration helper: legacy isAdmin flag maps to SiteAdmin.
-inline UserRole roleFromLegacyAdminFlag(bool isAdmin) {
-    return isAdmin ? UserRole::SiteAdmin : UserRole::User;
-}
-
 } // namespace pyracms

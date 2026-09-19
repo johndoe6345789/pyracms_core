@@ -9,44 +9,6 @@
 
 using namespace pyracms;
 
-TEST(TenantServiceTest, NormalizeSlugSpaceBecomesHyphen) {
-    EXPECT_EQ(TenantService::normalizeSlug("Hello World"), "hello-world");
-}
-
-TEST(TenantServiceTest, NormalizeSlugMultipleSpacesCollapsed) {
-    EXPECT_EQ(TenantService::normalizeSlug("Hello   World"), "hello-world");
-}
-
-TEST(TenantServiceTest, NormalizeSlugSpecialCharBecomesHyphen) {
-    EXPECT_EQ(TenantService::normalizeSlug("my_site!"), "my-site");
-}
-
-TEST(TenantServiceTest, NormalizeSlugStripsLeadingHyphen) {
-    // Input starts with a non-alnum char that would produce a leading '-'
-    EXPECT_EQ(TenantService::normalizeSlug(" leading"), "leading");
-}
-
-TEST(TenantServiceTest, NormalizeSlugStripsTrailingHyphen) {
-    EXPECT_EQ(TenantService::normalizeSlug("trailing "), "trailing");
-}
-
-TEST(TenantServiceTest, NormalizeSlugAllUppercase) {
-    EXPECT_EQ(TenantService::normalizeSlug("MY AWESOME SITE"),
-              "my-awesome-site");
-}
-
-TEST(TenantServiceTest, NormalizeSlugDigitsPreserved) {
-    EXPECT_EQ(TenantService::normalizeSlug("Site 42"), "site-42");
-}
-
-TEST(TenantServiceTest, NormalizeSlugAlreadyNormalized) {
-    EXPECT_EQ(TenantService::normalizeSlug("hello-world"), "hello-world");
-}
-
-TEST(TenantServiceTest, NormalizeSlugEmptyInputReturnsEmpty) {
-    EXPECT_EQ(TenantService::normalizeSlug(""), "");
-}
-
 // ── isValidDisplayName
 // ────────────────────────────────────────────────────────
 

@@ -1,6 +1,7 @@
 #include "controllers/BoolReply.h"
 #include "controllers/ForumController.h"
 #include "filters/TenantGuard.h"
+#include "services/WebhookEvents.h"
 
 namespace pyracms {
 
@@ -34,7 +35,8 @@ void ForumController::createPost(
 
     forumService_.createPost(
         db, threadId, title, content, userId,
-        [callback](int newId, const std::string &error) {
+        [callback, threadId, userId](int newId,
+                                    const std::string &error) {
             if (newId <= 0) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -43,6 +45,11 @@ void ForumController::createPost(
                 callback(resp);
                 return;
             }
+            Json::Value d;
+            d["postId"] = newId;
+            d["threadId"] = threadId;
+            d["userId"] = userId;
+            fireForumWebhookEvent(threadId, "forum.post.created", d);
             Json::Value result;
             result["success"] = true;
             result["id"] = newId;

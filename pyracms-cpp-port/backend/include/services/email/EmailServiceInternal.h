@@ -18,32 +18,6 @@ inline std::string headerSafe(const std::string &v) {
     return out;
 }
 
-inline std::string htmlEscape(const std::string &v) {
-    std::string out;
-    for (char c : v) {
-        switch (c) {
-        case '&':
-            out += "&amp;";
-            break;
-        case '<':
-            out += "&lt;";
-            break;
-        case '>':
-            out += "&gt;";
-            break;
-        case '"':
-            out += "&quot;";
-            break;
-        case '\'':
-            out += "&#39;";
-            break;
-        default:
-            out += c;
-        }
-    }
-    return out;
-}
-
 // Links in mail point at the configured site, never at a request header.
 inline std::string fillBaseUrl(std::string body) {
     const char *env = std::getenv("PUBLIC_BASE_URL");

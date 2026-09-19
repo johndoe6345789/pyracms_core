@@ -55,10 +55,6 @@ class AnalyticsService {
     void getSearchQueries(
         const DbClientPtr &db, int tenantId, int limit,
         std::function<void(const std::vector<SearchQueryStat> &)> cb);
-
-    void recordSearchQuery(const DbClientPtr &db, int tenantId,
-                           const std::string &query, int resultCount,
-                           int userId, BoolCallback cb);
 };
 
 } // namespace pyracms

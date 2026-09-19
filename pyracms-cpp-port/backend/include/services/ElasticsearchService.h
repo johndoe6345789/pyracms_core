@@ -27,19 +27,6 @@ class ElasticsearchService {
                       const std::string &displayName,
                       const std::string &content, const std::string &createdAt);
 
-    void indexForumPost(int tenantId, int postId, const std::string &title,
-                        const std::string &content, int threadId,
-                        const std::string &createdAt);
-
-    void indexSnippet(int tenantId, int snippetId, const std::string &title,
-                      const std::string &code, const std::string &language,
-                      const std::string &createdAt);
-
-    void indexGameDep(int tenantId, int pageId, const std::string &name,
-                      const std::string &displayName,
-                      const std::string &description,
-                      const std::string &createdAt);
-
     void deleteDocument(const std::string &index, int id);
 
     // Search operations
@@ -50,9 +37,6 @@ class ElasticsearchService {
     void
     autocomplete(int tenantId, const std::string &prefix, int limit,
                  std::function<void(const std::vector<AutocompleteItem> &)> cb);
-
-    // Bulk sync from database
-    void syncFromDatabase(const DbClientPtr &db, int tenantId);
 
   private:
     ElasticsearchService() = default;

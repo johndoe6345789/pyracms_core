@@ -1,4 +1,5 @@
 #include "controllers/ArticleController.h"
+#include "services/WebhookEvents.h"
 
 namespace pyracms {
 
@@ -23,7 +24,8 @@ void ArticleController::deleteArticle(
 
         articleService_.deleteArticle(
             db, tenantId, name,
-            [callback](bool success, const std::string &error) {
+            [callback, tenantId, name](bool success,
+                                       const std::string &error) {
                 if (!success) {
                     auto resp = drogon::HttpResponse::newHttpJsonResponse(
                         Json::Value{});
@@ -33,6 +35,9 @@ void ArticleController::deleteArticle(
                     return;
                 }
 
+                Json::Value d;
+                d["name"] = name;
+                fireWebhookEvent(tenantId, "article.deleted", d);
                 Json::Value result;
                 result["message"] = "Article deleted";
                 callback(drogon::HttpResponse::newHttpJsonResponse(result));
@@ -44,7 +49,8 @@ void ArticleController::deleteArticle(
     auto db = drogon::app().getDbClient();
 
     articleService_.deleteArticle(
-        db, tenantId, name, [callback](bool success, const std::string &error) {
+        db, tenantId, name,
+        [callback, tenantId, name](bool success, const std::string &error) {
             if (!success) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -54,6 +60,9 @@ void ArticleController::deleteArticle(
                 return;
             }
 
+            Json::Value d;
+            d["name"] = name;
+            fireWebhookEvent(tenantId, "article.deleted", d);
             Json::Value result;
             result["message"] = "Article deleted";
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

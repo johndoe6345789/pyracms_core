@@ -55,17 +55,6 @@ TEST(UserScopeDb, PlatformScopeIsTenantZero) {
     EXPECT_EQ(hit->tenantId, 0);
 }
 
-TEST(UserScopeDb, CountUsersIsScoped) {
-    REQUIRE_DB();
-    int a = makeTenant(db, uniq("uf"));
-    auto count = [&] {
-        return awaitValue<int>([&](auto cb) { svc.countUsers(db, a, cb); });
-    };
-    EXPECT_EQ(count(), 0);
-    ASSERT_TRUE(create(db, a, "one").first);
-    EXPECT_EQ(count(), 1);
-}
-
 TEST(UserScopeDb, PasswordHashLookupIsScoped) {
     REQUIRE_DB();
     int a = makeTenant(db, uniq("ug")), b = makeTenant(db, uniq("uh"));

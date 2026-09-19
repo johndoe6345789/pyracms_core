@@ -66,10 +66,3 @@ TEST(TenantServiceTest, InvalidSlugDot) {
 TEST(TenantServiceTest, InvalidSlugSlash) {
     EXPECT_FALSE(TenantService::isValidSlug("my/site"));
 }
-
-// ── normalizeSlug
-// ─────────────────────────────────────────────────────────────
-
-TEST(TenantServiceTest, NormalizeSlugLowercases) {
-    EXPECT_EQ(TenantService::normalizeSlug("Hello"), "hello");
-}

@@ -425,8 +425,6 @@ set(LIB_SOURCES
 
     src/services/analytics/AnalyticsServiceGetTrafficSources.cpp
 
-    src/services/analytics/AnalyticsServiceRecordSearchQuery.cpp
-
     src/services/analytics/AnalyticsServiceTrackPageView.cpp
 
     src/services/article/ArticleServiceCreateArticle.cpp
@@ -438,8 +436,6 @@ set(LIB_SOURCES
     src/services/article/ArticleServiceGetRevision.cpp
 
     src/services/article/ArticleServiceListArticles.cpp
-
-    src/services/article/ArticleServiceListArticlesByStatus.cpp
 
     src/services/article/ArticleServiceListRevisions.cpp
 
@@ -487,8 +483,6 @@ set(LIB_SOURCES
 
     src/services/cache/CacheServiceArticleKey.cpp
 
-    src/services/cache/CacheServiceArticleListKey.cpp
-
     src/services/cache/CacheServiceAutocompleteKey.cpp
 
     src/services/cache/CacheServiceDel.cpp
@@ -498,8 +492,6 @@ set(LIB_SOURCES
     src/services/cache/CacheServiceExecCommand.cpp
 
     src/services/cache/CacheServiceGet.cpp
-
-    src/services/cache/CacheServiceGetOrSet.cpp
 
     src/services/cache/CacheServiceInitialize.cpp
 
@@ -511,8 +503,6 @@ set(LIB_SOURCES
 
     src/services/cache/CacheServiceInvalidateSearch.cpp
 
-    src/services/cache/CacheServiceInvalidateUser.cpp
-
     src/services/cache/CacheServiceIsConnected.cpp
 
     src/services/cache/CacheServiceReconnect.cpp
@@ -522,8 +512,6 @@ set(LIB_SOURCES
     src/services/cache/CacheServiceSet.cpp
 
     src/services/cache/CacheServiceState.cpp
-
-    src/services/cache/CacheServiceUserKey.cpp
 
     src/services/comment/CommentServiceCreateComment.cpp
 
@@ -551,12 +539,6 @@ set(LIB_SOURCES
 
     src/services/elasticsearch/ElasticsearchServiceIndexArticle.cpp
 
-    src/services/elasticsearch/ElasticsearchServiceIndexForumPost.cpp
-
-    src/services/elasticsearch/ElasticsearchServiceIndexGameDep.cpp
-
-    src/services/elasticsearch/ElasticsearchServiceIndexSnippet.cpp
-
     src/services/elasticsearch/ElasticsearchServiceInitialize.cpp
 
     src/services/elasticsearch/ElasticsearchServiceInstance.cpp
@@ -569,33 +551,17 @@ set(LIB_SOURCES
 
     src/services/elasticsearch/ElasticsearchServiceSearchBody.cpp
 
-    src/services/elasticsearch/ElasticsearchServiceSyncArticles.cpp
-
-    src/services/elasticsearch/ElasticsearchServiceSyncForumPosts.cpp
-
-    src/services/elasticsearch/ElasticsearchServiceSyncFromDatabase.cpp
-
-    src/services/elasticsearch/ElasticsearchServiceSyncGameDeps.cpp
-
     src/services/email/EmailServiceBuildMimeMessage.cpp
 
     src/services/email/EmailServiceCtor.cpp
-
-    src/services/email/EmailServiceNotificationEmailTemplate.cpp
 
     src/services/email/EmailServicePasswordResetEmailTemplate.cpp
 
     src/services/email/EmailServiceSendEmail.cpp
 
-    src/services/email/EmailServiceSendNotificationEmail.cpp
-
     src/services/email/EmailServiceSendPasswordResetEmail.cpp
 
-    src/services/email/EmailServiceSendVerificationEmail.cpp
-
     src/services/email/EmailServiceState.cpp
-
-    src/services/email/EmailServiceVerificationEmailTemplate.cpp
 
     src/services/file/FileServiceQueries.cpp
 
@@ -624,8 +590,6 @@ set(LIB_SOURCES
     src/services/forum/ForumServiceGetThread.cpp
 
     src/services/forum/ForumServiceListCategories.cpp
-
-    src/services/forum/ForumServiceRowToCategoryDto.cpp
 
     src/services/forum/ForumServiceRowToForumDto.cpp
 
@@ -829,11 +793,7 @@ set(LIB_SOURCES
 
     src/services/snippet/CodeSnippetServiceUpdateSnippet.cpp
 
-    src/services/social/SocialServiceAwardAchievement.cpp
-
     src/services/social/SocialServiceCalculateReputation.cpp
-
-    src/services/social/SocialServiceCheckAndAwardAchievements.cpp
 
     src/services/social/SocialServiceFollowUser.cpp
 
@@ -844,10 +804,6 @@ set(LIB_SOURCES
     src/services/social/SocialServiceGetFollowing.cpp
 
     src/services/social/SocialServiceGetUserAchievements.cpp
-
-    src/services/social/SocialServiceIsFollowing.cpp
-
-    src/services/social/SocialServiceParseMentions.cpp
 
     src/services/social/SocialServiceUnfollowUser.cpp
 
@@ -863,8 +819,6 @@ set(LIB_SOURCES
 
     src/services/tenant/TenantServiceListTenants.cpp
 
-    src/services/tenant/TenantServiceNormalizeSlug.cpp
-
     src/services/tenant/TenantServiceRowToDto.cpp
 
     src/services/user/UserAdminServiceLoadTarget.cpp
@@ -872,8 +826,6 @@ set(LIB_SOURCES
     src/services/user/UserAdminServiceSetBanned.cpp
 
     src/services/user/UserAdminServiceSetRole.cpp
-
-    src/services/user/UserServiceCountUsers.cpp
 
     src/services/user/UserServiceCreateUser.cpp
 
@@ -891,19 +843,17 @@ set(LIB_SOURCES
 
     src/services/user/UserServiceListScoped.cpp
 
-    src/services/user/UserServiceListUsers.cpp
-
     src/services/user/UserServiceRegisterAccount.cpp
 
     src/services/user/UserServiceRowToDto.cpp
-
-    src/services/user/UserServiceSetUserRole.cpp
 
     src/services/user/UserServiceUpdatePassword.cpp
 
     src/services/user/UserServiceUpdateProblem.cpp
 
     src/services/user/UserServiceUpdateUser.cpp
+
+    src/services/webhook/WebhookEvents.cpp
 
     src/services/webhook/WebhookServiceCreateWebhook.cpp
 

@@ -1,5 +1,4 @@
 #include "http_accounts.h"
-#include "services/AnalyticsService.h"
 #include "services/WebhookService.h"
 
 using namespace harness;
@@ -39,22 +38,10 @@ TEST(WebhookService, DeliversSignedEventsAndRetriesFailures) {
     EXPECT_EQ(b.json[0]["statusCode"].asInt(), 0);
 }
 
-TEST(AnalyticsService, SearchQueriesAndPeriods) {
+TEST(Analytics, PageViewPeriods) {
     REQUIRE_SERVER();
     auto s = makeSite();
-    auto db = testDb();
-    AnalyticsService svc;
-    EXPECT_TRUE(awaitBool([&](auto cb) {
-                    svc.recordSearchQuery(db, s.id, "zebra", 3, s.user.id,
-                                          cb);
-                }).first);
-    EXPECT_TRUE(awaitBool([&](auto cb) {
-                    svc.recordSearchQuery(db, s.id, "zebra", 1, 0, cb);
-                }).first);
     auto t = "?tenant_id=" + std::to_string(s.id);
-    auto q = get("/api/analytics/search-queries" + t, s.admin.token);
-    ASSERT_EQ(q.status, 200);
-    EXPECT_EQ(q.json[0]["query"].asString(), "zebra");
     for (auto p : {"week", "month", "day"})
         EXPECT_EQ(get("/api/analytics/page-views" + t + "&period=" + p,
                       s.admin.token).status, 200);

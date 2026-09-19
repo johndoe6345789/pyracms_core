@@ -23,14 +23,6 @@ inline Json::Value isoDate(std::string s) {
     return Json::Value(s);
 }
 
-// syncFromDatabase steps, one per indexed content type.
-void esSyncArticles(ElasticsearchService &es,
-                    const drogon::orm::DbClientPtr &db, int tenantId);
-void esSyncForumPosts(ElasticsearchService &es,
-                      const drogon::orm::DbClientPtr &db, int tenantId);
-void esSyncGameDeps(ElasticsearchService &es,
-                    const drogon::orm::DbClientPtr &db, int tenantId);
-
 // search(): request construction and response parsing.
 std::string esSearchIndexes(const std::string &type);
 std::string esSearchBody(int tenantId, const std::string &query, int limit,

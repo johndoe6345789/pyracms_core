@@ -5,7 +5,7 @@
 
 // Unit tests for the UserRole system.
 // All tests here are DB-free: they exercise the UserRole enum, the
-// hasMinRole() inline, and the roleFromLegacyAdminFlag() helper.
+// and hasMinRole() inline.
 // Integration tests for setUserRole / getUserRole are tracked separately.
 
 using namespace pyracms;

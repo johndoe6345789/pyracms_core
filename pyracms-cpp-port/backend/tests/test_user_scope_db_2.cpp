@@ -23,9 +23,8 @@ std::optional<UserDto> find(const drogon::orm::DbClientPtr &db, int tenant,
 TEST(UserScopeDb, RoleRoundTripAndClamp) {
     REQUIRE_DB();
     int id = makeUser(db, 0, uniq("role"));
-    auto set = awaitBool(
-        [&](auto cb) { svc.setUserRole(db, id, UserRole::SiteAdmin, cb); });
-    EXPECT_TRUE(set.first);
+    db->execSqlSync("UPDATE users SET role = $1 WHERE id = $2",
+                    static_cast<int>(UserRole::SiteAdmin), id);
     auto get = [&] {
         return awaitValue<std::optional<UserRole>>(
             [&](auto cb) { svc.getUserRole(db, id, cb); });

@@ -63,9 +63,6 @@ class ArticleService {
     void unpublishArticle(const DbClientPtr &db, int articleId,
                           BoolCallback cb);
     void publishDueArticles(const DbClientPtr &db, BoolCallback cb);
-    void listArticlesByStatus(const DbClientPtr &db, int tenantId,
-                              const std::string &status, int limit, int offset,
-                              ArticleListCallback cb);
     // Re-index (or drop) the article in the search engine after a change.
     void refreshSearchIndex(const DbClientPtr &db, int articleId);
 

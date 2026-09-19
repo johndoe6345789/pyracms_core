@@ -1,6 +1,7 @@
 #include "controllers/CommentController.h"
 #include "filters/TenantGuard.h"
 #include "security/Validate.h"
+#include "services/WebhookEvents.h"
 
 namespace pyracms {
 
@@ -43,18 +44,19 @@ void CommentController::createComment(
                           drogon::k400BadRequest);
 
     std::optional<int> parentId;
-    if ((*json).isMember("parentId") && !(*json)["parentId"].isNull()) {
+    if ((*json).isMember("parentId") && !(*json)["parentId"].isNull())
         parentId = (*json)["parentId"].asInt();
-    }
 
     auto db = drogon::app().getDbClient();
-
+    int tenantId = req->attributes()->get<int>("tenantId");
     commentService_.createComment(
         db, userId, contentType, contentId, body, parentId,
-        [this, db, userId, parentId, callback](bool success, int commentId,
-                                               const std::string &error) {
+        [this, db, userId, parentId, callback, tenantId, contentType,
+         contentId](bool success, int commentId, const std::string &error) {
             if (!success)
                 return errorReply(callback, error, drogon::k400BadRequest);
+            fireCommentCreated(tenantId, contentType, contentId, userId,
+                               commentId);
             if (!parentId.has_value())
                 return createdReply(callback, commentId);
             // Reply notification for the parent comment owner.

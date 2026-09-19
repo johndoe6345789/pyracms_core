@@ -5,7 +5,7 @@
 
 // Unit tests for the UserRole system.
 // All tests here are DB-free: they exercise the UserRole enum, the
-// hasMinRole() inline, and the roleFromLegacyAdminFlag() helper.
+// and hasMinRole() inline.
 // Integration tests for setUserRole / getUserRole are tracked separately.
 
 using namespace pyracms;
@@ -36,37 +36,6 @@ TEST(UserRoleTest, SuperAdminPassesSuperAdminMinimum) {
 
 TEST(UserRoleTest, SuperAdminPassesGuestMinimum) {
     EXPECT_TRUE(hasMinRole(UserRole::SuperAdmin, UserRole::Guest));
-}
-
-// ── Legacy admin-flag migration
-// ───────────────────────────────────────────────
-
-TEST(UserRoleTest, LegacyAdminTrueMapsTOSiteAdmin) {
-    EXPECT_EQ(roleFromLegacyAdminFlag(true), UserRole::SiteAdmin);
-}
-
-TEST(UserRoleTest, LegacyAdminFalseMapsToUser) {
-    EXPECT_EQ(roleFromLegacyAdminFlag(false), UserRole::User);
-}
-
-TEST(UserRoleTest, LegacyAdminSiteAdminPassesAdminMinimum) {
-    auto role = roleFromLegacyAdminFlag(true);
-    EXPECT_TRUE(hasMinRole(role, UserRole::SiteAdmin));
-}
-
-TEST(UserRoleTest, LegacyAdminSiteAdminFailsSuperAdminMinimum) {
-    auto role = roleFromLegacyAdminFlag(true);
-    EXPECT_FALSE(hasMinRole(role, UserRole::SuperAdmin));
-}
-
-TEST(UserRoleTest, LegacyNonAdminUserPassesUserMinimum) {
-    auto role = roleFromLegacyAdminFlag(false);
-    EXPECT_TRUE(hasMinRole(role, UserRole::User));
-}
-
-TEST(UserRoleTest, LegacyNonAdminUserFailsModeratorMinimum) {
-    auto role = roleFromLegacyAdminFlag(false);
-    EXPECT_FALSE(hasMinRole(role, UserRole::Moderator));
 }
 
 // ── UserDto role field

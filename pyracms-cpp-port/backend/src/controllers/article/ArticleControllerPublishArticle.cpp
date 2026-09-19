@@ -1,4 +1,5 @@
 #include "controllers/ArticleController.h"
+#include "services/WebhookEvents.h"
 
 namespace pyracms {
 
@@ -21,7 +22,8 @@ void ArticleController::publishArticle(
 
     articleService_.findArticle(
         db, tenantId, name,
-        [this, db, callback](const std::optional<ArticleDto> &article) {
+        [this, db, callback, tenantId,
+         name](const std::optional<ArticleDto> &article) {
             if (!article) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -33,7 +35,8 @@ void ArticleController::publishArticle(
 
             articleService_.publishArticle(
                 db, article->id,
-                [callback](bool success, const std::string &error) {
+                [callback, tenantId, name](bool success,
+                                           const std::string &error) {
                     if (!success) {
                         auto resp = drogon::HttpResponse::newHttpJsonResponse(
                             Json::Value{});
@@ -42,6 +45,9 @@ void ArticleController::publishArticle(
                         callback(resp);
                         return;
                     }
+                    Json::Value d;
+                    d["name"] = name;
+                    fireWebhookEvent(tenantId, "article.published", d);
                     Json::Value result;
                     result["message"] = "Article published";
                     callback(drogon::HttpResponse::newHttpJsonResponse(result));

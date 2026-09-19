@@ -1,5 +1,6 @@
 #include "controllers/AuthController.h"
 #include "controllers/auth/AuthControllerInternal.h"
+#include "services/WebhookEvents.h"
 
 namespace pyracms {
 
@@ -15,6 +16,10 @@ void AuthController::registerDone(int tenantId, const std::string &slug,
                           drogon::k500InternalServerError);
                 return;
             }
+            Json::Value d;
+            d["userId"] = user->id;
+            d["username"] = user->username;
+            fireWebhookEvent(tenantId, "user.registered", d);
             Json::Value result;
             result["token"] = authService_.generateToken(
                 user->id, user->username, user->tenantId);

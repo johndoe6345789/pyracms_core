@@ -7,13 +7,12 @@
 namespace pyracms {
 
 void AuthController::oauthUrl(
-    const drogon::HttpRequestPtr &req,
+    const drogon::HttpRequestPtr &/*req*/,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,
     const std::string &provider) {
 
-    auto state = req->getParameter("state");
-    if (state.empty())
-        state = "pyracms";
+    // Server-minted anti-forgery state; the callback verifies it.
+    auto state = makeOAuthState(std::time(nullptr));
 
     auto url = oauthService_.getAuthorizationUrl(provider, state);
     if (url.empty()) {

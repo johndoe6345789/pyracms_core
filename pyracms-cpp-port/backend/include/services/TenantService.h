@@ -32,11 +32,6 @@ public:
     // must not be empty, start/end with a hyphen, or contain spaces
     static bool isValidSlug(const std::string &slug);
 
-    // normalizeSlug: lowercases, trims, replaces whitespace / invalid
-    // chars with hyphens, collapses consecutive hyphens, strips leading
-    // and trailing hyphens
-    static std::string normalizeSlug(const std::string &name);
-
     // displayName must not be empty (validated before calling createTenant)
     static bool isValidDisplayName(const std::string &displayName);
 
