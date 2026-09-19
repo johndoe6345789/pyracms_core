@@ -46,8 +46,8 @@ python3 - <<'PY'
 import json
 d = json.load(open("/cov.json"))["files"]
 rows = [(f["line_total"] - f["line_covered"], f["line_total"],
-         f["line_percent"], f["filename"]) for f in d
-        if f["line_percent"] < 80]
+         (f["line_percent"] if f["line_percent"] is not None else 100), f["filename"]) for f in d
+        if (f["line_percent"] if f["line_percent"] is not None else 100) < 80]
 for miss, tot, pct, n in sorted(rows, reverse=True):
     print(f"{n} {tot} {pct:.0f}% (missing {miss})")
 PY

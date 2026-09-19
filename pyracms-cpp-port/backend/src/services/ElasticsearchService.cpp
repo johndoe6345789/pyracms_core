@@ -26,6 +26,20 @@ bool ElasticsearchService::isConfigured() const {
     return configured_;
 }
 
+// PostgreSQL timestamps ("2026-09-19 01:57:16.4+00") and "" are not valid
+// for the index's date field, which made every index call fail silently.
+static Json::Value isoDate(std::string s) {
+    if (s.empty())
+        return Json::Value(Json::nullValue);
+    auto space = s.find(' ');
+    if (space != std::string::npos)
+        s[space] = 'T';
+    auto tz = s.find_last_of("+-");
+    if (tz != std::string::npos && tz > 10 && s.size() - tz == 3)
+        s += ":00";
+    return Json::Value(s);
+}
+
 size_t ElasticsearchService::curlWriteCallback(char *ptr, size_t size, size_t nmemb, std::string *data) {
     data->append(ptr, size * nmemb);
     return size * nmemb;
@@ -43,6 +57,8 @@ std::string ElasticsearchService::httpRequest(const std::string &method,
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
+    curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, "http,https");
 
     struct curl_slist *headers = nullptr;
     headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -138,7 +154,7 @@ void ElasticsearchService::indexArticle(int tenantId, int articleId,
     doc["name"] = name;
     doc["url"] = "/articles/" + name;
     doc["type"] = "article";
-    doc["created_at"] = createdAt;
+    doc["created_at"] = isoDate(createdAt);
 
     Json::StreamWriterBuilder writer;
     auto body = Json::writeString(writer, doc);
@@ -156,7 +172,7 @@ void ElasticsearchService::indexForumPost(int tenantId, int postId,
     doc["content"] = content;
     doc["url"] = "/forum/thread/" + std::to_string(threadId);
     doc["type"] = "forum_post";
-    doc["created_at"] = createdAt;
+    doc["created_at"] = isoDate(createdAt);
 
     Json::StreamWriterBuilder writer;
     auto body = Json::writeString(writer, doc);
@@ -175,7 +191,7 @@ void ElasticsearchService::indexSnippet(int tenantId, int snippetId,
     doc["name"] = language;
     doc["url"] = "/snippets/" + std::to_string(snippetId);
     doc["type"] = "snippet";
-    doc["created_at"] = createdAt;
+    doc["created_at"] = isoDate(createdAt);
 
     Json::StreamWriterBuilder writer;
     auto body = Json::writeString(writer, doc);
@@ -194,7 +210,7 @@ void ElasticsearchService::indexGameDep(int tenantId, int pageId,
     doc["name"] = name;
     doc["url"] = "/gamedep/" + name;
     doc["type"] = "gamedep";
-    doc["created_at"] = createdAt;
+    doc["created_at"] = isoDate(createdAt);
 
     Json::StreamWriterBuilder writer;
     auto body = Json::writeString(writer, doc);
@@ -336,7 +352,8 @@ void ElasticsearchService::syncFromDatabase(const DbClientPtr &db, int tenantId)
         "SELECT a.id, a.name, a.display_name, a.created_at, "
         "  (SELECT content FROM article_revisions WHERE article_id = a.id "
         "   ORDER BY created_at DESC LIMIT 1) AS content "
-        "FROM articles a WHERE a.tenant_id = $1 AND a.status = 'published'",
+        "FROM articles a WHERE a.tenant_id = $1 AND a.status = 'published' "
+        "AND a.is_private = false",
         [this, tenantId](const drogon::orm::Result &result) {
             for (const auto &row : result) {
                 indexArticle(tenantId, row["id"].as<int>(),

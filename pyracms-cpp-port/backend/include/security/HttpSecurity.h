@@ -19,6 +19,10 @@ void addSecurityHeaders(const drogon::HttpRequestPtr &req,
 // Cap for JSON / form bodies (multipart uploads have a larger cap).
 constexpr size_t kMaxJsonBody = 2 * 1024 * 1024;
 
+// CORS headers for a response (no-op when the origin is not allowed).
+void addCors(const drogon::HttpRequestPtr &req,
+             const drogon::HttpResponsePtr &resp);
+
 // Body-size, CORS preflight, header and error-handler wiring.
 void installHttpSecurity(drogon::HttpAppFramework &app);
 

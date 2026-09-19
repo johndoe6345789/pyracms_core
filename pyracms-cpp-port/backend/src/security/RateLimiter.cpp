@@ -64,26 +64,6 @@ bool RateLimiter::allow(const std::string &key, int max, int windowSec,
     return true;
 }
 
-bool RateLimiter::locked(const std::string &key, int maxFails,
-                         int windowSec) {
-    std::lock_guard<std::mutex> lock(mu_);
-    auto it = fails_.find(key);
-    if (it == fails_.end())
-        return false;
-    dropOld(it->second, now() - windowSec);
-    return static_cast<int>(it->second.size()) >= maxFails;
-}
-
-void RateLimiter::fail(const std::string &key) {
-    std::lock_guard<std::mutex> lock(mu_);
-    fails_[key].push_back(now());
-}
-
-void RateLimiter::succeed(const std::string &key) {
-    std::lock_guard<std::mutex> lock(mu_);
-    fails_.erase(key);
-}
-
 size_t RateLimiter::size() {
     std::lock_guard<std::mutex> lock(mu_);
     return hits_.size() + fails_.size();

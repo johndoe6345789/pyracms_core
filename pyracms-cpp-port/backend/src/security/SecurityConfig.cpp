@@ -20,9 +20,11 @@ std::string weakSecretReason(const char *secret) {
     if (!secret || !*secret)
         return "JWT_SECRET is not set";
     std::string s = secret;
-    if (s.find("change-me") != std::string::npos ||
-        s.find("dev-secret") != std::string::npos)
-        return "JWT_SECRET is a placeholder value";
+    for (const char *marker : {"change-me", "dev-secret", "insecure",
+                               "do-not-use", "changeme", "placeholder"}) {
+        if (s.find(marker) != std::string::npos)
+            return "JWT_SECRET is a placeholder value";
+    }
     if (s.size() < 32)
         return "JWT_SECRET must be at least 32 characters";
     return "";

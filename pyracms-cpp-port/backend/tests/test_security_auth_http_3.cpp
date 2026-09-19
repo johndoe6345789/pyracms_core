@@ -1,0 +1,64 @@
+#include "http_accounts.h"
+#include "security/Hash.h"
+#include "security/RateLimiter.h"
+#include "services/UserService.h"
+
+#include <future>
+#include <thread>
+
+using namespace harness;
+using pyracms::RateLimiter;
+
+namespace {
+Json::Value creds(const std::string &user, const std::string &pw,
+                  const std::string &slug = "") {
+    Json::Value b = J({{"username", user}, {"password", pw}});
+    if (!slug.empty())
+        b["tenant"] = slug;
+    return b;
+}
+
+// Base64url without padding (to build tokens by hand).
+std::string b64url(const std::string &in) {
+    static const char *t =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    std::string out;
+    for (size_t i = 0; i < in.size(); i += 3) {
+        unsigned v = static_cast<unsigned char>(in[i]) << 16;
+        if (i + 1 < in.size())
+            v |= static_cast<unsigned char>(in[i + 1]) << 8;
+        if (i + 2 < in.size())
+            v |= static_cast<unsigned char>(in[i + 2]);
+        out += t[(v >> 18) & 63];
+        out += t[(v >> 12) & 63];
+        if (i + 1 < in.size())
+            out += t[(v >> 6) & 63];
+        if (i + 2 < in.size())
+            out += t[v & 63];
+    }
+    return out;
+}
+} // namespace
+
+TEST(SecurityAuth, LoginLocksAnAccountAndThrottlesAnAddress) {
+    REQUIRE_SERVER();
+    auto u = signup("");
+    RateLimiter::setEnabled(true);
+    for (int i = 0; i < 5; ++i)
+        EXPECT_EQ(post("/api/auth/login", creds(u.name, "wrong-pw-1")).status,
+                  401);
+    // even the right password is refused while the account is locked
+    EXPECT_EQ(post("/api/auth/login", creds(u.name, "password123")).status,
+              429);
+    int limited = 0;
+    for (int i = 0; i < 12; ++i)
+        limited += post("/api/auth/login", creds(uniq("nobody"), "x1234567"))
+                       .status == 429;
+    RateLimiter::setEnabled(false);
+    EXPECT_GE(limited, 1);
+    RateLimiter::instance().succeed("acct|0|" + u.name);
+    EXPECT_EQ(post("/api/auth/login", creds(u.name, "password123")).status,
+              200);
+    EXPECT_EQ(post("/api/auth/login", creds(u.name, std::string(500, 'x')))
+                  .status, 401);
+}

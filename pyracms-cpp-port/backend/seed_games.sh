@@ -13,18 +13,28 @@ tetris|Tetris|Falling blocks with 7-bag randomiser, ghost piece and levels.|1.0.
 twenty48|2048|Slide and merge numbered tiles to reach 2048. Pure shapes, no assets.|1.0.0|arcade,puzzle,pyglet|pyglet==2.1.16'
 
 gd_call() { # method path json
-  curl -s -X "$1" "$API$2?tenant_id=$TENANT_ID" \
-    -H "Content-Type: application/json" -H "$AUTH" -d "$3" > /dev/null 2>&1
+  curl -s -X "$1" "$API$2?tenant_id=$TENANT_ID"     -H "Content-Type: application/json" -H "$AUTH" -d "$3" > /dev/null 2>&1
+}
+
+# Prints the page JSON (empty when the page does not exist). Reading first
+# keeps re-runs quiet: no duplicate POSTs, so no unique-key errors in the
+# server log.
+gd_page() { # path
+  curl -sf "$API$1?tenant_id=$TENANT_ID" -H "$AUTH" 2>/dev/null
 }
 
 seed_games() {
-  local name display desc ver tags pip base tj pj
+  local name display desc ver tags pip base tj pj page
   while IFS='|' read -r name display desc ver tags pip; do
     base="/api/gamedep/game/$name"
-    gd_call POST /api/gamedep/game \
-      "{\"name\":\"$name\",\"displayName\":\"$display\",\"description\":\"$desc\"}"
-    gd_call POST "$base/revisions" \
-      "{\"version\":\"$ver\",\"moduleType\":\"python\"}"
+    page=$(gd_page "$base")
+    if [ -z "$page" ]; then
+      gd_call POST /api/gamedep/game         "{\"name\":\"$name\",\"displayName\":\"$display\",\"description\":\"$desc\"}"
+    fi
+    # Everything below belongs to the revision: skip it when it exists
+    # (publish is a toggle, so it must never run twice).
+    case "$page" in *"\"version\":\"$ver\""*) continue ;; esac
+    gd_call POST "$base/revisions"       "{\"version\":\"$ver\",\"moduleType\":\"python\"}"
     tj="\"${tags//,/\",\"}\""
     gd_call PUT "$base/tags" "{\"tags\":[$tj]}"
     pj="\"${pip//,/\",\"}\""

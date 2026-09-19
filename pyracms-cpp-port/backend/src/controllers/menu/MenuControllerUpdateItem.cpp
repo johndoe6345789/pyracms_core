@@ -1,6 +1,7 @@
 #include "controllers/BoolReply.h"
 #include "controllers/MenuController.h"
 #include "filters/TenantGuard.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -17,6 +18,14 @@ void MenuController::updateItem(
         return;
     }
 
+    for (const char *k : {"url", "routePath"}) {
+        if (json->isMember(k) && (!(*json)[k].isString() ||
+                                  !isSafeLinkUrl((*json)[k].asString()))) {
+            callback(filterError("Invalid menu link",
+                                 drogon::k400BadRequest));
+            return;
+        }
+    }
     Json::Value upd = *json;
     // Scoped accounts may not move an item into another group
     if (tokenTenantOf(req) != 0)

@@ -22,7 +22,8 @@ void AuthController::login(
     }
     auto username = (*json)["username"].asString();
     auto password = (*json)["password"].asString();
-    if (username.size() > 64 || password.size() > AuthService::kMaxPasswordLen) {
+    if (username.size() > 64 ||
+        password.size() > AuthService::kMaxPasswordLen) {
         sendError(callback, "Invalid credentials", drogon::k401Unauthorized);
         return;
     }

@@ -193,7 +193,7 @@ for kv in "site_name:Demo Site" "site_description:A demo PyraCMS site" "default_
   KEY="${kv%%:*}"
   VAL="${kv#*:}"
   curl -s -X PUT "$API/api/settings/$KEY?tenant_id=$TENANT_ID" -H "Content-Type: application/json" -H "$AUTH" \
-    -d "{\"name\":\"$KEY\",\"value\":\"$VAL\"}" > /dev/null 2>&1
+    -d "{\"tenantId\":$TENANT_ID,\"value\":\"$VAL\"}" > /dev/null 2>&1
 done
 echo "    4 settings created"
 

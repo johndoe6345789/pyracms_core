@@ -122,6 +122,9 @@ public:
                               int limit, int offset,
                               ArticleListCallback cb);
 
+    // Re-index (or drop) the article in the search engine after a change.
+    void refreshSearchIndex(const DbClientPtr &db, int articleId);
+
 private:
     ArticleDto rowToArticleDto(const drogon::orm::Row &row);
     ArticleRevisionDto rowToRevisionDto(const drogon::orm::Row &row);

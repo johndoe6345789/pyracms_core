@@ -81,15 +81,57 @@ set(TEST_SOURCES
 
     test_search_http.cpp
 
-    test_security_auth_http.cpp
+    test_security_auth_http_1.cpp
 
-    test_security_content_http.cpp
+    test_security_auth_http_2.cpp
 
-    test_security_edge_http.cpp
+    test_security_auth_http_3.cpp
 
-    test_security_rules_1.cpp
+    test_security_auth_http_4.cpp
 
-    test_security_rules_2.cpp
+    test_security_auth_http_5.cpp
+
+    test_security_auth_http_6.cpp
+
+    test_security_auth_http_7.cpp
+
+    test_security_content_http_1.cpp
+
+    test_security_content_http_2.cpp
+
+    test_security_content_http_3.cpp
+
+    test_security_content_http_4.cpp
+
+    test_security_edge_http_1.cpp
+
+    test_security_edge_http_2.cpp
+
+    test_security_edge_http_3.cpp
+
+    test_security_edge_http_4.cpp
+
+    test_security_edge_http_5.cpp
+
+    test_security_rules_1_1.cpp
+
+    test_security_rules_1_2.cpp
+
+    test_security_rules_2_1.cpp
+
+    test_security_rules_2_2.cpp
+
+    test_security_rules_2_3.cpp
+
+    test_security_rules_2_4.cpp
+
+    test_security_ws_1.cpp
+
+    test_security_ws_2.cpp
+
+    test_security_ws_3.cpp
+
+    test_security_ws_4.cpp
 
     test_services_crud_db_1.cpp
 

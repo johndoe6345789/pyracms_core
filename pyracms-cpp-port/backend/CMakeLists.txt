@@ -61,8 +61,6 @@ set(LIB_SOURCES
 
     src/controllers/SocialController.cpp
 
-    src/controllers/UserController.cpp
-
     src/controllers/WebSocketCollabController.cpp
 
     src/controllers/WebSocketNotificationController.cpp
@@ -229,9 +227,13 @@ set(LIB_SOURCES
 
     src/controllers/tenant/TenantControllerRemove.cpp
 
+    src/controllers/user/UserControllerChangePassword.cpp
+
     src/controllers/user/UserControllerGetById.cpp
 
     src/controllers/user/UserControllerList.cpp
+
+    src/controllers/user/UserControllerUpdate.cpp
 
     src/controllers/webhook/WebhookControllerCreate.cpp
 
@@ -245,9 +247,15 @@ set(LIB_SOURCES
 
     src/filters/AdminFilter.cpp
 
+    src/filters/JwtAccountState.cpp
+
     src/filters/JwtAuthFilter.cpp
 
     src/filters/OwnerFilter.cpp
+
+    src/filters/OwnerQueries.cpp
+
+    src/filters/OwnerTarget.cpp
 
     src/filters/RateLimitFilter.cpp
 
@@ -261,13 +269,19 @@ set(LIB_SOURCES
 
     src/security/HttpSecurity.cpp
 
+    src/security/HttpSecurityInstall.cpp
+
     src/security/OAuthState.cpp
 
     src/security/RateLimiter.cpp
 
+    src/security/RateLimiterLockout.cpp
+
     src/security/SecurityConfig.cpp
 
     src/security/SsrfGuard.cpp
+
+    src/security/SsrfUrl.cpp
 
     src/services/AnalyticsService.cpp
 
@@ -307,6 +321,10 @@ set(LIB_SOURCES
 
     src/services/WebhookDelivery.cpp
 
+    src/services/WebhookFire.cpp
+
+    src/services/WebhookSend.cpp
+
     src/services/WebhookService.cpp
 
     src/services/article/ArticleServiceCreateArticle.cpp
@@ -328,6 +346,8 @@ set(LIB_SOURCES
     src/services/article/ArticleServicePublishArticle.cpp
 
     src/services/article/ArticleServicePublishDueArticles.cpp
+
+    src/services/article/ArticleServiceRefreshSearchIndex.cpp
 
     src/services/article/ArticleServiceRevertToRevision.cpp
 
@@ -522,6 +542,8 @@ set(LIB_SOURCES
     src/services/user/UserServiceSetUserRole.cpp
 
     src/services/user/UserServiceUpdatePassword.cpp
+
+    src/services/user/UserServiceUpdateProblem.cpp
 
     src/services/user/UserServiceUpdateUser.cpp
 

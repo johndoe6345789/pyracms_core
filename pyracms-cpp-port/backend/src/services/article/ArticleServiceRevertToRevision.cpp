@@ -20,7 +20,8 @@ void ArticleService::revertToRevision(const DbClientPtr &db, int articleId,
                 "INSERT INTO article_revisions (article_id, content, summary, "
                 "user_id, created_at) "
                 "VALUES ($1, $2, $3, $4, NOW())",
-                [cb](const drogon::orm::Result &) {
+                [this, db, articleId, cb](const drogon::orm::Result &) {
+                    refreshSearchIndex(db, articleId);
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {

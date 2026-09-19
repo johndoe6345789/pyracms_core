@@ -9,10 +9,11 @@ void ArticleService::scheduleArticle(const DbClientPtr &db, int articleId,
     db->execSqlAsync(
         "UPDATE articles SET status = 'scheduled', scheduled_at = $2 "
         "WHERE id = $1",
-        [cb](const drogon::orm::Result &result) {
+        [this, db, articleId, cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Article not found");
             } else {
+                refreshSearchIndex(db, articleId);
                 cb(true, "");
             }
         },

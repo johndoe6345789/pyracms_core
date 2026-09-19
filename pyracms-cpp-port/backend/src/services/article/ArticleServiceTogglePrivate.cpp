@@ -7,10 +7,11 @@ void ArticleService::togglePrivate(const DbClientPtr &db, int articleId,
                                     BoolCallback cb) {
     db->execSqlAsync(
         "UPDATE articles SET is_private = NOT is_private WHERE id = $1",
-        [cb](const drogon::orm::Result &result) {
+        [this, db, articleId, cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Article not found");
             } else {
+                refreshSearchIndex(db, articleId);
                 cb(true, "");
             }
         },

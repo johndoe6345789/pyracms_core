@@ -1,6 +1,7 @@
 #include "controllers/BoolReply.h"
 #include "controllers/MenuController.h"
 #include "filters/TenantGuard.h"
+#include "security/Validate.h"
 
 namespace pyracms {
 
@@ -20,6 +21,12 @@ void MenuController::createItem(
     auto name = (*json)["name"].asString();
     auto routePath = (*json).get("routePath", "").asString();
     auto url = (*json).get("url", "").asString();
+    if (!isSafeLinkUrl(url) || !isSafeLinkUrl(routePath) ||
+        name.size() > 128) {
+        callback(filterError("Invalid menu item name or link",
+                             drogon::k400BadRequest));
+        return;
+    }
     auto type = (*json).get("type", "route").asString();
     int position = (*json).get("position", 0).asInt();
     auto permissions = (*json).get("permissions", "").asString();
