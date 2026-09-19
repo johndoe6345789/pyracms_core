@@ -324,4 +324,4 @@ if(BUILD_TESTS)
 endif()
 
 # Installation
-install(TARGETS hypernucleus RUNTIME DESTINATION bin)
+install(TARGETS hypernucleus RUNTIME DESTINATION bin BUNDLE DESTINATION .)
