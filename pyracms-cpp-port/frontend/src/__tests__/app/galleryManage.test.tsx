@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
 import AlbumPage from '@/app/site/[slug]/(tenant)/gallery/[albumId]/page'
-import PicturePage from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
+import PicturePage from
+  '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
 
 const push = jest.fn()
 jest.mock('@/components/common/CommentSection', () =>
@@ -30,26 +31,9 @@ jest.mock('@/hooks/useGalleryAlbum', () => ({
     pictures: [],
   }),
 }))
-jest.mock('@/hooks/useGalleryPicture', () => ({
-  useGalleryPicture: () => ({
-    handleLike: jest.fn(),
-    handleDislike: jest.fn(),
-    handleSetCover: jest.fn().mockResolvedValue(undefined),
-    refresh: jest.fn(),
-    picture: {
-      title: 'Pic',
-      description: 'd',
-      src: '/s',
-      tags: [],
-      likes: 1,
-      dislikes: 0,
-      isVideo: false,
-      albumId: '4',
-      albumName: 'Trip',
-      ownerId: 1,
-    },
-  }),
-}))
+jest.mock('@/hooks/useGalleryPicture', () =>
+  require('../helpers/galleryPictureMock').galleryPictureMock(),
+)
 
 describe('gallery owner controls', () => {
   beforeEach(() => {
