@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import MenuToggle from './MenuToggle'
 import TopBarLinks from './TopBarLinks'
 import TopBarTools from './TopBarTools'
+import { barSx, brandSx } from './appBarStyles'
 import type { NavEntry } from './navTypes'
 
 interface Props {
@@ -20,22 +21,6 @@ interface Props {
   /** Where the 'Get the launcher' tool points */
   downloadHref?: string | undefined
 }
-
-const barSx = {
-  bgcolor: 'background.paper',
-  borderBottom: '1px solid',
-  borderColor: 'divider',
-  backgroundImage: 'none',
-} as const
-
-const brandSx = {
-  color: 'text.primary',
-  textDecoration: 'none',
-  fontWeight: 800,
-  flexGrow: { xs: 1, lg: 0 },
-  mr: { lg: 3 },
-  whiteSpace: 'nowrap',
-} as const
 
 /**
  * The one top bar used by the portal and by every site. Burger on the

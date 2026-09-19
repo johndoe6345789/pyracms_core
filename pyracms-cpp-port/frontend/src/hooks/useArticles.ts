@@ -13,7 +13,16 @@ export interface ArticleSummary {
   tags: string[]
 }
 
-type Raw = Record<string, any>
+/** Article row as the API sends it; every field may be missing. */
+interface Raw {
+  name?: string
+  displayName?: string
+  content?: unknown
+  authorUsername?: string
+  createdAt?: unknown
+  viewCount?: number
+  tags?: unknown
+}
 
 export function mapSummary(a: Raw): ArticleSummary {
   const content =
@@ -21,14 +30,14 @@ export function mapSummary(a: Raw): ArticleSummary {
       ? a.content.replace(/<[^>]*>/g, '').substring(0, 120) + '...'
       : ''
   return {
-    name: a.name,
+    name: a.name ?? '',
     title: a.displayName ?? a.name ?? '',
     excerpt: content,
     author: a.authorUsername || 'Unknown',
     date:
       typeof a.createdAt === 'string' ? (a.createdAt.split('T')[0] ?? '') : '',
     views: a.viewCount || 0,
-    tags: Array.isArray(a.tags) ? a.tags : [],
+    tags: Array.isArray(a.tags) ? (a.tags as string[]) : [],
   }
 }
 

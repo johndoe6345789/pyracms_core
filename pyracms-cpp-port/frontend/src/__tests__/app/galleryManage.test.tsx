@@ -1,8 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import api from '@/lib/api'
 import AlbumPage from '@/app/site/[slug]/(tenant)/gallery/[albumId]/page'
-import PicturePage from
-  '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
+import PicturePage from '@/app/site/[slug]/(tenant)/gallery/picture/[pictureId]/page'
 
 const push = jest.fn()
 jest.mock('@/components/common/CommentSection', () =>

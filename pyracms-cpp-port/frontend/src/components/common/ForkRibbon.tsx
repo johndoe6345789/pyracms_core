@@ -1,6 +1,7 @@
-import { Box, Link as MuiLink } from '@mui/material'
+import { Box } from '@mui/material'
 import { GitHub } from '@mui/icons-material'
 import { repoUrl } from '@/lib/repo'
+import ForkInline, { LABEL, printOff } from './ForkInline'
 
 interface Props {
   /** 'corner' is a small top-right triangle; 'inline' is a plain link */
@@ -9,10 +10,6 @@ interface Props {
   size?: number
 }
 
-const LABEL = 'Fork me on GitHub'
-
-const printOff = { '@media print': { display: 'none' } }
-
 /** "Fork me on GitHub": pure CSS/SVG, theme-aware, hidden in print. */
 export default function ForkRibbon({
   variant = 'corner',
@@ -20,26 +17,7 @@ export default function ForkRibbon({
   size = 64,
 }: Props) {
   const href = repoUrl(repo)
-  if (variant === 'inline') {
-    return (
-      <MuiLink
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={LABEL}
-        data-testid="fork-inline"
-        color="inherit"
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.5,
-          ...printOff,
-        }}
-      >
-        <GitHub fontSize="small" aria-hidden="true" /> {LABEL}
-      </MuiLink>
-    )
-  }
+  if (variant === 'inline') return <ForkInline href={href} />
   return (
     <Box
       component="a"

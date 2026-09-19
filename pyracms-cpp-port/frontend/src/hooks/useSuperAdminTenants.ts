@@ -55,8 +55,9 @@ export function useSuperAdminTenants() {
       const row = mapTenantRow(res.data as Record<string, unknown>)
       setTenants((prev) => [...prev, row])
       return true
-    } catch (e: any) {
-      setCreateError(e.response?.data?.error ?? 'Failed to create site')
+    } catch (e: unknown) {
+      const r = e as { response?: { data?: { error?: string } } }
+      setCreateError(r.response?.data?.error ?? 'Failed to create site')
       return false
     }
   }

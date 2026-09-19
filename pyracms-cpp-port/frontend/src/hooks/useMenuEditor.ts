@@ -27,7 +27,8 @@ export function useMenuEditor(tenantId: number | null) {
       .then((loaded) => {
         setMenuGroups(loaded)
         const first = loaded[0]
-        if (first && !selectedGroup) setSelectedGroup(first.name)
+        // Keep the user's choice if they already picked a group
+        if (first) setSelectedGroup((cur) => cur || first.name)
       })
       .catch(() => {})
       .finally(() => setLoading(false))

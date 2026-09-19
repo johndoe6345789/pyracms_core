@@ -23,10 +23,29 @@ export interface Article {
   scheduledAt?: string
 }
 
-function mapArticle(a: Record<string, any>): Article {
+/** Article as the API sends it; every field may be missing. */
+interface RawArticle {
+  id?: unknown
+  name?: string
+  displayName?: string
+  content?: string
+  authorUsername?: string
+  createdAt?: string
+  rendererName?: string
+  viewCount?: number
+  likes?: number
+  dislikes?: number
+  tags?: string[]
+  revisionCount?: number
+  status?: string
+  isPrivate?: unknown
+  scheduledAt?: unknown
+}
+
+function mapArticle(a: RawArticle): Article {
   return {
     ...(typeof a.id === 'number' ? { id: a.id } : {}),
-    title: a.displayName || a.name,
+    title: a.displayName || a.name || '',
     content: a.content || '',
     author: a.authorUsername || 'Unknown',
     createdDate: formatDay(a.createdAt || ''),

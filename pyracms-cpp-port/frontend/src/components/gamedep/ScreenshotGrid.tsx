@@ -1,4 +1,5 @@
-import { ImageList, ImageListItem } from '@mui/material'
+import { Box, ImageList, ImageListItem } from '@mui/material'
+import Image from 'next/image'
 import type { Screenshot } from '@/hooks/useGameDepDetail'
 
 interface ScreenshotGridProps {
@@ -10,12 +11,18 @@ export default function ScreenshotGrid({ screenshots }: ScreenshotGridProps) {
     <ImageList cols={3} gap={16}>
       {screenshots.map((ss) => (
         <ImageListItem key={ss.id} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-          <img
-            src={ss.src}
-            alt={ss.title}
-            loading="lazy"
-            style={{ display: 'block', width: '100%', borderRadius: 12 }}
-          />
+          <Box
+            sx={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}
+          >
+            <Image
+              src={ss.src}
+              alt={ss.title}
+              fill
+              unoptimized
+              sizes="(max-width: 900px) 100vw, 33vw"
+              style={{ objectFit: 'cover', borderRadius: 12 }}
+            />
+          </Box>
         </ImageListItem>
       ))}
     </ImageList>

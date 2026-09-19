@@ -43,6 +43,13 @@ jobs:
       working-directory: pyracms-cpp-port/frontend
       run: npm ci
 
+    # One Prettier config (.prettierrc, 80 columns): drift fails here
+    # instead of showing up as thousands of lint warnings.
+    - name: Check formatting
+      working-directory: pyracms-cpp-port/frontend
+      run: npm run format:check
+
+    # --max-warnings 0: warnings are fixed, not tolerated.
     - name: Run linter
       working-directory: pyracms-cpp-port/frontend
       run: npm run lint
