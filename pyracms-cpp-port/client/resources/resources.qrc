@@ -1,5 +1,0 @@
-<!-- QML now ships inside the "Hypernucleus" QML module (qt_add_qml_module in
-     CMakeLists.txt). This file is intentionally empty and not referenced by
-     the build; it can be deleted. -->
-<RCC>
-</RCC>
