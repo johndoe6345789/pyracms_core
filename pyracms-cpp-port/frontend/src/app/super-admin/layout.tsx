@@ -21,9 +21,7 @@ export default function SuperAdminLayout({
   children: React.ReactNode
 }) {
   const theme = useTheme()
-  const isMobile = useMediaQuery(
-    theme.breakpoints.down('md'),
-  )
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [hydrated, setHydrated] = useState(false)
 

@@ -34,6 +34,10 @@ docker compose -f docker-compose.ghcr.yml -f docker-compose.prod.yml \
 # (or docker-compose.yml + docker-compose.prod.yml --build to build locally)
 ```
 
+Full deployment and operations guides (first-run owner, TLS, backups,
+upgrades): `pyracms-cpp-port/docs/DEPLOY.md` and `docs/OPERATIONS.md`.
+`scripts/smoke.sh <url>` verifies headers, 401s and rate limiting.
+
 Needs Docker Compose >= 2.24. Use a fresh project name/volumes: a database
 volume created by the dev stack has the dev password.
 
@@ -42,6 +46,9 @@ Checklist:
 - [ ] `.env.prod` has a random `POSTGRES_PASSWORD` and a `JWT_SECRET` of at
       least 48 hex chars; file mode 600; never committed (it is git-ignored).
       The prod override refuses to start if either is missing.
+- [ ] The first platform account becomes Platform Owner: create it before
+      exposing the site (`scripts/create-owner.sh`, or the guarded
+      `ADMIN_*` bootstrap; remove `ADMIN_PASSWORD` afterwards).
 - [ ] `SEED_DEV` is **not** set (the override forces `0`). The seed creates
       `admin/password123`. If a demo ever ran on the host, delete that user.
 - [ ] Only nginx is published, and only on `127.0.0.1` unless you set

@@ -6,18 +6,10 @@ import {
   Typography,
   Box,
 } from '@mui/material'
-import {
-  useRevisions,
-} from '@/hooks/useRevisions'
-import {
-  useTenantId,
-} from '@/hooks/useTenantId'
-import {
-  BackButton,
-} from '@/components/common/BackButton'
-import {
-  RevisionTable,
-} from '@/components/articles/RevisionTable'
+import { useRevisions } from '@/hooks/useRevisions'
+import { useTenantId } from '@/hooks/useTenantId'
+import { BackButton } from '@/components/common/BackButton'
+import { RevisionTable } from '@/components/articles/RevisionTable'
 import {
   RevisionDiffViewer,
 } from '@/components/articles/RevisionDiffViewer'
@@ -27,25 +19,15 @@ export default function RevisionsPage() {
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
-  const {
-    revisions,
-    diffs,
-    latestRevision,
-    handleRevert,
-  } = useRevisions(name, tenantId)
+  const { revisions, diffs, latestRevision, handleRevert } =
+    useRevisions(name, tenantId)
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{ py: 6 }}
-      data-testid="revisions-page"
-    >
+    <Container maxWidth="md" sx={{ py: 6 }}
+      data-testid="revisions-page">
       <Box sx={{ mb: 4 }}>
         <BackButton
-          href={
-            `/site/${slug}` +
-            `/articles/${name}`
-          }
+          href={`/site/${slug}/articles/${name}`}
           label="Back to Article"
           data-testid="back-to-article-btn"
         />
@@ -57,12 +39,8 @@ export default function RevisionsPage() {
         >
           Revision History
         </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-        >
-          View and manage past revisions
-          of this article.
+        <Typography variant="body1" color="text.secondary">
+          View and manage past revisions of this article.
         </Typography>
       </Box>
       <section

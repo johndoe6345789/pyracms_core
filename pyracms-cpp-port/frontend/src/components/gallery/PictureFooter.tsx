@@ -35,8 +35,8 @@ export default function PictureFooter({
         onDislike={onDislike}
       />
       {canManage && (
-        <PictureActions onSetCover={onSetCover} onEdit={onEdit}
-          onDelete={onDelete} />
+        <PictureActions onSetCover={onSetCover} onDelete={onDelete}
+          {...(onEdit ? { onEdit } : {})} />
       )}
     </Box>
   )

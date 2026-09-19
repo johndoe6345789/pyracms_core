@@ -14,7 +14,8 @@ jest.mock('next/navigation', () => ({ usePathname: () => path }))
 jest.mock('@/hooks/useAuthHydration', () => ({ useAuthHydration: jest.fn() }))
 jest.mock('@/hooks/useTenantId',
   () => ({ useTenantId: () => ({ tenantId: 3, loading: false }) }))
-jest.mock('@/lib/api', () => ({ __esModule: true, default: { get: jest.fn() } }))
+jest.mock('@/lib/api',
+  () => ({ __esModule: true, default: { get: jest.fn() } }))
 const get = (api as unknown as { get: jest.Mock }).get
 
 function Probe() {

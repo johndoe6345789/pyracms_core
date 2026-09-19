@@ -17,6 +17,10 @@ endif()
 # Auto-generated test sources — run `python generate_cmake.py` to update
 set(TEST_SOURCES
 
+    fake_s3.cpp
+
+    fake_s3_handle.cpp
+
     http_accounts.cpp
 
     http_calls.cpp
@@ -50,6 +54,10 @@ set(TEST_SOURCES
     test_comment_notify_http.cpp
 
     test_file_http.cpp
+
+    test_file_s3_errors.cpp
+
+    test_file_s3_http.cpp
 
     test_forum_flow_db_1.cpp
 
@@ -178,6 +186,12 @@ set(TEST_SOURCES
     test_social_http.cpp
 
     test_social_service_http.cpp
+
+    test_storage_config.cpp
+
+    test_storage_local.cpp
+
+    test_storage_s3.cpp
 
     test_tenant_http.cpp
 

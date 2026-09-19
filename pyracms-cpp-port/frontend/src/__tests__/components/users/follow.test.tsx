@@ -48,16 +48,17 @@ describe('FollowButton', () => {
 
 describe('UserHeader', () => {
   const user = { id: 9, username: 'zed', email: '', bio: 'hi',
-    location: 'NYC', avatarUrl: '', reputation: 4, createdAt: '' }
+    website: 'http://nyc.dev', avatarUrl: '', reputation: 4,
+    postCount: 2, createdAt: '' }
 
-  it('shows optional bio and location', () => {
+  it('shows optional bio and website', () => {
     renderWithStore(<UserHeader user={user} />)
     expect(screen.getByText('hi')).toBeInTheDocument()
-    expect(screen.getByText('NYC')).toBeInTheDocument()
+    expect(screen.getByText('http://nyc.dev')).toBeInTheDocument()
   })
 
   it('omits them when empty', () => {
-    renderWithStore(<UserHeader user={{ ...user, bio: '', location: '' }} />)
-    expect(screen.queryByText('NYC')).toBeNull()
+    renderWithStore(<UserHeader user={{ ...user, bio: '', website: '' }} />)
+    expect(screen.queryByText('http://nyc.dev')).toBeNull()
   })
 })

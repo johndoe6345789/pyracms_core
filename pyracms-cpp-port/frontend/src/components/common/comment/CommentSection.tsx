@@ -20,21 +20,17 @@ export default function CommentSection({
   contentType,
   contentId,
 }: CommentSectionProps) {
-  const [comments, setComments] = useState<
-    Comment[]
-  >([])
+  const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const isAuthenticated = useSelector(
-    (s: RootState) => s.auth.isAuthenticated
-  )
+    (s: RootState) => s.auth.isAuthenticated)
 
   const fetchComments = useCallback(async () => {
     try {
-      const url =
-        `/api/comments/${contentType}/${contentId}`
-      const res = await api.get(url)
+      const res = await api.get(
+        `/api/comments/${contentType}/${contentId}`)
       const flat: ApiComment[] = Array.isArray(res.data) ? res.data : []
       setComments(buildTree(flat))
       setError('')

@@ -15,6 +15,9 @@ FileDto FileService::rowToDto(const drogon::orm::Row &row) {
     dto.isVideo = row["is_video"].as<bool>();
     dto.downloadCount = row["download_count"].as<int>();
     dto.sha256 = row["sha256"].as<std::string>();
+    if (!row["tenant_id"].isNull())
+        dto.tenantId = row["tenant_id"].as<int>();
+    dto.storage = row["storage"].as<std::string>();
     return dto;
 }
 
@@ -24,18 +27,19 @@ void FileService::uploadFile(const DbClientPtr &db,
                              const std::string &mimetype, int64_t size,
                              bool isPicture, bool isVideo, BoolCallback cb,
                              const std::string &sha256, int userId,
-                             int tenantId) {
+                             int tenantId, const std::string &storage) {
     db->execSqlAsync(
         "INSERT INTO files (filename, uuid, mimetype, size, is_picture, "
-        "is_video, download_count, sha256, created_at, user_id, tenant_id) "
+        "is_video, download_count, sha256, created_at, user_id, tenant_id, "
+        "storage) "
         "VALUES ($1, $2, $3, $4, $5, $6, 0, $7, NOW(), NULLIF($8::int, 0), "
-        "NULLIF($9::int, 0)) RETURNING id",
+        "NULLIF($9::int, 0), $10) RETURNING id",
         [cb](const drogon::orm::Result &) { cb(true, ""); },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
         },
         filename, uuid, mimetype, size, isPicture, isVideo, sha256, userId,
-        tenantId);
+        tenantId, storage);
 }
 
 } // namespace pyracms

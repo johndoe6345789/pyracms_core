@@ -39,11 +39,6 @@ beforeEach(() => {
   }
 })
 
-it('mounts the shared comments for the snippet', () => {
-  render(<ViewSnippetPage />)
-  expect(screen.getByTestId('comments-snippet-4')).toBeInTheDocument()
-})
-
 it('shows loading and not-found states', () => {
   sn.loading = true
   const { rerender } = render(<ViewSnippetPage />)
@@ -56,6 +51,7 @@ it('shows loading and not-found states', () => {
 it('runs, forks and shows action errors', () => {
   act.error = 'Log in to fork this snippet.'
   const { rerender } = render(<ViewSnippetPage />)
+  expect(screen.getByTestId('comments-snippet-4')).toBeVisible()
   fireEvent.click(screen.getByTestId('run-snippet-btn'))
   fireEvent.click(screen.getByTestId('fork-snippet-btn'))
   expect(run).toHaveBeenCalledWith('4')

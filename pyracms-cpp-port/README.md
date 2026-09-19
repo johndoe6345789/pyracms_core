@@ -146,7 +146,11 @@ cd backend/build
   nginx (loopback), isolates data services on an internal network, runs
   read-only, unprivileged containers and uses a filtered Docker socket proxy.
 * `nginx.conf` is HTTP-only behind your TLS terminator; `nginx.tls.conf.example`
-  is a stand-alone TLS variant.
+  is a stand-alone TLS variant. Both expose `/healthz` and `/readyz`.
+* Full guides: [`docs/DEPLOY.md`](docs/DEPLOY.md) (first-run owner, TLS,
+  reverse proxies, upgrades, production checklist) and
+  [`docs/OPERATIONS.md`](docs/OPERATIONS.md) (backup/restore, monitoring).
+  Ops scripts: `scripts/{create-owner,backup,restore,test-mail,smoke}.sh`.
 
 See [`../SECURITY.md`](../SECURITY.md) (hardening checklist, Proxmox/CapRover)
 and [`SECURITY_AUDIT_INFRA.md`](SECURITY_AUDIT_INFRA.md) (findings + residual

@@ -1,6 +1,7 @@
 #include "security/HttpSecurity.h"
 #include "security/SecurityConfig.h"
 #include "startup/Startup.h"
+#include "storage/StorageConfig.h"
 
 #include <drogon/drogon.h>
 #include <iostream>
@@ -11,6 +12,11 @@ int main() {
     if (!secErr.empty()) {
         std::cerr << "FATAL: " << secErr << " (PYRACMS_ENV=production)"
                   << std::endl;
+        return 1;
+    }
+    auto storageErr = pyracms::startupStorageError();
+    if (!storageErr.empty()) {
+        std::cerr << "FATAL: " << storageErr << std::endl;
         return 1;
     }
     if (!std::getenv("JWT_SECRET"))

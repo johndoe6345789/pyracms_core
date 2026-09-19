@@ -21,13 +21,6 @@ std::string FileController::generateUuid() {
     return drogon::utils::getUuid();
 }
 
-std::string FileController::getUploadDir() {
-    auto &config = drogon::app().getCustomConfig();
-    if (config.isMember("upload_dir"))
-        return config["upload_dir"].asString();
-    return "./uploads";
-}
-
 std::string FileController::mimeFor(const std::string &filename) {
     static const std::map<std::string, std::string> known = {
         {"png", "image/png"},       {"jpg", "image/jpeg"},

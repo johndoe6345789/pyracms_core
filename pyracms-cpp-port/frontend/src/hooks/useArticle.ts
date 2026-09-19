@@ -42,10 +42,7 @@ function mapArticle(a: Record<string, any>): Article {
   }
 }
 
-export function useArticle(
-  name: string,
-  tenantId: number | null
-) {
+export function useArticle(name: string, tenantId: number | null) {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)

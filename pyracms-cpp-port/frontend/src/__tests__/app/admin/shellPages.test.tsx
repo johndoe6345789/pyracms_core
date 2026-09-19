@@ -44,8 +44,12 @@ it('layout opens and closes the mobile drawer', () => {
   return waitFor(() => screen.getByTestId('admin-nav-users').click())
 })
 
-it('dashboard page shows quick links', () => {
+it('dashboard page shows quick links and real activity', async () => {
+  m.get.mockResolvedValue({ data: [{ id: 1, type: 'article', actor: 'a',
+    title: 'Hello', link: '/x', createdAt: '2026-01-01T00:00:00Z' }] })
   render(<DashboardPage />)
+  expect(await screen.findByTestId('activity-1')).toBeInTheDocument()
+  expect(m.get).toHaveBeenCalledWith('/api/activity?tenant_id=3&limit=10')
   expect(screen.getByTestId('stats')).toBeInTheDocument()
   expect(screen.getByTestId('quick-link-users')).toBeInTheDocument()
 })

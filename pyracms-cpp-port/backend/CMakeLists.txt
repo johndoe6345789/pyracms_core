@@ -145,6 +145,8 @@ set(LIB_SOURCES
 
     src/controllers/docs/DocsControllerSwaggerUi.cpp
 
+    src/controllers/file/FileControllerBlob.cpp
+
     src/controllers/file/FileControllerDownload.cpp
 
     src/controllers/file/FileControllerHelpers.cpp
@@ -906,6 +908,18 @@ set(LIB_SOURCES
     src/startup/StartupDbClient.cpp
 
     src/startup/StartupPublishTimer.cpp
+
+    src/storage/BlobRegistry.cpp
+
+    src/storage/BlobStatus.cpp
+
+    src/storage/LocalDiskStorage.cpp
+
+    src/storage/S3Storage.cpp
+
+    src/storage/S3StorageHttp.cpp
+
+    src/storage/StorageConfig.cpp
 
 )
 

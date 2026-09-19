@@ -18,6 +18,8 @@ struct FileDto {
     bool isVideo;
     int downloadCount;
     std::string sha256;
+    int tenantId{0};               // 0 = platform site
+    std::string storage{"local"};  // BlobStorage that holds the bytes
 };
 
 class FileService {
@@ -32,7 +34,8 @@ class FileService {
                     const std::string &uuid, const std::string &mimetype,
                     int64_t size, bool isPicture, bool isVideo, BoolCallback cb,
                     const std::string &sha256 = "", int userId = 0,
-                    int tenantId = 0);
+                    int tenantId = 0,
+                    const std::string &storage = "local");
 
     void getFile(const DbClientPtr &db, const std::string &uuid, Callback cb);
 

@@ -46,17 +46,17 @@ describe('PasswordStrengthBar', () => {
 })
 
 describe('useCommentActions', () => {
-  it('ignores guest votes and toggles existing votes', async () => {
+  it('ignores guest votes and sends like/dislike', async () => {
     (api.post as jest.Mock).mockResolvedValue({})
     const onRefresh = jest.fn()
     const { result } = renderHook(() => useCommentActions(3, 'x', onRefresh))
-    await act(async () => { await result.current.vote(1, null, false) })
+    await act(async () => { await result.current.vote(true, false) })
     expect(api.post).not.toHaveBeenCalled()
-    await act(async () => { await result.current.vote(1, null, true) })
+    await act(async () => { await result.current.vote(true, true) })
     expect(api.post).toHaveBeenLastCalledWith('/api/comments/3/vote',
-      { value: 1 })
-    await act(async () => { await result.current.vote(-1, -1, true) })
+      { isLike: true })
+    await act(async () => { await result.current.vote(false, true) })
     expect(api.post).toHaveBeenLastCalledWith('/api/comments/3/vote',
-      { value: 0 })
+      { isLike: false })
   })
 })

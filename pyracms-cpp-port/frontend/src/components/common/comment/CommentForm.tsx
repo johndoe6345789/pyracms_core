@@ -1,10 +1,11 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Box, TextField, Button } from '@mui/material'
+import { Box, TextField } from '@mui/material'
 import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
 import { ErrorAlert } from '../ErrorAlert'
+import CommentFormButtons from './CommentFormButtons'
 import { MentionAutocomplete } from '../MentionAutocomplete'
 
 interface CommentFormProps {
@@ -63,27 +64,9 @@ export default function CommentForm({
       />
       <MentionAutocomplete inputRef={ref}
         onSelect={(u) => setText(insertMention(text, u))} />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end',
-        gap: 1, mt: 1 }}>
-        {onCancel && (
-          <Button
-            size="small"
-            onClick={onCancel}
-            data-testid="comment-cancel-btn"
-          >
-            Cancel
-          </Button>
-        )}
-        <Button
-          size={parentId ? 'small' : 'medium'}
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={submitting || !text.trim()}
-          data-testid="comment-submit-btn"
-        >
-          {submitLabel}
-        </Button>
-      </Box>
+      <CommentFormButtons small={!!parentId} label={submitLabel}
+        disabled={submitting || !text.trim()}
+        onSubmit={handleSubmit} {...(onCancel ? { onCancel } : {})} />
     </Box>
   )
 }

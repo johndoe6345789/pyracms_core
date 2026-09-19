@@ -1,9 +1,9 @@
 #include "controllers/BoolReply.h"
 #include "controllers/FileController.h"
 #include "controllers/FileRules.h"
+#include "controllers/FileBlob.h"
 #include "filters/TenantGuard.h"
-
-#include <filesystem>
+#include "storage/BlobRegistry.h"
 
 namespace pyracms {
 
@@ -43,30 +43,35 @@ void FileController::upload(
     auto mime = mimeFor(filename);
     auto size = static_cast<int64_t>(data.size());
     auto sha = sha256Hex(data);
-    auto dir = getUploadDir();
-    std::filesystem::create_directories(dir);
-    file.saveAs(dir + "/" + uuid);
-
-    fileService_.uploadFile(
-        drogon::app().getDbClient(), filename, uuid, mime, size,
-        isImageMimetype(mime), isVideoMimetype(mime),
-        [callback, uuid, filename, size, sha, dir](bool ok,
-                                                   const std::string &) {
-            if (!ok) {
-                std::filesystem::remove(dir + "/" + uuid);
-                callback(filterError("Could not store the file",
-                                     drogon::k500InternalServerError));
-                return;
-            }
-            Json::Value r;
-            r["success"] = true;
-            r["uuid"] = uuid;
-            r["filename"] = filename;
-            r["size"] = static_cast<Json::Int64>(size);
-            r["sha256"] = sha;
-            callback(drogon::HttpResponse::newHttpJsonResponse(r));
-        },
-        sha, req->attributes()->get<int>("userId"), tokenTenantOf(req));
+    auto store = BlobRegistry::active();
+    if (!store)
+        return callback(blobFailure(BlobStatus::Unavailable));
+    int tenant = tokenTenantOf(req);
+    int userId = req->attributes()->get<int>("userId");
+    BlobKey key{tenant, uuid, false};
+    store->put(key, std::move(data), [=, this](BlobStatus st) {
+        if (st != BlobStatus::Ok)
+            return callback(blobFailure(st));
+        fileService_.uploadFile(
+            drogon::app().getDbClient(), filename, uuid, mime, size,
+            isImageMimetype(mime), isVideoMimetype(mime),
+            [=](bool ok, const std::string &) {
+                if (!ok) {
+                    store->remove(key, [](BlobStatus) {});
+                    callback(filterError("Could not store the file",
+                                         drogon::k500InternalServerError));
+                    return;
+                }
+                Json::Value r;
+                r["success"] = true;
+                r["uuid"] = uuid;
+                r["filename"] = filename;
+                r["size"] = static_cast<Json::Int64>(size);
+                r["sha256"] = sha;
+                callback(drogon::HttpResponse::newHttpJsonResponse(r));
+            },
+            sha, userId, tenant, store->name());
+    });
 }
 
 } // namespace pyracms

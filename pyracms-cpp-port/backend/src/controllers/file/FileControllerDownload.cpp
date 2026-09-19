@@ -1,21 +1,21 @@
+#include "controllers/FileBlob.h"
 #include "controllers/FileController.h"
-#include "controllers/FileRules.h"
 #include "filters/TenantGuard.h"
 #include "security/Validate.h"
-
-#include <filesystem>
+#include "storage/BlobRegistry.h"
 
 namespace pyracms {
 
-static void notFound(
-    const std::function<void(const drogon::HttpResponsePtr &)> &callback) {
+using Reply = std::function<void(const drogon::HttpResponsePtr &)>;
+
+static void notFound(const Reply &callback) {
     callback(filterError("File not found", drogon::k404NotFound));
 }
 
-// The uuid is checked for shape before it is ever turned into a path.
+// The uuid is checked for shape before it is ever turned into a key; the
+// file row says which store holds the bytes.
 void FileController::download(
-    const drogon::HttpRequestPtr &,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    const drogon::HttpRequestPtr &, Reply &&callback,
     const std::string &uuid) {
     if (!isValidUuid(uuid))
         return notFound(callback);
@@ -25,39 +25,46 @@ void FileController::download(
         [this, callback, uuid, db](const std::optional<FileDto> &file) {
             if (!file)
                 return notFound(callback);
-            auto path = getUploadDir() + "/" + uuid;
-            if (!std::filesystem::exists(path))
-                return notFound(callback);
-            // Always a download, never rendered in our origin
-            auto resp = drogon::HttpResponse::newFileResponse(
-                path, safeFilename(file->filename));
-            resp->addHeader("Content-Type", servedMime(file->mimetype));
-            callback(resp);
-            fileService_.incrementDownloadCount(
-                db, uuid, [](bool, const std::string &) {});
+            auto store = BlobRegistry::named(file->storage);
+            if (!store)
+                return callback(blobFailure(BlobStatus::Unavailable));
+            loadBlob(store, {file->tenantId, uuid, false},
+                     [=, this](BlobStatus s, BlobPayload p) {
+                         if (s != BlobStatus::Ok)
+                             return callback(blobFailure(s));
+                         // Always a download, never rendered in our origin
+                         callback(blobResponse(p, *file, true));
+                         fileService_.incrementDownloadCount(
+                             db, uuid, [](bool, const std::string &) {});
+                     });
         });
 }
 
+// The thumbnail when one was stored, else the original.
 void FileController::thumbnail(
-    const drogon::HttpRequestPtr &,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+    const drogon::HttpRequestPtr &, Reply &&callback,
     const std::string &uuid) {
     if (!isValidUuid(uuid))
         return notFound(callback);
     fileService_.getFile(
         drogon::app().getDbClient(), uuid,
-        [this, callback, uuid](const std::optional<FileDto> &file) {
+        [callback, uuid](const std::optional<FileDto> &file) {
             if (!file)
                 return notFound(callback);
-            auto dir = getUploadDir();
-            auto thumb = dir + "/thumbnails/" + uuid;
-            auto path = std::filesystem::exists(thumb) ? thumb
-                                                       : dir + "/" + uuid;
-            if (!std::filesystem::exists(path))
-                return notFound(callback);
-            auto resp = drogon::HttpResponse::newFileResponse(path);
-            resp->addHeader("Content-Type", servedMime(file->mimetype));
-            callback(resp);
+            auto store = BlobRegistry::named(file->storage);
+            if (!store)
+                return callback(blobFailure(BlobStatus::Unavailable));
+            auto done = [=](BlobStatus s, BlobPayload p) {
+                callback(s == BlobStatus::Ok ? blobResponse(p, *file, false)
+                                             : blobFailure(s));
+            };
+            loadBlob(store, {file->tenantId, uuid, true},
+                     [=](BlobStatus s, BlobPayload p) {
+                         if (s != BlobStatus::NotFound)
+                             return done(s, std::move(p));
+                         loadBlob(store, {file->tenantId, uuid, false},
+                                  done);
+                     });
         });
 }
 
