@@ -17,7 +17,7 @@ TEST(BlobStorage, IdsAndStatuses) {
 }
 
 TEST(LocalDiskStorage, RoundTripAndTraversalRefused) {
-    auto dir = "/tmp/" + harness::uniq("blobs");
+    auto dir = "/tmp/" + uniq("blobs");
     LocalDiskStorage st([dir] { return dir; });
     auto wait = [](auto call) {
         std::promise<BlobStatus> p;
