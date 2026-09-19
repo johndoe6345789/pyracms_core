@@ -73,6 +73,8 @@ set(TEST_SOURCES
 
     test_role_rules.cpp
 
+    test_search_http.cpp
+
     test_services_crud_db_1.cpp
 
     test_services_crud_db_2.cpp
@@ -86,7 +88,6 @@ set(TEST_SOURCES
     test_social_http.cpp
 
     test_tenant_rules.cpp
-    test_user_visibility.cpp
 
     test_tenant_service.cpp
 
@@ -97,6 +98,8 @@ set(TEST_SOURCES
     test_user_service.cpp
 
     test_user_service_roles.cpp
+
+    test_user_visibility.cpp
 
     test_webhook_http.cpp
 

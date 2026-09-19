@@ -3,66 +3,6 @@
 
 namespace pyracms {
 
-void UserController::list(
-    const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
-
-    auto limitStr = req->getParameter("limit");
-    auto offsetStr = req->getParameter("offset");
-    int limit = limitStr.empty() ? 50 : std::stoi(limitStr);
-    int offset = offsetStr.empty() ? 0 : std::stoi(offsetStr);
-
-    auto db = drogon::app().getDbClient();
-    userService_.listUsers(
-        db, limit, offset,
-        [callback](const std::vector<UserDto> &users) {
-            Json::Value result(Json::arrayValue);
-            for (const auto &u : users) {
-                Json::Value item;
-                item["id"] = u.id;
-                item["username"] = u.username;
-                item["fullName"] = u.fullName;
-                item["email"] = u.email;
-                item["createdAt"] = u.createdAt;
-                item["banned"] = u.banned;
-                result.append(item);
-            }
-            callback(drogon::HttpResponse::newHttpJsonResponse(result));
-        });
-}
-
-void UserController::getById(
-    const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-    int id) {
-
-    auto db = drogon::app().getDbClient();
-    userService_.findById(
-        db, id,
-        [callback](const std::optional<UserDto> &user) {
-            if (!user) {
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(
-                    Json::Value{});
-                (*resp->jsonObject())["error"] = "User not found";
-                resp->setStatusCode(drogon::k404NotFound);
-                callback(resp);
-                return;
-            }
-
-            Json::Value result;
-            result["id"] = user->id;
-            result["username"] = user->username;
-            result["fullName"] = user->fullName;
-            result["email"] = user->email;
-            result["website"] = user->website;
-            result["aboutme"] = user->aboutme;
-            result["timezone"] = user->timezone;
-            result["banned"] = user->banned;
-            result["createdAt"] = user->createdAt;
-            callback(drogon::HttpResponse::newHttpJsonResponse(result));
-        });
-}
-
 void UserController::update(
     const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback,

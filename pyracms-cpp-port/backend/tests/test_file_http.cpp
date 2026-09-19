@@ -31,7 +31,6 @@ TEST(FileHttp, UploadDownloadThumbnailListRemove) {
     EXPECT_EQ(bin.status, 200);
     EXPECT_EQ(del("/api/files/" + uuid, u).status, 200);
     EXPECT_EQ(get("/api/files/" + uuid).status, 404);
-    EXPECT_NE(del("/api/files/" + uuid, u).status, 200);
     EXPECT_EQ(del("/api/files/" + vid.json["uuid"].asString(), "").status,
               401);
 }

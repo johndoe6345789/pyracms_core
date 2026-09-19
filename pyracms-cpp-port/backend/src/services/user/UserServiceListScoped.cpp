@@ -7,10 +7,10 @@ void UserService::listUsersScoped(const DbClientPtr &db, int scope,
                                   const std::string &username, int limit,
                                   int offset, ListCallback cb) {
     db->execSqlAsync(
-        "SELECT * FROM users WHERE ($1 < 0 OR COALESCE(tenant_id, 0) = $1) "
-        "AND ($2 = '' OR username ILIKE '%' || $2 || '%' "
+        "SELECT * FROM users WHERE ($1::int < 0 OR COALESCE(tenant_id, 0) = $1::int) "
+        "AND ($2::text = '' OR username ILIKE '%' || $2::text || '%' "
         "OR full_name ILIKE '%' || $2 || '%') "
-        "AND ($3 = '' OR username = $3) "
+        "AND ($3::text = '' OR username = $3::text) "
         "ORDER BY created_at DESC LIMIT $4 OFFSET $5",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<UserDto> users;

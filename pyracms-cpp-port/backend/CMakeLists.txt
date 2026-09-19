@@ -229,6 +229,10 @@ set(LIB_SOURCES
 
     src/controllers/tenant/TenantControllerRemove.cpp
 
+    src/controllers/user/UserControllerGetById.cpp
+
+    src/controllers/user/UserControllerList.cpp
+
     src/filters/AdminFilter.cpp
 
     src/filters/JwtAuthFilter.cpp
@@ -472,6 +476,8 @@ set(LIB_SOURCES
     src/services/user/UserServiceGetPasswordHash.cpp
 
     src/services/user/UserServiceGetUserRole.cpp
+
+    src/services/user/UserServiceListScoped.cpp
 
     src/services/user/UserServiceListUsers.cpp
 
