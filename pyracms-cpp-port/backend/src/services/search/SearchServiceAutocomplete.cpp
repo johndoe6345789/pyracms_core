@@ -49,7 +49,9 @@ void SearchService::autocomplete(
         "  SELECT display_name AS text, 'gamedep' AS type, "
         "  '/gamedep/' || name AS url "
         "  FROM gamedep_pages WHERE tenant_id = $1 "
-        "  AND LOWER(display_name) LIKE LOWER($2) LIMIT $3::int"
+        "  AND NOT is_private AND EXISTS (SELECT 1 FROM "
+        "gamedep_revisions gr WHERE gr.page_id = gamedep_pages.id AND "
+        "gr.published) AND LOWER(display_name) LIKE LOWER($2) LIMIT $3::int"
         ") LIMIT $3::int",
         [cb](const drogon::orm::Result &result) {
             std::vector<AutocompleteItem> items;

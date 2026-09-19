@@ -1,5 +1,6 @@
 #include "services/GameDepService.h"
 #include "services/DbError.h"
+#include "services/gamedep/GdVisibility.h"
 #include <regex>
 
 namespace pyracms {
@@ -13,11 +14,13 @@ void GameDepWriteService::createPage(const GdCtx &c,
         cb(gdError(400, "name required (letters, digits, . _ -)"));
         return;
     }
+    bool priv = false;
+    gdParseVisibility(body, priv);
     std::string display = body.get("displayName", name).asString();
     c.db->execSqlAsync(
         "INSERT INTO gamedep_pages (type, name, display_name, "
-        "description, owner_id, tenant_id) "
-        "VALUES ($1, $2, $3, $4, $5, NULLIF($6, 0)) RETURNING id",
+        "description, owner_id, tenant_id, is_private) "
+        "VALUES ($1, $2, $3, $4, $5, NULLIF($6, 0), $7) RETURNING id",
         [cb](const drogon::orm::Result &r) {
             GdResult out = gdOk(201);
             out.body["id"] = r[0]["id"].as<int>();
@@ -27,7 +30,7 @@ void GameDepWriteService::createPage(const GdCtx &c,
             cb(gdDbError(dbError(e)));
         },
         type, name, display, body.get("description", "").asString(),
-        c.userId, c.scope);
+        c.userId, c.scope, priv);
 }
 
 } // namespace pyracms

@@ -27,6 +27,10 @@ RateRule rateRuleFor(const std::string &path) {
         return {"track", 120, 60};
     if (path == "/api/files")
         return {"upload", 30, 600};
+    // Anonymous game downloads: generous for a launcher fetching a
+    // catalog's screenshots and resuming, hostile to scraping loops.
+    if (path.rfind("/api/files/", 0) == 0)
+        return {"download", 300, 60};
     if (path == "/api/tenants")
         return {"tenant", 10, 3600};
     if (path.rfind("/api/snippets/", 0) == 0 && endsWith(path, "/run"))

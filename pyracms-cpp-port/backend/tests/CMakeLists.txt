@@ -55,6 +55,10 @@ set(TEST_SOURCES
 
     test_file_http.cpp
 
+    test_file_range_rules.cpp
+
+    test_file_s3_range.cpp
+
     test_file_s3_errors.cpp
 
     test_file_s3_http.cpp
@@ -88,6 +92,10 @@ set(TEST_SOURCES
     test_gamedep_http_3.cpp
 
     test_gamedep_http_4.cpp
+
+    test_gamedep_public_files_http.cpp
+
+    test_gamedep_public_http.cpp
 
     test_jwt_filter_1.cpp
 

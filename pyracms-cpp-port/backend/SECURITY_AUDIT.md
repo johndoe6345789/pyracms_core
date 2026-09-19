@@ -66,8 +66,8 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 | 44 | GET | `/api/docs` | none | Swagger UI / OpenAPI | n/a | OK: static; no CSP (needs CDN scripts) |
 | 45 | GET | `/api/openapi.yaml` | none | Swagger UI / OpenAPI | n/a | OK: static; no CSP (needs CDN scripts) |
 | 46 | POST | `/api/files` | JwtAuthFilter, RateLimitFilter | stores upload | owner + site recorded | OK (F-23) |
-| 47 | GET | `/api/files/{uuid}` | none | file bytes | uuid capability URL | ACCEPTED: unguessable id; served as attachment, sandboxed |
-| 48 | GET | `/api/files/{uuid}/thumbnail` | none | file bytes | uuid capability URL | as download |
+| 47 | GET | `/api/files/{uuid}` | RateLimitFilter | file bytes | files of a game/dep page: public page + published revision = anyone (anonymous OK), else owner/site admin/site owner only (404 otherwise); all other files: uuid capability URL | OK (F-34); Range/ETag supported; served as attachment, sandboxed |
+| 48 | GET | `/api/files/{uuid}/thumbnail` | RateLimitFilter | file bytes | as download | as download |
 | 49 | DELETE | `/api/files/{uuid}` | JwtAuthFilter, OwnerFilter | deletes file | OwnerFilter: uploader or site admin | OK (F-06) |
 | 50 | GET | `/api/files` | JwtAuthFilter | file list | own files; site admin: site; platform admin: all | OK (F-06) |
 | 51 | GET | `/api/forum/categories` | none | forum content | SQL scoped by tenant + owner/mod (kOwnerOrMod); admin routes AdminFilter | OK (audited, unchanged) |
@@ -106,9 +106,9 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 | 84 | POST | `/api/gamedep/{type}/{name}/screenshots` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
 | 85 | DELETE | `/api/gamedep/{type}/{name}/screenshots/{id}` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
 | 86 | POST | `/api/gamedep/{type}/{name}/vote` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
-| 87 | GET | `/api/gamedep/{type}` | none | catalog data | tenant scope via token/tenant_id | OK: unpublished revisions owner/admin only |
+| 87 | GET | `/api/gamedep/{type}` | none | catalog data | tenant scope via token/tenant_id; page visible only if public (not `is_private`, has a published revision) or caller manages it | OK (F-34): anonymous launcher browse |
 | 88 | POST | `/api/gamedep/{type}` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
-| 89 | GET | `/api/gamedep/{type}/{name}` | none | catalog data | tenant scope via token/tenant_id | OK: unpublished revisions owner/admin only |
+| 89 | GET | `/api/gamedep/{type}/{name}` | none | catalog data | as list; private/draft page = 404 | OK (F-34) |
 | 90 | PUT | `/api/gamedep/{type}/{name}` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
 | 91 | DELETE | `/api/gamedep/{type}/{name}` | JwtAuthFilter | changes page/revision | owner-or-admin check in GdWithPage + tenant scope | OK (audited, unchanged); download URLs use PUBLIC_BASE_URL (F-30) |
 | 92 | GET | `/api/outputs/json` | none | catalog data | tenant scope via token/tenant_id | OK: unpublished revisions owner/admin only |
@@ -211,6 +211,7 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 | F-31 | Low | Corrupt stored hash threw in `verifyPassword` | Fixed |
 | F-32 | Low | Game/dep seed logged `uq_gamedep_*` duplicate-key errors on every start | Fixed |
 | F-33 | Low | Webhook update wiped omitted fields | Fixed |
+| F-34 | Medium | Game files open to every uuid holder; no private games | Fixed |
 
 **F-01 (Critical) WebSocket tokens verified with a different, hard-coded secret.** Both WebSocket controllers verified JWTs with `custom_config.jwt_secret` falling back to the literal `change-me-in-production` instead of `JWT_SECRET`. Anyone who knew that string could mint a token for any user id (including the platform owner) and read that user's notifications / join collab rooms; with a real `JWT_SECRET` the sockets simply failed. Fixed: one `wsAuthenticate()` built on `AuthService` (same secret/issuer/alg/expiry as HTTP), tenant kept in the connection, collab rooms namespaced per site, thread subscriptions checked against the caller's site, typing relay only to subscribers, frame cap 1 MB.
 
@@ -277,6 +278,8 @@ Roles: 0 Guest, 1 User, 2 Moderator, 3 Site admin, 4 Platform owner. `tenant 0` 
 **F-32 (Low) Game/dep seed logged `uq_gamedep_*` duplicate-key errors on every start.** `seed_games.sh` POSTed every page/revision again and relied on 409s (and the publish toggle). Now reads first and only creates what is missing. Seed settings also lacked the required `tenantId`.
 
 **F-33 (Low) Webhook update wiped omitted fields.** Fixed (unsent fields keep their value).
+
+**F-34 (Medium) Anonymous access to public games, and no private games.** The Hypernucleus launcher must browse, install and play public games without signing in. *Public* has one definition (migration 080): a game/dep page with `is_private = FALSE` (default; create/update accept `isPrivate` or `visibility: "public"|"private"`) and at least one published revision; only published revisions are shown. Anonymous surface: `GET /api/tenants[/{slug}]`, `GET /api/gamedep/{type}[/{name}]`, `/api/gamedep/catalog` (`?tenant_id=`) and `GET /api/files/{uuid}[/thumbnail]`. Private pages, pages without a published revision and their draft revisions are invisible to everyone but the page owner, admins and the site owner (lists omit them, detail is 404; search and autocomplete omit them too). A file referenced by a game/dep (source archive, binary, screenshot) is served to anyone only while a referencing page is public and that reference is published; otherwise a manager token is required and every other caller (anonymous, other member, token of another site) gets the same 404 as a missing uuid, so private files cannot be probed. Dependencies of kind `pyracms` are ordinary dep pages, so a public dep is downloadable and a private one is not. Files outside game pages keep the previous uuid-capability behaviour (gallery and article media sit in img tags that cannot send a bearer). Why it is safe: read-only, uuid shape is validated before any key is built (traversal untouched), visibility comes from the page row, downloads stay `attachment` + sandbox CSP + nosniff, and downloads are rate limited per client IP (300/min). Resume support: `Accept-Ranges: bytes`, single `Range` (206/416), `ETag` (content sha-256) with `If-None-Match` (304) and `If-Range`; resumed transfers do not bump `download_count`.
 
 ## Accepted / remaining
 

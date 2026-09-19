@@ -1,4 +1,5 @@
 #include "services/gamedep/GdSql.h"
+#include "services/gamedep/GdVisibility.h"
 
 namespace pyracms {
 
@@ -8,8 +9,7 @@ std::string gdRevisionsSql(bool publishedOnly) {
     std::string vis =
         publishedOnly
             ? "AND r.published AND $3::int >= 0 "
-            : "AND (r.published OR p.owner_id = $3 OR COALESCE((SELECT "
-              "role FROM users WHERE id = $3), 0) >= 3) ";
+            : "AND (r.published OR " + gdManagerSql() + ") ";
     return "(SELECT COALESCE(jsonb_agg(jsonb_build_object("
            "'id', r.id, 'pageId', r.page_id, 'version', r.version, "
            "'moduleType', r.module_type, 'published', r.published, "

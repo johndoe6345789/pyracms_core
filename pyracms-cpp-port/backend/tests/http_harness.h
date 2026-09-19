@@ -32,10 +32,12 @@ class Server {
 Server &server();
 
 // Method + path (with query) + optional JSON body + optional bearer token.
+using Hdrs = std::map<std::string, std::string>; // extra request headers
 Reply call(drogon::HttpMethod m, const std::string &path,
            const Json::Value &body = Json::Value(),
-           const std::string &token = "");
-Reply get(const std::string &path, const std::string &token = "");
+           const std::string &token = "", const Hdrs &extra = {});
+Reply get(const std::string &path, const std::string &token = "",
+          const Hdrs &extra = {});
 Reply post(const std::string &path, const Json::Value &b,
            const std::string &token = "");
 Reply put(const std::string &path, const Json::Value &b,

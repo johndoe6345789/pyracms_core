@@ -6,7 +6,8 @@
 namespace harness {
 
 Reply call(drogon::HttpMethod m, const std::string &path,
-           const Json::Value &body, const std::string &token) {
+           const Json::Value &body, const std::string &token,
+           const Hdrs &extra) {
     auto req = drogon::HttpRequest::newHttpRequest();
     req->setMethod(m);
     req->setPath(path);
@@ -16,6 +17,8 @@ Reply call(drogon::HttpMethod m, const std::string &path,
     }
     if (!token.empty())
         req->addHeader("Authorization", "Bearer " + token);
+    for (const auto &h : extra)
+        req->addHeader(h.first, h.second);
     auto res = server().client->sendRequest(req, 15);
     Reply r;
     if (res.first != drogon::ReqResult::Ok)
@@ -28,8 +31,8 @@ Reply call(drogon::HttpMethod m, const std::string &path,
     return r;
 }
 
-Reply get(const std::string &p, const std::string &t) {
-    return call(drogon::Get, p, Json::Value(), t);
+Reply get(const std::string &p, const std::string &t, const Hdrs &x) {
+    return call(drogon::Get, p, Json::Value(), t, x);
 }
 Reply post(const std::string &p, const Json::Value &b,
            const std::string &t) {

@@ -419,6 +419,104 @@ paths:
       responses:
         '200': { description: "[{id, action, target, actor, actorId, createdAt}]" }
 
+  /api/gamedep/{type}:
+    get:
+      tags: [GameDep]
+      summary: Public games or dependencies of a site (no sign-in needed)
+      description: >
+        Public = not private and has a published revision. Private pages and
+        drafts are only returned to their owner, site owner and admins.
+        `type` is game, dep or catalog (the launcher catalog).
+      parameters:
+        - { name: type, in: path, required: true, schema: { type: string, enum: [game, dep, catalog] } }
+        - { name: tenant_id, in: query, schema: { type: integer } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: tag, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        '200': { description: "[{id, name, displayName, isPrivate, visibility (public|private), revisions:[{version, published, url, sha256, size, binaries:[{os, arch, uuid, url, sha256, size}]}], dependencies:[{kind (pip|pyracms), name, version}], screenshots:[{uuid, url, thumbnail}]}]" }
+    post:
+      tags: [GameDep]
+      summary: Create a game or dependency page
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                displayName: { type: string }
+                description: { type: string }
+                isPrivate: { type: boolean, description: "true hides the page from everyone but managers (default false)" }
+                visibility: { type: string, enum: [public, private] }
+      responses:
+        '201': { description: "{id}" }
+        '409': { description: Name already used on this site }
+
+  /api/gamedep/{type}/{name}:
+    get:
+      tags: [GameDep]
+      summary: One public game or dependency with revisions, binaries and dependencies (no sign-in needed)
+      parameters:
+        - { name: type, in: path, required: true, schema: { type: string, enum: [game, dep] } }
+        - { name: name, in: path, required: true, schema: { type: string } }
+        - { name: tenant_id, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: Page JSON (see the list) }
+        '404': { description: Missing, private or without a published revision (unless the caller manages it) }
+    put:
+      tags: [GameDep]
+      summary: Update display name, description or visibility (owner or admin)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName: { type: string }
+                description: { type: string }
+                isPrivate: { type: boolean }
+                visibility: { type: string, enum: [public, private] }
+      responses:
+        '200': { description: Updated }
+        '403': { description: Not the owner }
+
+  /api/files/{uuid}:
+    get:
+      tags: [Files]
+      summary: Download a file (anonymous for public game/dep files)
+      description: >
+        Files of a game/dep page (binary, source archive, screenshot) are
+        served to anyone while a referencing page is public and published;
+        otherwise only to its owner/site admin (404 for everyone else, so
+        private uuids cannot be probed). Supports a single byte Range
+        (resume), ETag/If-None-Match and If-Range. Rate limited per IP.
+      parameters:
+        - { name: uuid, in: path, required: true, schema: { type: string } }
+        - { name: Range, in: header, schema: { type: string, example: "bytes=1024-" } }
+        - { name: If-None-Match, in: header, schema: { type: string } }
+        - { name: If-Range, in: header, schema: { type: string } }
+      responses:
+        '200': { description: "Bytes; headers Accept-Ranges, ETag, Content-Length" }
+        '206': { description: "Partial bytes; Content-Range: bytes a-b/total" }
+        '304': { description: Not modified }
+        '404': { description: Unknown, or private/draft game file }
+        '416': { description: "Range starts past the end; Content-Range: bytes */total" }
+        '429': { description: Too many requests }
+
+  /api/files/{uuid}/thumbnail:
+    get:
+      tags: [Files]
+      summary: Thumbnail (or the original) with the same access rules as the download
+      parameters:
+        - { name: uuid, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Image bytes }
+        '404': { description: Unknown, or private/draft game file }
+
   /api/docs:
     get:
       tags: [Documentation]

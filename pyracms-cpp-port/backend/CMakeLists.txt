@@ -148,6 +148,8 @@ set(LIB_SOURCES
     src/controllers/file/FileControllerBlob.cpp
 
     src/controllers/file/FileControllerDownload.cpp
+    src/controllers/file/FileControllerServe.cpp
+    src/controllers/file/FileControllerThumbnail.cpp
 
     src/controllers/file/FileControllerHelpers.cpp
 
@@ -708,6 +710,8 @@ set(LIB_SOURCES
     src/services/gamedep/GdSqlBinaries.cpp
 
     src/services/gamedep/GdSqlPage.cpp
+    src/services/gamedep/GdFileAccess.cpp
+    src/services/gamedep/GdVisibility.cpp
 
     src/services/gamedep/GdSqlParts.cpp
 
