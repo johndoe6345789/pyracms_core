@@ -121,6 +121,8 @@ set(TEST_SOURCES
 
     test_owner_scope_forum_http.cpp
 
+    test_account_levels_http.cpp
+
     test_account_model_http.cpp
 
     test_permissions_forum_http.cpp
