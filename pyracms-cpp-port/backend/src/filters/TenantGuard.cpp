@@ -8,7 +8,7 @@ std::vector<std::string> namedTenants(const drogon::HttpRequestPtr &req) {
         out.push_back(req->getParameter(k));
     }
     auto body = req->getJsonObject();
-    if (!body)
+    if (!body || !body->isObject())
         return out;
     for (const char *k : {"tenant_id", "tenantId"}) {
         if (body->isMember(k) &&

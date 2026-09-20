@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { useActionError } from './useActionError'
+import { publishSiteFeatures } from './useSiteFeatures'
+import { flagsFromSettings } from '@/lib/siteFeatures'
 import {
   Feature,
   FEATURE_DEFS,
@@ -13,7 +15,7 @@ export type { Feature }
 
 export function useFeatureToggles(tenantId: number | null) {
   const [features, setFeatures] = useState<Feature[]>(
-    FEATURE_DEFS.map((f) => ({ ...f, enabled: false })),
+    FEATURE_DEFS.map((f) => ({ ...f, enabled: true })),
   )
   const [loading, setLoading] = useState(true)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -46,7 +48,18 @@ export function useFeatureToggles(tenantId: number | null) {
       }),
     )
     Promise.all(promises)
-      .then(() => setSnackbarOpen(true))
+      .then(() => {
+        publishSiteFeatures(
+          tenantId,
+          flagsFromSettings(
+            features.map((f) => ({
+              name: `feature_${f.id}`,
+              value: String(f.enabled),
+            })),
+          ),
+        )
+        setSnackbarOpen(true)
+      })
       .catch(fail('Could not save feature toggles'))
   }
 

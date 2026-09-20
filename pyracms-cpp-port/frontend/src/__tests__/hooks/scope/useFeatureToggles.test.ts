@@ -41,3 +41,22 @@ it('handles errors, null data and no tenant', async () => {
   const c = renderHook(() => useFeatureToggles(null))
   act(() => c.result.current.handleSave())
 })
+
+it('treats a missing setting as enabled and "false" as off', async () => {
+  m.get.mockResolvedValue({
+    data: [{ name: 'feature_forum', value: 'false' }],
+  })
+  const { result } = renderHook(() => useFeatureToggles(1))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  const on = (id: string) =>
+    result.current.features.find((f) => f.id === id)!.enabled
+  expect(on('forum')).toBe(false)
+  expect(on('articles')).toBe(true)
+  expect(on('hypernucleus')).toBe(true)
+})
+
+it('starts enabled before the settings arrive', () => {
+  m.get.mockReturnValue(new Promise(() => {}))
+  const { result } = renderHook(() => useFeatureToggles(1))
+  expect(result.current.features.every((f) => f.enabled)).toBe(true)
+})

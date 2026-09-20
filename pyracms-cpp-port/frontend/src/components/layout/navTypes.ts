@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { FeatureId } from '@/lib/siteFeatures'
 
 /** One destination in the top bar and burger drawer. */
 export interface NavEntry {
@@ -9,6 +10,8 @@ export interface NavEntry {
   /** Highlight only on an exact path match (e.g. home) */
   exact?: boolean
   testId?: string
+  /** Site feature that must be on for this entry to show */
+  feature?: FeatureId
   /** Sub-destinations: shown as a dropdown / collapsible group */
   children?: NavEntry[]
 }

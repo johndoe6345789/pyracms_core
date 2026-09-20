@@ -148,14 +148,16 @@ set(LIB_SOURCES
     src/controllers/file/FileControllerBlob.cpp
 
     src/controllers/file/FileControllerDownload.cpp
-    src/controllers/file/FileControllerServe.cpp
-    src/controllers/file/FileControllerThumbnail.cpp
 
     src/controllers/file/FileControllerHelpers.cpp
 
     src/controllers/file/FileControllerJson.cpp
 
     src/controllers/file/FileControllerManage.cpp
+
+    src/controllers/file/FileControllerServe.cpp
+
+    src/controllers/file/FileControllerThumbnail.cpp
 
     src/controllers/file/FileControllerUpload.cpp
 
@@ -389,6 +391,10 @@ set(LIB_SOURCES
 
     src/filters/AuditScopeFilter.cpp
 
+    src/filters/FeatureCache.cpp
+
+    src/filters/FeatureGate.cpp
+
     src/filters/JwtAccountState.cpp
 
     src/filters/JwtAuthFilter.cpp
@@ -438,6 +444,8 @@ set(LIB_SOURCES
     src/services/DockerRunArgv.cpp
 
     src/services/SettingsService.cpp
+
+    src/services/SettingsServiceWrite.cpp
 
     src/services/WebhookDelivery.cpp
 
@@ -701,6 +709,8 @@ set(LIB_SOURCES
 
     src/services/gamedep/GdAddPip.cpp
 
+    src/services/gamedep/GdFileAccess.cpp
+
     src/services/gamedep/GdFileId.cpp
 
     src/services/gamedep/GdQuery.cpp
@@ -710,12 +720,12 @@ set(LIB_SOURCES
     src/services/gamedep/GdSqlBinaries.cpp
 
     src/services/gamedep/GdSqlPage.cpp
-    src/services/gamedep/GdFileAccess.cpp
-    src/services/gamedep/GdVisibility.cpp
 
     src/services/gamedep/GdSqlParts.cpp
 
     src/services/gamedep/GdSqlRevisions.cpp
+
+    src/services/gamedep/GdVisibility.cpp
 
     src/services/gamedep/GdWithPage.cpp
 

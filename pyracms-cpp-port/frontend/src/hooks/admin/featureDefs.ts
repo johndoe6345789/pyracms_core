@@ -1,3 +1,5 @@
+import { flagsFromSettings, type FeatureId } from '@/lib/siteFeatures'
+
 export interface Feature {
   id: string
   name: string
@@ -43,18 +45,16 @@ export const FEATURE_DEFS: Omit<Feature, 'enabled'>[] = [
   },
 ]
 
-/** Builds the feature list from raw settings records. */
+/**
+ * Builds the feature list from raw settings records. A feature with no
+ * setting is ENABLED (same rule the backend enforces).
+ */
 export function featuresFromSettings(
   settings: { name?: unknown; value?: unknown }[],
 ): Feature[] {
-  const on: Record<string, string> = {}
-  for (const s of settings) {
-    if (typeof s.name === 'string' && s.name.startsWith('feature_')) {
-      on[s.name.replace('feature_', '')] = String(s.value)
-    }
-  }
+  const flags = flagsFromSettings(settings)
   return FEATURE_DEFS.map((f) => ({
     ...f,
-    enabled: on[f.id] === 'true',
+    enabled: flags[f.id as FeatureId] !== false,
   }))
 }

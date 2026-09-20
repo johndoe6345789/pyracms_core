@@ -2,6 +2,7 @@
 
 import AppTopBar from './AppTopBar'
 import { tenantModuleEntries } from './navConfig'
+import { useSiteFeatures } from '@/hooks/useSiteFeatures'
 
 interface TenantAppBarProps {
   slug: string
@@ -17,11 +18,12 @@ export default function TenantAppBar({
   drawerOpen,
   onMenuClick,
 }: TenantAppBarProps) {
+  const { flags } = useSiteFeatures(slug)
   return (
     <AppTopBar
       brand={siteName}
       brandHref={`/site/${slug}`}
-      items={tenantModuleEntries(slug)}
+      items={tenantModuleEntries(slug, flags)}
       drawerOpen={drawerOpen}
       onMenuClick={onMenuClick}
       navLabel="Site navigation"

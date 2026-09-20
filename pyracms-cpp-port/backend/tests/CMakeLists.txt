@@ -53,15 +53,21 @@ set(TEST_SOURCES
 
     test_comment_notify_http.cpp
 
+    test_feature_gate.cpp
+
+    test_feature_gate_http.cpp
+
+    test_feature_rules.cpp
+
     test_file_http.cpp
 
     test_file_range_rules.cpp
 
-    test_file_s3_range.cpp
-
     test_file_s3_errors.cpp
 
     test_file_s3_http.cpp
+
+    test_file_s3_range.cpp
 
     test_forum_flow_db_1.cpp
 
@@ -216,6 +222,10 @@ set(TEST_SOURCES
     test_user_admin_http_3.cpp
 
     test_user_admin_http_4.cpp
+
+    test_user_admin_last_http.cpp
+
+    test_user_admin_last_rules.cpp
 
     test_user_admin_rules.cpp
 

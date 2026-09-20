@@ -2,6 +2,7 @@
 
 import AppDrawer from './AppDrawer'
 import { tenantSections, TENANT_FOOTER } from './navConfig'
+import { useSiteFeatures } from '@/hooks/useSiteFeatures'
 
 interface TenantDrawerProps {
   slug: string
@@ -21,13 +22,14 @@ export default function TenantDrawer({
   open,
   onClose,
 }: TenantDrawerProps) {
+  const { flags } = useSiteFeatures(slug)
   return (
     <AppDrawer
       open={open}
       onClose={onClose}
       title={siteName}
       subtitle={description || 'Site navigation'}
-      sections={tenantSections(slug, canAdmin)}
+      sections={tenantSections(slug, canAdmin, flags)}
       footer={TENANT_FOOTER}
     />
   )

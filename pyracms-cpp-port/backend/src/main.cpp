@@ -1,3 +1,4 @@
+#include "filters/FeatureGate.h"
 #include "security/HttpSecurity.h"
 #include "security/SecurityConfig.h"
 #include "startup/Startup.h"
@@ -36,6 +37,7 @@ int main() {
 
     // CORS, security headers, body limits, generic error handler
     pyracms::installHttpSecurity(app);
+    pyracms::installFeatureGate(app);
     pyracms::createDbClientFromEnv();
     pyracms::initCacheAndSearch();
     pyracms::startPublishTimer(app);

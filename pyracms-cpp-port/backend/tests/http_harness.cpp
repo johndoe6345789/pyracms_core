@@ -1,6 +1,7 @@
 #include "http_harness.h"
 
 #include "fake_s3.h"
+#include "filters/FeatureGate.h"
 #include "security/HttpSecurity.h"
 #include "security/RateLimiter.h"
 
@@ -16,6 +17,7 @@ Server::Server() {
     setenv("PYRACMS_ALLOW_PRIVATE_URLS", "1", 1);
     auto &app = drogon::app();
     pyracms::installHttpSecurity(app);
+    pyracms::installFeatureGate(app);
     FakeS3::install(app);
     app.addListener("127.0.0.1", kPort)
         .setThreadNum(2)
