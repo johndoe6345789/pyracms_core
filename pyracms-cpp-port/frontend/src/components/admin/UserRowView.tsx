@@ -1,12 +1,16 @@
 import { TableCell, TableRow, Chip } from '@mui/material'
 import { UserRow } from '@/hooks/useAdminUsers'
+import type { Actor } from '@/lib/userGuards'
+import { guardUser } from '@/lib/userGuards'
 import UserActions from './UserActions'
+import UserLevelChip from './users/UserLevelChip'
 
 interface Props {
   user: UserRow
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
   onEdit?: ((user: UserRow) => void) | undefined
+  actor?: Actor | undefined
 }
 
 export default function UserRowView({
@@ -14,12 +18,16 @@ export default function UserRowView({
   onToggleBan,
   onDelete,
   onEdit,
+  actor,
 }: Props) {
   return (
     <TableRow hover data-testid={`user-row-${user.id}`}>
       <TableCell>{user.username}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.created}</TableCell>
+      <TableCell>
+        <UserLevelChip role={user.role} siteOwner={user.siteOwner} />
+      </TableCell>
       <TableCell>
         <Chip
           label={user.banned ? 'Banned' : 'Active'}
@@ -34,6 +42,7 @@ export default function UserRowView({
           onToggleBan={onToggleBan}
           onDelete={onDelete}
           onEdit={onEdit}
+          guard={actor && guardUser(actor, user)}
         />
       </TableCell>
     </TableRow>

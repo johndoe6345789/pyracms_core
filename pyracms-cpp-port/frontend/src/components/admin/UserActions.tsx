@@ -1,4 +1,3 @@
-import { IconButton, Tooltip } from '@mui/material'
 import {
   EditOutlined,
   BlockOutlined,
@@ -6,12 +5,15 @@ import {
   DeleteOutlined,
 } from '@mui/icons-material'
 import { UserRow } from '@/hooks/useAdminUsers'
+import type { UserGuard } from '@/lib/userGuards'
+import GuardedIconButton from './users/GuardedIconButton'
 
 interface UserActionsProps {
   user: UserRow
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
   onEdit?: ((user: UserRow) => void) | undefined
+  guard?: UserGuard | undefined
 }
 
 export default function UserActions({
@@ -19,47 +21,44 @@ export default function UserActions({
   onToggleBan,
   onDelete,
   onEdit,
+  guard,
 }: UserActionsProps) {
   const { id, username, banned } = user
   return (
     <>
-      <Tooltip title="Edit">
-        <IconButton
-          size="small"
-          color="primary"
-          onClick={() => onEdit?.(user)}
-          aria-label={`Edit user ${username}`}
-          data-testid={`edit-user-${id}`}
-        >
-          <EditOutlined fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={banned ? 'Unban' : 'Ban'}>
-        <IconButton
-          size="small"
-          color={banned ? 'success' : 'warning'}
-          onClick={() => onToggleBan(id)}
-          aria-label={banned ? `Unban ${username}` : `Ban ${username}`}
-          data-testid={`ban-user-${id}`}
-        >
-          {banned ? (
-            <CheckCircleOutlined fontSize="small" />
-          ) : (
-            <BlockOutlined fontSize="small" />
-          )}
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete">
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => onDelete(user)}
-          aria-label={`Delete user ${username}`}
-          data-testid={`delete-user-${id}`}
-        >
-          <DeleteOutlined fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      <GuardedIconButton
+        title="Edit"
+        label={`Edit user ${username}`}
+        testId={`edit-user-${id}`}
+        color="primary"
+        onClick={() => onEdit?.(user)}
+      >
+        <EditOutlined fontSize="small" />
+      </GuardedIconButton>
+      <GuardedIconButton
+        title={banned ? 'Unban' : 'Ban'}
+        reason={guard?.ban}
+        label={banned ? `Unban ${username}` : `Ban ${username}`}
+        testId={`ban-user-${id}`}
+        color={banned ? 'success' : 'warning'}
+        onClick={() => onToggleBan(id)}
+      >
+        {banned ? (
+          <CheckCircleOutlined fontSize="small" />
+        ) : (
+          <BlockOutlined fontSize="small" />
+        )}
+      </GuardedIconButton>
+      <GuardedIconButton
+        title="Delete"
+        reason={guard?.del}
+        label={`Delete user ${username}`}
+        testId={`delete-user-${id}`}
+        color="error"
+        onClick={() => onDelete(user)}
+      >
+        <DeleteOutlined fontSize="small" />
+      </GuardedIconButton>
     </>
   )
 }

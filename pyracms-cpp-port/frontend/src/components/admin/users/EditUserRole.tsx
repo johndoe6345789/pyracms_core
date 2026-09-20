@@ -1,40 +1,68 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-import { UserRole, USER_ROLE_LABELS } from '@/types'
-import { grantableRoles } from '@/lib/roles'
+import {
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tooltip,
+} from '@mui/material'
+import { USER_ROLE_LABELS, UserRole } from '@/types'
+import { grantable, guardUser, type Actor } from '@/lib/userGuards'
+import type { UserRow } from '@/hooks/admin/userRow'
 
 interface Props {
-  actorRole: UserRole
+  actor: Actor
+  target: UserRow
   value: number
   onChange: (role: number) => void
 }
 
+const LAST = 'The last administrator cannot be demoted'
+
 /**
- * Role picker limited to what the signed-in account may grant. The
- * account's current role stays visible even when it cannot be granted.
+ * Level picker limited to what the signed-in account may grant. Locked,
+ * with the reason shown, when the backend would refuse any change.
  */
-export default function EditUserRole({ actorRole, value, onChange }: Props) {
-  const roles: number[] = grantableRoles(actorRole)
+export default function EditUserRole({
+  actor,
+  target,
+  value,
+  onChange,
+}: Props) {
+  const roles: number[] = grantable(actor)
   const options = roles.includes(value) ? roles : [...roles, value]
+  const why = guardUser(actor, target).role
+  const pinned = !!target.lastAdmin
+  const locked = why !== null || roles.length === 0
   return (
-    <FormControl size="small">
-      <InputLabel id="edit-role-label">Role</InputLabel>
-      <Select
-        labelId="edit-role-label"
-        label="Role"
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        disabled={
-          roles.length === 0 ||
-          (value >= actorRole && actorRole < UserRole.SuperAdmin)
-        }
-        data-testid="edit-role-select"
-      >
-        {options.map((r) => (
-          <MenuItem key={r} value={r} disabled={!roles.includes(r)}>
-            {USER_ROLE_LABELS[r as UserRole]}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Tooltip title={why ?? ''}>
+      <FormControl size="small" disabled={locked}>
+        <InputLabel id="edit-role-label">Level</InputLabel>
+        <Select
+          labelId="edit-role-label"
+          label="Level"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          data-testid="edit-role-select"
+        >
+          {options.map((r) => (
+            <MenuItem
+              key={r}
+              value={r}
+              disabled={
+                !roles.includes(r) || (pinned && r < UserRole.SiteAdmin)
+              }
+            >
+              {USER_ROLE_LABELS[r as UserRole]}
+            </MenuItem>
+          ))}
+        </Select>
+        {(why || pinned) && (
+          <FormHelperText data-testid="edit-role-reason">
+            {why ?? LAST}
+          </FormHelperText>
+        )}
+      </FormControl>
+    </Tooltip>
   )
 }

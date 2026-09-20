@@ -21,6 +21,7 @@ struct AdminTarget {
     int tenant{0};
     bool siteOwner{false};   // tenants.owner_id of its own tenant
     bool lastPlatformOwner{false};
+    bool lastAdmin{false};   // last active Administrator/owner of its site
     bool actorOwnsTenant{false}; // the actor owns this account's tenant
 };
 

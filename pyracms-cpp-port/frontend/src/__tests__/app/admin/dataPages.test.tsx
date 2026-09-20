@@ -12,7 +12,7 @@ import AdminUsersPage from '@/app/site/[slug]/(admin)/admin/users/page'
 import AdminBackupPage from '@/app/site/[slug]/(admin)/admin/backup/page'
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
-import { renderWithStore } from '../../helpers/renderWithStore'
+import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -52,7 +52,7 @@ it('menus page renders groups and adds an item', async () => {
 
 it('users page bans, deletes and opens create dialog', async () => {
   routeGet({ '/api/users': [{ id: 1, username: 'bob', banned: false }] })
-  renderWithStore(<AdminUsersPage />)
+  renderWithStore(<AdminUsersPage />, makeUser({ id: 99, role: 3 }))
   await screen.findByTestId('user-row-1')
   fireEvent.click(screen.getByTestId('ban-user-1'))
   await screen.findByText('Banned')

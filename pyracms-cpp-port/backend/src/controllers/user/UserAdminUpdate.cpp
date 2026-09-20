@@ -1,5 +1,6 @@
 #include "controllers/UserAdminGate.h"
 #include "filters/TenantGuard.h"
+#include "services/AuditLog.h"
 
 
 namespace pyracms {
@@ -42,7 +43,15 @@ void adminUpdate(const drogon::HttpRequestPtr &req, int id,
             if (refuse(AdminAction::SetRole, role))
                 return;
             steps->push_back([=](auto cb) {
-                UserAdminService().setRole(db, id, role, cb);
+                UserAdminService().setRole(
+                    db, id, role, [=](bool ok, const std::string &err) {
+                        if (ok)
+                            auditLog(c.target.tenant, c.actor.id,
+                                     "user.role",
+                                     std::to_string(id) + " role=" +
+                                         std::to_string(role));
+                        cb(ok, err);
+                    });
             });
         }
         if (body.isMember("banned") && body["banned"].asBool() != c.banned) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "filters/UserAdminLast.h"
 #include "filters/UserAdminTypes.h"
 
 namespace pyracms {
@@ -23,7 +24,7 @@ inline AdminVerdict ownerMayAdminister(const AdminTarget &t, AdminAction act,
     }
     if (t.lastPlatformOwner)
         return adminDeny(403, "Cannot remove the last Platform Owner");
-    return {};
+    return lastAdminVerdict(t, act, newRole);
 }
 
 // Same checks for every action; SetRole also passes the new role.
@@ -53,7 +54,7 @@ inline AdminVerdict canAdminister(const AdminActor &a, const AdminTarget &t,
     }
     if (t.lastPlatformOwner)
         return adminDeny(403, "Cannot remove the last Platform Owner");
-    return {};
+    return lastAdminVerdict(t, act, newRole);
 }
 
 } // namespace pyracms

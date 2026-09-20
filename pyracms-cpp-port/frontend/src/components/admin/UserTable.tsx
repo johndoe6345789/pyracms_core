@@ -8,6 +8,7 @@ import {
   Paper,
 } from '@mui/material'
 import { UserRow } from '@/hooks/useAdminUsers'
+import type { Actor } from '@/lib/userGuards'
 import UserRowView from './UserRowView'
 
 interface UserTableProps {
@@ -15,15 +16,17 @@ interface UserTableProps {
   onToggleBan: (id: number) => void
   onDelete: (user: UserRow) => void
   onEdit?: ((user: UserRow) => void) | undefined
+  actor?: Actor | undefined
 }
 
-const HEADS = ['Username', 'Email', 'Created', 'Status']
+const HEADS = ['Username', 'Email', 'Created', 'Level', 'Status']
 
 export default function UserTable({
   users,
   onToggleBan,
   onDelete,
   onEdit,
+  actor,
 }: UserTableProps) {
   return (
     <TableContainer
@@ -53,6 +56,7 @@ export default function UserTable({
               onToggleBan={onToggleBan}
               onDelete={onDelete}
               onEdit={onEdit}
+              actor={actor}
             />
           ))}
         </TableBody>

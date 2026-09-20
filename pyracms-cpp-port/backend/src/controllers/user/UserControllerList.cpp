@@ -49,6 +49,8 @@ void UserController::list(
                                 item["email"] = u.email;
                                 item["banned"] = u.banned;
                                 item["role"] = static_cast<int>(u.role);
+                                item["siteOwner"] = u.siteOwner;
+                                item["lastAdmin"] = u.lastAdmin;
                             }
                             out.append(item);
                         }

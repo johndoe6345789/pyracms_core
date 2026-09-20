@@ -2,6 +2,7 @@
 
 import { Alert, Box } from '@mui/material'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
+import { useActor } from '@/hooks/useActor'
 import UserTable from '@/components/admin/UserTable'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog'
@@ -12,6 +13,7 @@ import { useCreateUser } from '@/components/admin/users/useCreateUser'
 export default function AdminUsersPage() {
   const u = useAdminUsers()
   const create = useCreateUser()
+  const actor = useActor(u.users)
 
   return (
     <Box data-testid="admin-users-page">
@@ -26,6 +28,7 @@ export default function AdminUsersPage() {
         onToggleBan={u.handleToggleBan}
         onDelete={u.handleDeleteClick}
         onEdit={u.handleEditClick}
+        actor={actor}
       />
       <ConfirmDialog
         open={u.deleteDialogOpen}
@@ -44,6 +47,7 @@ export default function AdminUsersPage() {
         error={u.editError}
         onClose={u.handleEditClose}
         onSave={u.handleEditSave}
+        actor={actor}
       />
       <CreateUserDialog s={create} />
     </Box>

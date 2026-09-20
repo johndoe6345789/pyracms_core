@@ -24,6 +24,9 @@ struct UserDto {
     UserRole role{UserRole::User};
     // 0 = platform account, otherwise the tenant the account belongs to
     int tenantId{0};
+    // Filled by the scoped listing only (admin UI guards).
+    bool siteOwner{false};
+    bool lastAdmin{false};
 };
 
 } // namespace pyracms

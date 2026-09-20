@@ -1,10 +1,10 @@
-import { Dialog, DialogTitle, DialogContent, Alert } from '@mui/material'
+import { Dialog, DialogTitle } from '@mui/material'
 import type { UserRow } from '@/hooks/admin/userRow'
 import type { UserProfileFields } from '@/hooks/admin/useUserEdit'
-import EditUserFields from './EditUserFields'
-import EditUserRole from './EditUserRole'
+import EditUserContent from './EditUserContent'
 import EditUserActions from './EditUserActions'
-import { useCurrentRole } from '@/hooks/useCurrentRole'
+import { useActor } from '@/hooks/useActor'
+import type { Actor } from '@/lib/userGuards'
 import { useEditUserForm } from './useEditUserForm'
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
   error: string
   onClose: () => void
   onSave: (fields: UserProfileFields) => void
+  actor?: Actor | undefined
 }
 
 export default function EditUserDialog({
@@ -21,10 +22,12 @@ export default function EditUserDialog({
   error,
   onClose,
   onSave,
+  actor,
 }: Props) {
-  const { fullName, setFullName, email, setEmail, role, setRole } =
-    useEditUserForm(user)
-  const actorRole = useCurrentRole()
+  const form = useEditUserForm(user)
+  const { fullName, email, role } = form
+  const own = useActor()
+  const who = actor ?? own
 
   return (
     <Dialog
@@ -36,27 +39,7 @@ export default function EditUserDialog({
       aria-labelledby="edit-user-title"
     >
       <DialogTitle id="edit-user-title">Edit {user?.username}</DialogTitle>
-      <DialogContent
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          pt: '16px !important',
-        }}
-      >
-        {error && (
-          <Alert severity="error" data-testid="edit-user-error">
-            {error}
-          </Alert>
-        )}
-        <EditUserFields
-          fullName={fullName}
-          email={email}
-          onFullName={setFullName}
-          onEmail={setEmail}
-        />
-        <EditUserRole actorRole={actorRole} value={role} onChange={setRole} />
-      </DialogContent>
+      <EditUserContent error={error} user={user} actor={who} form={form} />
       <EditUserActions
         saving={saving}
         canSave={!!email.trim()}
