@@ -16,7 +16,9 @@ public:
     bool write(const QString& service, const QString& account,
                const QString& secret) override
     {
+        qWarning("kc: remove");
         remove(service, account);
+        qWarning("kc: removed");
         Cf s(str(service)), a(str(account));
         const QByteArray u = secret.toUtf8();
         Cf data(CFDataCreate(kCFAllocatorDefault,
@@ -25,6 +27,7 @@ public:
         Cf q(query(CFStringRef(s.ref), CFStringRef(a.ref)));
         CFDictionarySetValue(CFMutableDictionaryRef(q.ref), kSecValueData,
                              data.ref);
+        qWarning("kc: add");
         const OSStatus st = SecItemAdd(CFDictionaryRef(q.ref), nullptr);
         if (st != errSecSuccess)
             qWarning("Keychain add failed: OSStatus %d", int(st));
