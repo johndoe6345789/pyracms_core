@@ -18,7 +18,7 @@ export default function SiteHomePage() {
   if (notFound) return <SiteNotFound slug={slug} />
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
       <Box sx={{ mb: 6 }}>
         <Typography
           variant="h2"

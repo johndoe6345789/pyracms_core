@@ -20,7 +20,7 @@ export default function ViewThreadPage() {
 
   if (tenantLoading || t.loading) {
     return (
-      <Container sx={{ py: 6 }}>
+      <Container sx={{ py: { xs: 3, md: 6 } }}>
         <ForumLoading />
       </Container>
     )

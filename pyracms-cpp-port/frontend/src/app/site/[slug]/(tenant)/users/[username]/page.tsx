@@ -18,7 +18,7 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ py: 6 }}>
+      <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
         <Skeleton variant="circular" width={120} height={120} />
         <Skeleton variant="text" width={200} height={40} sx={{ mt: 2 }} />
       </Container>
@@ -27,7 +27,7 @@ export default function UserProfilePage() {
 
   if (!user) {
     return (
-      <Container maxWidth="md" sx={{ py: 6 }}>
+      <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
         <Typography variant="h4">User not found</Typography>
       </Container>
     )
@@ -35,7 +35,7 @@ export default function UserProfilePage() {
 
   return (
     <PageTransition>
-      <Container maxWidth="md" sx={{ py: 6 }}>
+      <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
         <UserHeader user={user} />
         <Tabs
           value={activeTab}

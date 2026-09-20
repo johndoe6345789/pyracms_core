@@ -12,7 +12,7 @@ export default function NotificationsPage() {
   const { items, loading, error, markRead, markAll, remove } =
     useNotificationPage(isAuth)
   return (
-    <Container maxWidth="md" sx={{ py: 6 }}>
+    <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="h3" component="h1" gutterBottom>
           Notifications

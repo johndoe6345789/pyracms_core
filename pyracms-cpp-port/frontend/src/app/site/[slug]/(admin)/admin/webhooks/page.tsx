@@ -20,7 +20,7 @@ export default function WebhooksPage() {
   const [del, setDel] = useState<Webhook | null>(null)
   const [log, setLog] = useState<number | null>(null)
   return (
-    <Container maxWidth="xl" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 } }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="h3" component="h1" gutterBottom>
           Webhooks

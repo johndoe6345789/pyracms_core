@@ -14,7 +14,7 @@ export default function SearchPage() {
     <PageTransition>
       <Container
         maxWidth="lg"
-        sx={{ py: 6 }}
+        sx={{ py: { xs: 3, md: 6 } }}
         data-testid="search-page"
         role="main"
         aria-label="Search page"

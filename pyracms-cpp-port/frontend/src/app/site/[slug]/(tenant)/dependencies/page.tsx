@@ -18,7 +18,7 @@ export default function DependenciesPage() {
   const signedIn = useSiteSession(slug)
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h3" component="h1" gutterBottom>

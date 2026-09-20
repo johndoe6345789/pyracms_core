@@ -27,7 +27,7 @@ export default function DepView({
   const { detail, tabIndex, setTabIndex } = useGameDepDetail(data)
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
       <Breadcrumbs
         sx={{ mb: 3 }}
         separator={<NavigateNextOutlined fontSize="small" />}

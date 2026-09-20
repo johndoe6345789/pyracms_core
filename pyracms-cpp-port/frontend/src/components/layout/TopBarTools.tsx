@@ -22,6 +22,7 @@ export default function TopBarTools({
       </Box>
       <Tooltip title="Get the launcher">
         <IconButton
+          sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
           component={Link}
           href={downloadHref}
           aria-label="Get the launcher"

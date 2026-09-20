@@ -8,7 +8,7 @@ import MenuToggle from './MenuToggle'
 import TopBarLinks from './TopBarLinks'
 import TopBarMenu from './TopBarMenu'
 import TopBarTools from './TopBarTools'
-import { barSx, brandSx } from './appBarStyles'
+import { barSx, brandSx, logoSx } from './appBarStyles'
 import type { NavEntry } from './navTypes'
 
 interface Props {
@@ -43,6 +43,7 @@ export default function AppTopBar({
   return (
     <AppBar position="sticky" elevation={0} sx={barSx}>
       <Toolbar
+        sx={{ px: { xs: 1, sm: 2 }, gap: { xs: 0.5, sm: 0 } }}
         component="nav"
         role="navigation"
         aria-label={navLabel}
@@ -50,7 +51,7 @@ export default function AppTopBar({
       >
         <MenuToggle open={drawerOpen} onClick={onMenuClick} />
         <LanguageOutlined
-          sx={{ color: 'primary.main', mr: 1, fontSize: 22 }}
+          sx={logoSx}
           aria-hidden="true"
         />
         <Typography

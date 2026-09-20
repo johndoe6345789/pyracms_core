@@ -21,7 +21,7 @@ export default function AuditLogPage() {
   const { tenantId } = useTenantId(slug)
   const { rows, loading, error } = useAuditLog(tenantId)
   return (
-    <Container maxWidth="xl" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 } }}>
       <Typography variant="h3" component="h1" gutterBottom>
         Audit Log
       </Typography>

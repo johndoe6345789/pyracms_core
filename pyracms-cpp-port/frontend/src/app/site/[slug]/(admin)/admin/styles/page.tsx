@@ -40,7 +40,7 @@ export default function StyleEditorPage() {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 } }}>
       <Typography variant="h3" component="h1" gutterBottom>
         Style Editor
       </Typography>

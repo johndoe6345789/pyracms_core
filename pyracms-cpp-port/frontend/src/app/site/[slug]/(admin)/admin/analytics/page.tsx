@@ -17,7 +17,7 @@ export default function AnalyticsPage() {
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
   return (
-    <Container maxWidth="xl" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 } }}>
       <Typography variant="h3" component="h1" gutterBottom>
         Analytics Dashboard
       </Typography>
