@@ -4,6 +4,7 @@ import { Box, Button, Typography, Alert } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import { useCreateSite } from '@/hooks/useCreateSite'
 import CreateSiteFields from './CreateSiteFields'
+import CreateSiteAdminFields from './CreateSiteAdminFields'
 
 export default function CreateSiteForm() {
   const { form, updateField, loading, error, handleSubmit } = useCreateSite()
@@ -19,7 +20,7 @@ export default function CreateSiteForm() {
         Create Your Site
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Choose a name and URL slug for your new site.
+        Choose a name and address, and set up the account that will run it.
       </Typography>
 
       {error && (
@@ -40,6 +41,7 @@ export default function CreateSiteForm() {
         aria-label="Create site form"
       >
         <CreateSiteFields form={form} updateField={updateField} />
+        <CreateSiteAdminFields form={form} updateField={updateField} />
         <Button
           fullWidth
           variant="contained"

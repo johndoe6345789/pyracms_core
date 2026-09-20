@@ -109,10 +109,6 @@ set(LIB_SOURCES
 
     src/controllers/auth/AuthControllerOauthKnownUser.cpp
 
-    src/controllers/auth/AuthControllerOauthLink.cpp
-
-    src/controllers/auth/AuthControllerOauthNewUser.cpp
-
     src/controllers/auth/AuthControllerOauthProfile.cpp
 
     src/controllers/auth/AuthControllerOauthProviders.cpp
@@ -128,6 +124,8 @@ set(LIB_SOURCES
     src/controllers/auth/AuthControllerRegisterUser.cpp
 
     src/controllers/auth/AuthControllerResetPassword.cpp
+
+    src/controllers/auth/AuthControllerSetup.cpp
 
     src/controllers/auth/AuthControllerVerifyEmail.cpp
 
@@ -290,6 +288,10 @@ set(LIB_SOURCES
     src/controllers/settings/SettingsControllerList.cpp
 
     src/controllers/settings/SettingsControllerRemove.cpp
+
+    src/controllers/site/SiteSignupController.cpp
+
+    src/controllers/site/SiteSignupFinish.cpp
 
     src/controllers/snippet/CodeSnippetControllerCreateSnippet.cpp
 
@@ -859,6 +861,8 @@ set(LIB_SOURCES
 
     src/services/social/SocialServiceUnfollowUser.cpp
 
+    src/services/tenant/TenantServiceCreateEmpty.cpp
+
     src/services/tenant/TenantServiceCreateTenant.cpp
 
     src/services/tenant/TenantServiceDeleteTenant.cpp
@@ -878,6 +882,8 @@ set(LIB_SOURCES
     src/services/user/UserAdminServiceSetBanned.cpp
 
     src/services/user/UserAdminServiceSetRole.cpp
+
+    src/services/user/UserServiceCreateFounder.cpp
 
     src/services/user/UserServiceCreateUser.cpp
 

@@ -5,6 +5,7 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { navigationMock, apiMock } from '../helpers/createSiteHook'
+import { withStore } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -16,7 +17,7 @@ beforeEach(() => {
 
 describe('updateField(slug)', () => {
   it('rejects a slug containing spaces and sets error', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'bad slug')
@@ -27,7 +28,7 @@ describe('updateField(slug)', () => {
   })
 
   it('rejects a slug with uppercase letters and sets error', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'Bad-Slug')
@@ -38,7 +39,7 @@ describe('updateField(slug)', () => {
   })
 
   it('rejects a slug with special characters and sets error', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'bad@slug!')
@@ -49,7 +50,7 @@ describe('updateField(slug)', () => {
   })
 
   it('rejects a slug with a leading hyphen and sets error', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', '-leading')
@@ -60,7 +61,7 @@ describe('updateField(slug)', () => {
   })
 
   it('rejects a slug with a trailing hyphen and sets error', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'trailing-')

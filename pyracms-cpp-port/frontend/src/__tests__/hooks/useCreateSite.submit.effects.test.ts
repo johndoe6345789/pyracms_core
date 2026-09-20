@@ -11,6 +11,7 @@ import {
   fakeSubmitEvent,
   makeMockFormEvent,
 } from '../helpers/createSiteHook'
+import { withStore, fillAdmin } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -22,10 +23,13 @@ beforeEach(() => {
 
 describe('handleSubmit – success', () => {
   it('calls preventDefault on the submit event', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    const { result } = renderHook(() => useCreateSite())
+    mockPost.mockResolvedValueOnce({
+      data: { token: 't', user: { id: 1, username: 'owner' } },
+    })
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
     const { event, preventDefault } = makeMockFormEvent()
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(event)
     })
@@ -34,13 +38,16 @@ describe('handleSubmit – success', () => {
   })
 
   it('leaves error as empty string after success', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    const { result } = renderHook(() => useCreateSite())
+    mockPost.mockResolvedValueOnce({
+      data: { token: 't', user: { id: 1, username: 'owner' } },
+    })
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'My Blog')
     })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })

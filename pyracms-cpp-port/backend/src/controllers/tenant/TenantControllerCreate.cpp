@@ -1,7 +1,7 @@
 #include "controllers/BoolReply.h"
 #include "controllers/TenantController.h"
 #include "filters/TenantGuard.h"
-#include "security/Validate.h"
+#include "controllers/SiteInput.h"
 
 namespace pyracms {
 
@@ -10,38 +10,14 @@ void TenantController::create(
     std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
 
     auto json = req->getJsonObject();
-    if (!json || !(*json).isMember("slug") ||
-        !(*json).isMember("displayName")) {
-        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-        (*resp->jsonObject())["error"] = "slug and displayName required";
-        resp->setStatusCode(drogon::k400BadRequest);
-        callback(resp);
-        return;
-    }
-
-    if (!(*json)["slug"].isString() || !(*json)["displayName"].isString() ||
-        !(*json).get("description", "").isString()) {
-        callback(filterError("slug, displayName and description must be "
-                             "text", drogon::k400BadRequest));
+    auto problem = json ? siteProblem(*json) : "slug and displayName required";
+    if (!problem.empty()) {
+        callback(filterError(problem, drogon::k400BadRequest));
         return;
     }
     auto slug = (*json)["slug"].asString();
     auto displayName = (*json)["displayName"].asString();
     auto description = (*json).get("description", "").asString();
-    // The slug becomes part of URLs and of login scoping: lowercase
-    // letters, digits and hyphens only, and not a reserved word.
-    static const char *reserved[] = {"api", "admin", "www", "platform",
-                                     "static", "site", "null"};
-    bool isReserved = false;
-    for (const char *r : reserved)
-        isReserved = isReserved || slug == r;
-    if (slug.size() > 63 || !TenantService::isValidSlug(slug) || isReserved ||
-        !TenantService::isValidDisplayName(displayName) ||
-        !isBoundedText(displayName, 128) || !isBoundedText(description, 2000)) {
-        callback(filterError("Invalid site slug, name or description",
-                             drogon::k400BadRequest));
-        return;
-    }
     auto ownerId = req->attributes()->get<int>("userId");
 
     // Only platform accounts may create sites; a site's own accounts are

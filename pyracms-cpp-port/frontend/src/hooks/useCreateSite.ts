@@ -2,33 +2,29 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import api from '@/lib/api'
+import { useDispatch } from 'react-redux'
 import {
   INITIAL,
   SLUG_PATTERN,
   SLUG_ERROR,
   nameToSlug,
   createSiteError,
+  adminProblem,
   type CreateSiteForm,
 } from './createSiteForm'
+import { submitNewSite } from './createSiteSubmit'
 
 export type { CreateSiteForm }
 
-/**
- * Manages form state, validation, and submission for creating a new
- * CMS site (tenant).
- */
+/** Form state, validation and submission for creating a new site. */
 export function useCreateSite() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [form, setForm] = useState<CreateSiteForm>(INITIAL)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  /**
-   * Updates a single form field. Changing `name` auto-generates the
-   * slug while it is still empty (read from `prev`, never a stale
-   * closure); an invalid `slug` sets the error and is ignored.
-   */
+  /** `name` fills an empty slug; an invalid `slug` is ignored + flagged. */
   const updateField = (field: keyof CreateSiteForm, value: string) => {
     if (field === 'slug') {
       if (value !== '' && !SLUG_PATTERN.test(value)) {
@@ -56,18 +52,19 @@ export function useCreateSite() {
     setError('')
   }
 
-  /** Submits to `POST /api/tenants`, then navigates to `/site/{slug}`. */
+  /**
+   * Submits to `POST /api/sites`, which creates the site together with its
+   * Administrator account, then signs that account in and opens the site.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const problem = adminProblem(form)
+    if (problem) return setError(problem)
     setError('')
     setLoading(true)
     try {
-      await api.post('/api/tenants', {
-        slug: form.slug,
-        displayName: form.name,
-        description: form.description,
-      })
-      router.push(`/site/${form.slug}`)
+      await submitNewSite(form, dispatch)
+      router.push(`/site/${form.slug}/admin`)
     } catch (err: unknown) {
       setError(createSiteError(err))
     } finally {

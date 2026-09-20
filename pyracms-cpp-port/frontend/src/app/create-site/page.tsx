@@ -2,17 +2,10 @@
 
 import { useEffect } from 'react'
 import { Box, Container, Paper } from '@mui/material'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store/store'
-import AuthPromptCard from '@/components/create-site/AuthPromptCard'
 import CreateSiteForm from '@/components/create-site/CreateSiteForm'
 import CreateSiteHeader from '@/components/create-site/CreateSiteHeader'
 
 export default function CreateSitePage() {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated,
-  )
-
   useEffect(() => {
     document.title = 'Create New Site – PyraCMS'
   }, [])
@@ -40,7 +33,7 @@ export default function CreateSitePage() {
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
           }}
         >
-          {isAuthenticated ? <CreateSiteForm /> : <AuthPromptCard />}
+          <CreateSiteForm />
         </Paper>
       </Container>
     </Box>

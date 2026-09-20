@@ -3,12 +3,19 @@ export interface CreateSiteForm {
   slug: string
   name: string
   description: string
+  /** The site's Administrator account, created with the site */
+  adminUsername: string
+  adminEmail: string
+  adminPassword: string
 }
 
 export const INITIAL: CreateSiteForm = {
   slug: '',
   name: '',
   description: '',
+  adminUsername: '',
+  adminEmail: '',
+  adminPassword: '',
 }
 
 /** Regex that a valid slug must fully satisfy. */
@@ -37,4 +44,14 @@ export function createSiteError(err: unknown): string {
     return r?.data?.error || 'Failed to create site'
   }
   return 'Unable to connect to server'
+}
+
+/** Why the administrator details are not acceptable yet, else ''. */
+export function adminProblem(f: CreateSiteForm): string {
+  if (f.adminUsername.trim().length < 3) return 'Choose an admin username'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.adminEmail))
+    return 'Enter a valid admin email'
+  if (f.adminPassword.length < 8)
+    return 'Admin password must be at least 8 characters'
+  return ''
 }

@@ -3,7 +3,9 @@
 
 namespace pyracms {
 
-// Step 2: fetch the provider profile, then log in or create the account.
+// Step 2: fetch the provider profile and sign in the linked account. A
+// provider never creates an account: people sign up on a site, and the
+// platform account comes from first-run setup.
 void AuthController::oauthProfile(const std::string &provider,
                                   const std::string &accessToken,
                                   HttpCb callback) {
@@ -20,11 +22,11 @@ void AuthController::oauthProfile(const std::string &provider,
                 drogon::app().getDbClient(), provider, info->providerId,
                 [this, provider, accessToken, info,
                  callback](std::optional<int> userId) {
-                    if (userId) {
-                        oauthKnownUser(*userId, callback);
-                    } else {
-                        oauthNewUser(provider, accessToken, *info, callback);
-                    }
+                    if (userId)
+                        return oauthKnownUser(*userId, callback);
+                    sendError(callback,
+                              "No account is linked to this provider yet",
+                              drogon::k403Forbidden);
                 });
         });
 }

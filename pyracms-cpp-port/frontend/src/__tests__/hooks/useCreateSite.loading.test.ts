@@ -10,6 +10,7 @@ import {
   mockPost,
   fakeSubmitEvent,
 } from '../helpers/createSiteHook'
+import { withStore, fillAdmin } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -28,8 +29,9 @@ describe('loading flag', () => {
       }),
     )
 
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     // Start submit but do not await
     act(() => {
       void result.current.handleSubmit(fakeSubmitEvent())
@@ -39,16 +41,19 @@ describe('loading flag', () => {
 
     // Now resolve the promise and wait for state to settle
     await act(async () => {
-      resolvePost({ data: {} })
+      resolvePost({ data: { token: 't', user: { id: 1, username: 'owner' } } })
     })
 
     expect(result.current.loading).toBe(false)
   })
 
   it('is false after a successful response', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    const { result } = renderHook(() => useCreateSite())
+    mockPost.mockResolvedValueOnce({
+      data: { token: 't', user: { id: 1, username: 'owner' } },
+    })
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })
@@ -60,8 +65,9 @@ describe('loading flag', () => {
     mockPost.mockRejectedValueOnce({
       response: { data: { error: 'err' } },
     })
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })

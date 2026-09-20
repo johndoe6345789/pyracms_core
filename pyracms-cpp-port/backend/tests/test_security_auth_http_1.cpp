@@ -43,8 +43,9 @@ std::string b64url(const std::string &in) {
 TEST(SecurityAuth, RegistrationInputIsValidated) {
     REQUIRE_SERVER();
     auto n = uniq("rv");
+    auto site = makeSite();
     auto base = J({{"username", n}, {"email", n + "@h.test"},
-                   {"password", "password123"}});
+                   {"password", "password123"}, {"tenant", site.slug}});
     auto with = [&](const char *k, Json::Value v) {
         Json::Value b = base;
         b[k] = v;

@@ -40,7 +40,7 @@ std::string b64url(const std::string &in) {
 }
 } // namespace
 
-TEST(SecurityAuth, ConcurrentFirstSignupsCreateExactlyOneOwner) {
+TEST(SecurityAuth, ConcurrentFoundersCreateExactlyOneAdministrator) {
     REQUIRE_SERVER();
     auto pa = platformAdmin();
     std::string slug;
@@ -52,12 +52,10 @@ TEST(SecurityAuth, ConcurrentFirstSignupsCreateExactlyOneOwner) {
         results.push_back(std::async(std::launch::async, [&, i] {
             auto p = std::make_shared<std::promise<bool>>();
             auto f = p->get_future();
-            svc.registerAccount(
+            svc.createFounder(
                 testDb(), tenant, "race" + std::to_string(i), "",
-                "race" + std::to_string(i) + "@h.test", "hash", 0,
-                [p](bool ok, const std::string &, bool first) {
-                    p->set_value(ok && first);
-                });
+                "race" + std::to_string(i) + "@h.test", "hash",
+                [p](bool ok, const std::string &) { p->set_value(ok); });
             return f.get();
         }));
     }
@@ -71,5 +69,5 @@ TEST(SecurityAuth, ConcurrentFirstSignupsCreateExactlyOneOwner) {
         "FROM users WHERE tenant_id = $1", tenant);
     EXPECT_EQ(rows[0]["admins"].as<int>(), 1);
     EXPECT_EQ(rows[0]["firsts"].as<int>(), 1);
-    EXPECT_EQ(rows[0]["n"].as<int>(), 8);
+    EXPECT_EQ(rows[0]["n"].as<int>(), 1); // the losers were skipped
 }

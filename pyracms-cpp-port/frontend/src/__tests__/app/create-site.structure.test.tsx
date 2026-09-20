@@ -10,10 +10,6 @@ jest.mock(
   () => jest.requireActual('../helpers/createSitePageMocks').MockLink,
 )
 jest.mock(
-  '@/components/create-site/AuthPromptCard',
-  () => jest.requireActual('../helpers/createSitePageMocks').MockAuthPromptCard,
-)
-jest.mock(
   '@/components/create-site/CreateSiteForm',
   () => jest.requireActual('../helpers/createSitePageMocks').MockCreateSiteForm,
 )

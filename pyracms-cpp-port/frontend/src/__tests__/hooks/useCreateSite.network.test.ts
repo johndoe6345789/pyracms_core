@@ -10,6 +10,7 @@ import {
   mockPost,
   fakeSubmitEvent,
 } from '../helpers/createSiteHook'
+import { withStore, fillAdmin } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -22,8 +23,9 @@ beforeEach(() => {
 describe('handleSubmit – network error', () => {
   it('sets connection error for errors with no response', async () => {
     mockPost.mockRejectedValueOnce(new Error('Network Error'))
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })
@@ -33,8 +35,9 @@ describe('handleSubmit – network error', () => {
 
   it('handles a plain string rejection value', async () => {
     mockPost.mockRejectedValueOnce('timeout')
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })

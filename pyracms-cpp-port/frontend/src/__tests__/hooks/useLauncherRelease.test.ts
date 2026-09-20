@@ -36,9 +36,15 @@ describe('useLauncherRelease', () => {
 })
 
 describe('usePlatform', () => {
-  it('detects the jsdom user agent asynchronously', async () => {
+  // jsdom reports the host OS in its user agent, so pin it: the test must
+  // not depend on which machine runs it.
+  it('detects the platform from the user agent asynchronously', async () => {
+    const ua = jest
+      .spyOn(window.navigator, 'userAgent', 'get')
+      .mockReturnValue('Mozilla/5.0 (X11; Linux x86_64) Chrome/120 Safari/537')
     const { result } = renderHook(() => usePlatform())
     await waitFor(() => expect(result.current.arch).toBeTruthy())
     expect(result.current.os).toBe('lin')
+    ua.mockRestore()
   })
 })

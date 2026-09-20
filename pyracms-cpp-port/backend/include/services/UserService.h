@@ -23,15 +23,21 @@ class UserService {
                     const std::string &username, const std::string &fullName,
                     const std::string &email, const std::string &passwordHash,
                     BoolCallback cb);
-    using RegisterCallback = std::function<void(
-        bool success, const std::string &error, bool firstUser)>;
-    // Atomic sign-up: inserts the account and, if it is the first of its
-    // scope, makes it the owner (race free). `attempt` starts at 0.
+    // Ordinary sign-up: always a Normal User. Nobody becomes an
+    // administrator or moderator by registering; levels above User are
+    // only given by createFounder (setup, site creation) or by a site
+    // administrator through the admin panel.
     void registerAccount(const DbClientPtr &db, int tenantId,
                          const std::string &username,
                          const std::string &fullName, const std::string &email,
-                         const std::string &passwordHash, int attempt,
-                         RegisterCallback cb);
+                         const std::string &passwordHash, BoolCallback cb);
+    // The founding account of a scope: Platform Owner (tenantId 0, only
+    // while the platform has none) or the site's Administrator. Race free:
+    // exactly one call per scope succeeds.
+    void createFounder(const DbClientPtr &db, int tenantId,
+                       const std::string &username,
+                       const std::string &fullName, const std::string &email,
+                       const std::string &passwordHash, BoolCallback cb);
     void findByUsername(const DbClientPtr &db, int tenantId,
                         const std::string &username, Callback cb);
     void findById(const DbClientPtr &db, int id, Callback cb);

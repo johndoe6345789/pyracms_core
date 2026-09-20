@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import AppTopBar from './AppTopBar'
 import AppDrawer from './AppDrawer'
+import SetupRedirect from '@/components/portal/SetupRedirect'
 import { portalEntries, portalSections } from './navConfig'
 import { hasMinRole, UserRole } from '@/types'
 import type { RootState } from '@/store/store'
@@ -19,6 +20,7 @@ export default function PortalShell() {
 
   return (
     <>
+      <SetupRedirect />
       <AppTopBar
         brand="PyraCMS"
         brandHref="/"

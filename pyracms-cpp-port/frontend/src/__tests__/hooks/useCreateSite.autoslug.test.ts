@@ -5,6 +5,7 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { navigationMock, apiMock } from '../helpers/createSiteHook'
+import { withStore } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -18,7 +19,7 @@ beforeEach(() => {
 
 describe('updateField(name) – auto-slug generation', () => {
   it('sets name and generates a slug from a simple name', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'My Blog')
@@ -29,7 +30,7 @@ describe('updateField(name) – auto-slug generation', () => {
   })
 
   it('strips special characters when generating the slug', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'Hello World!!!')
@@ -39,7 +40,7 @@ describe('updateField(name) – auto-slug generation', () => {
   })
 
   it('generates slug with no leading or trailing hyphens', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', '---cool site---')

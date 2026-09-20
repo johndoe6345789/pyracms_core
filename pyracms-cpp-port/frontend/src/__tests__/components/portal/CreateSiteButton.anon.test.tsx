@@ -10,18 +10,15 @@ describe('CreateSiteButton', () => {
       expect(screen.getByTestId('create-site-button')).toBeInTheDocument()
     })
 
-    it('links to /auth/login/create-site', () => {
+    it('links straight to /create-site', () => {
       const btn = screen.getByTestId('create-site-button')
-      expect(btn.closest('a')).toHaveAttribute(
-        'href',
-        '/auth/login/create-site',
-      )
+      expect(btn.closest('a')).toHaveAttribute('href', '/create-site')
     })
 
-    it('has aria-label "Sign in to create a new site"', () => {
+    it('has aria-label "Create a new site"', () => {
       expect(screen.getByTestId('create-site-button')).toHaveAttribute(
         'aria-label',
-        'Sign in to create a new site',
+        'Create a new site',
       )
     })
 

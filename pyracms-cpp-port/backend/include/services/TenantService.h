@@ -42,6 +42,16 @@ public:
                       int ownerId,
                       BoolCallback cb);
 
+    // Self-service site creation in three steps: an ownerless site, its
+    // founding administrator (UserService::createFounder), then owner_id.
+    // A failed founder step calls discard so no empty site is left behind.
+    using IdCallback = std::function<void(int id, const std::string &error)>;
+    void createEmpty(const DbClientPtr &db, const std::string &slug,
+                     const std::string &displayName,
+                     const std::string &description, IdCallback cb);
+    void adoptFounder(const DbClientPtr &db, int tenantId, BoolCallback cb);
+    void discard(const DbClientPtr &db, int tenantId);
+
     void findBySlug(const DbClientPtr &db,
                     const std::string &slug,
                     Callback cb);

@@ -5,6 +5,7 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { navigationMock, apiMock } from '../helpers/createSiteHook'
+import { withStore } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -16,7 +17,7 @@ beforeEach(() => {
 
 describe('updateField(slug)', () => {
   it('updates slug directly when value is valid', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'my-custom-slug')
@@ -27,7 +28,7 @@ describe('updateField(slug)', () => {
   })
 
   it('does not change name when only slug is updated', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'Some Name')
@@ -41,7 +42,7 @@ describe('updateField(slug)', () => {
   })
 
   it('accepts an empty string as slug (clearing it)', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'valid-slug')
@@ -55,7 +56,7 @@ describe('updateField(slug)', () => {
   })
 
   it('clears a previous validation error when a valid slug is entered', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('slug', 'bad slug')

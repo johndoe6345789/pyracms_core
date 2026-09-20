@@ -11,6 +11,7 @@ import {
   mockPush,
   fakeSubmitEvent,
 } from '../helpers/createSiteHook'
+import { withStore, fillAdmin } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -21,9 +22,11 @@ beforeEach(() => {
 })
 
 describe('handleSubmit – success', () => {
-  it('calls POST /api/tenants with correct payload', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    const { result } = renderHook(() => useCreateSite())
+  it('calls POST /api/sites with the site and its admin', async () => {
+    mockPost.mockResolvedValueOnce({
+      data: { token: 't', user: { id: 1, username: 'owner' } },
+    })
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'My Blog')
@@ -32,29 +35,38 @@ describe('handleSubmit – success', () => {
       result.current.updateField('description', 'A blog')
     })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })
 
-    expect(mockPost).toHaveBeenCalledWith('/api/tenants', {
+    expect(mockPost).toHaveBeenCalledWith('/api/sites', {
       slug: 'my-blog',
       displayName: 'My Blog',
       description: 'A blog',
+      admin: {
+        username: 'owner',
+        email: 'owner@x.io',
+        password: 'password123',
+      },
     })
   })
 
-  it('navigates to /site/{slug} on success', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    const { result } = renderHook(() => useCreateSite())
+  it('opens the new site admin panel on success', async () => {
+    mockPost.mockResolvedValueOnce({
+      data: { token: 't', user: { id: 1, username: 'owner' } },
+    })
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'My Blog')
     })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })
 
-    expect(mockPush).toHaveBeenCalledWith('/site/my-blog')
+    expect(mockPush).toHaveBeenCalledWith('/site/my-blog/admin')
   })
 })

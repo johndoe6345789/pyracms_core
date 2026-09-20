@@ -27,9 +27,10 @@ export function useAuthParams(fallbackRedirect?: string) {
   const params = useSearchParams()
   const rawTenant = params.get('tenant') || ''
   const tenant = SLUG.test(rawTenant) ? rawTenant : undefined
+  const explicitRedirect = safeRedirect(params.get('redirect'))
   const redirectTo =
-    safeRedirect(params.get('redirect')) ??
+    explicitRedirect ??
     fallbackRedirect ??
     (tenant ? `/site/${tenant}` : undefined)
-  return { tenant, redirectTo }
+  return { tenant, redirectTo, explicitRedirect }
 }

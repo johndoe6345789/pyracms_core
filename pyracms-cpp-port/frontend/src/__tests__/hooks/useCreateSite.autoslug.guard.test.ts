@@ -5,6 +5,7 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { navigationMock, apiMock } from '../helpers/createSiteHook'
+import { withStore } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -16,7 +17,7 @@ beforeEach(() => {
 
 describe('updateField(name) – auto-slug generation', () => {
   it('does not overwrite a manually set slug when name changes', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     // Manually set the slug first
     act(() => {
@@ -43,7 +44,7 @@ describe('updateField(name) – auto-slug generation', () => {
    * always observes the latest queued state.
    */
   it('uses prev.slug (not stale closure) for the auto-slug guard', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       // First update: slug is '' → auto-generate 'first-name'

@@ -10,6 +10,7 @@ import {
   mockPost,
   fakeSubmitEvent,
 } from '../helpers/createSiteHook'
+import { withStore, fillAdmin } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -21,7 +22,7 @@ beforeEach(() => {
 
 describe('resetForm', () => {
   it('clears all form fields back to empty strings', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'Old Name')
@@ -35,13 +36,17 @@ describe('resetForm', () => {
       slug: '',
       name: '',
       description: '',
+      adminUsername: '',
+      adminEmail: '',
+      adminPassword: '',
     })
   })
 
   it('clears the error state', async () => {
     mockPost.mockRejectedValueOnce(new Error('Network Error'))
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
+    fillAdmin(result)
     await act(async () => {
       await result.current.handleSubmit(fakeSubmitEvent())
     })
@@ -55,7 +60,7 @@ describe('resetForm', () => {
   })
 
   it('allows auto-slug generation again after reset', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     // Fill in and then reset
     act(() => {

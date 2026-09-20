@@ -19,6 +19,9 @@ class AuthController : public drogon::HttpController<AuthController> {
                   PYR_RATE);
     ADD_METHOD_TO(AuthController::registerUser, "/api/auth/register",
                   drogon::Post, PYR_RATE);
+    ADD_METHOD_TO(AuthController::setupStatus, "/api/auth/setup", drogon::Get);
+    ADD_METHOD_TO(AuthController::setup, "/api/auth/setup", drogon::Post,
+                  PYR_RATE);
     ADD_METHOD_TO(AuthController::me, "/api/auth/me", drogon::Get, PYR_JWT);
     ADD_METHOD_TO(AuthController::forgotPassword, "/api/auth/forgot-password",
                   drogon::Post, PYR_RATE);
@@ -37,21 +40,18 @@ class AuthController : public drogon::HttpController<AuthController> {
                   drogon::Get, PYR_JWT);
     METHOD_LIST_END
 
-    void login(HttpReq req, HttpCbRef callback);
-    void registerUser(HttpReq req, HttpCbRef callback);
-    void me(HttpReq req, HttpCbRef callback);
-    void forgotPassword(HttpReq req, HttpCbRef callback);
-    void resetPassword(HttpReq req, HttpCbRef callback);
-    void verifyEmail(HttpReq req, HttpCbRef callback);
+    void login(HttpReq, HttpCbRef); void registerUser(HttpReq, HttpCbRef);
+    void setupStatus(HttpReq, HttpCbRef); void setup(HttpReq, HttpCbRef);
+    void me(HttpReq, HttpCbRef); void forgotPassword(HttpReq, HttpCbRef);
+    void resetPassword(HttpReq, HttpCbRef);
+    void verifyEmail(HttpReq, HttpCbRef);
     void oauthUrl(HttpReq req, HttpCbRef callback, HttpStr provider);
     void oauthCallback(HttpReq req, HttpCbRef callback, HttpStr provider);
     void oauthUnlink(HttpReq req, HttpCbRef callback, HttpStr provider);
     void oauthProviders(HttpReq req, HttpCbRef callback);
 
   private:
-    struct NewAccount {
-        std::string username, fullName, email, passwordHash;
-    };
+    struct NewAccount { std::string username, fullName, email, passwordHash; };
     void registerIn(int tenantId, HttpStr slug, const NewAccount &acct,
                     HttpCb callback);
     void registerDone(int tenantId, HttpStr slug, HttpStr username,
@@ -62,10 +62,6 @@ class AuthController : public drogon::HttpController<AuthController> {
     // OAuth callback steps (see AuthControllerOauth*.cpp)
     void oauthProfile(HttpStr provider, HttpStr accessToken, HttpCb callback);
     void oauthKnownUser(int userId, HttpCb callback);
-    void oauthNewUser(HttpStr provider, HttpStr accessToken,
-                      const OAuthUserInfo &info, HttpCb callback);
-    void oauthLink(const UserDto &user, HttpStr provider, HttpStr accessToken,
-                   const OAuthUserInfo &info, HttpCb callback);
     void withTenant(const Json::Value &json, const HttpCb &callback,
                     std::function<void(int, const std::string &)> next);
 

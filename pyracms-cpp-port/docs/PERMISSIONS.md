@@ -15,6 +15,28 @@ enforces them (the UI only hides what would be refused).
 Accounts belong to one site. Being a Moderator on site A gives no power on
 site B; only a Platform Owner reaches across sites.
 
+## How accounts are created
+
+There is exactly one way to get each kind of account:
+
+| You want | How |
+|---|---|
+| The **Platform Owner** | First visit to a new install shows a **setup screen**: choose a username, email and password. It works once; after that the screen redirects home. |
+| A site **Administrator** | **Create a site** (`/create-site`): the form also asks for the admin account. Creating a site creates that account, on that site only, and signs you in to it. |
+| A **Normal User** | **Register on a site**. Registering always gives a Normal User, never more, even for the first person to register. |
+| A **Moderator** | Only through the site **admin panel** (Users, change level). Nobody becomes a moderator by signing up. |
+
+Consequences:
+
+* The portal has no public sign-up. Its register page tells people to sign up
+  on a site. Signing in with an OAuth provider only works for an already
+  linked account; it never creates one.
+* At **sign-in**, the login page has a *Sign in as* dropdown: Platform Owner,
+  or any site. The Platform Owner lands on the portal home; a site account
+  lands on its site.
+* Accounts are separate on every site: `richard` on site A is not `richard`
+  on site B, and signing out of one site does not sign out of another.
+
 ## What each level can do
 
 | | Guest | User | Moderator | Administrator | Platform Owner |

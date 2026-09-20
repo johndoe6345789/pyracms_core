@@ -6,12 +6,18 @@ export const emptyForm: CreateSiteForm = {
   name: '',
   slug: '',
   description: '',
+  adminUsername: '',
+  adminEmail: '',
+  adminPassword: '',
 }
 
 export const filledForm: CreateSiteForm = {
   name: 'My Site',
   slug: 'my-site',
   description: 'A test site',
+  adminUsername: 'owner',
+  adminEmail: 'owner@x.io',
+  adminPassword: 'password123',
 }
 
 /** Renders CreateSiteFields; returns the updateField spy. */

@@ -6,6 +6,7 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { navigationMock, apiMock } from '../helpers/createSiteHook'
+import { withStore } from '../helpers/createSiteHook'
 import { useCreateSite } from '@/hooks/useCreateSite'
 
 jest.mock('next/navigation', () => navigationMock())
@@ -19,22 +20,25 @@ beforeEach(() => {
 
 describe('initial state', () => {
   it('returns empty strings for all form fields', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     expect(result.current.form).toEqual({
       slug: '',
       name: '',
       description: '',
+      adminUsername: '',
+      adminEmail: '',
+      adminPassword: '',
     })
   })
 
   it('starts with loading=false', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
     expect(result.current.loading).toBe(false)
   })
 
   it('starts with an empty error string', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
     expect(result.current.error).toBe('')
   })
 })
@@ -43,7 +47,7 @@ describe('initial state', () => {
 
 describe('updateField(description)', () => {
   it('updates description without affecting name or slug', () => {
-    const { result } = renderHook(() => useCreateSite())
+    const { result } = renderHook(() => useCreateSite(), { wrapper: withStore })
 
     act(() => {
       result.current.updateField('name', 'Test Site')

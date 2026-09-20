@@ -6,7 +6,6 @@ import LoginHeader from './LoginHeader'
 import LoginActions from './LoginActions'
 import LoginFooter from './LoginFooter'
 import TurboErrorDialog from './TurboErrorDialog'
-import AuthScopeNotice from './AuthScopeNotice'
 import { useLogin } from '@/hooks/useLogin'
 import { useTurboLogin } from '@/hooks/useTurboLogin'
 
@@ -32,7 +31,6 @@ export default function LoginForm({ redirectTo, tenant }: Props) {
         onClose={clearTurboError}
       />
       <LoginHeader error={error} tenant={tenant} />
-      {tenant && <AuthScopeNotice tenant={tenant} platformHref="/auth/login" />}
       <form
         onSubmit={handleSubmit}
         data-testid="login-form"

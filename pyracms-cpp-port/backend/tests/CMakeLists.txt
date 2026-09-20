@@ -121,7 +121,13 @@ set(TEST_SOURCES
 
     test_owner_scope_forum_http.cpp
 
+    test_account_model_http.cpp
+
+    test_permissions_forum_http.cpp
+
     test_permissions_http.cpp
+
+    test_permissions_moderation_http.cpp
 
     test_owner_scope_menu_http.cpp
 
@@ -192,6 +198,8 @@ set(TEST_SOURCES
     test_services_crud_db_1.cpp
 
     test_services_crud_db_2.cpp
+
+    test_setup_http.cpp
 
     test_snippet_menu_http.cpp
 
