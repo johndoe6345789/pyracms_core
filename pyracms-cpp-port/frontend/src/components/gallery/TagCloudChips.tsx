@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { Box, Chip } from '@mui/material'
-import { LocalOfferOutlined } from '@mui/icons-material'
+import { Box } from '@mui/material'
 import type { TagCloudViewItem } from '@/hooks/useTagCloudPage'
 
+/** A real tag cloud: common tags are bigger, bolder and stronger. */
 export default function TagCloudChips({
   items,
 }: {
@@ -10,28 +10,40 @@ export default function TagCloudChips({
 }) {
   return (
     <Box
-      sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}
+      component="ul"
       aria-label="Tag cloud"
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'baseline',
+        gap: '6px 22px',
+        listStyle: 'none',
+        m: 0,
+        p: 0,
+      }}
     >
       {items.map((tag) => (
-        <Chip
-          key={tag.name}
-          component={Link}
-          href={tag.href}
-          clickable
-          icon={<LocalOfferOutlined />}
-          label={`${tag.name} (${tag.count})`}
-          data-testid={`tag-cloud-chip-${tag.name}`}
-          sx={{
-            fontSize: tag.fontSize,
-            height: tag.height,
-            borderColor: 'primary.light',
-            bgcolor: 'primary.50',
-            '& .MuiChip-label': { px: 1.25 },
-          }}
-          variant="outlined"
-          color="primary"
-        />
+        <li key={tag.name}>
+          <Link
+            href={tag.href}
+            data-testid={`tag-cloud-chip-${tag.name}`}
+            title={`${tag.count} article${tag.count === 1 ? '' : 's'}`}
+            style={{
+              fontSize: tag.fontSize,
+              fontWeight: tag.weight > 0.6 ? 700 : 500,
+              opacity: 0.55 + tag.weight * 0.45,
+              color: 'inherit',
+              textDecoration: 'none',
+              lineHeight: 1.25,
+            }}
+          >
+            {tag.name}
+            <sup style={{ fontSize: '0.5em', marginLeft: 2, opacity: 0.7 }}>
+              {tag.count}
+            </sup>
+          </Link>
+        </li>
       ))}
     </Box>
   )

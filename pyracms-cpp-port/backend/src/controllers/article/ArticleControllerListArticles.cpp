@@ -1,6 +1,8 @@
 #include "controllers/ArticleController.h"
+#include "controllers/ArticleInput.h"
 #include "filters/UserVisibility.h"
 #include "filters/Viewer.h"
+#include "security/ValidateContent.h"
 
 namespace pyracms {
 
@@ -21,10 +23,15 @@ void ArticleController::listArticles(
     int limit = clampLimit(req->getParameter("limit"), 20, 100);
     int offset = clampOffset(req->getParameter("offset"));
 
+    auto tag = req->getParameter("tag");
+    if (!isBoundedText(tag, 64)) {
+        callback(articleBad("Invalid tag"));
+        return;
+    }
     auto db = drogon::app().getDbClient();
 
     articleService_.listArticles(
-        db, tenantId, limit, offset, viewerIdFor(req, tenantId),
+        db, tenantId, limit, offset, viewerIdFor(req, tenantId), tag,
         [callback](const std::vector<ArticleDto> &articles) {
             Json::Value result(Json::arrayValue);
             for (const auto &a : articles) {

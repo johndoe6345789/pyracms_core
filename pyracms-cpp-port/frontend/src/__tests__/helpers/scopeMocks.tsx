@@ -7,6 +7,7 @@ const router = { push, replace }
 /** Factory for `jest.mock('next/navigation', ...)`. */
 export const navMock = {
   useParams: () => ({ slug: 's', name: 'n' }),
+  useSearchParams: () => new URLSearchParams(),
   useRouter: () => router,
   usePathname: () => '/site/s',
 }

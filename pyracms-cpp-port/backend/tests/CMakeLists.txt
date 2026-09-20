@@ -37,6 +37,8 @@ set(TEST_SOURCES
 
     test_article_http_1.cpp
 
+    test_article_tag_filter_http.cpp
+
     test_article_http_2.cpp
 
     test_article_http_3.cpp

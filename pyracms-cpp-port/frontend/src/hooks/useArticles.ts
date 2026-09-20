@@ -41,7 +41,8 @@ export function mapSummary(a: Raw): ArticleSummary {
   }
 }
 
-export function useArticles(tenantId: number | null) {
+/** `tag` narrows the list to articles carrying that tag. */
+export function useArticles(tenantId: number | null, tag = '') {
   const [searchQuery, setSearchQuery] = useState('')
   const [allArticles, setAllArticles] = useState<ArticleSummary[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,11 +51,14 @@ export function useArticles(tenantId: number | null) {
     if (!tenantId) return
     setLoading(true)
     api
-      .get(`/api/articles?tenant_id=${tenantId}`)
+      .get(
+        `/api/articles?tenant_id=${tenantId}` +
+          (tag ? `&tag=${encodeURIComponent(tag)}` : ''),
+      )
       .then((res) => setAllArticles((res.data || []).map(mapSummary)))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [tenantId])
+  }, [tenantId, tag])
 
   const q = searchQuery.toLowerCase()
   const articles = allArticles.filter(

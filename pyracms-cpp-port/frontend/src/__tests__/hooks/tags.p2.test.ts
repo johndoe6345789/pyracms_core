@@ -26,7 +26,7 @@ describe('tag cloud hooks', () => {
     expect(get).toHaveBeenCalledTimes(2)
   })
 
-  it('useTagCloudPage scales tags by weight', async () => {
+  it('useTagCloudPage scales tags and links to articles', async () => {
     get.mockImplementation((u: string) =>
       Promise.resolve(
         u.includes('tenants')
@@ -42,10 +42,11 @@ describe('tag cloud hooks', () => {
     const { result } = renderHook(() => useTagCloudPage())
     await waitFor(() => expect(result.current.items).toHaveLength(2))
     expect(result.current.items[0]).toMatchObject({
-      fontSize: 20,
+      weight: 1,
+      fontSize: 40,
       height: 40,
-      href: '/search?site=demo&q=big',
+      href: '/site/demo/articles?tag=big',
     })
-    expect(result.current.items[1]!.fontSize).toBe(16.5)
+    expect(result.current.items[1]!.fontSize).toBe(27.5)
   })
 })

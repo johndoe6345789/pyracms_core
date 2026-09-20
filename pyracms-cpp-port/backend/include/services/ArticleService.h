@@ -24,9 +24,11 @@ class ArticleService {
     using BoolCallback =
         std::function<void(bool success, const std::string &error)>;
     // viewerId 0 = anonymous. Private/unpublished articles only show for
-    // their author, moderators and the site owner.
+    // their author, moderators and the site owner. A non-empty `tag` keeps
+    // only articles carrying that tag (case-insensitive).
     void listArticles(const DbClientPtr &db, int tenantId, int limit,
-                      int offset, int viewerId, ArticleListCallback cb);
+                      int offset, int viewerId, const std::string &tag,
+                      ArticleListCallback cb);
     void getArticle(const DbClientPtr &db, int tenantId,
                     const std::string &name, int viewerId, ArticleCallback cb);
     // No visibility check, no view count: for callers past OwnerFilter.

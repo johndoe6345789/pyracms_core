@@ -5,6 +5,8 @@ import { useTagCloud } from '@/hooks/useTagCloud'
 import { useTenantId } from '@/hooks/useTenantId'
 
 export interface TagCloudViewItem {
+  /** 0..1: how common the tag is, for weight and colour */
+  weight: number
   count: number
   fontSize: number
   height: number
@@ -12,12 +14,9 @@ export interface TagCloudViewItem {
   name: string
 }
 
-function searchHref(slug: string, tag: string) {
-  const params = new URLSearchParams({
-    site: slug,
-    q: tag,
-  })
-  return `/search?${params.toString()}`
+/** The articles carrying this tag (not a text search for its name). */
+function tagHref(slug: string, tag: string) {
+  return `/site/${slug}/articles?tag=${encodeURIComponent(tag)}`
 }
 
 export function useTagCloudPage() {
@@ -29,10 +28,11 @@ export function useTagCloudPage() {
   const items: TagCloudViewItem[] = tags.map((tag) => {
     const weight = tag.count / maxCount
     return {
+      weight,
       count: tag.count,
-      fontSize: 13 + weight * 7,
+      fontSize: 15 + weight * 25,
       height: 32 + weight * 8,
-      href: searchHref(slug, tag.name),
+      href: tagHref(slug, tag.name),
       name: tag.name,
     }
   })

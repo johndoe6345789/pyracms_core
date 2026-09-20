@@ -32,7 +32,7 @@ export default function RecentActivity({ tenantId, limit }: Props) {
       )}
       <List disablePadding>
         {items.map((a, i) => (
-          <ActivityRow key={a.id} a={a} first={i === 0} />
+          <ActivityRow key={`${a.type}-${a.id}`} a={a} first={i === 0} />
         ))}
       </List>
     </Paper>

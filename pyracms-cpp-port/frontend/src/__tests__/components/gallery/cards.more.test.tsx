@@ -22,13 +22,14 @@ describe('gallery cards', () => {
     expect(screen.getByTestId('picture-missing-8')).toHaveTextContent('Nada')
   })
 
-  it('TagCloudChips renders labelled chips', () => {
+  it('TagCloudChips renders sized, linked tags', () => {
     render(
       <TagCloudChips
         items={[
           {
             name: 'a',
             count: 2,
+            weight: 0.5,
             href: '/t/a',
             fontSize: 12,
             height: 20,
@@ -37,7 +38,8 @@ describe('gallery cards', () => {
       />,
     )
     const chip = screen.getByTestId('tag-cloud-chip-a')
-    expect(chip).toHaveTextContent('a (2)')
+    expect(chip).toHaveTextContent('a2')
+    expect(chip).toHaveAttribute('title', '2 articles')
     expect(chip).toHaveAttribute('href', '/t/a')
   })
 })
