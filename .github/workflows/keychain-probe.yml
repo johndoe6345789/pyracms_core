@@ -66,6 +66,6 @@ jobs:
           EOC
           clang p.c -framework Security -framework CoreFoundation -o p
           for v in 0 1 2 3 4 5 6 7; do
-            security delete-generic-password -s HnProbe >/dev/null 2>&1
+            security delete-generic-password -s HnProbe >/dev/null 2>&1 || true
             ./p $v || echo "variant $v killed/timed out ($?)"
           done
