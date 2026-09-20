@@ -49,5 +49,22 @@ CFMutableDictionaryRef query(CFStringRef service, CFStringRef account,
     return q;
 }
 
+// Pin an add to the default keychain and let any app read the item: the
+// implicit target/ACL can stall headless sessions.
+void pinToDefaultKeychain(CFMutableDictionaryRef q, const QString& label)
+{
+    SecKeychainRef kc = nullptr;
+    SecKeychainCopyDefault(&kc);
+    Cf kcHold(kc);
+    if (kc) CFDictionarySetValue(q, kSecUseKeychain, kc);
+    Cf empty(CFArrayCreate(kCFAllocatorDefault, nullptr, 0,
+                           &kCFTypeArrayCallBacks));
+    Cf name(str(label));
+    SecAccessRef acc = nullptr;
+    SecAccessCreate(CFStringRef(name.ref), CFArrayRef(empty.ref), &acc);
+    Cf accHold(acc);
+    if (acc) CFDictionarySetValue(q, kSecAttrAccess, acc);
+}
+
 } // namespace
 } // namespace Hypernucleus
