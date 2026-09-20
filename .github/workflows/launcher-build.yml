@@ -218,12 +218,6 @@ jobs:
           security unlock-keychain -p ci build.keychain
           security set-keychain-settings -lut 21600 build.keychain
           security list-keychains -d user -s build.keychain
-          security default-keychain -d user
-          security show-keychain-info build.keychain || true
-          perl -e 'alarm 20; exec @ARGV' security add-generic-password             -a diag -s HnDiag -w secret -U build.keychain
-          echo "add exit: $?"
-          perl -e 'alarm 20; exec @ARGV' security find-generic-password             -a diag -s HnDiag -w build.keychain
-          echo "find exit: $?"
 
       - name: Test
         shell: bash
