@@ -1,0 +1,71 @@
+name: Keychain probe
+
+# Diagnostic only: which SecItemAdd variant works on a headless runner.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: macos-14
+    timeout-minutes: 10
+    steps:
+      - name: Unlock temp keychain
+        run: |
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security list-keychains -d user -s build.keychain
+
+      - name: Probe variants
+        run: |
+          cat > p.c <<'EOC'
+          #include <Security/Security.h>
+          #include <pthread.h>
+          #include <stdio.h>
+          #include <stdlib.h>
+          #include <string.h>
+          static int variant;
+          static void *run(void *x) {
+            CFMutableDictionaryRef q = CFDictionaryCreateMutable(0, 0,
+              &kCFTypeDictionaryKeyCallBacks,
+              &kCFTypeDictionaryValueCallBacks);
+            CFDictionarySetValue(q, kSecClass, kSecClassGenericPassword);
+            CFDictionarySetValue(q, kSecAttrService, CFSTR("HnProbe"));
+            CFDictionarySetValue(q, kSecAttrAccount, CFSTR("acc"));
+            CFDataRef d = CFDataCreate(0, (const UInt8 *)"secret", 6);
+            CFDictionarySetValue(q, kSecValueData, d);
+            if (variant & 1) {
+              SecKeychainRef kc = 0; SecKeychainCopyDefault(&kc);
+              CFDictionarySetValue(q, kSecUseKeychain, kc);
+            }
+            if (variant & 2) {
+              SecAccessRef a = 0;
+              CFArrayRef e = CFArrayCreate(0, 0, 0, &kCFTypeArrayCallBacks);
+              SecAccessCreate(CFSTR("p"), e, &a);
+              CFDictionarySetValue(q, kSecAttrAccess, a);
+            }
+            printf("variant %d start\n", variant); fflush(stdout);
+            OSStatus st = SecItemAdd(q, 0);
+            printf("variant %d status %d\n", variant, (int)st);
+            return 0;
+          }
+          int main(int c, char **v) {
+            variant = atoi(v[1]);
+            alarm(20);
+            if (variant & 4) {
+              pthread_t t; pthread_create(&t, 0, run, 0);
+              pthread_join(t, 0);
+            } else run(0);
+            return 0;
+          }
+          EOC
+          clang p.c -framework Security -framework CoreFoundation -o p
+          for v in 0 1 2 3 4 5 6 7; do
+            security delete-generic-password -s HnProbe >/dev/null 2>&1
+            ./p $v || echo "variant $v killed/timed out ($?)"
+          done
