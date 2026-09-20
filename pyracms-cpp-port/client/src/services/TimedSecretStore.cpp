@@ -3,6 +3,8 @@
 #include <chrono>
 #include <thread>
 
+#include <QDebug>
+
 namespace Hypernucleus {
 
 TimedSecretStore::TimedSecretStore(std::shared_ptr<SecretStore> inner,
@@ -40,6 +42,7 @@ TimedSecretStore::run(std::function<void(Result&)> job)
         lock, std::chrono::milliseconds(m_timeoutMs),
         [&res]() { return res->finished; });
     if (!in_time) {
+        qWarning("Secret store call timed out after %d ms", m_timeoutMs);
         m_hung = true;
         return nullptr;
     }
