@@ -50,10 +50,7 @@ export default function AppTopBar({
         data-testid="tenant-appbar"
       >
         <MenuToggle open={drawerOpen} onClick={onMenuClick} />
-        <LanguageOutlined
-          sx={logoSx}
-          aria-hidden="true"
-        />
+        <LanguageOutlined sx={logoSx} aria-hidden="true" />
         <Typography
           variant="h6"
           component={Link}

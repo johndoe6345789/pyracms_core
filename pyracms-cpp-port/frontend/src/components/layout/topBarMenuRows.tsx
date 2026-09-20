@@ -9,11 +9,7 @@ const newTab = { target: '_blank', rel: 'noopener noreferrer' } as const
  * titled group, fenced off by dividers from the links around it. MUI's Menu
  * needs a flat array, so this returns one rather than fragments.
  */
-export function menuRows(
-  item: NavEntry,
-  pathname: string,
-  close: () => void,
-) {
+export function menuRows(item: NavEntry, pathname: string, close: () => void) {
   const row = (c: NavEntry) => (
     <MenuItem
       key={c.key}
