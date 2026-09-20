@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useCreateArticle } from '@/app/site/[slug]/(tenant)/articles/create/useCreateArticle'
+import { useCreateArticle as useCreate } from '../helpers/createArticleHook'
 
 const post = jest.fn()
 const push = jest.fn()
@@ -10,7 +10,7 @@ jest.mock('@/lib/api', () => ({
 }))
 
 function start(renderer: string) {
-  const hook = renderHook(() => useCreateArticle('demo', 7))
+  const hook = renderHook(() => useCreate('demo', 7))
   act(() => {
     hook.result.current.editor.setTitle('Another Test')
     hook.result.current.editor.setContent('body')

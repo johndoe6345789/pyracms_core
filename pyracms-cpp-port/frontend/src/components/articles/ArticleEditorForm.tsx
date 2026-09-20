@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, TextField } from '@mui/material'
 import type { ArticleEditorState } from '@/hooks/useArticleEditor'
 import type { EditorMode } from './EditorModeSelector'
+import { defaultModeFor } from './editorModes'
 import { ArticleEditorToolbar } from './ArticleEditorToolbar'
 import { ArticleEditorContent } from './ArticleEditorContent'
 import { ArticleTagEditor } from './ArticleTagEditor'
@@ -11,14 +12,19 @@ import { ArticleTagEditor } from './ArticleTagEditor'
 interface ArticleEditorFormProps {
   editor: ArticleEditorState
   contentPlaceholder?: string
+  /** Where an unsaved draft is kept; leave out when editing */
+  draftKey?: string
   onSummaryChange?: (value: string) => void
 }
 
 export function ArticleEditorForm({
   editor,
+  draftKey,
   onSummaryChange,
 }: ArticleEditorFormProps) {
-  const [mode, setMode] = useState<EditorMode>('monaco')
+  const [mode, setMode] = useState<EditorMode>(defaultModeFor(editor.renderer))
+  // Changing the renderer picks the editor that suits it
+  useEffect(() => setMode(defaultModeFor(editor.renderer)), [editor.renderer])
 
   return (
     <Box
@@ -43,7 +49,7 @@ export function ArticleEditorForm({
         mode={mode}
         onModeChange={setMode}
       />
-      <ArticleEditorContent mode={mode} editor={editor} />
+      <ArticleEditorContent mode={mode} editor={editor} draftKey={draftKey} />
       <ArticleTagEditor
         tagsInput={editor.tagsInput}
         setTagsInput={editor.setTagsInput}

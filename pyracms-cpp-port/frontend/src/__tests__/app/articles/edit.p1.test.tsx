@@ -13,7 +13,7 @@ import { push, routeGet } from '../../helpers/scopeMocks'
 const article = {
   displayName: 'Old',
   content: 'c',
-  rendererName: 'HTML',
+  rendererName: 'restructuredtext', // edited in the code editor
   tags: ['a', 'b'],
 }
 

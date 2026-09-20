@@ -44,6 +44,8 @@ const fill = (title: string) => {
     within(screen.getByTestId('article-title-input')).getByRole('textbox'),
     { target: { value: title } },
   )
+  // Markdown starts in its own editor; these tests drive the code editor
+  fireEvent.click(screen.getByRole('button', { name: /Monaco/ }))
   fireEvent.change(screen.getByTestId('monaco'), { target: { value: 'body' } })
 }
 

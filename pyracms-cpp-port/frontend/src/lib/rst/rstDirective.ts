@@ -32,7 +32,8 @@ export function rstDirective(
   if (name === 'image' || name === 'figure') {
     const src = safeSrc(arg.trim())
     if (!src) return ''
-    return `<img src="${esc(src)}" alt="${esc(opts.alt ?? '')}" style="max-width:100%">`
+    const alt = esc(opts.alt ?? '')
+    return `<img src="${esc(src)}" alt="${alt}" style="max-width:100%">`
   }
   if (CODE.includes(name))
     return `<pre><code>${esc(rest.join('\n'))}</code></pre>`

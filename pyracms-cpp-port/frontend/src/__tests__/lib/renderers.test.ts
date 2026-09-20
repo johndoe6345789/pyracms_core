@@ -5,7 +5,7 @@ import {
 } from '@/lib/renderers'
 
 describe('renderer names', () => {
-  it('sends reStructuredText as restructuredtext, the name the API accepts', () => {
+  it('sends reStructuredText as restructuredtext', () => {
     expect(rendererToApi('reStructuredText')).toBe('restructuredtext')
     expect(rendererToApi('RST')).toBe('restructuredtext')
     expect(rendererToApi('rst')).toBe('restructuredtext')

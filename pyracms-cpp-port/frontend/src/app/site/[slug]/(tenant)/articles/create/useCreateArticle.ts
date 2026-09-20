@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useArticleEditor } from '@/hooks/useArticleEditor'
 import api from '@/lib/api'
+import { clearDraft } from '@/components/articles/useAutoSave'
 import { apiErrorDetails, apiErrorMessage } from '@/lib/apiError'
 import { rendererToApi } from '@/lib/renderers'
 
@@ -35,7 +36,10 @@ export function useCreateArticle(slug: string, tenantId: number | null) {
         renderer: rendererToApi(editor.renderer),
         tenant_id: tenantId,
       })
-      .then(() => router.push(`/site/${slug}/articles/${name}`))
+      .then(() => {
+        clearDraft(`new:${slug}`)
+        router.push(`/site/${slug}/articles/${name}`)
+      })
       .catch((err: unknown) => {
         setError(apiErrorMessage(err, 'Failed to create article'))
         setErrorDetails(

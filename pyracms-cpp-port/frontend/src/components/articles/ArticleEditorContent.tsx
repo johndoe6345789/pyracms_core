@@ -12,11 +12,14 @@ import { ContentPreview } from './ContentPreview'
 interface ArticleEditorContentProps {
   mode: EditorMode
   editor: ArticleEditorState
+  /** Where an unsaved draft is kept; none = no autosave (editing) */
+  draftKey?: string | undefined
 }
 
 export function ArticleEditorContent({
   mode,
   editor,
+  draftKey,
 }: ArticleEditorContentProps) {
   if (mode === 'monaco') {
     return (
@@ -30,7 +33,7 @@ export function ArticleEditorContent({
             value={editor.content}
             onChange={editor.setContent}
             language={editor.renderer}
-            autoSaveKey="article-editor"
+            autoSaveKey={draftKey}
           />
         ) : (
           <ContentPreview content={editor.content} renderer={editor.renderer} />

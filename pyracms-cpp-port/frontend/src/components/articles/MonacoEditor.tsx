@@ -9,12 +9,13 @@ import { EditorViewToggle, type ViewMode } from './EditorViewToggle'
 import { getToolbarActions } from './toolbarActions'
 import { useAutoSave } from './useAutoSave'
 import { MonacoEditorPane } from './MonacoEditorPane'
+import { DraftNotice } from './DraftNotice'
 
 interface MonacoEditorProps {
   value: string
   onChange: (value: string) => void
   language: string
-  autoSaveKey?: string
+  autoSaveKey?: string | undefined
 }
 
 export function MonacoEditorComponent({
@@ -25,7 +26,7 @@ export function MonacoEditorComponent({
 }: MonacoEditorProps) {
   const ref = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
   const [vm, setVm] = useState<ViewMode>('edit')
-  useAutoSave(value, onChange, autoSaveKey)
+  const draft = useAutoSave(value, onChange, autoSaveKey)
 
   const onMount: OnMount = (ed) => {
     ref.current = ed
@@ -45,6 +46,7 @@ export function MonacoEditorComponent({
 
   return (
     <section aria-label="Monaco code editor">
+      {draft.restored && <DraftNotice onDiscard={draft.discard} />}
       <Box
         sx={{
           border: 1,

@@ -49,6 +49,7 @@ export default function CreateArticlePage() {
         />
         <ArticleEditorForm
           editor={editor}
+          draftKey={`new:${slug}`}
           contentPlaceholder="Write your article content here..."
         />
         <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>

@@ -5,7 +5,23 @@ import {
   DescriptionOutlined,
 } from '@mui/icons-material'
 
+import { rendererToApi } from '@/lib/renderers'
+
 export type EditorMode = 'monaco' | 'wysiwyg' | 'bbcode' | 'markdown'
+
+/** The editor that suits a renderer: what you type is what it stores. */
+export function defaultModeFor(renderer: string): EditorMode {
+  switch (rendererToApi(renderer)) {
+    case 'html':
+      return 'wysiwyg'
+    case 'markdown':
+      return 'markdown'
+    case 'bbcode':
+      return 'bbcode'
+    default:
+      return 'monaco'
+  }
+}
 
 const INCOMPATIBLE_PAIRS: [EditorMode, EditorMode][] = [
   ['wysiwyg', 'bbcode'],

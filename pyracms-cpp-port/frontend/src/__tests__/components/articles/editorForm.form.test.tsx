@@ -33,8 +33,8 @@ it('ArticleEditorForm edits fields', () => {
     within(screen.getByTestId('renderer-select')).getByRole('combobox'),
   )
   fireEvent.click(screen.getByRole('option', { name: 'HTML' }))
-  fireEvent.click(screen.getByRole('button', { name: /WYSIWYG/ }))
-  expect(screen.getByTestId('rich')).toBeInTheDocument()
+  // choosing HTML picks the WYSIWYG editor by itself
   rerender(<ArticleEditorForm editor={result.current} />)
+  expect(screen.getByTestId('rich')).toBeInTheDocument()
   fireEvent.change(box('summary-input'), { target: { value: 'S2' } })
 })
