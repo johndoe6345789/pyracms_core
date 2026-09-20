@@ -1,8 +1,9 @@
 import type { GameDepItem } from '@/hooks/useGameDepList'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
+import { dayOf } from '@/lib/dates'
 
 const asStr = (v: unknown): string => (typeof v === 'string' ? v : '')
-const day = (v: unknown) => asStr(v).split('T')[0] ?? ''
+const day = dayOf
 
 export function mapListItem(r: Record<string, unknown>): GameDepItem {
   return {

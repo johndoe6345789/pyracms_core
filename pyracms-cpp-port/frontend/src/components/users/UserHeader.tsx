@@ -5,6 +5,7 @@ import { ProfileStats } from './ProfileStats'
 import { ProfileBadges } from './ProfileBadges'
 import { ReputationBadge } from './ReputationBadge'
 import { getLevel } from './reputationLevels'
+import { dayOf } from '@/lib/dates'
 
 export interface UserProfile {
   id: number
@@ -52,7 +53,7 @@ export function UserHeader({ user }: { user: UserProfile }) {
           )}
           <ProfileInfo
             {...(user.website ? { website: user.website } : {})}
-            joinDate={user.createdAt.split('T')[0] ?? ''}
+            joinDate={dayOf(user.createdAt)}
           />
           <ProfileStats
             postCount={user.postCount}

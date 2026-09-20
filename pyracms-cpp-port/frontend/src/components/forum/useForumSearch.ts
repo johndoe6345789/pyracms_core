@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import api from '@/lib/api'
 import { threadIdOf } from './threadIdOf'
+import { dayOf } from '@/lib/dates'
 
 export interface ForumSearchResult {
   id: string
@@ -40,10 +41,7 @@ export function useForumSearch(tenantId?: number | null) {
           threadTitle: item.title || '',
           postContent: item.snippet || item.content || '',
           author: item.author || '',
-          date:
-            typeof item.createdAt === 'string'
-              ? (item.createdAt as string).split('T')[0]
-              : '',
+          date: dayOf(item.createdAt),
           forumName: item.forumName || '',
         }))
         if (author)

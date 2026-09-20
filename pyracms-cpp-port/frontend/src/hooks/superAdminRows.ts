@@ -1,4 +1,5 @@
 import { UserRole, USER_ROLE_LABELS } from '@/types'
+import { dayOf } from '@/lib/dates'
 
 export interface TenantRow {
   id: number
@@ -21,8 +22,7 @@ export interface GlobalUserRow {
 
 type Raw = Record<string, unknown>
 
-const day = (v: unknown): string =>
-  typeof v === 'string' ? (v.split('T')[0] ?? '') : ''
+const day = dayOf
 
 /** Maps an API tenant record to a table row. */
 export function mapTenantRow(t: Raw): TenantRow {

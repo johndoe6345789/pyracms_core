@@ -1,3 +1,5 @@
+import { dayOf } from '@/lib/dates'
+
 export interface FileItem {
   id: number
   name: string
@@ -17,8 +19,7 @@ export function formatFileSize(bytes: number): string {
 
 /** Maps a raw API file record to a FileItem. */
 export function mapFileRecord(f: Record<string, unknown>): FileItem {
-  const createdAt =
-    typeof f.createdAt === 'string' ? (f.createdAt.split('T')[0] ?? '') : ''
+  const createdAt = dayOf(f.createdAt)
   return {
     id: f.id as number,
     name: (f.filename as string) || '',

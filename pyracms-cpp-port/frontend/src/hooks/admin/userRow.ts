@@ -1,3 +1,5 @@
+import { dayOf } from '@/lib/dates'
+
 export interface UserRow {
   id: number
   username: string
@@ -21,7 +23,7 @@ export function mapUser(u: Record<string, unknown>): UserRow {
     username: (u.username as string) || '',
     fullName: (u.fullName as string) || '',
     email: (u.email as string) || '',
-    created: typeof created === 'string' ? (created.split('T')[0] ?? '') : '',
+    created: dayOf(created),
     banned: (u.banned as boolean) || false,
     role: typeof u.role === 'number' ? u.role : 1,
     siteOwner: u.siteOwner === true,

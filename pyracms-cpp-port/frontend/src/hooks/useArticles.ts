@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { dayOf } from '@/lib/dates'
 
 export interface ArticleSummary {
   name: string
@@ -34,8 +35,7 @@ export function mapSummary(a: Raw): ArticleSummary {
     title: a.displayName ?? a.name ?? '',
     excerpt: content,
     author: a.authorUsername || 'Unknown',
-    date:
-      typeof a.createdAt === 'string' ? (a.createdAt.split('T')[0] ?? '') : '',
+    date: dayOf(a.createdAt),
     views: a.viewCount || 0,
     tags: Array.isArray(a.tags) ? (a.tags as string[]) : [],
   }

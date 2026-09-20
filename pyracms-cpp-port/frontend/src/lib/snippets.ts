@@ -1,3 +1,5 @@
+import { dayOf } from './dates'
+
 export interface Snippet {
   id: string
   title: string
@@ -45,7 +47,7 @@ export function mapSnippet(s: Record<string, unknown>): Snippet {
     code: String(s.code ?? ''),
     author: String(s.authorUsername || 'Unknown'),
     authorId: Number(s.authorId ?? 0),
-    date: created.split('T')[0] ?? '',
+    date: dayOf(created),
     runCount: Number(s.runCount ?? 0),
     forkedFrom: Number(s.forkedFrom ?? 0),
     visibility: String(s.visibility ?? 'public'),
