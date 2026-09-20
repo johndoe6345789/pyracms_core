@@ -229,10 +229,6 @@ set(TEST_SOURCES
 
     test_user_admin_last_rules.cpp
 
-    test_user_admin_last_http.cpp
-
-    test_user_admin_last_rules.cpp
-
     test_user_admin_rules.cpp
 
     test_user_admin_rules_2.cpp
