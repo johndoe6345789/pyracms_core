@@ -1,6 +1,12 @@
 'use client'
 
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Box,
+  ThemeProvider,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { useGameLibrary } from '@/hooks/useGameLibrary'
 import { useGameDetail } from '@/hooks/useGameDetail'
 import { useSiteSession } from '@/hooks/useSiteSession'
@@ -9,19 +15,12 @@ import LibraryHeader from './LibraryHeader'
 import LibraryNav from './LibraryNav'
 import LibraryContent from './LibraryContent'
 import { useLibrarySelection } from './useLibrarySelection'
+import { launcherTheme, shellSx } from './launcherTheme'
 
 interface Props {
   slug: string
   initialName?: string | undefined
 }
-const shellSx = {
-  display: 'flex',
-  minHeight: '70vh',
-  bgcolor: '#171d25',
-  color: '#c7d5e0',
-  borderRadius: 1,
-  overflow: 'hidden',
-} as const
 export default function GameLibrary({ slug, initialName }: Props) {
   const lib = useGameLibrary()
   const signedIn = useSiteSession(slug)
@@ -47,31 +46,33 @@ export default function GameLibrary({ slug, initialName }: Props) {
     />
   )
   return (
-    <Box data-testid="game-library" sx={shellSx}>
-      <LibraryNav
-        mobile={mobile}
-        drawer={sel.drawer}
-        onCloseDrawer={() => sel.setDrawer(false)}
-        sidebar={sidebar}
-      />
-      <Box sx={{ flex: 1, p: { xs: 1.5, md: 3 }, minWidth: 0 }}>
-        <LibraryHeader
+    <ThemeProvider theme={launcherTheme}>
+      <Box data-testid="game-library" sx={shellSx}>
+        <LibraryNav
           mobile={mobile}
-          view={sel.view}
-          onView={sel.setView}
-          onOpenDrawer={() => sel.setDrawer(true)}
-          newHref={signedIn ? `/site/${slug}/games/new` : undefined}
-          downloadHref={`/site/${slug}/download`}
+          drawer={sel.drawer}
+          onCloseDrawer={() => sel.setDrawer(false)}
+          sidebar={sidebar}
         />
-        {lib.loading && <Typography>Loading...</Typography>}
-        <LibraryContent
-          slug={slug}
-          lib={lib}
-          detail={detail}
-          view={sel.view}
-          onSelect={sel.select}
-        />
+        <Box sx={{ flex: 1, p: { xs: 1.5, md: 3 }, minWidth: 0 }}>
+          <LibraryHeader
+            mobile={mobile}
+            view={sel.view}
+            onView={sel.setView}
+            onOpenDrawer={() => sel.setDrawer(true)}
+            newHref={signedIn ? `/site/${slug}/games/new` : undefined}
+            downloadHref={`/site/${slug}/download`}
+          />
+          {lib.loading && <Typography>Loading...</Typography>}
+          <LibraryContent
+            slug={slug}
+            lib={lib}
+            detail={detail}
+            view={sel.view}
+            onSelect={sel.select}
+          />
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   )
 }
