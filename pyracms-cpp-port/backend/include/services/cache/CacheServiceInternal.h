@@ -2,13 +2,10 @@
 
 #include "services/CacheService.h"
 
-#include <arpa/inet.h>
+#include "security/NetPort.h"
+
 #include <cstring>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <sstream>
-#include <sys/socket.h>
-#include <unistd.h>
 
 namespace pyracms {
 
@@ -19,7 +16,7 @@ struct CacheService::RedisContext {
 
     ~RedisContext() {
         if (fd >= 0)
-            ::close(fd);
+            netClose(fd);
     }
 };
 

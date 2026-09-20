@@ -23,7 +23,7 @@ void SiteSignupController::create(HttpReq req, HttpCbRef callback) {
     tenantService_.createEmpty(
         db, slug, (*json)["displayName"].asString(),
         (*json).get("description", "").asString(),
-        [=, this](int id, const std::string &) {
+        [=](int id, const std::string &) {
             if (!id)
                 return callback(filterError("That site address is taken",
                                             drogon::k409Conflict));
@@ -31,7 +31,7 @@ void SiteSignupController::create(HttpReq req, HttpCbRef callback) {
                 db, id, username, admin.get("fullName", "").asString(),
                 admin["email"].asString(),
                 authService_.hashPassword(admin["password"].asString()),
-                [=, this](bool ok, const std::string &) {
+                [=](bool ok, const std::string &) {
                     if (!ok) {
                         tenantService_.discard(db, id);
                         return callback(filterError(
@@ -39,7 +39,7 @@ void SiteSignupController::create(HttpReq req, HttpCbRef callback) {
                             drogon::k409Conflict));
                     }
                     tenantService_.adoptFounder(
-                        db, id, [=, this](bool, const std::string &) {
+                        db, id, [=](bool, const std::string &) {
                             finish(id, slug, username, callback);
                         });
                 });

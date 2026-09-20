@@ -49,7 +49,7 @@ void FileController::upload(
     int tenant = tokenTenantOf(req);
     int userId = req->attributes()->get<int>("userId");
     BlobKey key{tenant, uuid, false};
-    store->put(key, std::move(data), [=, this](BlobStatus st) {
+    store->put(key, std::move(data), [=](BlobStatus st) {
         if (st != BlobStatus::Ok)
             return callback(blobFailure(st));
         fileService_.uploadFile(

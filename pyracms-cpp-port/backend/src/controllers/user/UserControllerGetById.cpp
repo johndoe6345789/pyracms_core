@@ -24,7 +24,7 @@ void UserController::getById(
     auto db = drogon::app().getDbClient();
     userService_.getUserRole(
         db, viewerId,
-        [=, this](const std::optional<UserRole> &role) {
+        [=](const std::optional<UserRole> &role) {
             int raw = static_cast<int>(role.value_or(UserRole::User));
             userService_.findById(
                 db, id, [=](const std::optional<UserDto> &user) {

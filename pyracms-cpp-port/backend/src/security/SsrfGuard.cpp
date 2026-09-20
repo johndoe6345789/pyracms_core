@@ -1,10 +1,9 @@
 #include "security/SsrfGuard.h"
 
-#include <arpa/inet.h>
+#include "security/NetPort.h"
+
 #include <cstdlib>
 #include <cstring>
-#include <netdb.h>
-#include <sys/socket.h>
 
 namespace pyracms {
 

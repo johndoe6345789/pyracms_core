@@ -51,8 +51,8 @@ TEST(SecurityMenus, LinksCannotCarryScriptSchemes) {
     auto items = "/api/menu-groups/" + std::to_string(maxId("menu_groups")) +
                  "/items";
     for (const char *bad : {"javascript:alert(1)", "JaVaScRiPt:x",
-                            "data:text/html,x",
-                            "//evil.example/x", "/\evil.example", "vbscript:x"})
+                            "data:text/html,x", "//evil.example/x",
+                            "/\\evil.example", "vbscript:x"})
         EXPECT_EQ(post(items, J({{"name", "n"}, {"url", bad}}), a).status, 400)
             << bad;
     for (const char *good : {"/about", "https://example.com/x", "mailto:a@b.co",

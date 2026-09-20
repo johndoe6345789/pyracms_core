@@ -21,7 +21,7 @@ void UserController::list(
     auto db = drogon::app().getDbClient();
     userService_.getUserRole(
         db, viewerId,
-        [=, this](const std::optional<UserRole> &role) {
+        [=](const std::optional<UserRole> &role) {
             int raw = static_cast<int>(role.value_or(UserRole::User));
             int scope = userListScope(raw, tenant);
             int named = 0;
@@ -30,7 +30,7 @@ void UserController::list(
             } catch (...) {
             }
             bool ask = named > 0 && scope != -1 && tenant == 0;
-            auto run = [=, this](bool owns) {
+            auto run = [=](bool owns) {
                 int sc = owns ? named : scope;
                 int owned = owns ? named : -1;
                 userService_.listUsersScoped(

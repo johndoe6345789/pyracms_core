@@ -34,6 +34,9 @@ TEST(DockerRunnerTest, CodeIsOneArgvEntryAndNeverParsedByAShell) {
 }
 
 TEST(DockerRunnerTest, RunArgvCapturesOutputWithoutAShell) {
+#ifdef _WIN32
+    GTEST_SKIP() << "runs echo/sh, and code execution needs a Linux host";
+#endif
     std::string out;
     EXPECT_EQ(runArgv({"echo", "$HOME; id"}, 1000, out), 0);
     EXPECT_EQ(out, "$HOME; id\n");

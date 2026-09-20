@@ -12,7 +12,7 @@ void SiteSignupController::finish(int tenantId, const std::string &slug,
                                   HttpCb callback) {
     userService_.findByUsername(
         drogon::app().getDbClient(), tenantId, username,
-        [=, this](const std::optional<UserDto> &u) {
+        [=](const std::optional<UserDto> &u) {
             if (!u)
                 return callback(filterError("Site created; please sign in",
                                             drogon::k500InternalServerError));

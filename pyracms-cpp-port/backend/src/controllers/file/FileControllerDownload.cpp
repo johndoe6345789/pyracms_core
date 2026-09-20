@@ -20,16 +20,16 @@ void FileController::download(const drogon::HttpRequestPtr &req,
     if (!isValidUuid(uuid))
         return notFound(callback);
     auto db = drogon::app().getDbClient();
-    withFileAccess(req, db, uuid, callback, [=, this]() {
+    withFileAccess(req, db, uuid, callback, [=]() {
         fileService_.getFile(
-            db, uuid, [=, this](const std::optional<FileDto> &file) {
+            db, uuid, [=](const std::optional<FileDto> &file) {
                 if (!file)
                     return notFound(callback);
                 auto store = BlobRegistry::named(file->storage);
                 if (!store)
                     return callback(blobFailure(BlobStatus::Unavailable));
                 loadBlob(store, {file->tenantId, uuid, false},
-                         [=, this](BlobStatus s, BlobPayload p) {
+                         [=](BlobStatus s, BlobPayload p) {
                              if (s != BlobStatus::Ok)
                                  return callback(blobFailure(s));
                              // Always a download, never rendered in place

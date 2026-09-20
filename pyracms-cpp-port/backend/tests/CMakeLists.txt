@@ -271,16 +271,23 @@ set(TEST_SOURCES
 
 add_executable(pyracms_tests ${TEST_SOURCES})
 
-# --whole-archive keeps controller/filter static initializers, so the
-# HTTP tests (http_harness.h) see every route like the real server.
-target_link_libraries(pyracms_tests
-    PRIVATE
-    "-Wl,--whole-archive"
-    pyracms_lib
-    "-Wl,--no-whole-archive"
-    GTest::gtest_main
-    GTest::gmock
-)
+# Keep controller/filter static initializers, so the HTTP tests
+# (http_harness.h) see every route like the real server:
+# --whole-archive with GNU ld, /WHOLEARCHIVE with MSVC.
+if(MSVC)
+    target_link_libraries(pyracms_tests PRIVATE pyracms_lib
+        GTest::gtest_main GTest::gmock)
+    target_link_options(pyracms_tests PRIVATE "/WHOLEARCHIVE:pyracms_lib")
+else()
+    target_link_libraries(pyracms_tests
+        PRIVATE
+        "-Wl,--whole-archive"
+        pyracms_lib
+        "-Wl,--no-whole-archive"
+        GTest::gtest_main
+        GTest::gmock
+    )
+endif()
 
 include(GoogleTest)
 gtest_discover_tests(pyracms_tests)

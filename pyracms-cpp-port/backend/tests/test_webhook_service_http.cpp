@@ -32,8 +32,17 @@ TEST(WebhookService, DeliversSignedEventsAndRetriesFailures) {
         // track rejects the envelope (no top-level path): proves it arrived
         EXPECT_EQ(d.json[0]["statusCode"].asInt(), 400);
     }
-    auto b = get("/api/webhooks/" + std::to_string(bad) + "/deliveries",
-                 s.admin.token);
+    // A refused connection is reported after ~2s on Windows, so wait for the
+    // retry to be recorded instead of assuming Linux timing.
+    auto deliveriesOfBad = [&] {
+        return get("/api/webhooks/" + std::to_string(bad) + "/deliveries",
+                   s.admin.token);
+    };
+    auto b = deliveriesOfBad();
+    for (int i = 0; i < 20 && b.json.size() < 2u; ++i) {
+        usleep(500000);
+        b = deliveriesOfBad();
+    }
     EXPECT_GE(b.json.size(), 2u);
     EXPECT_EQ(b.json[0]["statusCode"].asInt(), 0);
 }

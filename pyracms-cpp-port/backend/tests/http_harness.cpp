@@ -1,5 +1,7 @@
 #include "http_harness.h"
 
+#include <gtest/gtest.h>
+
 #include "fake_s3.h"
 #include "filters/FeatureGate.h"
 #include "security/HttpSecurity.h"
@@ -37,14 +39,35 @@ Server::Server() {
         "http://127.0.0.1:" + std::to_string(kPort), loop_.getLoop());
 }
 
-Server::~Server() {
+void Server::stop() {
+    if (!thread_.joinable())
+        return;
+    client.reset();
     drogon::app().quit();
     thread_.join();
 }
 
+Server::~Server() { stop(); }
+
+static Server *created = nullptr;
+
 Server &server() {
     static Server s;
+    created = &s;
     return s;
 }
+
+namespace {
+// Runs after the last test, before any static object is destroyed.
+class StopServer : public ::testing::Environment {
+  public:
+    void TearDown() override {
+        if (created)
+            created->stop();
+    }
+};
+const auto *const kStopServer =
+    ::testing::AddGlobalTestEnvironment(new StopServer);
+} // namespace
 
 } // namespace harness

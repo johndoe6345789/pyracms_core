@@ -1,5 +1,7 @@
 # Backend
 backend/build/
+backend/build-win/
+backend/uploads/
 backend/node_modules/
 backend/.env
 backend/auth_uuid.txt

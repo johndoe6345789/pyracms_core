@@ -22,7 +22,7 @@ void FileController::remove(
             auto store = file ? BlobRegistry::named(file->storage) : nullptr;
             if (file && !store)
                 return callback(blobFailure(BlobStatus::Unavailable));
-            auto dropRow = [=, this](BlobStatus s) {
+            auto dropRow = [=](BlobStatus s) {
                 if (s != BlobStatus::Ok && s != BlobStatus::NotFound)
                     return callback(blobFailure(s));
                 fileService_.deleteFile(
@@ -59,7 +59,7 @@ void FileController::list(
     int tenant = tokenTenantOf(req);
     bool admin = roleAllows(role, UserRole::SiteAdmin);
     int named = firstNamedTenant(namedTenants(req));
-    auto run = [=, this](bool owns) {
+    auto run = [=](bool owns) {
         int scopeUser = (admin || owns) ? 0 : actor;
         int scopeTenant = owns ? named : (admin && tenant != 0) ? tenant : -1;
         fileService_.listFiles(

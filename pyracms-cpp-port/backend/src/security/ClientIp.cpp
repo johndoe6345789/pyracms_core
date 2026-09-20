@@ -1,6 +1,7 @@
 #include "security/ClientIp.h"
 
-#include <arpa/inet.h>
+#include "security/NetPort.h"
+
 #include <cstring>
 
 namespace pyracms {

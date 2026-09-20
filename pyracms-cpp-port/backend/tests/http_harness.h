@@ -22,6 +22,7 @@ class Server {
   public:
     Server();
     ~Server();
+    void stop(); // also called before static destruction
     drogon::HttpClientPtr client;
 
   private:

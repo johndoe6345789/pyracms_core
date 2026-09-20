@@ -30,9 +30,9 @@ TEST(AuthHttp, PasswordResetAndEmailVerification) {
     EXPECT_EQ(post("/api/auth/reset-password",
                    J({{"token", "bad"}, {"password", "newpassword1"}}))
                   .status, 400);
-    EXPECT_EQ(post("/api/auth/reset-password",
-                   J({{"token", tok}, {"password", "newpassword1"}})).status,
-              200);
+    auto reset = post("/api/auth/reset-password",
+                      J({{"token", tok}, {"password", "newpassword1"}}));
+    EXPECT_EQ(reset.status, 200) << reset.text;
     EXPECT_EQ(post("/api/auth/login", creds(s, "newpassword1")).status, 200);
     auto vt = uniq("vfy");
     testDb()->execSqlSync("INSERT INTO email_verification_tokens (user_id, "

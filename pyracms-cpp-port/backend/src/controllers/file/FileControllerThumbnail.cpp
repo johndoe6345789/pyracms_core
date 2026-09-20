@@ -18,7 +18,7 @@ void FileController::thumbnail(const drogon::HttpRequestPtr &req,
     if (!isValidUuid(uuid))
         return notFound(callback);
     auto db = drogon::app().getDbClient();
-    withFileAccess(req, db, uuid, callback, [=, this]() {
+    withFileAccess(req, db, uuid, callback, [=]() {
         fileService_.getFile(
             db, uuid, [=](const std::optional<FileDto> &file) {
                 if (!file)

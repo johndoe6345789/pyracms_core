@@ -6,7 +6,7 @@
 #include <functional>
 #include <future>
 #include <gtest/gtest.h>
-#include <unistd.h>
+#include "port.h"
 
 // Integration tests need PostgreSQL with backend/sql applied. They skip
 // themselves unless TEST_DB_HOST is set (see backend/run-tests.sh).

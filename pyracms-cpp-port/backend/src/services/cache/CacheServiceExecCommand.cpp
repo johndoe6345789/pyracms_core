@@ -1,13 +1,8 @@
 #include "services/CacheService.h"
 #include "services/cache/CacheServiceInternal.h"
 
-#include <arpa/inet.h>
 #include <cstring>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <sstream>
-#include <sys/socket.h>
-#include <unistd.h>
 
 namespace pyracms {
 
@@ -23,7 +18,7 @@ std::string CacheService::execCommand(const std::vector<std::string> &args) {
     }
 
     char buf[8192];
-    ssize_t n = recv(ctx_->fd, buf, sizeof(buf) - 1, 0);
+    SsizeT n = recv(ctx_->fd, buf, sizeof(buf) - 1, 0);
     if (n <= 0) {
         connected_ = false;
         return "";

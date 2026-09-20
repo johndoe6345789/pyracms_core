@@ -1,6 +1,7 @@
 #include "http_harness.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 
 namespace harness {
@@ -51,8 +52,11 @@ Reply upload(const std::string &path, const std::string &token,
              const std::string &filename, const std::string &content) {
     std::string leaf = filename; // the client-side name may hold '/'
     std::replace(leaf.begin(), leaf.end(), '/', '_');
-    auto tmp = "/tmp/" + uniq("up") + "_" + leaf;
-    std::ofstream(tmp) << content;
+    // Binary, in the platform temp dir: Windows text mode rewrites line
+    // endings and would corrupt the bytes under test.
+    auto tmp = (std::filesystem::temp_directory_path() /
+                (uniq("up") + "_" + leaf)).string();
+    std::ofstream(tmp, std::ios::binary) << content;
     drogon::UploadFile f(tmp, filename, "file");
     auto req = drogon::HttpRequest::newFileUploadRequest({f});
     req->setPath(path);

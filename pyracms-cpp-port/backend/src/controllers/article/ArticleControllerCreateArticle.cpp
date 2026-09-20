@@ -43,7 +43,7 @@ void ArticleController::createArticle(
     auto db = drogon::app().getDbClient();
 
     // Writing articles takes Moderator level (or owning the site).
-    mayWriteArticles(req, tenantId, [=, this](bool allowed) {
+    mayWriteArticles(req, tenantId, [=](bool allowed) {
         if (!allowed)
             return callback(articleForbidden());
         articleService_.createArticle(

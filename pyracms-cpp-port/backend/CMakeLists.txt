@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 project(pyracms_server VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+
+if(WIN32)
+    # windows.h would otherwise define min()/max() macros
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -448,6 +453,8 @@ set(LIB_SOURCES
     src/services/DockerExecutionService.cpp
 
     src/services/DockerRunArgv.cpp
+
+    src/services/DockerRunProcess.cpp
 
     src/services/SettingsService.cpp
 
@@ -959,13 +966,19 @@ target_include_directories(pyracms_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includ
 
 # Main executable
 add_executable(pyracms_server src/main.cpp)
-# --whole-archive is required so Drogon controller static initializers
-# (which register routes) are not stripped from the static lib by the linker.
-target_link_libraries(pyracms_server PRIVATE
-    "-Wl,--whole-archive"
-    pyracms_lib
-    "-Wl,--no-whole-archive"
-)
+# The whole library must be linked so Drogon controller static initializers
+# (which register routes) are not stripped: --whole-archive with GNU ld,
+# /WHOLEARCHIVE with MSVC.
+if(MSVC)
+    target_link_libraries(pyracms_server PRIVATE pyracms_lib)
+    target_link_options(pyracms_server PRIVATE "/WHOLEARCHIVE:pyracms_lib")
+else()
+    target_link_libraries(pyracms_server PRIVATE
+        "-Wl,--whole-archive"
+        pyracms_lib
+        "-Wl,--no-whole-archive"
+    )
+endif()
 
 # Testing
 if(BUILD_TESTS)
