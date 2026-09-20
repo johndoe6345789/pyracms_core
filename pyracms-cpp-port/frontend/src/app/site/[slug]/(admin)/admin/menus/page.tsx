@@ -10,6 +10,13 @@ import AddMenuItemCard from '@/components/admin/menus/AddMenuItemCard'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
 
+const INTRO = [
+  'Your links along the top of the site, in your own words.',
+  'The group called "main" is shown (if there is none, the first group',
+  'with links). Stock pages such as Articles and Forum stay under Explore.',
+  'Each link can be public, for signed-in members, or for admins only.',
+]
+
 export default function AdminMenusPage() {
   const params = useParams()
   const slug = params.slug as string
@@ -22,7 +29,7 @@ export default function AdminMenusPage() {
         Menu Editor
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Manage navigation menus and menu items.
+        {INTRO.join(' ')}
       </Typography>
       <ErrorAlert error={editor.error} testId="menu-editor-error" />
       <MenuGroupSelect

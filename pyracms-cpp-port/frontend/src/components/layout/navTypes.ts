@@ -12,6 +12,8 @@ export interface NavEntry {
   testId?: string
   /** Site feature that must be on for this entry to show */
   feature?: FeatureId
+  /** Leaves the site: open in a new tab */
+  external?: boolean
   /** Sub-destinations: shown as a dropdown / collapsible group */
   children?: NavEntry[]
 }

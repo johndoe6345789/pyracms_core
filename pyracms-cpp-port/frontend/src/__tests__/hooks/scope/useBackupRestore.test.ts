@@ -43,7 +43,7 @@ it('exports menu groups with their items', async () => {
   get.mockImplementation((u: string) =>
     Promise.resolve({
       data: u.includes('items')
-        ? [{ id: 2, name: 'Home', route: '/' }]
+        ? [{ id: 2, name: 'Home', routePath: '/', url: '' }]
         : [{ id: 1, name: 'main' }],
     }),
   )

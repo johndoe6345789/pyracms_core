@@ -4,12 +4,10 @@ import { useState } from 'react'
 import api from '@/lib/api'
 import { useActionError } from '../useActionError'
 import { MenuItemRow, SetGroups, updateGroupItems } from './menuData'
+import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
+import { toApiRoute } from '@/lib/menuRoute'
 
-/**
- * Inline edit and delete state for menu items.
- * @param selectedGroup - Name of the active group.
- * @param setMenuGroups - State setter for all groups.
- */
+/** Inline edit and delete state for the items of the active group. */
 export function useMenuItemEdit(
   selectedGroup: string,
   setMenuGroups: SetGroups,
@@ -35,11 +33,12 @@ export function useMenuItemEdit(
     api
       .put(`/api/menus/${editRow.id}`, {
         name,
-        route,
+        ...toApiRoute(route),
         position,
         permissions,
       })
       .then(() => {
+        invalidateSiteMenu()
         setMenuGroups((prev) =>
           updateGroupItems(prev, selectedGroup, (items) =>
             items.map((i) => (i.id === editRow.id ? editRow : i)),
@@ -55,6 +54,7 @@ export function useMenuItemEdit(
     api
       .delete(`/api/menus/${id}`)
       .then(() => {
+        invalidateSiteMenu()
         setMenuGroups((prev) =>
           updateGroupItems(prev, selectedGroup, (items) =>
             items.filter((i) => i.id !== id),

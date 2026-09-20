@@ -1,8 +1,7 @@
 'use client'
 
 import AppTopBar from './AppTopBar'
-import { tenantModuleEntries } from './navConfig'
-import { useSiteFeatures } from '@/hooks/useSiteFeatures'
+import { useSiteNav } from '@/hooks/useSiteNav'
 
 interface TenantAppBarProps {
   slug: string
@@ -11,19 +10,23 @@ interface TenantAppBarProps {
   onMenuClick: () => void
 }
 
-/** Top bar for a site: the shared bar with that site's module links. */
+/**
+ * Top bar for a site: the owner's own links along the top, the stock links
+ * in an Explore dropdown on the right.
+ */
 export default function TenantAppBar({
   slug,
   siteName,
   drawerOpen,
   onMenuClick,
 }: TenantAppBarProps) {
-  const { flags } = useSiteFeatures(slug)
+  const nav = useSiteNav(slug)
   return (
     <AppTopBar
       brand={siteName}
       brandHref={`/site/${slug}`}
-      items={tenantModuleEntries(slug, flags)}
+      items={nav.topLinks}
+      explore={nav.explore}
       drawerOpen={drawerOpen}
       onMenuClick={onMenuClick}
       navLabel="Site navigation"

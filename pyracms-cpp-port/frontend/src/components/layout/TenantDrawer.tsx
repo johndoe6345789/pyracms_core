@@ -2,7 +2,7 @@
 
 import AppDrawer from './AppDrawer'
 import { tenantSections, TENANT_FOOTER } from './navConfig'
-import { useSiteFeatures } from '@/hooks/useSiteFeatures'
+import { useSiteNav } from '@/hooks/useSiteNav'
 
 interface TenantDrawerProps {
   slug: string
@@ -13,7 +13,7 @@ interface TenantDrawerProps {
   onClose: () => void
 }
 
-/** Burger drawer for a site: every module plus Admin for site admins. */
+/** Burger drawer: the owner's links, then Explore, then Admin. */
 export default function TenantDrawer({
   slug,
   siteName,
@@ -22,14 +22,14 @@ export default function TenantDrawer({
   open,
   onClose,
 }: TenantDrawerProps) {
-  const { flags } = useSiteFeatures(slug)
+  const { flags, ownerLinks } = useSiteNav(slug)
   return (
     <AppDrawer
       open={open}
       onClose={onClose}
       title={siteName}
       subtitle={description || 'Site navigation'}
-      sections={tenantSections(slug, canAdmin, flags)}
+      sections={tenantSections(slug, canAdmin, flags, ownerLinks)}
       footer={TENANT_FOOTER}
     />
   )

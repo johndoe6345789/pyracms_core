@@ -1,4 +1,5 @@
 import api from '@/lib/api'
+import { fromApiRoute } from '@/lib/menuRoute'
 
 export interface MenuItemRow {
   id: number
@@ -19,7 +20,7 @@ function mapMenuItem(i: Record<string, unknown>): MenuItemRow {
   return {
     id: i.id as number,
     name: (i.name as string) || '',
-    route: (i.route as string) || '',
+    route: fromApiRoute(i),
     position: (i.position as number) || 0,
     permissions: (i.permissions as string) || 'public',
   }

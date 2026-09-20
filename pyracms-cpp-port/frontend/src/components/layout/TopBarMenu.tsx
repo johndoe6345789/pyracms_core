@@ -1,7 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, ListItemIcon, Menu, MenuItem } from '@mui/material'
+import {
+  Button,
+  ListItemIcon,
+  ListSubheader,
+  Menu,
+  MenuItem,
+} from '@mui/material'
 import { ArrowDropDown } from '@mui/icons-material'
 import Link from 'next/link'
 import type { NavEntry } from './navTypes'
@@ -12,11 +18,38 @@ interface Props {
   pathname: string
 }
 
+const newTab = { target: '_blank', rel: 'noopener noreferrer' } as const
+
 /** A top-bar button that opens a dropdown of the entry's children. */
 export default function TopBarMenu({ item, active, pathname }: Props) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const close = () => setAnchor(null)
   const id = `${item.key}-menu`
+
+  const row = (c: NavEntry) => (
+    <MenuItem
+      key={c.key}
+      component={Link}
+      href={c.href}
+      onClick={close}
+      selected={pathname === c.href}
+      data-testid={`nav-${c.key}`}
+      {...(c.external ? newTab : {})}
+    >
+      {c.icon && <ListItemIcon>{c.icon}</ListItemIcon>}
+      {c.label}
+    </MenuItem>
+  )
+  // A child that has children of its own becomes a titled group
+  const rows = (item.children ?? []).flatMap((c) =>
+    c.children?.length
+      ? [
+          <ListSubheader key={`${c.key}-head`}>{c.label}</ListSubheader>,
+          ...c.children.map(row),
+        ]
+      : [row(c)],
+  )
+
   return (
     <>
       <Button
@@ -24,6 +57,7 @@ export default function TopBarMenu({ item, active, pathname }: Props) {
         endIcon={<ArrowDropDown />}
         onClick={(e) => setAnchor(e.currentTarget)}
         data-testid={item.testId ?? `nav-${item.key}`}
+        data-fit-key={item.key}
         aria-haspopup="menu"
         aria-expanded={anchor ? 'true' : undefined}
         aria-controls={anchor ? id : undefined}
@@ -31,24 +65,13 @@ export default function TopBarMenu({ item, active, pathname }: Props) {
           color: active ? 'primary.main' : 'text.secondary',
           bgcolor: active ? 'action.selected' : 'transparent',
           px: 1.5,
+          whiteSpace: 'nowrap',
         }}
       >
         {item.label}
       </Button>
       <Menu id={id} anchorEl={anchor} open={!!anchor} onClose={close}>
-        {item.children?.map((c) => (
-          <MenuItem
-            key={c.key}
-            component={Link}
-            href={c.href}
-            onClick={close}
-            selected={pathname === c.href}
-            data-testid={`nav-${c.key}`}
-          >
-            <ListItemIcon>{c.icon}</ListItemIcon>
-            {c.label}
-          </MenuItem>
-        ))}
+        {rows}
       </Menu>
     </>
   )

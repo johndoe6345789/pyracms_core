@@ -16,7 +16,7 @@ const item = (type: string, title: string) => ({
   createdAt: '2026-01-01T00:00:00Z',
 })
 
-it('shows items that share an id across types, without key clashes', async () => {
+it('lists items sharing an id across types without key clashes', async () => {
   const error = jest.spyOn(console, 'error').mockImplementation(() => {})
   m.get.mockResolvedValue({
     data: [item('article', 'An article'), item('comment', 'A comment')],

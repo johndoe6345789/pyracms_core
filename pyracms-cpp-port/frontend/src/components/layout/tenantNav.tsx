@@ -1,18 +1,14 @@
-import {
-  HomeOutlined,
-  SearchOutlined,
-  AdminPanelSettingsOutlined,
-  ArrowBackOutlined,
-} from '@mui/icons-material'
+import { ArrowBackOutlined } from '@mui/icons-material'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
+import { adminEntry, homeEntry, searchEntry } from './exploreNav'
 import { hypernucleusEntry } from './hypernucleusNav'
 import { filterNavByFeatures, MODULE_FEATURE } from './navFeatures'
 import type { FeatureFlags } from '@/lib/siteFeatures'
 import type { NavEntry, NavSection } from './navTypes'
 
 /**
- * Module links for one site (also used for the inline top-bar links).
- * `flags` hides the modules the site switched off (null = show all).
+ * The stock modules of a site (Articles, Forum, Gallery, Hypernucleus, Code,
+ * Tags). `flags` hides the ones the site switched off (null = show all).
  */
 export function tenantModuleEntries(
   slug: string,
@@ -30,43 +26,24 @@ export function tenantModuleEntries(
   return filterNavByFeatures(modules, flags)
 }
 
+/**
+ * Burger drawer of a site. The owner's own links come first, under the
+ * site's menu; the stock links follow as "Explore".
+ */
 export function tenantSections(
   slug: string,
   canAdmin: boolean,
   flags: FeatureFlags | null = null,
+  ownerLinks: NavEntry[] = [],
 ): NavSection[] {
-  const site: NavEntry[] = [
-    {
-      key: 'home',
-      label: 'Home',
-      href: `/site/${slug}`,
-      icon: <HomeOutlined />,
-      exact: true,
-    },
-    ...tenantModuleEntries(slug, flags),
-    {
-      key: 'search',
-      label: 'Search',
-      href: '/search',
-      icon: <SearchOutlined />,
-      testId: 'search',
-    },
-  ]
-  const sections: NavSection[] = [{ title: 'Explore', items: site }]
-  if (canAdmin) {
-    sections.push({
-      title: 'Manage',
-      items: [
-        {
-          key: 'admin',
-          label: 'Admin',
-          href: `/site/${slug}/admin`,
-          icon: <AdminPanelSettingsOutlined />,
-          testId: 'admin',
-        },
-      ],
-    })
-  }
+  const explore = [...tenantModuleEntries(slug, flags), searchEntry()]
+  const sections: NavSection[] = ownerLinks.length
+    ? [
+        { title: 'Menu', items: [homeEntry(slug), ...ownerLinks] },
+        { title: 'Explore', items: explore },
+      ]
+    : [{ title: 'Explore', items: [homeEntry(slug), ...explore] }]
+  if (canAdmin) sections.push({ title: 'Manage', items: [adminEntry(slug)] })
   return sections
 }
 

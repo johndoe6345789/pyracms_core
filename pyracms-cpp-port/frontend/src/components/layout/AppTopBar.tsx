@@ -1,11 +1,12 @@
 'use client'
 
-import { AppBar, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Toolbar, Typography } from '@mui/material'
 import { LanguageOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import MenuToggle from './MenuToggle'
 import TopBarLinks from './TopBarLinks'
+import TopBarMenu from './TopBarMenu'
 import TopBarTools from './TopBarTools'
 import { barSx, brandSx } from './appBarStyles'
 import type { NavEntry } from './navTypes'
@@ -18,6 +19,8 @@ interface Props {
   drawerOpen: boolean
   onMenuClick: () => void
   navLabel: string
+  /** Dropdown on the right (the stock links); the burger has them too */
+  explore?: NavEntry | undefined
   /** Where the 'Get the launcher' tool points */
   downloadHref?: string | undefined
 }
@@ -33,6 +36,7 @@ export default function AppTopBar({
   drawerOpen,
   onMenuClick,
   navLabel,
+  explore,
   downloadHref,
 }: Props) {
   const pathname = usePathname() ?? ''
@@ -59,6 +63,11 @@ export default function AppTopBar({
           {brand}
         </Typography>
         <TopBarLinks items={items} pathname={pathname} />
+        {explore && (
+          <Box sx={{ display: { xs: 'none', md: 'block' }, mr: 1 }}>
+            <TopBarMenu item={explore} active={false} pathname={pathname} />
+          </Box>
+        )}
         <TopBarTools {...(downloadHref ? { downloadHref } : {})} />
       </Toolbar>
     </AppBar>

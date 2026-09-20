@@ -28,16 +28,21 @@ export default function DrawerNavItem({ item, active, onClose }: Props) {
         selected={active}
         aria-current={active ? 'page' : undefined}
         data-testid={testId}
+        {...(item.external
+          ? { target: '_blank', rel: 'noopener noreferrer' }
+          : {})}
         sx={drawerItemSx}
       >
-        <ListItemIcon
-          sx={{
-            minWidth: 40,
-            color: active ? 'primary.main' : 'text.secondary',
-          }}
-        >
-          {item.icon}
-        </ListItemIcon>
+        {item.icon && (
+          <ListItemIcon
+            sx={{
+              minWidth: 40,
+              color: active ? 'primary.main' : 'text.secondary',
+            }}
+          >
+            {item.icon}
+          </ListItemIcon>
+        )}
         <ListItemText
           primary={item.label}
           slotProps={{

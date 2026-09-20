@@ -17,7 +17,9 @@ beforeEach(() => {
   jest.resetAllMocks()
   m.get.mockImplementation((url: string) =>
     url.includes('items')
-      ? Promise.resolve({ data: [{ id: 10, name: 'H', route: '/' }] })
+      ? Promise.resolve({
+          data: [{ id: 10, name: 'H', routePath: '/', url: '' }],
+        })
       : Promise.resolve({
           data: [
             { id: 1, name: 'main' },

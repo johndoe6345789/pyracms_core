@@ -4,6 +4,7 @@ import { useState } from 'react'
 import api from '@/lib/api'
 import { useActionError } from '../useActionError'
 import { MenuGroup, SetGroups } from './menuData'
+import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
 
 /**
  * Create-group dialog state and submit handler.
@@ -30,6 +31,7 @@ export function useMenuGroupCreate(
     api
       .post('/api/menu-groups', { name, tenantId })
       .then((res) => {
+        invalidateSiteMenu()
         setMenuGroups((prev) => [...prev, { id: res.data.id, name, items: [] }])
         onCreated(name)
         setGroupDialogOpen(false)

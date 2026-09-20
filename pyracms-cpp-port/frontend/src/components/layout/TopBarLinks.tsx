@@ -1,9 +1,17 @@
-import { Box, Button } from '@mui/material'
-import Link from 'next/link'
+'use client'
+
+import { Box } from '@mui/material'
+import { MoreHorizOutlined } from '@mui/icons-material'
+import { useFitLinks } from '@/hooks/useFitLinks'
+import TopBarLinkButton from './TopBarLinkButton'
 import TopBarMenu from './TopBarMenu'
 import { isActive, type NavEntry } from './navTypes'
 
-/** Inline links shown from the `lg` breakpoint up. */
+/**
+ * The top row of links. From the `md` breakpoint up it keeps as many as fit
+ * the space it has and folds the rest into "More" (recomputed on resize);
+ * below `md` the burger drawer carries every link instead.
+ */
 export default function TopBarLinks({
   items,
   pathname,
@@ -11,37 +19,49 @@ export default function TopBarLinks({
   items: NavEntry[]
   pathname: string
 }) {
+  const { ref, count } = useFitLinks(items.map((i) => i.key).join('|'))
+  const shown = items.slice(0, count)
+  const rest = items.slice(count)
+  const more: NavEntry | null = rest.length
+    ? {
+        key: 'more',
+        label: 'More',
+        href: '',
+        icon: <MoreHorizOutlined />,
+        children: rest,
+      }
+    : null
   return (
-    <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5, flexGrow: 1 }}>
-      {items.map((item) => {
+    <Box
+      ref={ref}
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        gap: 0.5,
+        flexGrow: 1,
+        minWidth: 0,
+        overflow: 'hidden',
+      }}
+    >
+      {shown.map((item) => {
         const active = isActive(pathname, item)
-        if (item.children?.length)
-          return (
-            <TopBarMenu
-              key={item.key}
-              item={item}
-              active={active}
-              pathname={pathname}
-            />
-          )
-        return (
-          <Button
+        return item.children?.length ? (
+          <TopBarMenu
             key={item.key}
-            component={Link}
-            href={item.href}
-            startIcon={item.icon}
-            data-testid={item.testId ?? `nav-${item.key}`}
-            aria-current={active ? 'page' : undefined}
-            sx={{
-              color: active ? 'primary.main' : 'text.secondary',
-              bgcolor: active ? 'action.selected' : 'transparent',
-              px: 1.5,
-            }}
-          >
-            {item.label}
-          </Button>
+            item={item}
+            active={active}
+            pathname={pathname}
+          />
+        ) : (
+          <TopBarLinkButton key={item.key} item={item} active={active} />
         )
       })}
+      {more && (
+        <TopBarMenu
+          item={more}
+          active={rest.some((c) => isActive(pathname, c))}
+          pathname={pathname}
+        />
+      )}
     </Box>
   )
 }

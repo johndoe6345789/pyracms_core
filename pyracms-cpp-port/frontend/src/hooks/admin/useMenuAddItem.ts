@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import api from '@/lib/api'
 import { validateRoute } from '@/lib/routeSuggest'
+import { toApiRoute } from '@/lib/menuRoute'
 import { useActionError } from '../useActionError'
 import { MenuGroup, MenuItemRow, SetGroups, updateGroupItems } from './menuData'
+import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
 
 /**
  * Add-item form state and submit handler.
@@ -33,11 +35,12 @@ export function useMenuAddItem(
     api
       .post(`/api/menu-groups/${currentGroup.id}/items`, {
         name,
-        route,
+        ...toApiRoute(route),
         position,
         permissions,
       })
       .then((res) => {
+        invalidateSiteMenu()
         const item: MenuItemRow = {
           id: res.data.id,
           name,

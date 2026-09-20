@@ -17,7 +17,7 @@ export default function TopBarTools({
     <Box
       sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}
     >
-      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+      <Box sx={{ display: { xs: 'none', xl: 'block' } }}>
         <GlobalSearch />
       </Box>
       <Tooltip title="Get the launcher">

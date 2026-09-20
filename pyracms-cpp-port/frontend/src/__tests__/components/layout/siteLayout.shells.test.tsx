@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 import TenantDrawer from '@/components/layout/TenantDrawer'
 import TenantAppBar from '@/components/layout/TenantAppBar'
 import PortalShell from '@/components/layout/PortalShell'
@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 
 describe('tenant shells', () => {
   it('renders drawer with default subtitle', () => {
-    render(
+    renderWithStore(
       <TenantDrawer
         slug="d"
         siteName="Demo"
@@ -26,7 +26,7 @@ describe('tenant shells', () => {
   })
 
   it('renders drawer with description', () => {
-    render(
+    renderWithStore(
       <TenantDrawer
         slug="d"
         siteName="Demo"
