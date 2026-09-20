@@ -1,5 +1,6 @@
 import { Box, Container, Link as MuiLink, Typography } from '@mui/material'
 import Link from 'next/link'
+import FooterContact from './FooterContact'
 import ForkRibbon from '@/components/common/ForkRibbon'
 import { docsUrl, licenseUrl, releasesUrl, repoUrl } from '@/lib/repo'
 
@@ -8,8 +9,10 @@ const linkSx = { color: 'text.secondary', fontSize: 14 }
 /** Footer shared by the portal and every site. */
 export default function SiteFooter({
   downloadHref = '/download',
+  contactEmail,
 }: {
   downloadHref?: string
+  contactEmail?: string | undefined
 }) {
   const ext = { target: '_blank', rel: 'noopener noreferrer' }
   return (
@@ -47,6 +50,7 @@ export default function SiteFooter({
             alignItems: 'center',
           }}
         >
+          <FooterContact email={contactEmail} />
           <MuiLink
             component={Link}
             href={downloadHref}

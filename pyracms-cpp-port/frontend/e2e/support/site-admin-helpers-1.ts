@@ -2,7 +2,6 @@ import { Page } from '@playwright/test'
 import {
   ADMIN_USER,
   BASE,
-  MOCK_ACL,
   MOCK_FEATURES,
   MOCK_SETTINGS,
   MOCK_TENANTS,
@@ -38,7 +37,6 @@ export async function mockApiRoutes(page: Page): Promise<void> {
   await page.route('**/api/features**', (route) =>
     route.fulfill({ json: MOCK_FEATURES }),
   )
-  await page.route('**/api/acl**', (route) => route.fulfill({ json: MOCK_ACL }))
   await page.route('**/api/menus**', (route) =>
     route.fulfill({ json: MOCK_MENUS }),
   )

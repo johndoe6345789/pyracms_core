@@ -1,5 +1,4 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useAclEditor } from '@/hooks/useAclEditor'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
 import { useArticle } from '@/hooks/useArticle'
 import { useSuperAdminTenants } from '@/hooks/useSuperAdminTenants'
@@ -10,21 +9,6 @@ const boom = { response: { data: { error: 'boom' } } }
 beforeEach(() => {
   jest.resetAllMocks()
   m.get.mockResolvedValue({ data: [] })
-})
-
-it('acl editor surfaces a save failure', async () => {
-  m.get.mockResolvedValue({ data: { value: '[]' } })
-  m.put.mockRejectedValue(boom)
-  const { result } = renderHook(() => useAclEditor(1))
-  await waitFor(() => expect(result.current.loading).toBe(false))
-  act(() => {
-    result.current.setNewPrincipal('p')
-  })
-  act(() => {
-    result.current.setNewPermission('x')
-  })
-  act(() => result.current.handleAdd())
-  await waitFor(() => expect(result.current.error).toBe('boom'))
 })
 
 it('feature toggles surface a save failure', async () => {

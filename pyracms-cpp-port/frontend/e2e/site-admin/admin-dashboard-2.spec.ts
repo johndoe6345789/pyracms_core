@@ -19,7 +19,6 @@ test.describe('Admin Dashboard', () => {
     'quick-link-settings',
     'quick-link-feature-toggles',
     'quick-link-menus',
-    'quick-link-acl',
     'quick-link-files',
     'quick-link-backup',
   ]

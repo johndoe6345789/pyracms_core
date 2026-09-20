@@ -1,7 +1,6 @@
 import { parseSiteTheme, applySiteTheme } from '@/lib/siteTheme'
 import { lightTheme, darkTheme } from '@/lib/theme'
 import { slugFromPath } from '@/lib/siteSlug'
-import { parseTemplates } from '@/components/admin/templates/templateStore'
 import { DEFAULT_THEME } from '@/components/admin/styles/themeConfig'
 
 const saved = {
@@ -44,12 +43,4 @@ it('slugFromPath reads the tenant slug', () => {
   expect(slugFromPath('/site/abc/x')).toBe('abc')
   expect(slugFromPath('/auth/login')).toBeNull()
   expect(slugFromPath(null)).toBeNull()
-})
-
-it('parseTemplates keeps text sections only', () => {
-  const t = parseTemplates(JSON.stringify({ header: '<b>', footer: 3 }))
-  expect(t?.header).toBe('<b>')
-  expect(t?.footer).toContain('footer')
-  expect(parseTemplates('[')).toBeNull()
-  expect(parseTemplates('null')).toBeNull()
 })

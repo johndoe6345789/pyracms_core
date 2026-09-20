@@ -1,27 +1,11 @@
 #include "controllers/CommentController.h"
 #include "filters/TenantGuard.h"
 #include "security/Validate.h"
+#include "controllers/CommentReplies.h"
+#include "services/SiteSwitch.h"
 #include "services/WebhookEvents.h"
 
 namespace pyracms {
-
-namespace {
-using Reply = std::function<void(const drogon::HttpResponsePtr &)>;
-
-void errorReply(const Reply &cb, const std::string &msg,
-                drogon::HttpStatusCode c) {
-    cb(filterError(msg, c));
-}
-
-void createdReply(const Reply &cb, int commentId) {
-    Json::Value result;
-    result["success"] = true;
-    result["id"] = commentId;
-    auto resp = drogon::HttpResponse::newHttpJsonResponse(result);
-    resp->setStatusCode(drogon::k201Created);
-    cb(resp);
-}
-} // namespace
 
 void CommentController::createComment(
     const drogon::HttpRequestPtr &req,
@@ -47,8 +31,24 @@ void CommentController::createComment(
     if ((*json).isMember("parentId") && !(*json)["parentId"].isNull())
         parentId = (*json)["parentId"].asInt();
 
-    auto db = drogon::app().getDbClient();
     int tenantId = req->attributes()->get<int>("tenantId");
+    whenSwitchedOff(
+        drogon::app().getDbClient(), tenantId, "comments_enabled",
+        [=](bool off) {
+            if (off)
+                return errorReply(callback,
+                                  "Comments are turned off on this site",
+                                  drogon::k403Forbidden);
+            storeComment(userId, tenantId, contentType, contentId, body,
+                         parentId, callback);
+        });
+}
+
+void CommentController::storeComment(
+    int userId, int tenantId, const std::string &contentType, int contentId,
+    const std::string &body, std::optional<int> parentId,
+    std::function<void(const drogon::HttpResponsePtr &)> callback) {
+    auto db = drogon::app().getDbClient();
     commentService_.createComment(
         db, userId, contentType, contentId, body, parentId,
         [this, db, userId, parentId, callback, tenantId, contentType,

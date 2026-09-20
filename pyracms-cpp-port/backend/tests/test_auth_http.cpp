@@ -35,3 +35,22 @@ TEST(AuthHttp, LoginMeAndValidation) {
                   {"password", "password123"}, {"tenant", s.slug}});
     EXPECT_GE(post("/api/auth/register", dup).status, 400);
 }
+
+TEST(AuthHttp, ClosedRegistrationRefusesNewSiteMembers) {
+    REQUIRE_SERVER();
+    auto s = makeSite();
+    auto reg = [&]() {
+        auto n = uniq("cr");
+        return post("/api/auth/register",
+                    J({{"username", n}, {"email", n + "@h.test"},
+                       {"password", "password123"}, {"tenant", s.slug}}));
+    };
+    auto set = [&](const char *v) {
+        return put("/api/settings/registration_open",
+                   J({{"tenantId", s.id}, {"value", v}}), s.admin.token);
+    };
+    EXPECT_EQ(set("false").status, 200);
+    EXPECT_EQ(reg().status, 403);
+    EXPECT_EQ(set("true").status, 200);
+    EXPECT_TRUE(ok(reg()));
+}

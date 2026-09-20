@@ -25,20 +25,6 @@ test.describe('Admin sidebar navigation', () => {
     ).toBeVisible()
   })
 
-  test('clicking Templates nav item navigates to templates page', async ({
-    page,
-  }) => {
-    await page.getByTestId('admin-nav-templates').click()
-    await expect(page).toHaveURL(
-      new RegExp(`/site/${SITE_SLUG}/admin/templates`),
-    )
-    await expect(
-      page.getByRole('heading', {
-        name: /template editor/i,
-      }),
-    ).toBeVisible()
-  })
-
   test('clicking Styles nav item navigates to styles page', async ({
     page,
   }) => {

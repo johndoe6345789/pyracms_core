@@ -12,6 +12,7 @@ import { usePathname } from 'next/navigation'
 import { slugFromPath } from '@/lib/siteSlug'
 import { useSiteTheme } from '@/hooks/useSiteTheme'
 import { applySiteTheme } from '@/lib/siteTheme'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 
 export default function ThemeWrapper({
   children,
@@ -19,8 +20,11 @@ export default function ThemeWrapper({
   children: React.ReactNode
 }) {
   useAuthHydration()
-  const site = useSiteTheme(slugFromPath(usePathname()))
-  const colorMode = useSelector((state: RootState) => state.ui.colorMode)
+  const slug = slugFromPath(usePathname())
+  const site = useSiteTheme(slug)
+  const siteMode = useSiteSettings(slug)?.default_theme ?? 'system'
+  const picked = useSelector((state: RootState) => state.ui.colorMode)
+  const colorMode = picked === 'system' ? siteMode : picked
   const [systemDark, setSystemDark] = useState(false)
 
   useEffect(() => {

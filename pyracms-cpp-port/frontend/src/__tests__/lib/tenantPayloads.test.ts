@@ -1,7 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { putSetting, deleteSetting } from '@/hooks/admin/settingsApi'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
-import { useAclEditor } from '@/hooks/useAclEditor'
 import { useMenuGroupCreate } from '@/hooks/admin/useMenuGroupCreate'
 import { useArticle } from '@/hooks/useArticle'
 import { m } from '../helpers/scopeApi'
@@ -31,15 +30,6 @@ it('feature toggles send tenantId', async () => {
   await waitFor(() => expect(result.current.loading).toBe(false))
   act(() => result.current.handleSave())
   expect(m.put.mock.calls[0][1]).toMatchObject({ tenantId: 4 })
-})
-
-it('ACL rules send tenantId', async () => {
-  const { result } = renderHook(() => useAclEditor(5))
-  await waitFor(() => expect(result.current.loading).toBe(false))
-  act(() => result.current.setNewPrincipal('p'))
-  act(() => result.current.setNewPermission('x'))
-  act(() => result.current.handleAdd())
-  expect(m.put.mock.calls[0][1]).toMatchObject({ tenantId: 5 })
 })
 
 it('menu group create sends tenantId', () => {

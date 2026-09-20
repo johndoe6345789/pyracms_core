@@ -147,10 +147,8 @@
     "settings": "Parametres",
     "features": "Fonctionnalites",
     "menus": "Menus",
-    "acl": "Controle d'acces",
     "files": "Fichiers",
     "backup": "Sauvegarde",
-    "templates": "Modeles",
     "styles": "Styles",
     "analytics": "Analytique"
   },

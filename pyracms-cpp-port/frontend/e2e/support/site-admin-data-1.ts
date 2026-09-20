@@ -49,12 +49,3 @@ export const MOCK_FEATURES = [
     enabled: false,
   },
 ]
-
-export const MOCK_ACL = [
-  {
-    id: 1,
-    action: 'Allow',
-    principal: 'admin',
-    permission: 'manage_users',
-  },
-]

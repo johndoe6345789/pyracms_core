@@ -7,13 +7,11 @@ test.describe('Unauthenticated access redirects', () => {
     '/users',
     '/settings',
     '/features',
-    '/acl',
     '/analytics',
     '/backup',
     '/files',
     '/menus',
     '/styles',
-    '/templates',
   ]
 
   for (const path of PROTECTED_PATHS) {

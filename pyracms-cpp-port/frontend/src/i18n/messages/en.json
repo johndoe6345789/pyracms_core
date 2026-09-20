@@ -147,10 +147,8 @@
     "settings": "Settings",
     "features": "Features",
     "menus": "Menus",
-    "acl": "Access Control",
     "files": "Files",
     "backup": "Backup",
-    "templates": "Templates",
     "styles": "Styles",
     "analytics": "Analytics"
   },

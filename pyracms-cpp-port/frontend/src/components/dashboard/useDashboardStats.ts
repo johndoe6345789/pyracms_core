@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   PeopleOutlined,
   ArticleOutlined,
-  SettingsOutlined,
+  HowToRegOutlined,
 } from '@mui/icons-material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import api from '@/lib/api'
@@ -14,7 +14,11 @@ export interface Stat {
   color: string
 }
 
-function buildStats(users: string, items: string, settings: string): Stat[] {
+function buildStats(
+  users: string,
+  items: string,
+  registration: string,
+): Stat[] {
   return [
     {
       title: 'Total Users',
@@ -29,13 +33,20 @@ function buildStats(users: string, items: string, settings: string): Stat[] {
       color: '#f093fb',
     },
     {
-      title: 'Settings',
-      value: settings,
-      icon: SettingsOutlined,
+      title: 'Registration',
+      value: registration,
+      icon: HowToRegOutlined,
       color: '#43e97b',
     },
   ]
 }
+
+/** "Open" or "Closed" from the site's registration_open setting. */
+const registration = (tenantId: number) =>
+  api
+    .get(`/api/settings/registration_open?tenant_id=${tenantId}`)
+    .then((r) => (String(r.data?.value) === 'false' ? 'Closed' : 'Open'))
+    .catch(() => 'Open')
 
 /** Row count of a list route, or 'N/A' when the request fails. */
 const count = (path: string) =>
@@ -53,8 +64,8 @@ export function useDashboardStats(tenantId: number | null) {
     Promise.all([
       count('/api/users'),
       count(`/api/articles?tenant_id=${tenantId}`),
-      count(`/api/settings?tenant_id=${tenantId}`),
-    ]).then(([u, a, s]) => setStats(buildStats(u, a, s)))
+      registration(tenantId),
+    ]).then(([u, a, r]) => setStats(buildStats(u, a, r)))
   }, [tenantId])
 
   return stats

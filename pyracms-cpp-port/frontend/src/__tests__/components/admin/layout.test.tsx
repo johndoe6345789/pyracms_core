@@ -61,5 +61,5 @@ it('skip link reveals on focus and hides on blur', () => {
 
 it('builds quick links', () => {
   expect(buildQuickLinks('s')[0]!.href).toBe('/site/s/admin/users')
-  expect(buildQuickLinks('s')).toHaveLength(7)
+  expect(buildQuickLinks('s')).toHaveLength(6)
 })

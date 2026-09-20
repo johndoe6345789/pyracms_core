@@ -52,6 +52,10 @@ class CommentController : public drogon::HttpController<CommentController> {
                 int id);
 
   private:
+    void storeComment(
+        int userId, int tenantId, const std::string &contentType,
+        int contentId, const std::string &body, std::optional<int> parentId,
+        std::function<void(const drogon::HttpResponsePtr &)> callback);
     CommentService commentService_;
     NotificationService notificationService_;
     UserService userService_;

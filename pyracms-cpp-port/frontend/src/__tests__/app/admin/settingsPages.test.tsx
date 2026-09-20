@@ -5,7 +5,6 @@ import {
   waitFor,
   within,
 } from '@testing-library/react'
-import AdminAclPage from '@/app/site/[slug]/(admin)/admin/acl/page'
 import AdminSettingsPage from '@/app/site/[slug]/(admin)/admin/settings/page'
 import AdminFeaturesPage from '@/app/site/[slug]/(admin)/admin/features/page'
 import { m } from '../../helpers/scopeApi'
@@ -32,21 +31,10 @@ beforeEach(() => {
   m.delete.mockResolvedValue({})
 })
 
-it('ACL page adds and deletes rules', async () => {
-  routeGet({ acl_rules: { value: '[]' } })
-  render(<AdminAclPage />)
-  fireEvent.change(box('acl-principal-input'), { target: { value: 'p' } })
-  fireEvent.change(box('acl-permission-input'), { target: { value: 'x' } })
-  fireEvent.click(screen.getByTestId('add-acl-rule-btn'))
-  expect(screen.getByTestId('acl-row-1')).toBeInTheDocument()
-  fireEvent.click(screen.getByTestId('delete-acl-1'))
-  expect(screen.queryByTestId('acl-row-1')).toBeNull()
-  await waitFor(() => expect(m.put).toHaveBeenCalledTimes(2))
-})
-
 it('settings page edits and adds settings', async () => {
   routeGet({ '/api/settings': [{ id: 1, name: 'k', value: 'v' }] })
   render(<AdminSettingsPage />)
+  fireEvent.click(screen.getByText('Advanced: raw settings'))
   await screen.findByText('k')
   fireEvent.click(screen.getByTestId('edit-setting-btn'))
   const input = within(

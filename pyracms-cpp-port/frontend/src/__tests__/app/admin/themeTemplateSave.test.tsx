@@ -1,7 +1,6 @@
 import '../../helpers/scopeModuleMocks'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import StyleEditorPage from '@/app/site/[slug]/(admin)/admin/styles/page'
-import TemplateEditorPage from '@/app/site/[slug]/(admin)/admin/templates/page'
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
 
@@ -40,35 +39,4 @@ it('style editor loads the saved theme and shows save errors', async () => {
   render(<StyleEditorPage />)
   fireEvent.click(screen.getByRole('button', { name: 'Save' }))
   expect(await screen.findByTestId('theme-error')).toHaveTextContent('nope')
-})
-
-it('template editor saves templates as a setting', async () => {
-  m.put.mockResolvedValue({})
-  render(<TemplateEditorPage />)
-  fireEvent.change(screen.getByTestId('monaco'), {
-    target: { value: '<p>new</p>' },
-  })
-  fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-  await waitFor(() =>
-    expect(m.put).toHaveBeenCalledWith(
-      '/api/settings/site_templates?tenant_id=1',
-      expect.objectContaining({
-        value: expect.stringContaining('<p>new</p>'),
-      }),
-    ),
-  )
-  expect(await screen.findByText('Templates saved.')).toBeInTheDocument()
-})
-
-it('template editor loads saved templates and reports errors', async () => {
-  m.get.mockResolvedValue({
-    data: { value: JSON.stringify({ header: '<h1>saved</h1>' }) },
-  })
-  m.put.mockRejectedValue(new Error('x'))
-  render(<TemplateEditorPage />)
-  await waitFor(() =>
-    expect(screen.getByTestId('monaco')).toHaveValue('<h1>saved</h1>'),
-  )
-  fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-  expect(await screen.findByTestId('templates-error')).toBeInTheDocument()
 })

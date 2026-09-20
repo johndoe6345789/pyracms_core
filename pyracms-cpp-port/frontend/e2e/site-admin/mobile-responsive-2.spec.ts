@@ -27,7 +27,6 @@ test.describe('Mobile responsive — 375×667', () => {
       'admin-nav-settings',
       'admin-nav-feature-toggles',
       'admin-nav-menus',
-      'admin-nav-acl',
       'admin-nav-files',
       'admin-nav-analytics',
       'admin-nav-backup',

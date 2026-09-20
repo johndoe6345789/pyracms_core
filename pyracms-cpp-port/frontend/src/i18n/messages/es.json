@@ -147,10 +147,8 @@
     "settings": "Configuracion",
     "features": "Caracteristicas",
     "menus": "Menus",
-    "acl": "Control de acceso",
     "files": "Archivos",
     "backup": "Respaldo",
-    "templates": "Plantillas",
     "styles": "Estilos",
     "analytics": "Analiticas"
   },

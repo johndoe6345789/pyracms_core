@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import AnalyticsPage from '@/app/site/[slug]/(admin)/admin/analytics/page'
 import StyleEditorPage from '@/app/site/[slug]/(admin)/admin/styles/page'
-import TemplateEditorPage from '@/app/site/[slug]/(admin)/admin/templates/page'
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
 
@@ -49,17 +48,4 @@ it('style editor resets, saves, exports and imports', () => {
   expect(click).toHaveBeenCalledTimes(2)
   fireEvent.click(screen.getByTestId('swatch-Primary Color'))
   click.mockRestore()
-})
-
-it('template editor edits, resets and toggles preview', () => {
-  render(<TemplateEditorPage />)
-  fireEvent.change(screen.getByTestId('monaco'), {
-    target: { value: '<p>new</p>' },
-  })
-  expect(screen.getByTestId('template-preview-body')).toHaveTextContent('new')
-  fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Preview' }))
-  expect(screen.queryByTestId('template-preview-body')).toBeNull()
-  fireEvent.mouseDown(screen.getByRole('combobox'))
-  fireEvent.click(screen.getByRole('option', { name: 'Footer' }))
 })

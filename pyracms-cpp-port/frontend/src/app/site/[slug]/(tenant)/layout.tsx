@@ -8,6 +8,7 @@ import ForkRibbon from '@/components/common/ForkRibbon'
 import SkipLink from '@/components/layout/SkipLink'
 import TenantBreadcrumbs from '@/components/common/TenantBreadcrumbs'
 import { useTenantNav } from '@/hooks/useTenantNav'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 
 export default function TenantSiteLayout({
   children,
@@ -16,13 +17,16 @@ export default function TenantSiteLayout({
 }) {
   const {
     slug,
-    siteName,
+    siteName: tenantName,
     tenant,
     canAdmin,
     drawerOpen,
     toggleDrawer,
     closeDrawer,
   } = useTenantNav()
+  const settings = useSiteSettings(slug)
+  const siteName = settings?.site_name || tenantName
+  const description = settings?.site_description || tenant?.description
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -36,7 +40,7 @@ export default function TenantSiteLayout({
       <TenantDrawer
         slug={slug}
         siteName={siteName}
-        description={tenant?.description}
+        description={description}
         canAdmin={canAdmin}
         open={drawerOpen}
         onClose={closeDrawer}
@@ -59,7 +63,10 @@ export default function TenantSiteLayout({
       >
         {children}
       </Box>
-      <SiteFooter downloadHref={`/site/${slug}/download`} />
+      <SiteFooter
+        downloadHref={`/site/${slug}/download`}
+        contactEmail={settings?.contact_email}
+      />
     </Box>
   )
 }

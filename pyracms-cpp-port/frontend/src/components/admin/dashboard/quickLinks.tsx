@@ -5,7 +5,6 @@ import {
   SettingsOutlined,
   ToggleOnOutlined,
   MenuBookOutlined,
-  SecurityOutlined,
   BackupOutlined,
 } from '@mui/icons-material'
 
@@ -42,12 +41,6 @@ export function buildQuickLinks(slug: string): QuickLink[] {
       description: 'Edit navigation menus',
       icon: <MenuBookOutlined />,
       href: `${base}/menus`,
-    },
-    {
-      label: 'ACL',
-      description: 'Access control rules',
-      icon: <SecurityOutlined />,
-      href: `${base}/acl`,
     },
     {
       label: 'Files',

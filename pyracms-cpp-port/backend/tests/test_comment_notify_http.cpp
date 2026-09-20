@@ -63,3 +63,17 @@ TEST(SettingsHttp, ListGetSetAndRemove) {
     EXPECT_EQ(del("/api/settings/site_name", a,
                   J({{"tenantId", s.id}})).status, 404);
 }
+
+TEST(SettingsHttp, CommentsSwitchOffBlocksNewComments) {
+    REQUIRE_SERVER();
+    auto s = makeSite();
+    auto path = "/api/comments/article/" + std::to_string(s.id);
+    auto off = [&](const char *v) {
+        return put("/api/settings/comments_enabled",
+                   J({{"tenantId", s.id}, {"value", v}}), s.admin.token);
+    };
+    EXPECT_EQ(off("false").status, 200);
+    EXPECT_EQ(post(path, J({{"body", "x"}}), s.user.token).status, 403);
+    EXPECT_EQ(off("true").status, 200);
+    EXPECT_EQ(post(path, J({{"body", "x"}}), s.user.token).status, 201);
+}
