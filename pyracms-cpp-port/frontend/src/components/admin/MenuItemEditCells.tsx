@@ -5,6 +5,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import RouteField from './menus/RouteField'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 
 type Updater = (fn: (p: MenuItemRow | null) => MenuItemRow | null) => void
@@ -31,12 +32,12 @@ export default function MenuItemEditCells({ editRow, onEditRowChange }: Props) {
         />
       </TableCell>
       <TableCell>
-        <TextField
-          size="small"
+        <RouteField
           value={editRow?.route ?? ''}
+          onChange={(route) => set({ route })}
+          testId="route-input"
+          minWidth={260}
           fullWidth
-          data-testid="route-input"
-          onChange={(e) => set({ route: e.target.value })}
         />
       </TableCell>
       <TableCell>

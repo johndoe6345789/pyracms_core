@@ -5,17 +5,20 @@ import {
   ArrowBackOutlined,
 } from '@mui/icons-material'
 import { NAV_ITEMS } from '@/hooks/useTenantNav'
-import { launcherEntry } from './portalNav'
+import { hypernucleusEntry } from './hypernucleusNav'
 import type { NavEntry, NavSection } from './navTypes'
 
 /** Module links for one site (also used for the inline top-bar links). */
 export function tenantModuleEntries(slug: string): NavEntry[] {
-  return NAV_ITEMS.map((item) => ({
+  const modules: NavEntry[] = NAV_ITEMS.map((item) => ({
     key: item.path,
     label: item.label,
     href: `/site/${slug}/${item.path}`,
     icon: item.icon,
   }))
+  const at = modules.findIndex((m) => m.key === 'gallery') + 1
+  modules.splice(at, 0, hypernucleusEntry(slug))
+  return modules
 }
 
 export function tenantSections(slug: string, canAdmin: boolean): NavSection[] {
@@ -35,7 +38,6 @@ export function tenantSections(slug: string, canAdmin: boolean): NavSection[] {
       icon: <SearchOutlined />,
       testId: 'search',
     },
-    launcherEntry(`/site/${slug}/download`),
   ]
   const sections: NavSection[] = [{ title: 'Explore', items: site }]
   if (canAdmin) {

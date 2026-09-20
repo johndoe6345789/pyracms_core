@@ -54,7 +54,7 @@ export default function ModuleCard({
             >
               <Icon sx={{ color: mod.color, fontSize: 26 }} />
             </Box>
-            <Typography variant="h4" component="h2">
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 700 }}>
               {mod.label}
             </Typography>
           </Box>

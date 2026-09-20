@@ -7,7 +7,7 @@ import api from '@/lib/api'
 /** "totalViews" -> "Total views". */
 export function humanize(key: string): string {
   const s = key
-    .replace(/([A-Z])/g, ' $1')
+    .replace(/([A-Z]|\d+)/g, ' $1')
     .toLowerCase()
     .trim()
   return s.charAt(0).toUpperCase() + s.slice(1)

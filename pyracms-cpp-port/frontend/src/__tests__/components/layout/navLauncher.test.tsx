@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import TopBarTools from '@/components/layout/TopBarTools'
 import AppDrawer from '@/components/layout/AppDrawer'
 import LibraryHeader from '@/components/launcher/LibraryHeader'
@@ -32,11 +32,14 @@ describe('Get the launcher entries', () => {
     )
   })
 
-  it('portal and site drawers list it, top-bar links do not', () => {
+  it('portal lists it; the site drawer nests it under Hypernucleus', () => {
     const p = portalSections(false)[0]!.items
     expect(p.find((e) => e.key === 'download')?.href).toBe('/download')
     const t = tenantSections('d', false)[0]!.items
-    expect(t.find((e) => e.key === 'download')?.href).toBe('/site/d/download')
+    const group = t.find((e) => e.key === 'hypernucleus')
+    expect(group?.children?.find((e) => e.key.endsWith('download'))?.href).toBe(
+      '/site/d/download',
+    )
     render(
       <AppDrawer
         open
@@ -46,8 +49,9 @@ describe('Get the launcher entries', () => {
         sections={tenantSections('d', false)}
       />,
     )
+    fireEvent.click(screen.getByTestId('drawer-nav-hypernucleus'))
     expect(screen.getByTestId('drawer-download')).toHaveTextContent(
-      'Get the launcher',
+      'Download Hypernucleus Client',
     )
   })
 

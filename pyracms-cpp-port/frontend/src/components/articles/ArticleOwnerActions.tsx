@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Alert, Box } from '@mui/material'
+import { Alert, Divider, Paper } from '@mui/material'
 import type { Article } from '@/hooks/useArticle'
 import ArticleSchedule from './ArticleSchedule'
 import ArticleStatusRow from './ArticleStatusRow'
@@ -21,12 +21,17 @@ export default function ArticleOwnerActions(p: Props) {
   const a = useArticleAdmin(p.name, p.tenantId, p.onChanged, p.onDeleted)
   const [confirm, setConfirm] = useState(false)
   return (
-    <Box sx={{ mb: 3 }} data-testid="article-owner-actions">
+    <Paper
+      variant="outlined"
+      sx={{ p: 2, mb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}
+      data-testid="article-owner-actions"
+    >
       <ArticleStatusRow
         article={p.article}
         a={a}
         onDelete={() => setConfirm(true)}
       />
+      <Divider />
       <ArticleSchedule
         status={p.article.status ?? 'published'}
         busy={a.busy}
@@ -37,11 +42,7 @@ export default function ArticleOwnerActions(p: Props) {
           : {})}
       />
       {a.error && (
-        <Alert
-          severity="error"
-          sx={{ mt: 1 }}
-          data-testid="article-admin-error"
-        >
+        <Alert severity="error" data-testid="article-admin-error">
           {a.error}
         </Alert>
       )}
@@ -54,6 +55,6 @@ export default function ArticleOwnerActions(p: Props) {
           a.remove()
         }}
       />
-    </Box>
+    </Paper>
   )
 }

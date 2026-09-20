@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { useTenant, titleFromSlug } from '@/hooks/useTenant'
 import { isSessionOnSite } from '@/hooks/useSiteSession'
@@ -14,7 +14,6 @@ export { NAV_ITEMS }
 
 export function useTenantNav() {
   const params = useParams()
-  const pathname = usePathname()
   const slug = params.slug as string
   const { tenant, loading } = useTenant(slug)
   const siteName = tenant?.displayName ?? titleFromSlug(slug)
@@ -32,10 +31,6 @@ export function useTenantNav() {
   const closeDrawer = () => setDrawerOpen(false)
   const toggleDrawer = () => setDrawerOpen((o) => !o)
 
-  const activeLink = NAV_ITEMS.find(
-    (item) => pathname === `/site/${slug}/${item.path}`,
-  )?.path
-
   return {
     slug,
     siteName,
@@ -46,6 +41,5 @@ export function useTenantNav() {
     openDrawer,
     closeDrawer,
     toggleDrawer,
-    activeLink,
   }
 }

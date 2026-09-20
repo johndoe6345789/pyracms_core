@@ -38,10 +38,12 @@ it('menus page renders groups and adds an item', async () => {
   routeGet({ '/items': [], '/api/menu-groups': [{ id: 1, name: 'main' }] })
   render(<AdminMenusPage />)
   await screen.findByText('main')
-  const box = (id: string) =>
-    within(screen.getByTestId(id)).getByRole('textbox')
+  const box = (id: string, role = 'textbox') =>
+    within(screen.getByTestId(id)).getByRole(role)
   fireEvent.change(box('menu-name-input'), { target: { value: 'N' } })
-  fireEvent.change(box('menu-route-input'), { target: { value: '/n' } })
+  fireEvent.change(box('menu-route-input', 'combobox'), {
+    target: { value: '/n' },
+  })
   fireEvent.click(screen.getByTestId('add-menu-item-btn'))
   await screen.findByText('/n')
   fireEvent.click(screen.getByRole('button', { name: /New Menu Group/ }))

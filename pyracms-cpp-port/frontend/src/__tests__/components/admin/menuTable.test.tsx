@@ -40,10 +40,12 @@ it('MenuItemTable edit row updates fields', () => {
       editRow={item(1) as never}
     />,
   )
-  const input = (id: string) =>
-    within(screen.getByTestId(id)).getByRole('textbox')
+  const input = (id: string, role = 'textbox') =>
+    within(screen.getByTestId(id)).getByRole(role)
   fireEvent.change(input('name-input'), { target: { value: 'z' } })
-  fireEvent.change(input('route-input'), { target: { value: '/z' } })
+  fireEvent.change(input('route-input', 'combobox'), {
+    target: { value: '/z' },
+  })
   fireEvent.change(
     within(screen.getByTestId('position-input')).getByRole('spinbutton'),
     { target: { value: 'abc' } },

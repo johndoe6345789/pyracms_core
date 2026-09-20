@@ -5,6 +5,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import RouteField from './RouteField'
 import type { useMenuEditor } from '@/hooks/useMenuEditor'
 
 type Editor = ReturnType<typeof useMenuEditor>
@@ -20,13 +21,11 @@ export default function AddMenuItemFields({ editor }: { editor: Editor }) {
         sx={{ minWidth: 150 }}
         data-testid="menu-name-input"
       />
-      <TextField
-        label="Route / URL"
-        size="small"
+      <RouteField
         value={editor.newRoute}
-        onChange={(e) => editor.setNewRoute(e.target.value)}
-        sx={{ minWidth: 200 }}
-        data-testid="menu-route-input"
+        onChange={editor.setNewRoute}
+        testId="menu-route-input"
+        minWidth={300}
       />
       <TextField
         label="Position"

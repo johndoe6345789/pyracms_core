@@ -1,5 +1,6 @@
 import { Box, Button } from '@mui/material'
 import Link from 'next/link'
+import TopBarMenu from './TopBarMenu'
 import { isActive, type NavEntry } from './navTypes'
 
 /** Inline links shown from the `lg` breakpoint up. */
@@ -14,6 +15,15 @@ export default function TopBarLinks({
     <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 0.5, flexGrow: 1 }}>
       {items.map((item) => {
         const active = isActive(pathname, item)
+        if (item.children?.length)
+          return (
+            <TopBarMenu
+              key={item.key}
+              item={item}
+              active={active}
+              pathname={pathname}
+            />
+          )
         return (
           <Button
             key={item.key}

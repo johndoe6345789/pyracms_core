@@ -3,13 +3,21 @@
 // Responsive breakpoint
 @mixin responsive($breakpoint) {
   @if $breakpoint == sm {
-    @media (min-width: $breakpoint-sm) { @content; }
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
   } @else if $breakpoint == md {
-    @media (min-width: $breakpoint-md) { @content; }
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
   } @else if $breakpoint == lg {
-    @media (min-width: $breakpoint-lg) { @content; }
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
   } @else if $breakpoint == xl {
-    @media (min-width: $breakpoint-xl) { @content; }
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
   }
 }
 
@@ -51,7 +59,9 @@
 
 // Interactive hover
 @mixin hover-lift {
-  transition: transform $transition-fast, box-shadow $transition-fast;
+  transition:
+    transform $transition-fast,
+    box-shadow $transition-fast;
   &:hover {
     transform: translateY(-2px);
     box-shadow: $shadow-md;

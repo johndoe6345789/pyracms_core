@@ -2,6 +2,7 @@ import { Typography, Box, Card, CardContent, Button } from '@mui/material'
 import { AddCircleOutline } from '@mui/icons-material'
 import type { useMenuEditor } from '@/hooks/useMenuEditor'
 
+import { validateRoute } from '@/lib/routeSuggest'
 import AddMenuItemFields from './AddMenuItemFields'
 
 type Editor = ReturnType<typeof useMenuEditor>
@@ -26,7 +27,11 @@ export default function AddMenuItemCard({ editor }: { editor: Editor }) {
             variant="contained"
             startIcon={<AddCircleOutline />}
             onClick={editor.handleAddItem}
-            disabled={!editor.newName.trim() || !editor.newRoute.trim()}
+            disabled={
+              !editor.newName.trim() ||
+              !editor.newRoute.trim() ||
+              !!validateRoute(editor.newRoute)
+            }
             data-testid="add-menu-item-btn"
           >
             Add Item

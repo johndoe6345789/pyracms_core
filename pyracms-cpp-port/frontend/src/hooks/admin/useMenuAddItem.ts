@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import api from '@/lib/api'
+import { validateRoute } from '@/lib/routeSuggest'
 import { useActionError } from '../useActionError'
 import { MenuGroup, MenuItemRow, SetGroups, updateGroupItems } from './menuData'
 
@@ -25,7 +26,7 @@ export function useMenuAddItem(
   const handleAddItem = () => {
     const name = newName.trim()
     const route = newRoute.trim()
-    if (!name || !route || !currentGroup) return
+    if (!name || !route || !currentGroup || validateRoute(route)) return
     const position = parseInt(newPosition, 10) || 0
     const permissions = newPermissions
     setError('')

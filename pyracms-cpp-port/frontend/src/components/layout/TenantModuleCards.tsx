@@ -15,7 +15,7 @@ export default function TenantModuleCards({
 }: TenantModuleCardsProps) {
   const modules = canAdmin ? [...MODULES, ADMIN_MODULE] : MODULES
   return (
-    <Grid container spacing={3} data-testid="module-cards">
+    <Grid container spacing={3} sx={{ mb: 5 }} data-testid="module-cards">
       {modules.map((mod) => (
         <Grid item xs={12} sm={6} md={4} key={mod.key}>
           <ModuleCard mod={mod} slug={slug} />

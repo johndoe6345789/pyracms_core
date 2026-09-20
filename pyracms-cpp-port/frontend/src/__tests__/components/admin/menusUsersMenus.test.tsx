@@ -24,7 +24,9 @@ it('AddMenuItemCard edits fields and adds', () => {
   }
   render(<AddMenuItemCard editor={e as never} />)
   fireEvent.change(box('menu-name-input'), { target: { value: 'a' } })
-  fireEvent.change(box('menu-route-input'), { target: { value: '/a' } })
+  fireEvent.change(box('menu-route-input', 'combobox'), {
+    target: { value: '/a' },
+  })
   fireEvent.change(box('menu-position-input', 'spinbutton'), {
     target: { value: '3' },
   })

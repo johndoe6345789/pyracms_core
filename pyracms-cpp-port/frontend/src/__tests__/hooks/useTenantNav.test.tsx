@@ -32,10 +32,9 @@ describe('useTenantNav', () => {
     tenant = null
   })
 
-  it('falls back to the slug title and finds the active link', () => {
+  it('falls back to the slug title', () => {
     const { result } = setup()
     expect(result.current.siteName).toBe('DEMO')
-    expect(result.current.activeLink).toBe('games')
     expect(result.current.canAdmin).toBe(false)
   })
 

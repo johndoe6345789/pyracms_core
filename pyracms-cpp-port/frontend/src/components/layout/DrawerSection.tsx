@@ -1,4 +1,5 @@
 import { Box, List, Typography } from '@mui/material'
+import DrawerNavGroup from './DrawerNavGroup'
 import DrawerNavItem from './DrawerNavItem'
 import { isActive, type NavSection } from './navTypes'
 
@@ -35,14 +36,23 @@ export default function DrawerSection({
         disablePadding
         data-testid={index === 0 ? 'drawer-nav-list' : undefined}
       >
-        {section.items.map((item) => (
-          <DrawerNavItem
-            key={item.key}
-            item={item}
-            active={isActive(pathname, item)}
-            onClose={onClose}
-          />
-        ))}
+        {section.items.map((item) =>
+          item.children?.length ? (
+            <DrawerNavGroup
+              key={item.key}
+              item={item}
+              pathname={pathname}
+              onClose={onClose}
+            />
+          ) : (
+            <DrawerNavItem
+              key={item.key}
+              item={item}
+              active={isActive(pathname, item)}
+              onClose={onClose}
+            />
+          ),
+        )}
       </List>
     </Box>
   )

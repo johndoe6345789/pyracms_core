@@ -66,6 +66,7 @@ it('summary cards show numeric fields only', async () => {
   expect(screen.getByText('1,200')).toBeInTheDocument()
   expect(screen.queryByText('Note')).toBeNull()
   expect(humanize('uniqueVisitors')).toBe('Unique visitors')
+  expect(humanize('views30d')).toBe('Views 30d')
 })
 
 it('summary cards render nothing on failure', async () => {

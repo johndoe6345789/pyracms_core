@@ -1,16 +1,8 @@
 'use client'
 
-import NextLink from 'next/link'
-import {
-  Paper,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Link,
-} from '@mui/material'
+import { List, Paper, Typography } from '@mui/material'
 import { useSiteActivity } from '@/hooks/useSiteActivity'
-import { safeHref } from '@/lib/safeUrl'
+import ActivityRow from './ActivityRow'
 
 interface Props {
   tenantId: number | null
@@ -22,10 +14,10 @@ export default function RecentActivity({ tenantId, limit }: Props) {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 3, mb: 4 }}
+      sx={{ p: { xs: 2, sm: 3 }, mb: 4 }}
       data-testid="recent-activity"
     >
-      <Typography variant="h5" sx={{ mb: 1 }}>
+      <Typography variant="h6" component="h2" sx={{ mb: 1, fontWeight: 700 }}>
         Recent activity
       </Typography>
       {failed && (
@@ -38,32 +30,10 @@ export default function RecentActivity({ tenantId, limit }: Props) {
           Nothing has happened yet.
         </Typography>
       )}
-      <List dense disablePadding>
-        {items.map((a) => {
-          const href = safeHref(a.link)
-          return (
-            <ListItem
-              key={a.id}
-              disableGutters
-              data-testid={`activity-${a.id}`}
-            >
-              <ListItemText
-                primary={
-                  href ? (
-                    <Link component={NextLink} href={href}>
-                      {a.title}
-                    </Link>
-                  ) : (
-                    a.title
-                  )
-                }
-                secondary={`${a.actor} - ${a.type} - ${new Date(
-                  a.createdAt,
-                ).toLocaleString()}`}
-              />
-            </ListItem>
-          )
-        })}
+      <List disablePadding>
+        {items.map((a, i) => (
+          <ActivityRow key={a.id} a={a} first={i === 0} />
+        ))}
       </List>
     </Paper>
   )
