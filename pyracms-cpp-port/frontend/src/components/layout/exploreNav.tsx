@@ -40,14 +40,19 @@ export function exploreEntry(
   modules: NavEntry[],
   canAdmin: boolean,
 ): NavEntry {
+  // Plain links first, then titled groups (Hypernucleus), then Admin, so a
+  // group's heading never swallows the links that follow it.
+  const plain = modules.filter((m) => !m.children?.length)
+  const groups = modules.filter((m) => m.children?.length)
   return {
     key: 'explore',
     label: 'Explore',
     href: `/site/${slug}`,
     icon: <AppsOutlined />,
     children: [
-      ...modules,
+      ...plain,
       searchEntry(),
+      ...groups,
       ...(canAdmin ? [adminEntry(slug)] : []),
     ],
   }

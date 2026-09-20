@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import {
   Button,
+  Divider,
   ListItemIcon,
   ListSubheader,
   Menu,
@@ -41,11 +42,15 @@ export default function TopBarMenu({ item, active, pathname }: Props) {
     </MenuItem>
   )
   // A child that has children of its own becomes a titled group
-  const rows = (item.children ?? []).flatMap((c) =>
+  // and is fenced off by dividers from the links around it
+  const kids = item.children ?? []
+  const rows = kids.flatMap((c, i) =>
     c.children?.length
       ? [
+          ...(i > 0 ? [<Divider key={`${c.key}-top`} />] : []),
           <ListSubheader key={`${c.key}-head`}>{c.label}</ListSubheader>,
           ...c.children.map(row),
+          ...(i < kids.length - 1 ? [<Divider key={`${c.key}-end`} />] : []),
         ]
       : [row(c)],
   )
