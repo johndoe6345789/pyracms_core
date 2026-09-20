@@ -12,7 +12,11 @@ export const navMock = () => ({
 })
 export const apiMock = () => ({
   __esModule: true,
-  default: { get: jest.fn(), put: jest.fn(), post: jest.fn() },
+  default: {
+    get: jest.fn(() => Promise.resolve({ data: [] })),
+    put: jest.fn(),
+    post: jest.fn(),
+  },
 })
 export const libMock = () => ({
   __esModule: true,

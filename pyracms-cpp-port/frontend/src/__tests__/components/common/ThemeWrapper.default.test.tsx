@@ -47,7 +47,7 @@ beforeEach(() => {
   )
 })
 
-it('uses the site default mode when the visitor has not chosen one', async () => {
+it('uses the site default mode until the visitor chooses', async () => {
   show('system')
   await waitFor(() => expect(screen.getByTestId('m')).toHaveTextContent('dark'))
 })
