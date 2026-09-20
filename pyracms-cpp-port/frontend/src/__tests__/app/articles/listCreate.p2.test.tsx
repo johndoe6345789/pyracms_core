@@ -33,6 +33,10 @@ jest.mock(
   () => jest.requireActual('../../helpers/scopeMocks').monacoMock,
 )
 
+jest.mock('@/hooks/usePermissions', () => ({
+  usePermissions: () => ({ can: () => true, signedIn: true }),
+}))
+
 beforeEach(() => jest.resetAllMocks())
 
 const fill = (title: string) => {

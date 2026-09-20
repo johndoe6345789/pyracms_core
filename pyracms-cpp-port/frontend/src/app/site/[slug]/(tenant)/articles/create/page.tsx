@@ -5,6 +5,7 @@ import { Container, Typography, Box, Button, Alert } from '@mui/material'
 import { SaveOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { useTenantId } from '@/hooks/useTenantId'
+import { usePermissions } from '@/hooks/usePermissions'
 import { BackButton } from '@/components/common/BackButton'
 import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
 import { useCreateArticle } from './useCreateArticle'
@@ -15,6 +16,7 @@ export default function CreateArticlePage() {
   const { tenantId } = useTenantId(slug)
   const { editor, saving, error, create } = useCreateArticle(slug, tenantId)
   const back = `/site/${slug}/articles`
+  const { can, signedIn } = usePermissions(slug)
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }} data-testid="create-article-page">
@@ -25,6 +27,13 @@ export default function CreateArticlePage() {
           data-testid="back-to-articles-btn"
         />
       </Box>
+      {!can('writeArticles') && (
+        <Alert severity="info" data-testid="create-article-denied">
+          {signedIn
+            ? 'Writing articles needs Moderator level on this site.'
+            : 'Sign in as a Moderator or Administrator to write articles.'}
+        </Alert>
+      )}
       <section aria-label="Create article form">
         <Typography variant="h3" component="h1" gutterBottom>
           Create Article

@@ -25,6 +25,7 @@ TEST(PublishDue, ScheduledPublishFiresWebhookForItsSiteOnly) {
     auto s = makeSite();
     auto other = makeSite();
     int mine = hookFor(s), theirs = hookFor(other);
+    authorToken(s);
     post("/api/articles", J({{"name", "due-a"}, {"displayName", "d"},
          {"content", "x"}, {"tenant_id", s.id}}), s.user.token);
     auto when = J({{"tenant_id", s.id}, {"scheduled_at", "2099-01-01 00:00"}});

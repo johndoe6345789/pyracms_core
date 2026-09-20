@@ -3,8 +3,9 @@
 namespace pyracms {
 
 // $1 thread, $2 target forum, $3 caller, $4 caller's site (0 = platform).
-// Moves only inside the thread's own site, for a moderator or the site's
-// owner, and keeps the forums' thread/post counters in step.
+// Moves only inside the thread's own site, for a moderator OF THAT SITE,
+// its owner or a Platform Owner, and keeps the forums' thread/post counters
+// in step.
 constexpr const char *kMoveThreadSql =
     "WITH old AS (SELECT t.id, t.forum_id, COALESCE(t.total_posts, 0) AS n, "
     "oc.tenant_id AS tenant FROM forum_threads t "
@@ -17,7 +18,9 @@ constexpr const char *kMoveThreadSql =
     "WHERE t.id = old.id AND nc.tenant_id = old.tenant "
     "AND ($4::int = 0 OR old.tenant = $4::int) "
     "AND (EXISTS (SELECT 1 FROM users mu WHERE mu.id = $3::int "
-    "AND mu.role >= 2) OR EXISTS (SELECT 1 FROM tenants xt "
+    "AND (mu.role >= 4 OR "
+    "(mu.role >= 2 AND mu.tenant_id = old.tenant))) "
+    "OR EXISTS (SELECT 1 FROM tenants xt "
     "WHERE xt.id = old.tenant AND xt.owner_id = $3::int)) "
     "RETURNING old.forum_id AS oldf, old.n AS n), "
     "dcr AS (UPDATE forums SET total_threads = GREATEST(total_threads - 1, "

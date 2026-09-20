@@ -39,7 +39,8 @@ TEST(CommentHttp, ThreadVoteEditDeleteAndNotifications) {
     EXPECT_EQ(del("/api/notifications/" + nid, u).status, 200);
     EXPECT_NE(del("/api/notifications/" + nid, u).status, 500);
     EXPECT_EQ(get("/api/notifications").status, 401);
-    EXPECT_EQ(del(cs, a).status, 404);
+    auto stranger = signup(makeSite().slug, 2);
+    EXPECT_EQ(del(cs, stranger.token).status, 404);
     EXPECT_EQ(del(cs, u).status, 200);
 }
 

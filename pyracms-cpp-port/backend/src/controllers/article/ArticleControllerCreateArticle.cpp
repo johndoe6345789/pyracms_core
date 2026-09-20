@@ -1,6 +1,7 @@
 #include "controllers/ArticleController.h"
 #include "controllers/ArticleInput.h"
 #include "security/Validate.h"
+#include "filters/ArticleWriteGate.h"
 #include "services/WebhookEvents.h"
 
 namespace pyracms {
@@ -41,29 +42,16 @@ void ArticleController::createArticle(
     int userId = req->attributes()->get<int>("userId");
     auto db = drogon::app().getDbClient();
 
-    articleService_.createArticle(
-        db, tenantId, name, displayName, content, renderer, userId,
-        [callback, tenantId, name, userId](bool success,
-                             const std::string &error) {
-            if (!success) {
-                auto resp =
-                    drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-                (*resp->jsonObject())["error"] = error;
-                resp->setStatusCode(drogon::k409Conflict);
-                callback(resp);
-                return;
-            }
-
-            Json::Value d;
-            d["name"] = name;
-            d["userId"] = userId;
-            fireWebhookEvent(tenantId, "article.created", d);
-            Json::Value result;
-            result["message"] = "Article created";
-            auto resp = drogon::HttpResponse::newHttpJsonResponse(result);
-            resp->setStatusCode(drogon::k201Created);
-            callback(resp);
-        });
+    // Writing articles takes Moderator level (or owning the site).
+    mayWriteArticles(req, tenantId, [=, this](bool allowed) {
+        if (!allowed)
+            return callback(articleForbidden());
+        articleService_.createArticle(
+            db, tenantId, name, displayName, content, renderer, userId,
+            [=](bool ok, const std::string &err) {
+                callback(createdReply(ok, err, tenantId, name, userId));
+            });
+    });
 }
 
 } // namespace pyracms

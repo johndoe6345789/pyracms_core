@@ -44,4 +44,10 @@ Site makeSite() {
     return s;
 }
 
+std::string authorToken(const Site &s) {
+    testDb()->execSqlSync("UPDATE users SET role = 2 WHERE id = $1",
+                          s.user.id);
+    return s.user.token;
+}
+
 } // namespace harness

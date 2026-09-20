@@ -121,6 +121,8 @@ set(TEST_SOURCES
 
     test_owner_scope_forum_http.cpp
 
+    test_permissions_http.cpp
+
     test_owner_scope_menu_http.cpp
 
     test_public_reads_http.cpp

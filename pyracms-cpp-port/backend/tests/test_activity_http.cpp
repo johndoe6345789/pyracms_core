@@ -13,6 +13,7 @@ static std::set<std::string> kinds(const Json::Value &items) {
 
 static void seedActivity(const Site &s) {
     auto a = s.admin.token, u = s.user.token;
+    authorToken(s); // the author writes articles as a Moderator
     for (auto n : {"pub-a", "priv-a"})
         post("/api/articles", J({{"name", n}, {"displayName", n},
              {"content", "x"}, {"tenant_id", s.id}}), u);

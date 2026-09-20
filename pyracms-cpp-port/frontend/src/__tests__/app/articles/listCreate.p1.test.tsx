@@ -12,6 +12,10 @@ import { slugifyTitle } from '../../helpers/pages/slugifyTitle'
 import { m } from '../../helpers/scopeApi'
 import { push, routeGet } from '../../helpers/scopeMocks'
 
+jest.mock('@/hooks/usePermissions', () => ({
+  usePermissions: () => ({ can: () => true, signedIn: true }),
+}))
+
 beforeEach(() => jest.resetAllMocks())
 
 const fill = (title: string) => {

@@ -19,7 +19,7 @@ describe('CommentSection', () => {
     expect(screen.getByText('c2')).toBeInTheDocument()
     expect(screen.queryByTestId('comment-input')).toBeNull()
     expect(screen.getByTestId('comment-login-hint')).toHaveTextContent(
-      'Log in to post',
+      'Sign in to comment',
     )
   })
 

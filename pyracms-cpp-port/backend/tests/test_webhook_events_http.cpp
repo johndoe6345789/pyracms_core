@@ -35,6 +35,7 @@ TEST(WebhookEvents, ContentEventsReachOnlyTheirOwnTenant) {
     int mine = subscribe(s, all);
     int theirs = subscribe(other, all);
     auto a = s.admin.token;
+    authorToken(s);
     auto name = uniq("wev");
     post("/api/articles", J({{"name", name}, {"displayName", "n"},
          {"content", "secret"}, {"tenant_id", s.id}}), s.user.token);

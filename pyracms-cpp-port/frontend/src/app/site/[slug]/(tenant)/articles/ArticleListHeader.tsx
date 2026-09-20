@@ -1,8 +1,12 @@
+'use client'
+
 import { Typography, Box, Button } from '@mui/material'
 import { AddOutlined } from '@mui/icons-material'
 import Link from 'next/link'
+import { usePermissions } from '@/hooks/usePermissions'
 
 export default function ArticleListHeader({ slug }: { slug: string }) {
+  const { can } = usePermissions(slug)
   return (
     <section aria-label="Article list header">
       <Box
@@ -23,16 +27,18 @@ export default function ArticleListHeader({ slug }: { slug: string }) {
             Browse articles, tutorials, and blog posts published on this site.
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlined />}
-          component={Link}
-          href={`/site/${slug}/articles/create`}
-          data-testid="create-article-btn"
-          aria-label="Create new article"
-        >
-          Create Article
-        </Button>
+        {can('writeArticles') && (
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            component={Link}
+            href={`/site/${slug}/articles/create`}
+            data-testid="create-article-btn"
+            aria-label="Create new article"
+          >
+            Create Article
+          </Button>
+        )}
       </Box>
     </section>
   )

@@ -14,4 +14,9 @@ inline drogon::HttpResponsePtr articleBad(const std::string &msg) {
     return resp;
 }
 
+// Reply for a finished create; fires the webhook on success.
+drogon::HttpResponsePtr createdReply(bool ok, const std::string &error,
+                                     int tenantId, const std::string &name,
+                                     int userId);
+
 } // namespace pyracms

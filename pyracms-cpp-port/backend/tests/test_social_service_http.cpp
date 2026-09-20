@@ -6,6 +6,7 @@ using namespace pyracms;
 
 // Author with an article, a forum post and a snippet in one tenant.
 static Acct seedAuthor(const Site &s) {
+    authorToken(s);
     auto name = uniq("au");
     post("/api/articles", J({{"name", name}, {"displayName", "A"},
          {"content", "c"}, {"tenant_id", s.id}}), s.user.token);

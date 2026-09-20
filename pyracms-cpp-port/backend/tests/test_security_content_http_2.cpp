@@ -18,7 +18,7 @@ TEST(SecurityArticles, PrivateAndUnpublishedStayOutOfPublicView) {
     REQUIRE_SERVER();
     auto s = makeSite();
     auto other = signup(s.slug);
-    auto name = mkArticle(s, s.user.token, "secret-draft-text");
+    auto name = mkArticle(s, authorToken(s), "secret-draft-text");
     auto base = "/api/articles/" + name;
     ASSERT_EQ(put(base + "/private", J({{"tenant_id", s.id}}),
                   s.user.token).status, 200);
@@ -49,8 +49,8 @@ TEST(SecurityArticles, PrivateAndUnpublishedStayOutOfPublicView) {
 TEST(SecurityArticles, RevisionsCannotBeReadThroughAnotherArticle) {
     REQUIRE_SERVER();
     auto s = makeSite();
-    auto pub = mkArticle(s, s.user.token);
-    auto priv = mkArticle(s, s.user.token, "hidden-revision-text");
+    auto pub = mkArticle(s, authorToken(s));
+    auto priv = mkArticle(s, authorToken(s), "hidden-revision-text");
     put("/api/articles/" + priv + "/private", J({{"tenant_id", s.id}}),
         s.user.token);
     auto rows = testDb()->execSqlSync(

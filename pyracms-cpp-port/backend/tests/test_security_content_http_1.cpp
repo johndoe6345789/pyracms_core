@@ -18,7 +18,7 @@ TEST(SecurityArticles, OnlyAuthorsAndStaffMayChangeAnArticle) {
     REQUIRE_SERVER();
     auto s = makeSite();
     auto other = signup(s.slug);
-    auto name = mkArticle(s, s.user.token);
+    auto name = mkArticle(s, authorToken(s));
     auto base = "/api/articles/" + name;
     auto upd = J({{"content", "hijack"}, {"tenant_id", s.id}});
     EXPECT_EQ(put(base, upd, other.token).status, 403);
@@ -42,7 +42,7 @@ TEST(SecurityArticles, TenantAccountsCannotReachOtherSites) {
     REQUIRE_SERVER();
     auto a = makeSite();
     auto b = makeSite();
-    auto name = mkArticle(a, a.user.token);
+    auto name = mkArticle(a, authorToken(a));
     auto upd = J({{"content", "x"}, {"tenant_id", a.id}});
     EXPECT_EQ(put("/api/articles/" + name, upd, b.admin.token).status, 403);
     EXPECT_EQ(del("/api/articles/" + name + tq(a), b.admin.token).status, 403);

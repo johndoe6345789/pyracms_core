@@ -6,7 +6,7 @@
 
 namespace pyracms {
 
-// Moderators (role >= 2) and the owner of the thread's site may move a
+// Moderators of the thread's site, its owner or a Platform Owner may move a
 // thread, only to another forum of that same site (else 404).
 void ForumExtrasController::moveThread(HttpReq req, HttpCbRef callback,
                                        int id) {

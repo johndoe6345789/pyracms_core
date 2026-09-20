@@ -61,6 +61,8 @@ set(LIB_SOURCES
 
     src/controllers/article/ArticleControllerCreateArticle.cpp
 
+    src/controllers/article/ArticleCreatedReply.cpp
+
     src/controllers/article/ArticleControllerDeleteArticle.cpp
 
     src/controllers/article/ArticleControllerGetArticle.cpp
@@ -386,6 +388,8 @@ set(LIB_SOURCES
     src/controllers/wsnotify/WebSocketNotificationControllerState.cpp
 
     src/filters/AdminFilter.cpp
+
+    src/filters/ArticleWriteGate.cpp
 
     src/filters/AdminOwner.cpp
 

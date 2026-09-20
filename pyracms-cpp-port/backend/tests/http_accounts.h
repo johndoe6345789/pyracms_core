@@ -26,4 +26,8 @@ struct Site {
 };
 Site makeSite();
 
+// Writing articles takes Moderator level: makes the site's plain member a
+// Moderator and returns their token, for tests that need an article author.
+std::string authorToken(const Site &s);
+
 } // namespace harness

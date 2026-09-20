@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store/store'
+import { useParams } from 'next/navigation'
+import { useSiteSession } from '@/hooks/useSiteSession'
+import { can } from '@/lib/permissions'
+import { UserRole } from '@/types'
 import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
 import { ErrorAlert } from '../ErrorAlert'
@@ -20,7 +22,8 @@ export default function CommentSection({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated)
+  const slug = (useParams()?.slug as string | undefined) ?? ''
+  const signedIn = useSiteSession(slug)
 
   const fetchComments = useCallback(async () => {
     try {
@@ -45,7 +48,7 @@ export default function CommentSection({
       </Typography>
       <Divider sx={{ mb: 2 }} />
       <ErrorAlert error={error} testId="comments-error" />
-      {isAuthenticated ? (
+      {can('comment', signedIn ? UserRole.User : null) ? (
         <CommentForm
           contentType={contentType}
           contentId={contentId}
@@ -57,7 +60,7 @@ export default function CommentSection({
           sx={{ mb: 2 }}
           data-testid="comment-login-hint"
         >
-          Log in to post a comment.
+          Sign in to comment.
         </Typography>
       )}
       <CommentList
