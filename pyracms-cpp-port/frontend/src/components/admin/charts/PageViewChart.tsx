@@ -8,17 +8,9 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts'
-import { DateRange, DATA_MAP } from './pageViewData'
+import { useAnalyticsRows } from '@/hooks/useAnalyticsRows'
+import { mapPageViews, type Period } from '@/lib/analyticsRows'
+import { PageViewLine } from './PageViewLine'
 
 const headSx = {
   display: 'flex',
@@ -27,47 +19,41 @@ const headSx = {
   mb: 2,
 }
 
-export function PageViewChart() {
-  const [range, setRange] = useState<DateRange>('daily')
+/** Real page views per day, week or month (nothing is invented). */
+export function PageViewChart({ tenantId }: { tenantId?: number | null }) {
+  const [period, setPeriod] = useState<Period>('day')
+  const { rows, failed } = useAnalyticsRows(
+    `page-views?period=${period}`,
+    tenantId,
+    (r) => mapPageViews(r, period),
+  )
 
   return (
     <Paper variant="outlined" sx={{ p: 3, borderColor: 'divider' }}>
       <Box sx={headSx}>
         <Typography variant="h6">Page Views</Typography>
         <ToggleButtonGroup
-          value={range}
+          value={period}
           exclusive
-          onChange={(_, v) => v && setRange(v)}
+          onChange={(_, v) => v && setPeriod(v)}
           size="small"
         >
-          <ToggleButton value="daily">Daily</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-          <ToggleButton value="monthly">Monthly</ToggleButton>
+          <ToggleButton value="day">Daily</ToggleButton>
+          <ToggleButton value="week">Weekly</ToggleButton>
+          <ToggleButton value="month">Monthly</ToggleButton>
         </ToggleButtonGroup>
       </Box>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={DATA_MAP[range]}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="views"
-            stroke="#1976d2"
-            strokeWidth={2}
-            name="Total Views"
-          />
-          <Line
-            type="monotone"
-            dataKey="unique"
-            stroke="#2e7d32"
-            strokeWidth={2}
-            name="Unique Visitors"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {failed ? (
+        <Typography color="text.secondary">
+          Page views could not be loaded.
+        </Typography>
+      ) : rows.length === 0 ? (
+        <Typography color="text.secondary" data-testid="page-views-empty">
+          No page views recorded yet.
+        </Typography>
+      ) : (
+        <PageViewLine rows={rows} />
+      )}
     </Paper>
   )
 }

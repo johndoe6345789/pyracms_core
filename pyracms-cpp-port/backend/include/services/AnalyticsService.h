@@ -61,6 +61,12 @@ class AnalyticsService {
         const DbClientPtr &db, int tenantId, int limit,
         std::function<void(const std::vector<TrafficSource> &)> cb);
 
+    // Counts one search for the popular-queries table. Anonymous on purpose
+    // (no user id); the text is trimmed and lower-cased so 'React' and
+    // 'react ' count together. Fire and forget: analytics never delays a
+    // search. Blank or one-character queries are ignored.
+    static void recordSearch(const DbClientPtr &db, int tenantId,
+                             const std::string &query, int resultCount);
     void getSearchQueries(
         const DbClientPtr &db, int tenantId, int limit,
         std::function<void(const std::vector<SearchQueryStat> &)> cb);

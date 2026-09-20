@@ -28,7 +28,7 @@ export function TrafficPieChart({ tenantId }: { tenantId?: number | null }) {
       data-testid="traffic-pie-chart"
     >
       <Typography variant="h6" gutterBottom>
-        Traffic by Content Type
+        Content by Type
       </Typography>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>

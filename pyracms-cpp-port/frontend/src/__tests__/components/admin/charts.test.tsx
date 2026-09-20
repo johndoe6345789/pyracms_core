@@ -1,11 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { PageViewChart } from '@/components/admin/charts/PageViewChart'
+import { render, screen, waitFor } from '@testing-library/react'
 import { TopContentChart } from '@/components/admin/charts/TopContentChart'
 import { TrafficPieChart } from '@/components/admin/charts/TrafficPieChart'
-import {
-  ReferrersTable,
-  SearchesTable,
-} from '@/components/admin/analytics/AnalyticsTables'
 import { m } from '../../helpers/scopeApi'
 import { stubResizeObserver } from '../../helpers/scopeMocks'
 
@@ -17,25 +12,6 @@ jest.mock(
 beforeAll(stubResizeObserver)
 
 beforeEach(() => jest.resetAllMocks())
-
-it('PageViewChart switches ranges', () => {
-  render(<PageViewChart />)
-  fireEvent.click(screen.getByRole('button', { name: 'Weekly' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Weekly' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Monthly' }))
-  expect(screen.getByText('Page Views')).toBeInTheDocument()
-})
-
-it('analytics tables render rows', () => {
-  render(
-    <>
-      <ReferrersTable />
-      <SearchesTable />
-    </>,
-  )
-  expect(screen.getByText('Google Search')).toBeInTheDocument()
-  expect(screen.getByText('react hooks')).toBeInTheDocument()
-})
 
 it('TopContentChart loads when tenant given', async () => {
   m.get.mockResolvedValue({ data: [{ title: 'T', views: 1 }] })

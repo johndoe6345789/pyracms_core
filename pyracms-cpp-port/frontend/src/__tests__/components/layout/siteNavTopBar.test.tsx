@@ -1,6 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react'
-import TenantAppBar from '@/components/layout/TenantAppBar'
-import { renderWithStore } from '../../helpers/renderWithStore'
+import { renderSiteBar } from '../../helpers/siteNavRender'
 import { menuApi, ownerItems } from '../../helpers/siteNavHarness'
 import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
 
@@ -33,20 +32,10 @@ beforeEach(() => {
   invalidateSiteMenu()
 })
 
-const bar = () =>
-  renderWithStore(
-    <TenantAppBar
-      slug="d"
-      siteName="Demo"
-      drawerOpen={false}
-      onMenuClick={jest.fn()}
-    />,
-  )
-
 describe('site top bar', () => {
-  it('puts the owner links along the top, in their wording and order', async () => {
+  it('shows the owner links along the top, in order', async () => {
     menuApi(get, ownerItems)
-    bar()
+    renderSiteBar()
     const story = await screen.findByText('Our story')
     expect(story.closest('a')).toHaveAttribute('href', '/site/d/about')
     const links = screen.getAllByRole('link').map((l) => l.textContent)
@@ -56,7 +45,7 @@ describe('site top bar', () => {
 
   it('keeps the stock links in an Explore dropdown', async () => {
     menuApi(get, ownerItems)
-    bar()
+    renderSiteBar()
     await screen.findByText('Our story')
     fireEvent.click(screen.getByTestId('nav-explore'))
     const menu = await screen.findByRole('menu')
@@ -75,7 +64,7 @@ describe('site top bar', () => {
 
   it('gives a site with no menu a way home', async () => {
     menuApi(get, [])
-    bar()
+    renderSiteBar()
     expect(await screen.findByText('Home')).toBeInTheDocument()
     expect(screen.getByTestId('nav-explore')).toBeInTheDocument()
   })

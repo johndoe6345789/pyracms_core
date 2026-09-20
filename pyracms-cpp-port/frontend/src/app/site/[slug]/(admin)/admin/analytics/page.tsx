@@ -27,7 +27,7 @@ export default function AnalyticsPage() {
       <SummaryCards tenantId={tenantId} />
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <PageViewChart />
+          <PageViewChart tenantId={tenantId} />
         </Grid>
         <Grid item xs={12} md={6}>
           <TopContentChart tenantId={tenantId} />
@@ -36,10 +36,10 @@ export default function AnalyticsPage() {
           <TrafficPieChart tenantId={tenantId} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <ReferrersTable />
+          <ReferrersTable tenantId={tenantId} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <SearchesTable />
+          <SearchesTable tenantId={tenantId} />
         </Grid>
       </Grid>
     </Container>

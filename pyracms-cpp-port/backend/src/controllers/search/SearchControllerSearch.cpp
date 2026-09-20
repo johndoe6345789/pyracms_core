@@ -1,6 +1,7 @@
 #include "controllers/SearchController.h"
 #include "controllers/SearchItemJson.h"
 #include "filters/UserVisibility.h"
+#include "services/AnalyticsService.h"
 
 namespace pyracms {
 
@@ -46,7 +47,11 @@ void SearchController::search(
 
     searchService_.search(
         db, tenantId, query, type, limit, offset,
-        [callback](const SearchResults &results) {
+        [=](const SearchResults &results) {
+            // Only a fresh search counts, not paging or a facet click
+            if (offset == 0 && type.empty())
+                AnalyticsService::recordSearch(db, tenantId, query,
+                                               results.totalCount);
             Json::Value response;
             response["query"] = results.query;
             response["totalCount"] = results.totalCount;

@@ -145,6 +145,8 @@ set(TEST_SOURCES
 
     test_search_http.cpp
 
+    test_search_recording_http.cpp
+
     test_search_thread_http.cpp
 
     test_security_auth_http_1.cpp

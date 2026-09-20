@@ -472,6 +472,8 @@ set(LIB_SOURCES
 
     src/services/analytics/AnalyticsServiceGetSummary.cpp
 
+    src/services/analytics/AnalyticsServiceRecordSearch.cpp
+
     src/services/analytics/AnalyticsServiceGetTopContent.cpp
 
     src/services/analytics/AnalyticsServiceGetTrafficSources.cpp
