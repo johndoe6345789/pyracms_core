@@ -23,8 +23,9 @@ const headSx = {
 export function PageViewChart({ tenantId }: { tenantId?: number | null }) {
   const [period, setPeriod] = useState<Period>('day')
   const { rows, failed } = useAnalyticsRows(
-    `page-views?period=${period}`,
-    tenantId,
+    tenantId
+      ? `/api/analytics/page-views?period=${period}&tenant_id=${tenantId}`
+      : null,
     (r) => mapPageViews(r, period),
   )
 

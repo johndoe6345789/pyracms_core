@@ -21,8 +21,7 @@ function Note({ cols, text }: { cols: number; text: string }) {
 /** Where visitors came from, from the recorded referrers. */
 export function ReferrersTable({ tenantId }: Site) {
   const { rows, failed } = useAnalyticsRows(
-    'traffic-sources',
-    tenantId,
+    tenantId ? `/api/analytics/traffic-sources?tenant_id=${tenantId}` : null,
     mapReferrers,
   )
   return (
@@ -54,8 +53,7 @@ export function ReferrersTable({ tenantId }: Site) {
 /** What visitors searched for on the site. */
 export function SearchesTable({ tenantId }: Site) {
   const { rows, failed } = useAnalyticsRows(
-    'search-queries',
-    tenantId,
+    tenantId ? `/api/analytics/search-queries?tenant_id=${tenantId}` : null,
     mapSearches,
   )
   return (

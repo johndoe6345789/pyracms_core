@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import api from '@/lib/api'
 
 /**
- * Loads one analytics list for a site and maps it. `path` may carry its
- * own query (e.g. `?period=week`); the site is added. `failed` tells an
- * error apart from "nothing recorded yet".
+ * Loads one analytics list and maps it. `url` is the full API address (null
+ * until the site is known). `failed` tells an error apart from "nothing
+ * recorded yet".
  */
 export function useAnalyticsRows<T>(
-  path: string,
-  tenantId: number | null | undefined,
+  url: string | null,
   map: (rows: Record<string, unknown>[]) => T[],
 ) {
   const [rows, setRows] = useState<T[]>([])
@@ -20,12 +19,11 @@ export function useAnalyticsRows<T>(
   mapper.current = map
 
   useEffect(() => {
-    if (!tenantId) return
+    if (!url) return
     let live = true
     setLoading(true)
-    const sep = path.includes('?') ? '&' : '?'
     api
-      .get(`/api/analytics/${path}${sep}tenant_id=${tenantId}`)
+      .get(url)
       .then((r) => {
         if (!live) return
         setRows(mapper.current(Array.isArray(r.data) ? r.data : []))
@@ -36,7 +34,7 @@ export function useAnalyticsRows<T>(
     return () => {
       live = false
     }
-  }, [path, tenantId])
+  }, [url])
 
   return { rows, loading, failed }
 }
