@@ -2,6 +2,7 @@
 
 import { Box, Paper, Typography, Divider } from '@mui/material'
 import { sanitizeHtml } from '@/lib/sanitize'
+import { renderContentHtml } from '@/lib/renderContent'
 
 interface ContentPreviewProps {
   content: string
@@ -25,7 +26,7 @@ const PREVIEW_STYLES = {
  */
 export function ContentPreview({ content, renderer }: ContentPreviewProps) {
   // Sanitized via DOMPurify before rendering
-  const sanitized = sanitizeHtml(content)
+  const sanitized = sanitizeHtml(renderContentHtml(content, renderer))
 
   return (
     <Paper

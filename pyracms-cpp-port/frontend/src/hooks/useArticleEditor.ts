@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { RENDERER_LABELS } from '@/lib/renderers'
 
-export const RENDERERS = ['HTML', 'Markdown', 'BBCode', 'RST']
+export const RENDERERS = RENDERER_LABELS
 
 export interface ArticleEditorState {
   title: string

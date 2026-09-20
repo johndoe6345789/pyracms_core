@@ -1,4 +1,4 @@
-import { RENDERERS } from '@/hooks/useArticleEditor'
+import { rendererFromApi } from '@/lib/renderers'
 
 export interface ArticleEditSnapshot {
   content: string
@@ -43,10 +43,4 @@ export function buildRevisionSummary(
 }
 
 /** Maps an API renderer name onto the editor's RENDERERS entry. */
-export function matchRenderer(name: string) {
-  const lower = name.toLowerCase()
-  return (
-    RENDERERS.find((r) => r.toLowerCase() === lower) ??
-    lower.charAt(0).toUpperCase() + lower.slice(1)
-  )
-}
+export const matchRenderer = rendererFromApi

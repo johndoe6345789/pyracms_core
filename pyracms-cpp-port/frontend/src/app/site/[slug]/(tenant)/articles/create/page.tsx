@@ -6,6 +6,7 @@ import { SaveOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import { useTenantId } from '@/hooks/useTenantId'
 import { usePermissions } from '@/hooks/usePermissions'
+import { DetailedErrorAlert } from '@/components/common/DetailedErrorAlert'
 import { BackButton } from '@/components/common/BackButton'
 import { ArticleEditorForm } from '@/components/articles/ArticleEditorForm'
 import { useCreateArticle } from './useCreateArticle'
@@ -14,7 +15,10 @@ export default function CreateArticlePage() {
   const params = useParams()
   const slug = params.slug as string
   const { tenantId } = useTenantId(slug)
-  const { editor, saving, error, create } = useCreateArticle(slug, tenantId)
+  const { editor, saving, error, errorDetails, create } = useCreateArticle(
+    slug,
+    tenantId,
+  )
   const back = `/site/${slug}/articles`
   const { can, signedIn } = usePermissions(slug)
 
@@ -38,11 +42,11 @@ export default function CreateArticlePage() {
         <Typography variant="h3" component="h1" gutterBottom>
           Create Article
         </Typography>
-        {error && (
-          <Alert severity="error" data-testid="create-article-error">
-            {error}
-          </Alert>
-        )}
+        <DetailedErrorAlert
+          message={error}
+          details={errorDetails}
+          testId="create-article-error"
+        />
         <ArticleEditorForm
           editor={editor}
           contentPlaceholder="Write your article content here..."

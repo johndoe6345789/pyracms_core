@@ -20,7 +20,7 @@ const LANG: Record<string, string> = {
   HTML: 'html',
   Markdown: 'markdown',
   BBCode: 'plaintext',
-  RST: 'plaintext',
+  reStructuredText: 'restructuredtext',
 }
 
 interface MonacoEditorPaneProps {

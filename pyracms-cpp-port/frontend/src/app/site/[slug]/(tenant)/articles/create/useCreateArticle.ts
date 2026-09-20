@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useArticleEditor } from '@/hooks/useArticleEditor'
 import api from '@/lib/api'
+import { apiErrorDetails, apiErrorMessage } from '@/lib/apiError'
+import { rendererToApi } from '@/lib/renderers'
 
 export function slugifyTitle(title: string) {
   return title
@@ -15,6 +17,7 @@ export function useCreateArticle(slug: string, tenantId: number | null) {
   const editor = useArticleEditor()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [errorDetails, setErrorDetails] = useState('')
 
   const create = () => {
     if (!editor.title.trim() || !editor.content.trim() || !tenantId) {
@@ -22,19 +25,28 @@ export function useCreateArticle(slug: string, tenantId: number | null) {
     }
     setSaving(true)
     setError('')
+    setErrorDetails('')
     const name = slugifyTitle(editor.title)
     api
       .post('/api/articles', {
         name,
         displayName: editor.title,
         content: editor.content,
-        renderer: editor.renderer.toLowerCase(),
+        renderer: rendererToApi(editor.renderer),
         tenant_id: tenantId,
       })
       .then(() => router.push(`/site/${slug}/articles/${name}`))
-      .catch(() => setError('Failed to create article'))
+      .catch((err: unknown) => {
+        setError(apiErrorMessage(err, 'Failed to create article'))
+        setErrorDetails(
+          apiErrorDetails(
+            err,
+            `POST /api/articles (${name}, ${editor.renderer})`,
+          ),
+        )
+      })
       .finally(() => setSaving(false))
   }
 
-  return { editor, saving, error, create }
+  return { editor, saving, error, errorDetails, create }
 }

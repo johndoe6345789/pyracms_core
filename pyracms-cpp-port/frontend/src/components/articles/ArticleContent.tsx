@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Paper, Box } from '@mui/material'
 import { sanitizeHtml } from '@/lib/sanitize'
+import { renderContentHtml } from '@/lib/renderContent'
 import { MarkdownPreview } from './MarkdownPreview'
 import { HTML_STYLES } from './articleHtmlStyles'
 
@@ -16,8 +17,8 @@ export function ArticleContent({ content, renderer }: ArticleContentProps) {
   // the server must never emit unverified HTML.
   const [html, setHtml] = useState('')
   useEffect(() => {
-    setHtml(sanitizeHtml(content))
-  }, [content])
+    setHtml(sanitizeHtml(renderContentHtml(content, renderer)))
+  }, [content, renderer])
   return (
     <Paper
       variant="outlined"

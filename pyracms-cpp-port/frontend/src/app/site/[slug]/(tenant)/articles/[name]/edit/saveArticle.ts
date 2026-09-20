@@ -1,4 +1,5 @@
 import api from '@/lib/api'
+import { rendererToApi } from '@/lib/renderers'
 import { apiErrorMessage } from '@/lib/apiError'
 
 interface SaveArgs {
@@ -41,7 +42,7 @@ export async function saveArticle(a: SaveArgs) {
     await step(
       'renderer',
       api.put(`/api/articles/${a.name}/renderer`, {
-        renderer: a.renderer.toLowerCase(),
+        renderer: rendererToApi(a.renderer),
         tenant_id: a.tenantId,
       }),
     )
