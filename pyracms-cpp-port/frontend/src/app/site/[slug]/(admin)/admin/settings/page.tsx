@@ -8,6 +8,7 @@ import { useTenantId } from '@/hooks/useTenantId'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import AdvancedSettings from '@/components/admin/settings/AdvancedSettings'
 import SiteSettingsForm from '@/components/admin/settings/SiteSettingsForm'
+import { useTenant } from '@/hooks/useTenant'
 import { useSiteSettingsEditor } from '@/hooks/admin/useSiteSettingsEditor'
 import { announceSiteSettings } from '@/hooks/useSiteSettings'
 
@@ -15,7 +16,11 @@ export default function AdminSettingsPage() {
   const slug = useParams().slug as string
   const { tenantId } = useTenantId(slug)
   const raw = useAdminSettings(tenantId)
-  const guided = useSiteSettingsEditor(tenantId)
+  const { tenant } = useTenant(slug)
+  const guided = useSiteSettingsEditor(
+    tenantId,
+    tenant && { name: tenant.displayName, description: tenant.description },
+  )
   const { saved } = guided
 
   useEffect(() => {

@@ -24,7 +24,9 @@ export const SETTING_GROUPS: FieldGroup[] = [
         key: 'site_name',
         label: 'Site name',
         kind: 'text',
-        help: 'Shown in the header, the menu and the browser tab.',
+        help:
+          'Shown in the header, the menu and the browser tab. Starts as the ' +
+          'name you gave your site.',
       },
       {
         key: 'site_description',
@@ -32,7 +34,7 @@ export const SETTING_GROUPS: FieldGroup[] = [
         kind: 'multiline',
         help:
           'One or two sentences under the name in the menu; also the ' +
-          'default search-engine description.',
+          'default search-engine description. Starts as your site description.',
       },
       {
         key: 'site_logo_url',
