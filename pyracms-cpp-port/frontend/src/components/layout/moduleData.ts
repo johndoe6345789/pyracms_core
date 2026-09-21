@@ -2,9 +2,8 @@ import {
   ArticleOutlined,
   ForumOutlined,
   PhotoLibraryOutlined,
-  SportsEsportsOutlined,
+  RocketLaunchOutlined,
   CodeOutlined,
-  ExtensionOutlined,
   LocalOfferOutlined,
   AdminPanelSettingsOutlined,
 } from '@mui/icons-material'
@@ -42,9 +41,9 @@ export const MODULES: ModuleInfo[] = [
   },
   {
     key: 'games',
-    label: 'Games',
-    icon: SportsEsportsOutlined,
-    description: 'Browse the game library and launch titles with Hypernucleus.',
+    label: 'Hypernucleus',
+    icon: RocketLaunchOutlined,
+    description: 'Games to download and play, plus the dependencies they use.',
     color: '#f59e0b',
   },
   {
@@ -53,13 +52,6 @@ export const MODULES: ModuleInfo[] = [
     icon: CodeOutlined,
     description: 'Share, edit and run code snippets in the browser.',
     color: '#0ea5e9',
-  },
-  {
-    key: 'dependencies',
-    label: 'Dependencies',
-    icon: ExtensionOutlined,
-    description: 'Packages and libraries that games and tools depend on.',
-    color: '#8b5cf6',
   },
   {
     key: 'tags',

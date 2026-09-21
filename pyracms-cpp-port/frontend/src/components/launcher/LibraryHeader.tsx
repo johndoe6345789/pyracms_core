@@ -1,10 +1,12 @@
 import { Box, Button, Typography } from '@mui/material'
-import { AddOutlined } from '@mui/icons-material'
+import { AddOutlined, ExtensionOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import GetLauncherLink from './GetLauncherLink'
 import LibraryFilters from './LibraryFilters'
 
 interface Props extends React.ComponentProps<typeof LibraryFilters> {
+  /** Link to the dependencies page */
+  depsHref?: string | undefined
   /** Link to the create page; omitted for guests */
   newHref?: string | undefined
   /** Site download page; shows the 'Need Hypernucleus?' link */
@@ -12,13 +14,28 @@ interface Props extends React.ComponentProps<typeof LibraryFilters> {
 }
 
 /** Title, launcher link and filters above the games grid. */
-export default function LibraryHeader({ newHref, downloadHref, ...f }: Props) {
+export default function LibraryHeader({
+  newHref,
+  downloadHref,
+  depsHref,
+  ...f
+}: Props) {
   return (
     <Box sx={{ mb: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
         <Typography variant="h4" component="h1" sx={{ flex: 1 }}>
-          Games
+          Hypernucleus
         </Typography>
+        {depsHref && (
+          <Button
+            component={Link}
+            href={depsHref}
+            startIcon={<ExtensionOutlined />}
+            data-testid="deps-link"
+          >
+            Dependencies
+          </Button>
+        )}
         {newHref && (
           <Button
             component={Link}
@@ -31,7 +48,7 @@ export default function LibraryHeader({ newHref, downloadHref, ...f }: Props) {
         )}
       </Box>
       <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Download a game, install it with the Hypernucleus launcher and play.
+        Games you can download and play with the Hypernucleus launcher.
       </Typography>
       {downloadHref && <GetLauncherLink href={downloadHref} />}
       <LibraryFilters {...f} />
