@@ -1,16 +1,19 @@
 name: Release Compose Bundle
 
 # On v* tags, attaches a docker-compose bundle that runs the GHCR images
-# built by docker-multiarch.yml (same tag) to the GitHub Release. Launcher
-# binaries are attached separately by launcher-build.yml.
+# built by docker-multiarch.yml (same tag) to the GitHub Release. Every push
+# to master refreshes the same bundle on the rolling `edge` pre-release,
+# pinned to the `latest` images. Launcher binaries are attached separately by
+# launcher-build.yml.
 
 on:
   push:
+    branches: [ master ]
     tags: [ 'v*' ]
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing release tag to attach the bundle to'
+        description: 'Existing release tag to attach the bundle to (or edge, from master)'
         required: true
 
 permissions:
@@ -28,52 +31,68 @@ jobs:
       id-token: write          # keyless build-provenance attestation
       attestations: write
     env:
-      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      TAG: ${{ github.event.inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'edge' }}
     steps:
       - name: Validate tag
         run: |
           # TAG is attacker-influenced input (workflow_dispatch): allow-list it
           # before it reaches a ref, a path or a sed expression.
-          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]] || {
+          [[ "$TAG" =~ ^(edge|v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?)$ ]] || {
             echo "::error::unexpected tag format"; exit 1; }
+          # edge is a moving tag: only master may move it.
+          [ "$TAG" != edge ] || [ "$GITHUB_REF" = refs/heads/master ] || {
+            echo "::error::edge can only be published from master"; exit 1; }
 
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-          ref: ${{ env.TAG }}
+          ref: ${{ env.TAG == 'edge' && github.sha || env.TAG }}
 
       - name: Assemble bundle
         run: |
+          # edge runs the `latest` images; a tag runs its own version
+          VER="${TAG#v}"; [ "$TAG" != edge ] || VER=latest
           B="pyracms-compose-${TAG}"
           P=pyracms-cpp-port
-          mkdir -p "$B/sql"
+          mkdir -p "$B/sql" out
           cp $P/docker-compose.yml $P/docker-compose.ghcr.yml $P/nginx.conf "$B/"
           cp -r $P/backend/sql/. "$B/sql/"
-          sed -i "s/:\${PYRACMS_VERSION:-latest}/:\${PYRACMS_VERSION:-${TAG#v}}/" \
+          sed -i "s/:\${PYRACMS_VERSION:-latest}/:\${PYRACMS_VERSION:-${VER}}/" \
             "$B/docker-compose.ghcr.yml"
           cat > "$B/README.txt" <<EOT
           PyraCMS ${TAG}
           docker compose -f docker-compose.ghcr.yml up -d
-          Images: ghcr.io/johndoe6345789/pyracms-{backend,frontend}:${TAG#v}
+          Images: ghcr.io/johndoe6345789/pyracms-{backend,frontend}:${VER}
           (linux/amd64 and linux/arm64). Web UI on http://localhost:3199
           EOT
-          tar czf "$B.tar.gz" "$B"
-          zip -qr "$B.zip" "$B"
-          sha256sum "$B.tar.gz" "$B.zip" > "$B.sha256"
+          tar czf "out/$B.tar.gz" "$B"
+          zip -qr "out/$B.zip" "$B"
+          (cd out && sha256sum "$B.tar.gz" "$B.zip" > "$B.sha256")
 
       - name: Attest bundle provenance
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: |
-            pyracms-compose-*.tar.gz
-            pyracms-compose-*.zip
+            out/pyracms-compose-*.tar.gz
+            out/pyracms-compose-*.zip
 
       - name: Attach to GitHub Release
+        if: env.TAG != 'edge'
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ env.TAG }}
           files: |
-            pyracms-compose-*.tar.gz
-            pyracms-compose-*.zip
-            pyracms-compose-*.sha256
+            out/pyracms-compose-*.tar.gz
+            out/pyracms-compose-*.zip
+            out/pyracms-compose-*.sha256
           generate_release_notes: true
+
+      # The launcher build shares this release, so only touch our own assets.
+      - name: Update the edge pre-release
+        if: env.TAG == 'edge'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          EDGE_OWN: ^pyracms-compose-
+        run: bash .github/scripts/edge-release.sh out

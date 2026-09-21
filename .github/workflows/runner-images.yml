@@ -4,15 +4,13 @@ name: Code runner images (GHCR)
 # snippets. Published as ghcr.io/<owner>/pyracms-runner-<lang> for
 # linux/amd64 and linux/arm64 so they can be pulled on any Docker host
 # (e.g. a Proxmox VPS): docker pull ghcr.io/johndoe6345789/pyracms-runner-go
-# Pull requests build only.
+# Every push to master publishes; pull requests build only, and only when
+# the images' inputs change.
 
 on:
   push:
     branches: [ master ]
     tags: [ 'v*' ]
-    paths:
-      - 'pyracms-cpp-port/docker/**'
-      - '.github/workflows/runner-images.yml'
   pull_request:
     branches: [ master ]
     paths:
@@ -25,7 +23,7 @@ permissions:
 
 concurrency:
   group: runner-images-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   runner:
