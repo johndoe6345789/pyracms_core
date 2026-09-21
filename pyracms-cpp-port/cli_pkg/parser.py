@@ -35,6 +35,16 @@ def build_parser():
         help="migrate: run SQL files, seed: insert sample data, "
              "reset: drop and recreate")
 
+    p = sp.add_parser("user", help="Account maintenance")
+    p.add_argument("action", choices=["set-password"],
+                   help="set-password: reset a lost password without e-mail")
+    p.add_argument("username", help="account username")
+    p.add_argument("--tenant", metavar="SLUG",
+                   help="site the account belongs to (default: platform)")
+    p.add_argument("--yes", action="store_true", help="skip the confirmation")
+    p.add_argument("--print-sql", action="store_true",
+                   help="print the SQL instead of running psql")
+
     p = sp.add_parser("test", help="Run tests")
     flags(p, ("--backend", "Run backend tests"),
           ("--frontend", "Run frontend tests"),

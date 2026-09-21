@@ -7,6 +7,8 @@ Usage:
     python cli.py build [--backend] [--frontend] [--client] [--docker]
     python cli.py run [--dev] [--client]
     python cli.py db migrate|seed|reset
+    python cli.py user set-password USERNAME [--tenant SLUG] [--yes]
+                                 [--print-sql]
     python cli.py test [--backend] [--frontend] [--e2e] [--client]
     python cli.py generate-cmake
     python cli.py lint
