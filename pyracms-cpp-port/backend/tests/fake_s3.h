@@ -5,7 +5,7 @@
 #include <string>
 
 // An in-process stand-in for the object-store dialect PyraCMS talks to
-// (path-style /{bucket}/{key}, "Authorization: AWS <access>:<secret>"),
+// (path-style /{bucket}/{key}, every request AWS Signature V4 signed),
 // served by the test app itself under kFakeS3Prefix.
 namespace harness {
 

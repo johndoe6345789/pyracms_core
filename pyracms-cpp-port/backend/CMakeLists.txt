@@ -976,6 +976,10 @@ set(LIB_SOURCES
 
     src/storage/LocalDiskStorage.cpp
 
+    src/storage/S3Presign.cpp
+
+    src/storage/S3Sign.cpp
+
     src/storage/S3Storage.cpp
 
     src/storage/S3StorageHttp.cpp
@@ -985,6 +989,12 @@ set(LIB_SOURCES
     src/storage/S3StorageStream.cpp
 
     src/storage/S3StreamJob.cpp
+
+    src/storage/SigV4.cpp
+
+    src/storage/SigV4Encode.cpp
+
+    src/storage/SigV4Hash.cpp
 
     src/storage/StorageConfig.cpp
 

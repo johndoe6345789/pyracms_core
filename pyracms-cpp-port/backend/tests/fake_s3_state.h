@@ -19,6 +19,8 @@ extern std::map<std::string, std::pair<std::string, Parts>> uploads;
 drogon::HttpResponsePtr multipart(const drogon::HttpRequestPtr &req,
                                   const std::string &full);
 extern int failStatus;
+// True when the request carries a valid AWS Signature V4 for `secret`.
+bool verifySigV4(const drogon::HttpRequestPtr &r, const std::string &secret);
 
 drogon::HttpResponsePtr handle(const drogon::HttpRequestPtr &req);
 

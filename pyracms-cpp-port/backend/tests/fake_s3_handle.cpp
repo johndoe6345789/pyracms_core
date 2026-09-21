@@ -24,8 +24,7 @@ static drogon::HttpResponsePtr authAndFaults(const drogon::HttpRequestPtr &r) {
         failStatus = 0;
         return reply(code, "boom secret-internal-detail");
     }
-    if (r->getHeader("Authorization") !=
-        std::string("AWS ") + kFakeS3Access + ":" + kFakeS3Secret)
+    if (!verifySigV4(r, kFakeS3Secret))
         return reply(drogon::k403Forbidden, "AccessDenied");
     return nullptr;
 }

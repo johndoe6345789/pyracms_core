@@ -1,30 +1,35 @@
 """Tiny S3-style object store client (stdlib only, streaming)."""
 import hashlib
-import re
+import os
 import urllib.error
 import urllib.request
+from urllib.parse import quote
+
+from . import s3_multipart, sigv4_req
+from .s3_errors import StoreError
 
 CHUNK = 1 << 20
 PART = 50 << 20
 MULTIPART_ABOVE = 64 << 20
 
 
-class StoreError(Exception):
-    pass
-
-
 class Store:
-    def __init__(self, endpoint, bucket, access, secret, timeout=600):
+    def __init__(self, endpoint, bucket, access, secret, timeout=600,
+                 region=None):
         self.base = endpoint.rstrip("/") + "/" + bucket
-        self.auth = f"AWS {access}:{secret}"
+        self.key = (access, secret,
+                    region or os.environ.get("S3_REGION") or "us-east-1")
         self.timeout = timeout
         self.multipart_above = MULTIPART_ABOVE
         self.part = PART
 
     def call(self, method, key="", query="", body=None):
-        url = self.base + ("/" + key if key else "") + query
+        url = self.base + ("/" + quote(key, safe="/-_.~") if key else "")
+        url += query
         req = urllib.request.Request(url, data=body, method=method)
-        req.add_header("Authorization", self.auth)
+        hdrs = sigv4_req.signed_headers(self.key, method, url, body or b"")
+        for k, v in hdrs.items():
+            req.add_header(k, v)
         if body is not None:
             req.add_header("Content-Length", str(len(body)))
             req.add_header("Content-Type", "application/octet-stream")
@@ -45,29 +50,7 @@ class Store:
             with open(path, "rb") as f:
                 self.call("PUT", key, body=f.read()).read()
             return
-        self._multipart(key, path)
-
-    def _multipart(self, key, path):
-        with self.call("POST", key, "?uploads", b"") as r:
-            xml = r.read().decode()
-        m = re.search(r"<UploadId>([^<]+)</UploadId>", xml)
-        if not m:
-            raise StoreError("no UploadId in initiate response")
-        uid = m.group(1)
-        try:
-            with open(path, "rb") as f:
-                n = 0
-                while chunk := f.read(self.part):
-                    n += 1
-                    q = f"?partNumber={n}&uploadId={uid}"
-                    self.call("PUT", key, q, chunk).read()
-            self.call("POST", key, f"?uploadId={uid}", b"").read()
-        except BaseException:
-            try:
-                self.call("DELETE", key, f"?uploadId={uid}").read()
-            except StoreError:
-                pass
-            raise
+        s3_multipart.upload(self, key, path)
 
     def digest(self, key):
         """Streams the object; returns (sha256 hex, size)."""

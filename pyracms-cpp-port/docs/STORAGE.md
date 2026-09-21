@@ -14,11 +14,19 @@ With `PYRACMS_ENV=production` the backend **refuses to start** unless
 file to local disk. Rows that still say `storage='local'` stay readable
 (from the `uploads_data` volume) until `migrate-storage` (below) moves them.
 
-The `s3` backend speaks the dialect of
-[johndoe6345789/object-store](https://github.com/johndoe6345789/object-store):
-path-style URLs (`/{bucket}/{key}`) and the header
-`Authorization: AWS <access_key>:<secret_key>` (not SigV4, so it will not talk
-to AWS S3 or MinIO as is). Any store implementing that small dialect works.
+The `s3` backend is a standard S3 client: path-style URLs
+(`/{bucket}/{key}`) and **AWS Signature Version 4** on every request
+(`Authorization: AWS4-HMAC-SHA256 Credential=<access>/<date>/<region>/s3/
+aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date,
+Signature=...`, with the real payload sha256 in `x-amz-content-sha256`). It
+targets [johndoe6345789/object-store](https://github.com/johndoe6345789/object-store)
+and any other SigV4 path-style store. The old private
+`Authorization: AWS <access>:<secret>` scheme is gone from PyraCMS: there is
+no switch, and a store that only understands it will answer `403`. The
+signer is `backend/src/storage/SigV4*.cpp` (C++), `cli_pkg/sigv4*.py`
+(`migrate-storage`), and curl's `--aws-sigv4` in
+`scripts/storage-migrate-to-s3.sh`; the C++ and Python signers are tested
+against the official AWS S3 documentation examples.
 Keys are flat (`tenant-<siteId>-<uuid>`, thumbnails `tenant-<siteId>-thumb-<uuid>`,
 site 0 = platform) because the store routes `/{bucket}/{key}` with a single
 path segment; a key containing `/` returns 404 there.
@@ -34,6 +42,9 @@ the server at another host).
 | `S3_ENDPOINT` | | e.g. `http://objectstore:9000` (an optional path prefix is kept) |
 | `S3_BUCKET` | `pyracms` | 3-63 chars of `a-z 0-9 - .`; created on first use |
 | `S3_ACCESS_KEY` / `S3_SECRET_KEY` | | the store's API key; **required in production** |
+| `S3_REGION` | `us-east-1` | the SigV4 credential-scope region; must equal what the store expects |
+| `S3_PRESIGNED_DOWNLOADS` | off | `1` enables the presigned-GET helper below (needs `S3_PUBLIC_ENDPOINT`) |
+| `S3_PUBLIC_ENDPOINT` | | externally reachable store URL, used only for presigned URLs |
 | `S3_TIMEOUT_S` | `60` | per-request timeout (parts and completion get 600 s) |
 | `MAX_UPLOAD_MB` | `25` | body cap of every ordinary request |
 | `MAX_CHUNKED_UPLOAD_MB` | `1024` | largest file accepted through the chunked API |
@@ -56,6 +67,19 @@ Failures are mapped without leaking internals: store unreachable or timed out
 gives `503`, any other store error (bad key, 5xx) gives `502`, both with a
 generic message; details go to the server log. A delete that cannot reach the
 store keeps the database row so it can be retried.
+
+## Presigned downloads (optional helper)
+
+`S3Storage::presignedUrl(key, expiresS)` returns a SigV4 query-auth GET URL
+on `S3_PUBLIC_ENDPOINT` (signed header: `host` only, payload
+`UNSIGNED-PAYLOAD`, default lifetime 300 s), or an empty string unless
+`S3_PRESIGNED_DOWNLOADS=1` and `S3_PUBLIC_ENDPOINT` are both set. Nothing
+calls it yet: the download controllers still stream through the API (which
+enforces per-file permissions), so public behaviour is unchanged by the
+flag. Using it means a controller checking access and answering
+`302 Location: <url>`. The helper matches the AWS documentation example
+in the tests. The host in the URL must be the host the store sees
+(reverse proxies must not rewrite `Host`).
 
 ## Big uploads: the chunked API
 
@@ -149,6 +173,15 @@ by the API key that creates them, so keep using the same key (rotate by
 re-running `objectstore-init` with the same access key and a new secret).
 You can also use your own store: set `S3_ENDPOINT` and the keys.
 
+### Rollout: store and API together
+
+PyraCMS only signs with SigV4 and the store only accepts SigV4, so deploy the
+new object-store image and the new PyraCMS backend image **together** (one
+`up -d`, or store first and the API right after). Until both run the new
+versions, uploads and downloads of S3 files fail (`502`); the brief window is
+acceptable and self-heals. Keys and buckets do not change. Verify with
+`scripts/smoke.sh` and one upload.
+
 ## Migrating local files to the object store
 
 `cli.py migrate-storage` (in `pyracms-cpp-port`) moves every `files` row
@@ -161,7 +194,7 @@ skip rows already migrated; the exit status is non-zero if any file failed.
 
 Settings come from the backend's own variables (`DB_HOST`, `DB_PORT`,
 `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `S3_ENDPOINT`, `S3_BUCKET`,
-`S3_ACCESS_KEY`, `S3_SECRET_KEY`); the uploads dir is `--uploads-dir` or
+`S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`); the uploads dir is `--uploads-dir` or
 `UPLOAD_DIR` (default `/app/uploads`). It needs `python3` and `psql` and
 must reach both the database and the store, e.g. from a throwaway container
 on the deployment's docker network that mounts the uploads volume read-write:

@@ -9,13 +9,19 @@ set -eu
 : "${S3_ENDPOINT:?S3_ENDPOINT not set}" "${S3_ACCESS_KEY:?}" "${S3_SECRET_KEY:?}"
 B="${S3_BUCKET:-pyracms}"
 DIR="${UPLOAD_DIR:-/app/uploads}"
-AUTH="Authorization: AWS $S3_ACCESS_KEY:$S3_SECRET_KEY"
+# Every request is AWS Signature V4 signed by curl (>= 7.75); the payload
+# hash is sent explicitly so the signature covers the real bytes.
+SIG="aws:amz:${S3_REGION:-us-east-1}:s3"
+EMPTY=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 export PGPASSWORD="${DB_PASSWORD:-pyracms}"
 sql() { psql -h "${DB_HOST:-postgres}" -U "${DB_USER:-pyracms}" \
   -d "${DB_NAME:-pyracms}" -v ON_ERROR_STOP=1 -tA "$@"; }
-put() { curl -sS -o /dev/null -w '%{http_code}' -X PUT -H "$AUTH" \
+s3curl() { curl -sS -o /dev/null --aws-sigv4 "$SIG" \
+  -u "$S3_ACCESS_KEY:$S3_SECRET_KEY" "$@"; }
+put() { s3curl -w '%{http_code}' -X PUT \
+  -H "x-amz-content-sha256: $(sha256sum "$1" | cut -d' ' -f1)" \
   -H 'Content-Type: application/octet-stream' --data-binary @"$1" "$2"; }
-[ -n "${DRY_RUN:-}" ] || curl -sS -o /dev/null -X PUT -H "$AUTH" \
+[ -n "${DRY_RUN:-}" ] || s3curl -X PUT -H "x-amz-content-sha256: $EMPTY" \
   "$S3_ENDPOINT/$B" || true   # 409 = bucket exists
 moved=0; failed=0
 for row in $(sql -F, -c \

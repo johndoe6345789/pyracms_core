@@ -2,39 +2,23 @@
 import hashlib
 import http.server
 import threading
-from urllib.parse import parse_qs, urlparse
+
+from fake_http import base
 
 
 class State:
     def __init__(self):
         self.objects, self.parts, self.log = {}, {}, []
+        self.denied = 0
         self.fail_part = False
 
 
 def handler(st):
-    class H(http.server.BaseHTTPRequestHandler):
-        def log_message(self, *a):
-            pass
-
-        def reply(self, code, body=b"", headers=()):
-            self.send_response(code)
-            self.send_header("Content-Length", str(len(body)))
-            for k, v in headers:
-                self.send_header(k, v)
-            self.end_headers()
-            self.wfile.write(body)
-
-        def do(self, method):
-            u = urlparse(self.path)
-            q = parse_qs(u.query, keep_blank_values=True)
-            n = int(self.headers.get("Content-Length") or 0)
-            body = self.rfile.read(n) if n else b""
-            key = u.path.split("/", 2)[2] if u.path.count("/") > 1 else ""
-            st.log.append((method, key, u.query))
-            return method, key, q, body
-
+    class H(base(st)):
         def do_PUT(self):
             m, key, q, body = self.do("PUT")
+            if key is None:
+                return
             if "partNumber" in q:
                 if st.fail_part:
                     return self.reply(500)
@@ -47,6 +31,8 @@ def handler(st):
 
         def do_POST(self):
             m, key, q, body = self.do("POST")
+            if key is None:
+                return
             if "uploads" in q:
                 xml = b"<InitiateMultipartUploadResult><UploadId>U1" \
                       b"</UploadId></InitiateMultipartUploadResult>"
@@ -56,11 +42,15 @@ def handler(st):
 
         def do_DELETE(self):
             m, key, q, _ = self.do("DELETE")
+            if key is None:
+                return
             st.parts.pop(q["uploadId"][0], None)
             self.reply(204)
 
         def do_GET(self):
             m, key, q, _ = self.do("GET")
+            if key is None:
+                return
             if key in st.objects:
                 return self.reply(200, st.objects[key])
             self.reply(404)

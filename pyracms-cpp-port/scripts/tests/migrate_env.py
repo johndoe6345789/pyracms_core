@@ -33,6 +33,7 @@ def env(tmp_path, monkeypatch):
 
 def run(env, **kw):
     st, db, tmp, store = env
+    store = kw.pop("store", store)
     a = dict(dry_run=False, delete_local=False, uploads_dir=str(tmp))
     with pytest.raises(SystemExit) as e:
         migrate_cmd.cmd_migrate_storage(

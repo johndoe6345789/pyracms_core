@@ -1,3 +1,4 @@
+#include "storage/S3Sign.h"
 #include "storage/S3Storage.h"
 
 namespace pyracms {
@@ -10,6 +11,14 @@ std::string S3Storage::objectPath(const BlobKey &k) const {
     // segment, so a "tenants/<id>/" prefix would 404.
     return "/" + cfg_.bucket + "/tenant-" + std::to_string(k.tenant) +
            (k.thumb ? "-thumb-" : "-") + k.id;
+}
+
+std::string S3Storage::presignedUrl(const BlobKey &k, int expiresS) const {
+    auto pub = parseS3Endpoint(cfg_.publicEndpoint);
+    if (!cfg_.presignedDownloads || !pub.valid || !blobIdValid(k.id))
+        return "";
+    return s3PresignedGetUrl(cfg_, pub, objectPath(k), expiresS,
+                             sigv4UtcNow());
 }
 
 drogon::HttpClientPtr S3Storage::client() {
@@ -41,8 +50,15 @@ void S3Storage::send(drogon::HttpMethod m, const std::string &path,
     auto req = drogon::HttpRequest::newHttpRequest();
     req->setMethod(m);
     req->setPath(ep_.prefix + path);
-    req->addHeader("Authorization",
-                   "AWS " + cfg_.accessKey + ":" + cfg_.secretKey);
+    static const char *names[] = {"GET", "POST", "PUT", "DELETE", "HEAD"};
+    static const drogon::HttpMethod verbs[] = {
+        drogon::Get, drogon::Post, drogon::Put, drogon::Delete, drogon::Head};
+    std::string verb = "GET";
+    for (size_t i = 0; i < 5; ++i)
+        if (verbs[i] == m)
+            verb = names[i];
+    for (auto &h : s3SignedHeaders(cfg_, ep_, verb, ep_.prefix + path, body))
+        req->addHeader(h.first, h.second);
     if (path.find('?') != std::string::npos)
         req->setPathEncode(false); // the query is already well-formed
     if (m == drogon::Put || m == drogon::Post) {
