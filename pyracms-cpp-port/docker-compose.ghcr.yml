@@ -96,9 +96,12 @@ services:
       # Elasticsearch
       ELASTICSEARCH_URL: http://elasticsearch:9200
       SEARCH_ENGINE: elasticsearch
-      # Uploaded-file storage: local (default) or s3 (docs/STORAGE.md).
-      # s3 needs the bundled store (--profile storage) or your own endpoint.
-      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      # Uploaded-file storage: s3 (default, the bundled object store or your
+      # own endpoint). STORAGE_BACKEND=local writes to the uploads_data
+      # volume and is for throwaway development only (docs/STORAGE.md).
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-s3}
+      # Big uploads (chunked, docs/STORAGE.md): whole-file cap in MB.
+      MAX_CHUNKED_UPLOAD_MB: ${MAX_CHUNKED_UPLOAD_MB:-1024}
       S3_ENDPOINT: ${S3_ENDPOINT:-http://objectstore:9000}
       S3_BUCKET: ${S3_BUCKET:-pyracms}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-pyracms-dev}
@@ -130,7 +133,6 @@ services:
         condition: service_healthy
       objectstore-init:
         condition: service_completed_successfully
-        required: false   # only present with --profile storage
 
   frontend:
     image: ghcr.io/johndoe6345789/pyracms-frontend:${PYRACMS_VERSION:-latest}
@@ -165,13 +167,11 @@ services:
       - frontend
       - backend
 
-  # ---- Optional S3-compatible object store for uploaded files -------------
+  # ---- S3-compatible object store for uploaded files (the default) --------
   # https://github.com/johndoe6345789/object-store  (docs/STORAGE.md)
-  #   docker compose --profile storage up -d
-  #   STORAGE_BACKEND=s3 docker compose --profile storage up -d backend
+  #   docker compose up -d      # starts the store with everything else
   # Its own database (`objectstore`) lives in the postgres service above.
   objectstore-db:
-    profiles: [storage]
     image: postgres:15-alpine@sha256:a46e076249ce434e41203b8c1dadfaa025b9726331d72390df038385d6dc29cd
     restart: "no"
     entrypoint: ["sh", "/objectstore-init.sh", "db"]
@@ -189,7 +189,6 @@ services:
         condition: service_healthy
 
   objectstore:
-    profiles: [storage]
     image: ghcr.io/johndoe6345789/object-store:latest@sha256:0bc19d893dcc14e2a9504091147e4b2d3a3fe2c8efa340b9a3cd7a7e07809a1e
     environment:
       PGHOST: postgres
@@ -220,7 +219,6 @@ services:
   # Creates PyraCMS's API key (S3_ACCESS_KEY / S3_SECRET_KEY). Dev falls back
   # to throwaway keys; production must set real ones (scripts/gen-env.sh).
   objectstore-init:
-    profiles: [storage]
     image: postgres:15-alpine@sha256:a46e076249ce434e41203b8c1dadfaa025b9726331d72390df038385d6dc29cd
     restart: "no"
     entrypoint: ["sh", "/objectstore-init.sh", "key"]

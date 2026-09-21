@@ -17,8 +17,10 @@ project `pyracms-prod`, env file `.env.prod` and base file
 
 ## Backups
 
-What must be saved: the **Postgres database** and the **uploads volume**
-(`<project>_uploads_data`). Redis is a cache and Elasticsearch is rebuilt
+What must be saved: the **Postgres database** and the **object store**
+(volume `<project>_objectstore_data` plus its `objectstore` database, see
+STORAGE.md; the `<project>_uploads_data` volume only matters for files not yet
+migrated from local disk). Redis is a cache and Elasticsearch is rebuilt
 from the database (search may be stale after a restore).
 Keep `.env.prod` in a password manager: without `JWT_SECRET` sessions
 invalidate, without `POSTGRES_PASSWORD` you cannot start a restored volume.

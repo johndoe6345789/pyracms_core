@@ -135,6 +135,22 @@ server {
         proxy_send_timeout 3600s;
     }
 
+    # Chunked uploads (PUT parts of up to 50 MiB): each request stays under
+    # a CDN's 100 MB cap; streamed to the backend, not spooled to disk.
+    location /api/files/uploads/ {
+        limit_req zone=pyracms_api burst=60 nodelay;
+        client_max_body_size 64m;
+        client_body_timeout  300s;
+        proxy_request_buffering off;
+        proxy_pass http://backend:8080;
+        proxy_read_timeout 600s;
+        proxy_send_timeout 600s;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
     location /api/ {
         limit_req zone=pyracms_api burst=60 nodelay;
         client_max_body_size 50m;
