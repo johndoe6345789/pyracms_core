@@ -2,7 +2,6 @@
 
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
-#include <openssl/sha.h>
 
 #include <ctime>
 
@@ -16,17 +15,6 @@ std::string toHex(const std::string &raw) {
         out += d[c & 15];
     }
     return out;
-}
-
-static std::string sha256Raw(const std::string &data) {
-    unsigned char md[SHA256_DIGEST_LENGTH];
-    SHA256(reinterpret_cast<const unsigned char *>(data.data()),
-           data.size(), md);
-    return std::string(reinterpret_cast<char *>(md), sizeof md);
-}
-
-std::string sha256Hex(const std::string &data) {
-    return toHex(sha256Raw(data));
 }
 
 std::string hmacSha256(const std::string &key, const std::string &msg) {

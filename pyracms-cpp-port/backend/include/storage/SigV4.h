@@ -1,5 +1,7 @@
 #pragma once
 
+#include "security/Hash.h" // sha256Hex
+
 #include <map>
 #include <string>
 
@@ -24,7 +26,6 @@ struct SigV4Request {
     std::map<std::string, std::string> headers;
 };
 
-std::string sha256Hex(const std::string &data);
 std::string hmacSha256(const std::string &key, const std::string &msg);
 std::string toHex(const std::string &raw);
 std::string sigv4UriEncode(const std::string &s, bool keepSlash);
