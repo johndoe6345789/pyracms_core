@@ -41,6 +41,7 @@ int main() {
     pyracms::createDbClientFromEnv();
     pyracms::initCacheAndSearch();
     pyracms::startPublishTimer(app);
+    pyracms::startUploadSweep(app);
 
     std::cout << "PyraCMS Server starting on " << (host ? host : "0.0.0.0")
               << ":" << (port_str ? port_str : "8080") << std::endl;

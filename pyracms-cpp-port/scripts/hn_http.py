@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import json
+import os
 import urllib.error
 import urllib.request
 
+import hn_chunked
 from hn_errors import ApiError
 from hn_multipart import encode_file
 
@@ -44,6 +46,8 @@ class HttpClient:
                           {"Content-Type": "application/json"})
 
     def upload_file(self, path):
+        if os.path.getsize(path) > hn_chunked.BIG_FILE:
+            return hn_chunked.upload_chunked(self, path)
         data, ctype = encode_file(path)
         return self._open("POST", "/api/files", data,
                           {"Content-Type": ctype})

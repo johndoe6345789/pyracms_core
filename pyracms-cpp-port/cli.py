@@ -12,6 +12,8 @@ Usage:
     python cli.py test [--backend] [--frontend] [--e2e] [--client]
     python cli.py generate-cmake
     python cli.py lint
+    python cli.py migrate-storage [--dry-run] [--delete-local]
+                                  [--uploads-dir DIR]
 """
 
 from cli_pkg.main import main

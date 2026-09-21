@@ -1,17 +1,14 @@
 #include "controllers/BoolReply.h"
 #include "controllers/FileController.h"
 #include "controllers/FileRules.h"
+#include "controllers/UploadLimits.h"
 #include "controllers/FileBlob.h"
 #include "filters/TenantGuard.h"
 #include "storage/BlobRegistry.h"
 
 namespace pyracms {
 
-static const size_t kMaxFileBytes = [] {
-    const char *mb = std::getenv("MAX_UPLOAD_MB");
-    int v = mb ? std::atoi(mb) : 25;
-    return static_cast<size_t>(v > 0 && v <= 512 ? v : 25) << 20;
-}();
+static const size_t kMaxFileBytes = defaultBodyBytes();
 
 // Stored under a server-made uuid (the client filename never touches the
 // filesystem); the type comes from the extension and, for image formats,

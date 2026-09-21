@@ -6,15 +6,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
 } from '@mui/material'
-import { UploadOutlined } from '@mui/icons-material'
+import BinaryFilePick from './BinaryFilePick'
 
 interface BinaryUploadProps {
   selectedOs: string
   onOsChange: (v: string) => void
   selectedArch: string
   onArchChange: (v: string) => void
+  tenantId?: number | null | undefined
 }
 
 export default function BinaryUpload({
@@ -22,6 +22,7 @@ export default function BinaryUpload({
   onOsChange,
   selectedArch,
   onArchChange,
+  tenantId,
 }: BinaryUploadProps) {
   return (
     <Paper variant="outlined" sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
@@ -53,14 +54,7 @@ export default function BinaryUpload({
             <MenuItem value="arm64">arm64</MenuItem>
           </Select>
         </FormControl>
-        <Button
-          variant="outlined"
-          startIcon={<UploadOutlined />}
-          component="label"
-        >
-          Select Binary
-          <input type="file" hidden />
-        </Button>
+        <BinaryFilePick tenantId={tenantId} />
       </Box>
     </Paper>
   )

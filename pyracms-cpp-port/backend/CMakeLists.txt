@@ -66,8 +66,6 @@ set(LIB_SOURCES
 
     src/controllers/article/ArticleControllerCreateArticle.cpp
 
-    src/controllers/article/ArticleCreatedReply.cpp
-
     src/controllers/article/ArticleControllerDeleteArticle.cpp
 
     src/controllers/article/ArticleControllerGetArticle.cpp
@@ -97,6 +95,8 @@ set(LIB_SOURCES
     src/controllers/article/ArticleControllerUpdateArticle.cpp
 
     src/controllers/article/ArticleControllerVoteArticle.cpp
+
+    src/controllers/article/ArticleCreatedReply.cpp
 
     src/controllers/audit/AuditControllerList.cpp
 
@@ -162,9 +162,25 @@ set(LIB_SOURCES
 
     src/controllers/file/FileControllerServe.cpp
 
+    src/controllers/file/FileControllerStream.cpp
+
     src/controllers/file/FileControllerThumbnail.cpp
 
     src/controllers/file/FileControllerUpload.cpp
+
+    src/controllers/file/FileUploadAbort.cpp
+
+    src/controllers/file/FileUploadBegin.cpp
+
+    src/controllers/file/FileUploadCommon.cpp
+
+    src/controllers/file/FileUploadComplete.cpp
+
+    src/controllers/file/FileUploadFinish.cpp
+
+    src/controllers/file/FileUploadPart.cpp
+
+    src/controllers/file/UploadLimits.cpp
 
     src/controllers/forum/ForumControllerCreateCategory.cpp
 
@@ -396,9 +412,9 @@ set(LIB_SOURCES
 
     src/filters/AdminFilter.cpp
 
-    src/filters/ArticleWriteGate.cpp
-
     src/filters/AdminOwner.cpp
+
+    src/filters/ArticleWriteGate.cpp
 
     src/filters/AuditScopeFilter.cpp
 
@@ -472,11 +488,11 @@ set(LIB_SOURCES
 
     src/services/analytics/AnalyticsServiceGetSummary.cpp
 
-    src/services/analytics/AnalyticsServiceRecordSearch.cpp
-
     src/services/analytics/AnalyticsServiceGetTopContent.cpp
 
     src/services/analytics/AnalyticsServiceGetTrafficSources.cpp
+
+    src/services/analytics/AnalyticsServiceRecordSearch.cpp
 
     src/services/analytics/AnalyticsServiceTrackPageView.cpp
 
@@ -621,6 +637,10 @@ set(LIB_SOURCES
     src/services/file/FileServiceQueries.cpp
 
     src/services/file/FileServiceUpload.cpp
+
+    src/services/file/FileUploadParts.cpp
+
+    src/services/file/FileUploadService.cpp
 
     src/services/forum/ForumReactions.cpp
 
@@ -886,6 +906,10 @@ set(LIB_SOURCES
 
     src/services/tenant/TenantServiceRowToDto.cpp
 
+    src/services/upload/UploadHash.cpp
+
+    src/services/upload/UploadPlan.cpp
+
     src/services/user/UserAdminServiceLoadTarget.cpp
 
     src/services/user/UserAdminServiceSetBanned.cpp
@@ -942,15 +966,25 @@ set(LIB_SOURCES
 
     src/startup/StartupPublishTimer.cpp
 
+    src/startup/StartupUploadSweep.cpp
+
     src/storage/BlobRegistry.cpp
 
     src/storage/BlobStatus.cpp
+
+    src/storage/BlobStream.cpp
 
     src/storage/LocalDiskStorage.cpp
 
     src/storage/S3Storage.cpp
 
     src/storage/S3StorageHttp.cpp
+
+    src/storage/S3StorageMultipart.cpp
+
+    src/storage/S3StorageStream.cpp
+
+    src/storage/S3StreamJob.cpp
 
     src/storage/StorageConfig.cpp
 

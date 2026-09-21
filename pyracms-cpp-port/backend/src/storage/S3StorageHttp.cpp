@@ -37,13 +37,15 @@ static BlobStatus classify(drogon::ReqResult r,
 }
 
 void S3Storage::send(drogon::HttpMethod m, const std::string &path,
-                     std::string body, ReplyCb cb) {
+                     std::string body, ReplyCb cb, double timeout) {
     auto req = drogon::HttpRequest::newHttpRequest();
     req->setMethod(m);
     req->setPath(ep_.prefix + path);
     req->addHeader("Authorization",
                    "AWS " + cfg_.accessKey + ":" + cfg_.secretKey);
-    if (m == drogon::Put) {
+    if (path.find('?') != std::string::npos)
+        req->setPathEncode(false); // the query is already well-formed
+    if (m == drogon::Put || m == drogon::Post) {
         req->setContentTypeCode(drogon::CT_APPLICATION_OCTET_STREAM);
         req->setBody(std::move(body));
     }
@@ -55,7 +57,7 @@ void S3Storage::send(drogon::HttpMethod m, const std::string &path,
                          << drogon::to_string_view(r);
             cb(classify(r, resp), resp);
         },
-        cfg_.timeoutS);
+        timeout > 0 ? timeout : cfg_.timeoutS);
 }
 
 } // namespace pyracms

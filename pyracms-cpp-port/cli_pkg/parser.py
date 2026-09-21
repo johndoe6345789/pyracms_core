@@ -54,4 +54,11 @@ def build_parser():
     sp.add_parser("generate-cmake",
                   help="Generate CMakeLists.txt for backend and client")
     sp.add_parser("lint", help="Run linters on backend and frontend")
+
+    p = sp.add_parser("migrate-storage",
+                      help="Move local uploads to the S3 object store")
+    flags(p, ("--dry-run", "only list what would move"),
+          ("--delete-local", "delete local copies after verified copy"))
+    p.add_argument("--uploads-dir", metavar="DIR",
+                   help="uploads dir (env UPLOAD_DIR, default /app/uploads)")
     return parser

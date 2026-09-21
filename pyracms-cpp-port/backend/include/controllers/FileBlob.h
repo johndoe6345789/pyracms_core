@@ -39,6 +39,13 @@ drogon::HttpResponsePtr serveBlob(const drogon::HttpRequestPtr &req,
                                   const BlobPayload &p, const FileDto &file,
                                   bool attachment, bool thumb);
 
+// Big stored files are piped to the client instead of being loaded whole
+// (see STREAM_MIN_MB); same headers and status codes as serveBlob.
+using StreamReply = std::function<void(const drogon::HttpResponsePtr &)>;
+bool wantsStream(const FileDto &file, const BlobStorePtr &store);
+void streamBlob(const drogon::HttpRequestPtr &req, const BlobStorePtr &store,
+                const FileDto &file, StreamReply cb);
+
 // JSON error for a failed storage operation (503 / 502 / 404).
 drogon::HttpResponsePtr blobFailure(BlobStatus s);
 

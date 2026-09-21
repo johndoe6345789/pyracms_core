@@ -21,6 +21,7 @@ struct FakeS3 {
     static std::map<std::string, std::string> objects();
     static void plant(const std::string &bucketKey, const std::string &body);
     static int bucketsCreated();
+    static int openUploads(); // multipart uploads not completed/aborted
     // The next request is answered with this HTTP status (0 = normal).
     static void failNext(int status);
 };

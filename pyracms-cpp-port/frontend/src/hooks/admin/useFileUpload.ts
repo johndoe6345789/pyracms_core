@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import api from '@/lib/api'
+import { uploadFileAuto } from '@/lib/uploadFileAuto'
 import { FileItem, fileFromUpload } from './fileData'
 import { useActionError } from '../useActionError'
 
@@ -21,15 +21,9 @@ export function useFileUpload(tenantId: number | null, setFiles: SetFiles) {
       if (!tenantId) return
       setError('')
       Array.from(fileList).forEach((file) => {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('tenant_id', String(tenantId))
-        api
-          .post('/api/files', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          })
+        uploadFileAuto(file, { tenantId })
           .then((res) => {
-            const item = fileFromUpload(res.data, file)
+            const item = fileFromUpload(res, file)
             setFiles((prev) => [...prev, item])
           })
           .catch(fail(`Could not upload ${file.name}`))

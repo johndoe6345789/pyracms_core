@@ -6,8 +6,13 @@ metadata (name, type, size, sha256, owner, site) always stays in PostgreSQL.
 
 | Backend | Where the bytes live | Use it when |
 |---|---|---|
-| `local` (default) | `uploads_data` volume, `/app/uploads/<uuid>` | one host, simplest |
-| `s3` | an S3-compatible object store, `tenant-<siteId>-<uuid>` | you want blobs off the app host, or already run one |
+| `s3` (default; **the only production mode**) | an S3-compatible object store, `tenant-<siteId>-<uuid>` | always |
+| `local` (development only) | `uploads_data` volume, `/app/uploads/<uuid>` | a throwaway dev box without the store |
+
+With `PYRACMS_ENV=production` the backend **refuses to start** unless
+`STORAGE_BACKEND=s3` (endpoint and both keys set), and never writes a new
+file to local disk. Rows that still say `storage='local'` stay readable
+(from the `uploads_data` volume) until `migrate-storage` (below) moves them.
 
 The `s3` backend speaks the dialect of
 [johndoe6345789/object-store](https://github.com/johndoe6345789/object-store):
@@ -25,11 +30,15 @@ the server at another host).
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `STORAGE_BACKEND` | `local` | `local` or `s3`; anything else refuses to start |
+| `STORAGE_BACKEND` | `s3` in the compose files, code default `local` | `s3` or (dev only) `local`; production accepts only `s3` |
 | `S3_ENDPOINT` | | e.g. `http://objectstore:9000` (an optional path prefix is kept) |
 | `S3_BUCKET` | `pyracms` | 3-63 chars of `a-z 0-9 - .`; created on first use |
 | `S3_ACCESS_KEY` / `S3_SECRET_KEY` | | the store's API key; **required in production** |
-| `S3_TIMEOUT_S` | `60` | per-request timeout |
+| `S3_TIMEOUT_S` | `60` | per-request timeout (parts and completion get 600 s) |
+| `MAX_UPLOAD_MB` | `25` | body cap of every ordinary request |
+| `MAX_CHUNKED_UPLOAD_MB` | `1024` | largest file accepted through the chunked API |
+| `UPLOAD_PART_MB` | `50` (1-90) | size of one chunk; must stay below the proxy's body cap |
+| `STREAM_MIN_MB` | `8` | stored files at least this big are streamed to the client, not loaded into memory |
 
 The backend refuses to start when `STORAGE_BACKEND=s3` lacks `S3_ENDPOINT`,
 or, with `PYRACMS_ENV=production`, lacks either key.
@@ -48,10 +57,69 @@ gives `503`, any other store error (bad key, 5xx) gives `502`, both with a
 generic message; details go to the server log. A delete that cannot reach the
 store keeps the database row so it can be retried.
 
-## The bundled object store (compose profile `storage`)
+## Big uploads: the chunked API
+
+A proxy such as Cloudflare caps one request body at 100 MB, so a 1 GB game
+archive cannot go up as one `POST /api/files`. Files over ~40 MB (the web
+UI and `scripts/hn_http.py` decide this) use these routes instead; all need
+the same login, tenant, rate limit and type rules as `POST /api/files`.
+
+| Call | Meaning |
+|---|---|
+| `POST /api/files/uploads` `{filename,size,mimetype?,sha256?}` | starts an upload -> `{uploadId, partSize, maxParts}`; 413 above `MAX_CHUNKED_UPLOAD_MB`, 429 past 10 open uploads per user |
+| `PUT /api/files/uploads/{uploadId}/parts/{n}` raw body <= `partSize` | stores part `n` (from 1) -> `{part,size,etag}` |
+| `POST /api/files/uploads/{uploadId}/complete` | -> the same JSON as `POST /api/files` (`uuid`, `sha256`, `size`...); the `files` row gets `storage='s3'` |
+| `DELETE /api/files/uploads/{uploadId}` | aborts and frees the parts |
+
+Only the creating user (same site) can touch an upload; anyone else gets
+404. Unfinished uploads are aborted after 24 h. Parts go to the store's
+multipart API (`?uploads`, `?partNumber=N&uploadId=ID`, complete, abort), so
+the backend holds at most one part (<= 50 MiB) in memory, never the file.
+
+**Parts must be sent in order** (1, 2, ...). That is what makes the sha256
+check exact without re-reading the object: the server folds each part into a
+running SHA-256 (its state is saved with the part), so `complete` knows the
+digest of the whole file. Retrying a part is safe: an identical part is a
+no-op, and the last part may be replaced. `complete` answers 400 (and aborts
+the upload) if the parts do not add up to the declared `size` or if the
+supplied `sha256` differs; the returned `sha256` is always the server's.
+
+Through nginx, `/api/files/uploads/` allows `client_max_body_size 64m` with
+`proxy_request_buffering off` and 600 s timeouts (see `nginx.conf`, and
+`caprover/pyracms-nginx.ejs` in pyracms-deploy); every other route keeps its
+small limit. Drogon has a single global body cap, so it is set to the larger
+of `MAX_UPLOAD_MB` and one part and the backend rejects bigger bodies on all
+other routes itself.
+
+### Downloads of big files
+
+The object store cannot serve byte ranges, and the HTTP client would buffer a
+whole 1 GB body. Stored files of at least `STREAM_MIN_MB` are therefore piped
+with libcurl in a worker thread through a bounded queue (a few MiB in RAM,
+which also paces the fetch to the client). `Range` (206/416), `If-Range`,
+`ETag`/304 and `Accept-Ranges` behave as before; because the store has no
+range support a ranged request reads and discards the bytes before `start`
+(fast on the LAN, but the cost grows with the offset). Adding `Range` to the
+store would remove that.
+
+## Security notes
+
+* No public bucket: the store only answers requests carrying the API key and
+  is not published in production (data network only); browsers never talk to
+  it, every download goes through the backend, which applies file/page
+  visibility rules first.
+* Keys are per tenant (`tenant-<siteId>-<uuid>`, uuid server-made), never
+  built from a client filename; the multipart id from the store is validated
+  before it is put in a URL.
+* Least privilege: give PyraCMS its own API key (`objectstore-init`), remove
+  the store's seed key (`OBJECTSTORE_REMOVE_SEED=1`, forced in production)
+  and use no other client with it. Rotate by re-running `objectstore-init`.
+* Uploaded files are always served as downloads with a fixed safe type.
+
+## The bundled object store
 
 `docker-compose.yml`, `docker-compose.ghcr.yml` and `docker-compose.prod.yml`
-define, under profile `storage`:
+start it by default (no profile needed):
 
 * `objectstore`: `ghcr.io/johndoe6345789/object-store`, pinned by digest,
   port 9000, blob volume `objectstore_data`, healthcheck on `/health`.
@@ -66,46 +134,57 @@ define, under profile `storage`:
 
 ```bash
 # dev: throwaway keys pyracms-dev / pyracms-dev-secret
-STORAGE_BACKEND=s3 docker compose --profile storage up -d
+docker compose up -d
+# dev only, no object store needed: STORAGE_BACKEND=local docker compose up -d
 
 # production: keys come from gen-env.sh (it also sets OBJECTSTORE_REMOVE_SEED=1)
 ./scripts/gen-env.sh > .env.prod && chmod 600 .env.prod
-sed -i 's/^STORAGE_BACKEND=.*/STORAGE_BACKEND=s3/' .env.prod
 docker compose -f docker-compose.yml -f docker-compose.prod.yml \
-  --env-file .env.prod -p pyracms-prod --profile storage up -d --build
+  --env-file .env.prod -p pyracms-prod up -d --build
 ```
 
 The backend starts without waiting for the store; uploads return `503`/`502`
 for the few seconds until `objectstore-init` has finished. Buckets are owned
 by the API key that creates them, so keep using the same key (rotate by
 re-running `objectstore-init` with the same access key and a new secret).
-You can also use your own store: set `S3_ENDPOINT`, the keys, and skip the
-profile.
+You can also use your own store: set `S3_ENDPOINT` and the keys.
 
 ## Migrating local files to the object store
 
-1. Start the store and switch new uploads: `STORAGE_BACKEND=s3` (above).
-2. Copy the old files and flip their rows, inside the backend container:
+`cli.py migrate-storage` (in `pyracms-cpp-port`) moves every `files` row
+with `storage='local'`: it reads the file from the uploads dir, checks size
+and sha256 against the row, uploads it (multipart above 64 MiB) as
+`tenant-<siteId>-<uuid>` (plus its thumbnail), reads it back and verifies it,
+and only then sets `storage='s3'`. With `--delete-local` the local file is
+removed after that verified read-back. `--dry-run` changes nothing; re-runs
+skip rows already migrated; the exit status is non-zero if any file failed.
 
-   ```bash
-   DRY_RUN=1 docker compose exec -T backend sh -s < scripts/storage-migrate-to-s3.sh   # preview
-   docker compose exec -T backend sh -s < scripts/storage-migrate-to-s3.sh
-   ```
+Settings come from the backend's own variables (`DB_HOST`, `DB_PORT`,
+`DB_USER`, `DB_PASSWORD`, `DB_NAME`, `S3_ENDPOINT`, `S3_BUCKET`,
+`S3_ACCESS_KEY`, `S3_SECRET_KEY`); the uploads dir is `--uploads-dir` or
+`UPLOAD_DIR` (default `/app/uploads`). It needs `python3` and `psql` and
+must reach both the database and the store, e.g. from a throwaway container
+on the deployment's docker network that mounts the uploads volume read-write:
 
-   Each file is copied (plus its thumbnail), then `storage` is set to `s3`.
-   It is re-runnable and keeps the local copy. Once you have verified
-   downloads, remove old files with the volume (`uploads_data`) when ready.
-3. Going back is the same in reverse: set `STORAGE_BACKEND=local`; files whose
-   row says `s3` keep being served from the store until you copy them back and
-   run `UPDATE files SET storage='local' WHERE uuid = ...`.
+```bash
+docker run --rm --network <data-network> -v <project>_uploads_data:/app/uploads \
+  -v "$PWD":/w -w /w -e DB_HOST=... -e DB_PASSWORD=... -e S3_ENDPOINT=... \
+  -e S3_ACCESS_KEY=... -e S3_SECRET_KEY=... python:3-slim sh -c \
+  'apt-get update -qq && apt-get install -y -qq postgresql-client >/dev/null &&
+   python3 cli.py migrate-storage --dry-run'
+```
+
+Run it with `--dry-run` first, then without, then (after checking downloads)
+once more with `--delete-local`. `scripts/storage-migrate-to-s3.sh` is the
+older shell version (no read-back verification).
 
 ## Backups
 
 The database dump (`scripts/backup.sh`) covers metadata only. Blobs need their
 own backup:
 
-* `local`: the `uploads_data` volume (the `backup` profile already archives it).
-* `s3` with the bundled store: the object store keeps blob bytes in
+* `local` (dev, or files not yet migrated): the `uploads_data` volume (the `backup` profile already archives it).
+* `s3` with the bundled store (production): the object store keeps blob bytes in
   `objectstore_data` and their index in the `objectstore` database. Back up
   **both together**:
 

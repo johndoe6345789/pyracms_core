@@ -21,11 +21,17 @@ set(TEST_SOURCES
 
     fake_s3_handle.cpp
 
+    fake_s3_multipart.cpp
+
     http_accounts.cpp
 
     http_calls.cpp
 
     http_harness.cpp
+
+    test_account_levels_http.cpp
+
+    test_account_model_http.cpp
 
     test_activity_http.cpp
 
@@ -37,11 +43,11 @@ set(TEST_SOURCES
 
     test_article_http_1.cpp
 
-    test_article_tag_filter_http.cpp
-
     test_article_http_2.cpp
 
     test_article_http_3.cpp
+
+    test_article_tag_filter_http.cpp
 
     test_audit_http.cpp
 
@@ -61,6 +67,10 @@ set(TEST_SOURCES
 
     test_feature_rules.cpp
 
+    test_file_chunked_http.cpp
+
+    test_file_chunked_http_2.cpp
+
     test_file_http.cpp
 
     test_file_range_rules.cpp
@@ -70,6 +80,8 @@ set(TEST_SOURCES
     test_file_s3_http.cpp
 
     test_file_s3_range.cpp
+
+    test_file_stream_http.cpp
 
     test_forum_flow_db_1.cpp
 
@@ -123,17 +135,13 @@ set(TEST_SOURCES
 
     test_owner_scope_forum_http.cpp
 
-    test_account_levels_http.cpp
-
-    test_account_model_http.cpp
+    test_owner_scope_menu_http.cpp
 
     test_permissions_forum_http.cpp
 
     test_permissions_http.cpp
 
     test_permissions_moderation_http.cpp
-
-    test_owner_scope_menu_http.cpp
 
     test_public_reads_http.cpp
 
@@ -230,6 +238,8 @@ set(TEST_SOURCES
     test_tenant_service.cpp
 
     test_tenant_service_2.cpp
+
+    test_upload_plan.cpp
 
     test_user_admin_http_1.cpp
 

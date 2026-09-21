@@ -7,6 +7,7 @@ std::mutex mu;
 std::set<std::string> buckets;
 std::map<std::string, std::string> objects;
 int created = 0;
+std::map<std::string, std::pair<std::string, Parts>> uploads;
 int failStatus = 0;
 
 static drogon::HttpResponsePtr reply(drogon::HttpStatusCode code,
@@ -46,6 +47,8 @@ drogon::HttpResponsePtr handle(const drogon::HttpRequestPtr &req) {
     }
     if (!buckets.count(bucket))
         return reply(drogon::k404NotFound, "NoSuchBucket");
+    if (auto mp = multipart(req, full))
+        return mp;
     if (m == drogon::Put) {
         objects[full] = std::string(req->body());
         return reply(drogon::k200OK);
