@@ -11,6 +11,7 @@ project `pyracms-prod`, env file `.env.prod` and base file
 | `create-owner.sh` | Create the first Platform Owner; refuses if any platform account exists. |
 | `backup.sh` | One-off backup: `pg_dump -Fc` + uploads tarball into `./backups`, rotation. |
 | `restore.sh --yes db.dump [uploads.tgz]` | Destructive restore (stops app, restores, restarts). |
+| `set-password.sh USER [SITE]` | Reset a lost password without e-mail (hash made on the host, applied inside the Postgres container). |
 | `test-mail.sh you@x.com` | Send a test mail with the backend's SMTP settings. |
 | `smoke.sh [url]` | Availability, headers, 401, tenant isolation, 429 checks. |
 
@@ -56,8 +57,12 @@ See `docs/DEPLOY.md` section 5. Short form:
 ## Common tasks
 
 * **Lost owner password**: reset via the mail flow (`test-mail.sh` first).
-  If mail is unavailable, update `users.password_hash` in Postgres with a
-  hash from a throwaway instance.
+  If mail is unavailable, run `./scripts/set-password.sh USERNAME [SITE]`
+  (no SITE = platform account). It asks for the new password, stores it in
+  the backend's hash format, signs out older sessions and spends open reset
+  tokens. Against a database you can reach directly, use
+  `python cli.py user set-password USERNAME [--tenant SLUG]` (needs `psql`
+  and the `DB_*` variables).
 * **Rate limited (429)**: limits are per client IP; if everyone shares one
   IP, the real-IP block in `docs/DEPLOY.md` section 4 is missing.
 * **Rotate `JWT_SECRET`**: edit `.env.prod`, `up -d`; all users are logged
