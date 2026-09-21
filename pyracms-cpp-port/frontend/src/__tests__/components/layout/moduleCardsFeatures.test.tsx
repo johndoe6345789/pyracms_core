@@ -25,7 +25,7 @@ describe('home module cards', () => {
     mockFlags(off('forum', 'hypernucleus'))
     render(<TenantModuleCards slug="d" />)
     expect(screen.queryByText('Forum')).toBeNull()
-    expect(screen.queryByText('Games')).toBeNull()
+    expect(screen.queryByText('Hypernucleus')).toBeNull()
     expect(screen.queryByText('Dependencies')).toBeNull()
     expect(screen.getByText('Articles')).toBeInTheDocument()
     expect(screen.getByText('Tags')).toBeInTheDocument()

@@ -33,6 +33,7 @@ export default function GameLibrary({ slug, initialName }: Props) {
           onTag={lib.setTag}
           newHref={signedIn ? `/site/${slug}/games/new` : undefined}
           downloadHref={`/site/${slug}/download`}
+          depsHref={`/site/${slug}/dependencies`}
         />
       )}
       {lib.loading && <Typography>Loading...</Typography>}
