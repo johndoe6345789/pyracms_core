@@ -5,6 +5,9 @@ import { depRow as row } from '../helpers/depsPage'
 
 const push = jest.fn()
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's', name: 'sdl2' }),
@@ -49,6 +52,7 @@ describe('dependency edit page', () => {
     expect(put.mock.calls[0]).toEqual([
       '/api/gamedep/dep/sdl2',
       { displayName: 'SDL3', description: 'lib' },
+      { params: { tenant_id: 7 } },
     ])
     expect(put.mock.calls[1][1].tags).toEqual(['audio', 'fast'])
   })

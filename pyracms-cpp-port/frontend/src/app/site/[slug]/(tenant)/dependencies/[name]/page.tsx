@@ -9,7 +9,7 @@ export default function DependencyDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const name = params.name as string
-  const { item, loading } = useGameDepItem('dep', name)
+  const { item, loading } = useGameDepItem('dep', name, slug)
   return (
     <ItemGate loading={loading} found={!!item}>
       {item && <DepView slug={slug} name={name} data={item} />}

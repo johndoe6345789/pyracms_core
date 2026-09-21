@@ -12,7 +12,7 @@ import { useSiteSession } from '@/hooks/useSiteSession'
 export default function DependenciesPage() {
   const params = useParams()
   const slug = params.slug as string
-  const { items, loading, error } = useGameDepPages('dep')
+  const { items, loading, error } = useGameDepPages('dep', slug)
   const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort()
   const list = useGameDepList(items, tags)
   const signedIn = useSiteSession(slug)

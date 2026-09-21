@@ -9,7 +9,7 @@ export default function EditGamePage() {
   const params = useParams()
   const slug = params.slug as string
   const name = params.name as string
-  const { item, loading } = useGameDepItem('game', name)
+  const { item, loading } = useGameDepItem('game', name, slug)
   return (
     <ItemGate loading={loading} found={!!item}>
       {item && <GameEditor slug={slug} name={name} detail={item} />}
