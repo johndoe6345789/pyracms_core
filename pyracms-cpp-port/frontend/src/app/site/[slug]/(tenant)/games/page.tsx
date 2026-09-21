@@ -7,7 +7,7 @@ import GameLibrary from '@/components/launcher/GameLibrary'
 export default function GamesPage() {
   const slug = useParams().slug as string
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
       <GameLibrary slug={slug} />
     </Container>
   )
