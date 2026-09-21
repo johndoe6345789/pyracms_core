@@ -4,16 +4,14 @@ name: Docker Images (multi-arch)
 # ubuntu-24.04, arm64 on ubuntu-24.04-arm: no QEMU, the C++/Conan build is
 # too slow under emulation), then merges the per-arch digests into one
 # multi-arch manifest on GHCR. arm/v7 is intentionally not built: the Conan
-# dependency set has no reliable armv7 binaries. Pull requests build only.
+# dependency set has no reliable armv7 binaries. Every push to master
+# publishes (`latest`, `sha-*`); pull requests build only, and only when the
+# images' inputs change.
 
 on:
   push:
     branches: [ master ]
     tags: [ 'v*' ]
-    paths:
-      - 'pyracms-cpp-port/backend/**'
-      - 'pyracms-cpp-port/frontend/**'
-      - '.github/workflows/docker-multiarch.yml'
   pull_request:
     branches: [ master ]
     paths:

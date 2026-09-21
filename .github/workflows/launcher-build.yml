@@ -10,11 +10,6 @@ on:
   push:
     branches: [ master ]
     tags: [ 'v*.*.*', 'launcher-v*.*.*' ]
-    paths:
-      - 'pyracms-cpp-port/client/**'
-      - 'pyracms-cpp-port/games/**'
-      - 'pyracms-cpp-port/scripts/**'
-      - '.github/workflows/launcher-build.yml'
   pull_request:
     branches: [ master ]
     paths:
@@ -416,7 +411,7 @@ jobs:
   release:
     name: release and publish
     needs: [ launcher, games ]
-    if: ${{ !cancelled() && (startsWith(github.ref, 'refs/tags/') || inputs.publish) }}
+    if: ${{ !cancelled() && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || inputs.publish) }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -449,7 +444,7 @@ jobs:
           ls -la
 
       - name: Attest release artifact provenance
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: |
@@ -466,6 +461,18 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ startsWith(github.ref_name, 'launcher-v0.') || startsWith(github.ref_name, 'v0.') }}
 
+      # Rolling pre-release of master. The compose bundle (publish-release.yml)
+      # shares the release, so never delete its assets from here.
+      - name: Update the edge pre-release
+        if: github.ref == 'refs/heads/master' && needs.launcher.result == 'success' && needs.games.result == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          EDGE_DISOWN: ^pyracms-compose-
+        run: bash .github/scripts/edge-release.sh release
+
+      # Only real releases feed the live catalogue, never every master build.
       - name: Publish manifests to the GameDep API
-        if: env.HN_API_URL != '' && env.HN_API_TOKEN != ''
+        if: (startsWith(github.ref, 'refs/tags/') || inputs.publish) && env.HN_API_URL != '' && env.HN_API_TOKEN != ''
         run: python pyracms-cpp-port/scripts/publish_manifest.py --files-dir release 'release/*.manifest.json'
