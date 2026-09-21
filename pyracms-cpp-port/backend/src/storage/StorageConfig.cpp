@@ -18,6 +18,9 @@ StorageConfig storageConfigFromEnv() {
     c.bucket = env("S3_BUCKET", "pyracms");
     c.accessKey = env("S3_ACCESS_KEY");
     c.secretKey = env("S3_SECRET_KEY");
+    c.region = env("S3_REGION", "us-east-1");
+    c.publicEndpoint = env("S3_PUBLIC_ENDPOINT");
+    c.presignedDownloads = env("S3_PRESIGNED_DOWNLOADS") == "1";
     double t = std::atof(env("S3_TIMEOUT_S", "60").c_str());
     c.timeoutS = t > 0 && t <= 3600 ? t : 60;
     return c;
@@ -61,6 +64,10 @@ std::string storageConfigError(const StorageConfig &c, bool production) {
         return "STORAGE_BACKEND=s3 needs S3_ENDPOINT (http[s]://host:port)";
     if (!bucketNameOk(c.bucket))
         return "S3_BUCKET must be 3-63 chars of a-z 0-9 - .";
+    if (c.region.empty() || c.region.size() > 32)
+        return "S3_REGION must be 1-32 chars (e.g. us-east-1)";
+    if (c.presignedDownloads && !parseS3Endpoint(c.publicEndpoint).valid)
+        return "S3_PRESIGNED_DOWNLOADS=1 needs S3_PUBLIC_ENDPOINT";
     if (production && (c.accessKey.empty() || c.secretKey.empty()))
         return "STORAGE_BACKEND=s3 needs S3_ACCESS_KEY and S3_SECRET_KEY";
     return "";

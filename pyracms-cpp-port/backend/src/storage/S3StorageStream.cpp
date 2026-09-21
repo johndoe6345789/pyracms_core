@@ -1,3 +1,4 @@
+#include "storage/S3Sign.h"
 #include "storage/S3Storage.h"
 #include "storage/S3StreamJob.h"
 #include <thread>
@@ -29,14 +30,21 @@ void S3Storage::stream(const BlobKey &k, size_t skip, size_t length,
         return cb(BlobStatus::Unavailable, nullptr);
     ++gStreams;
     auto url = ep_.origin + ep_.prefix + objectPath(k);
-    auto auth = "Authorization: AWS " + cfg_.accessKey + ":" + cfg_.secretKey;
+    // Signed here (Host pinned to the signed value); libcurl sends these
+    // headers verbatim, so the signature matches whatever the store checks.
+    auto hdrs = s3SignedHeaders(cfg_, ep_, "GET",
+                                ep_.prefix + objectPath(k), "");
     std::thread([=] {
         StreamJob j;
         j.head = cb;
         j.skip = skip;
         j.length = length;
         j.easy = curl_easy_init();
-        curl_slist *h = curl_slist_append(nullptr, auth.c_str());
+        curl_slist *h = nullptr;
+        for (auto &kv : hdrs) {
+            auto line = kv.first + ": " + kv.second;
+            h = curl_slist_append(h, line.c_str());
+        }
         curl_easy_setopt(j.easy, CURLOPT_URL, url.c_str());
         curl_easy_setopt(j.easy, CURLOPT_HTTPHEADER, h);
         curl_easy_setopt(j.easy, CURLOPT_CONNECTTIMEOUT, 10L);

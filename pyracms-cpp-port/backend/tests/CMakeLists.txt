@@ -19,6 +19,8 @@ set(TEST_SOURCES
 
     fake_s3.cpp
 
+    fake_s3_auth.cpp
+
     fake_s3_handle.cpp
 
     fake_s3_multipart.cpp
@@ -226,6 +228,12 @@ set(TEST_SOURCES
     test_social_service_http.cpp
 
     test_storage_config.cpp
+
+    test_storage_config_s3.cpp
+
+    test_sigv4_util.cpp
+
+    test_sigv4_vectors.cpp
 
     test_storage_local.cpp
 

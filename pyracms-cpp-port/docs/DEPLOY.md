@@ -71,7 +71,7 @@ on a site (verified by `scripts/smoke.sh`).
 | `JWT_EXPIRY_SECONDS`, `MAX_UPLOAD_MB` | Backend tuning; nginx caps `/api/` bodies at 50 MB. Raise both together. |
 | `NGINX_BIND`, `NGINX_PORT` | Host publish address. Keep `127.0.0.1` behind a proxy. |
 | `BACKUP_*` | See `OPERATIONS.md`. |
-| `STORAGE_BACKEND`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Where uploaded files live: `s3` (default and the only production mode; the bundled object store or your own) - `local` is development only and refused when `PYRACMS_ENV=production`. See `STORAGE.md`. |
+| `STORAGE_BACKEND`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION` (default `us-east-1`) | Where uploaded files live: `s3` (default and the only production mode; the bundled object store or your own) - `local` is development only and refused when `PYRACMS_ENV=production`. All requests are AWS Signature V4 signed: deploy the object-store and backend images together (`STORAGE.md`, "Rollout"). |
 
 Changing `NEXT_PUBLIC_API_URL` requires a frontend rebuild; leave it empty
 (same-origin) unless the API lives on another host.

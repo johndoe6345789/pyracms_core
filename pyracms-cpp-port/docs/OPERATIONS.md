@@ -15,6 +15,13 @@ project `pyracms-prod`, env file `.env.prod` and base file
 | `test-mail.sh you@x.com` | Send a test mail with the backend's SMTP settings. |
 | `smoke.sh [url]` | Availability, headers, 401, tenant isolation, 429 checks. |
 
+## Upgrading the object store
+
+The API talks to the store with AWS Signature V4 only (no legacy header).
+Upgrade the store image and the backend image together; see the "Rollout"
+section of `STORAGE.md`. `S3_REGION` (default `us-east-1`) must match the
+store's region.
+
 ## Backups
 
 What must be saved: the **Postgres database** and the **object store**

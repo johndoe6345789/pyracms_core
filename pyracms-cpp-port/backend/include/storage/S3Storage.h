@@ -11,7 +11,7 @@
 namespace pyracms {
 
 // Files in an S3-compatible object store (johndoe6345789/object-store
-// dialect: path-style URLs, "Authorization: AWS <access>:<secret>").
+// path-style URLs, AWS Signature V4 on every request).
 // Objects live at <bucket>/tenant-<site>-[thumb-]<uuid> (the store has flat
 // keys; site 0 = platform). The bucket
 // is created on first use. The endpoint comes from the environment only.
@@ -26,6 +26,8 @@ class S3Storage : public BlobStorage {
     void stream(const BlobKey &k, size_t skip, size_t length,
                 StreamCb cb) override;
     bool canStream() const override { return true; }
+    // Presigned GET URL on S3_PUBLIC_ENDPOINT, "" unless enabled.
+    std::string presignedUrl(const BlobKey &k, int expiresS = 300) const;
     void initMultipart(const BlobKey &k, InitCb cb) override;
     void putPart(const BlobKey &k, const std::string &uploadId, int n,
                  std::string data, PartCb cb) override;

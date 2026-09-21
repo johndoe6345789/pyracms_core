@@ -136,6 +136,7 @@ services:
       # Production stores files in S3 only: the backend refuses to start
       # with anything else, or without both keys.
       STORAGE_BACKEND: s3
+      S3_REGION: ${S3_REGION:-us-east-1}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY in .env.prod}
       S3_SECRET_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY in .env.prod}
       DOCKER_HOST: tcp://docker-proxy:2375
