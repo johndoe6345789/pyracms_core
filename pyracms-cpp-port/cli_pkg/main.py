@@ -5,6 +5,7 @@ from .build_cmd import cmd_build
 from .cmake_cmd import cmd_generate_cmake
 from .db_cmd import cmd_db
 from .lint_cmd import cmd_lint
+from .migrate_cmd import cmd_migrate_storage
 from .parser import build_parser
 from .run_cmd import cmd_run
 from .setup_cmd import cmd_setup
@@ -20,6 +21,7 @@ COMMANDS = {
     "test": cmd_test,
     "generate-cmake": cmd_generate_cmake,
     "lint": cmd_lint,
+    "migrate-storage": cmd_migrate_storage,
 }
 
 
