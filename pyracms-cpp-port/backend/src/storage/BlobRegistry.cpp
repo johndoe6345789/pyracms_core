@@ -1,4 +1,5 @@
 #include "storage/BlobRegistry.h"
+#include "security/SecurityConfig.h"
 #include "storage/LocalDiskStorage.h"
 #include "storage/S3Storage.h"
 
@@ -31,7 +32,10 @@ void init() {
     asS3.backend = "s3";
     if (storageConfigError(asS3, false).empty())
         gState.s3 = std::make_shared<S3Storage>(cfg);
-    gState.active = cfg.backend == "s3" && gState.s3 ? "s3" : "local";
+    // Production writes only to S3 (startup refuses anything else); if it
+    // is somehow missing, uploads fail rather than land on local disk.
+    bool wantS3 = cfg.backend == "s3" || isProduction();
+    gState.active = wantS3 && (gState.s3 || isProduction()) ? "s3" : "local";
     gState.ready = true;
 }
 

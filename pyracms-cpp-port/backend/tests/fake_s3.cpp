@@ -18,6 +18,7 @@ void FakeS3::clear() {
     std::lock_guard<std::mutex> lock(mu);
     buckets.clear();
     fake::objects.clear();
+    uploads.clear();
     created = failStatus = 0;
 }
 
@@ -35,6 +36,11 @@ void FakeS3::plant(const std::string &bucketKey, const std::string &body) {
 int FakeS3::bucketsCreated() {
     std::lock_guard<std::mutex> lock(mu);
     return created;
+}
+
+int FakeS3::openUploads() {
+    std::lock_guard<std::mutex> lock(mu);
+    return static_cast<int>(uploads.size());
 }
 
 void FakeS3::failNext(int status) {

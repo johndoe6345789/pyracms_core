@@ -28,22 +28,23 @@ void FileController::download(const drogon::HttpRequestPtr &req,
                 auto store = BlobRegistry::named(file->storage);
                 if (!store)
                     return callback(blobFailure(BlobStatus::Unavailable));
+                auto served = [=](const drogon::HttpResponsePtr &resp) {
+                    callback(resp);
+                    if (resp->statusCode() != drogon::k200OK &&
+                        resp->statusCode() != drogon::k206PartialContent)
+                        return;
+                    if (countsAsDownload(req->getHeader("range")))
+                        fileService_.incrementDownloadCount(
+                            db, uuid, [](bool, const std::string &) {});
+                };
+                if (wantsStream(*file, store))
+                    return streamBlob(req, store, *file, served);
                 loadBlob(store, {file->tenantId, uuid, false},
                          [=](BlobStatus s, BlobPayload p) {
                              if (s != BlobStatus::Ok)
                                  return callback(blobFailure(s));
                              // Always a download, never rendered in place
-                             auto resp = serveBlob(req, p, *file, true,
-                                                   false);
-                             callback(resp);
-                             if (resp->statusCode() != drogon::k200OK &&
-                                 resp->statusCode() !=
-                                     drogon::k206PartialContent)
-                                 return;
-                             if (countsAsDownload(req->getHeader("range")))
-                                 fileService_.incrementDownloadCount(
-                                     db, uuid,
-                                     [](bool, const std::string &) {});
+                             served(serveBlob(req, p, *file, true, false));
                          });
             });
     });

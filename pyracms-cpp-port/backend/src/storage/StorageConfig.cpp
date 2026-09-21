@@ -52,7 +52,9 @@ static bool bucketNameOk(const std::string &b) {
 
 std::string storageConfigError(const StorageConfig &c, bool production) {
     if (c.backend == "local")
-        return "";
+        return production ? "production needs STORAGE_BACKEND=s3 (local "
+                            "disk is for development only)"
+                          : "";
     if (c.backend != "s3")
         return "STORAGE_BACKEND must be local or s3";
     if (!parseS3Endpoint(c.endpoint).valid)

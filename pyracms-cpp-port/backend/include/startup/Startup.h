@@ -8,5 +8,6 @@ namespace pyracms {
 void createDbClientFromEnv();
 void initCacheAndSearch();
 void startPublishTimer(drogon::HttpAppFramework &app);
+void startUploadSweep(drogon::HttpAppFramework &app);
 
 } // namespace pyracms

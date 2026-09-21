@@ -25,8 +25,11 @@ RateRule rateRuleFor(const std::string &path) {
         return {"oauth", 20, 600};
     if (path == "/api/analytics/track")
         return {"track", 120, 60};
-    if (path == "/api/files")
+    if (path == "/api/files" || path == "/api/files/uploads")
         return {"upload", 30, 600};
+    // Parts of a chunked upload: ~21 per GB, so its own generous bucket.
+    if (path.rfind("/api/files/uploads/", 0) == 0)
+        return {"uploadpart", 600, 600};
     // Anonymous game downloads: generous for a launcher fetching a
     // catalog's screenshots and resuming, hostile to scraping loops.
     if (path.rfind("/api/files/", 0) == 0)

@@ -484,6 +484,64 @@ paths:
         '200': { description: Updated }
         '403': { description: Not the owner }
 
+  /api/files/uploads:
+    post:
+      tags: [Files]
+      summary: Start a chunked upload (files over ~40 MB, up to MAX_CHUNKED_UPLOAD_MB)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, size]
+              properties:
+                filename: { type: string }
+                size: { type: integer, format: int64 }
+                mimetype: { type: string }
+                sha256: { type: string, description: "Optional; checked on complete" }
+      responses:
+        '200': { description: "{uploadId, partSize, maxParts}" }
+        '400': { description: Bad size or sha256 }
+        '413': { description: Larger than MAX_CHUNKED_UPLOAD_MB }
+        '429': { description: Too many open uploads }
+
+  /api/files/uploads/{uploadId}/parts/{n}:
+    put:
+      tags: [Files]
+      summary: Upload part n (from 1, in order) as a raw octet-stream body
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: uploadId, in: path, required: true, schema: { type: string } }
+        - { name: n, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: "{part, size, etag}; re-sending a part is safe" }
+        '404': { description: Unknown upload or not yours }
+        '409': { description: Part out of order }
+        '413': { description: Part larger than partSize }
+
+  /api/files/uploads/{uploadId}/complete:
+    post:
+      tags: [Files]
+      summary: Finish; same response as POST /api/files
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: uploadId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "{success, uuid, filename, size, sha256}" }
+        '400': { description: Size or sha256 mismatch (upload is aborted) }
+
+  /api/files/uploads/{uploadId}:
+    delete:
+      tags: [Files]
+      summary: Abort a chunked upload
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: uploadId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "{success: true}" }
+
   /api/files/{uuid}:
     get:
       tags: [Files]

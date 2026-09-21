@@ -15,7 +15,9 @@ TEST(StorageConfig, ParsesEndpoint) {
 
 TEST(StorageConfig, ValidatesBackend) {
     StorageConfig c;
-    EXPECT_EQ(storageConfigError(c, true), "");
+    EXPECT_EQ(storageConfigError(c, false), "");
+    EXPECT_NE(storageConfigError(c, true).find("development only"),
+              std::string::npos);
     c.backend = "ftp";
     EXPECT_NE(storageConfigError(c, false), "");
     c.backend = "s3";
@@ -57,4 +59,16 @@ TEST(StorageConfig, ReadsEnvironment) {
     EXPECT_STREQ(BlobRegistry::active()->name(), "local");
     EXPECT_EQ(BlobRegistry::named("s3"), nullptr);
     EXPECT_EQ(BlobRegistry::named("nope"), nullptr);
+}
+
+TEST(StorageConfig, ProductionNeverWritesToLocalDisk) {
+    setenv("PYRACMS_ENV", "production", 1);
+    setenv("STORAGE_BACKEND", "local", 1);
+    BlobRegistry::reset();
+    EXPECT_EQ(BlobRegistry::active(), nullptr); // no s3: uploads get 503
+    EXPECT_NE(BlobRegistry::named("local"), nullptr); // legacy reads
+    EXPECT_NE(startupStorageError(), "");
+    unsetenv("PYRACMS_ENV");
+    unsetenv("STORAGE_BACKEND");
+    BlobRegistry::reset();
 }

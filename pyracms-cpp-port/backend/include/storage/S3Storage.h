@@ -23,14 +23,25 @@ class S3Storage : public BlobStorage {
     void get(const BlobKey &k, GetCb cb) override;
     void remove(const BlobKey &k, DoneCb cb) override;
     void exists(const BlobKey &k, DoneCb cb) override;
+    void stream(const BlobKey &k, size_t skip, size_t length,
+                StreamCb cb) override;
+    bool canStream() const override { return true; }
+    void initMultipart(const BlobKey &k, InitCb cb) override;
+    void putPart(const BlobKey &k, const std::string &uploadId, int n,
+                 std::string data, PartCb cb) override;
+    void completeMultipart(const BlobKey &k, const std::string &uploadId,
+                           DoneCb cb) override;
+    void abortMultipart(const BlobKey &k, const std::string &uploadId,
+                        DoneCb cb) override;
 
   private:
     using ReplyCb =
         std::function<void(BlobStatus, const drogon::HttpResponsePtr &)>;
     std::string objectPath(const BlobKey &k) const;
     drogon::HttpClientPtr client();
+    // `path` may carry a query; timeout 0 = the configured default.
     void send(drogon::HttpMethod m, const std::string &path,
-              std::string body, ReplyCb cb);
+              std::string body, ReplyCb cb, double timeout = 0);
     void ensureBucket(DoneCb cb);
     void putOnce(const BlobKey &k, std::shared_ptr<std::string> data,
                  bool retry, DoneCb cb);

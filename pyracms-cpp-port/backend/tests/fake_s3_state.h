@@ -13,6 +13,11 @@ extern std::mutex mu;
 extern std::set<std::string> buckets;
 extern std::map<std::string, std::string> objects;
 extern int created;
+// Open multipart uploads: id -> (bucket/key, part number -> bytes).
+using Parts = std::map<int, std::string>;
+extern std::map<std::string, std::pair<std::string, Parts>> uploads;
+drogon::HttpResponsePtr multipart(const drogon::HttpRequestPtr &req,
+                                  const std::string &full);
 extern int failStatus;
 
 drogon::HttpResponsePtr handle(const drogon::HttpRequestPtr &req);

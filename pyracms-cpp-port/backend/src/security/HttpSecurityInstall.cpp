@@ -1,4 +1,5 @@
 #include "security/HttpSecurity.h"
+#include "controllers/UploadLimits.h"
 
 namespace pyracms {
 
@@ -12,13 +13,10 @@ static drogon::HttpResponsePtr jsonError(drogon::HttpStatusCode code,
 }
 
 void installHttpSecurity(drogon::HttpAppFramework &app) {
-    if (const char *mb = std::getenv("MAX_UPLOAD_MB")) {
-        int v = std::atoi(mb);
-        if (v > 0 && v <= 512)
-            app.setClientMaxBodySize(static_cast<size_t>(v) << 20);
-    } else {
-        app.setClientMaxBodySize(25u << 20);
-    }
+    // One global cap (drogon has no per-route one): the larger of the
+    // normal limit and one upload part; other routes are held to the
+    // normal limit in the advice below.
+    app.setClientMaxBodySize(globalBodyBytes());
     app.setIdleConnectionTimeout(60);
     app.setMaxConnectionNumPerIP(200);
 
@@ -31,9 +29,15 @@ void installHttpSecurity(drogon::HttpAppFramework &app) {
                 resp->addHeader("Access-Control-Max-Age", "86400");
                 return resp;
             }
+            bool part = isPartPath(req->path());
+            if (part && req->getHeader("authorization").empty())
+                return jsonError(drogon::k401Unauthorized, "Unauthorized");
+            if (!part && req->body().size() > defaultBodyBytes())
+                return jsonError(drogon::k413RequestEntityTooLarge,
+                                 "Request body too large");
             bool multipart =
                 req->contentType() == drogon::CT_MULTIPART_FORM_DATA;
-            if (!multipart && req->body().size() > kMaxJsonBody)
+            if (!multipart && !part && req->body().size() > kMaxJsonBody)
                 return jsonError(drogon::k413RequestEntityTooLarge,
                                  "Request body too large");
             return {};
