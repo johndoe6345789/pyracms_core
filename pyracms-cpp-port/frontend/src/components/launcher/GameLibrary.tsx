@@ -15,10 +15,10 @@ interface Props {
 
 /** Games page in the site's own theme: filter bar + grid, or one game. */
 export default function GameLibrary({ slug, initialName }: Props) {
-  const lib = useGameLibrary()
+  const lib = useGameLibrary(slug)
   const signedIn = useSiteSession(slug)
   const [selected, setSelected] = useState<string | null>(initialName ?? null)
-  const detail = useGameDetail(selected)
+  const detail = useGameDetail(selected, slug)
 
   return (
     <Box data-testid="game-library">

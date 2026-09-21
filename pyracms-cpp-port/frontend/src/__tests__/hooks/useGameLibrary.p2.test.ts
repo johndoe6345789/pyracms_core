@@ -2,6 +2,9 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useGameLibrary } from '@/hooks/useGameLibrary'
 import api from '@/lib/api'
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('@/lib/api', () => ({
   __esModule: true,
   default: { get: jest.fn() },
@@ -22,7 +25,7 @@ beforeEach(() => {
 describe('useGameLibrary', () => {
   it('loads games from the api', async () => {
     get.mockResolvedValue({ data: rows })
-    const { result } = renderHook(() => useGameLibrary())
+    const { result } = renderHook(() => useGameLibrary('s'))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.tags).toEqual(['x', 'y'])
     act(() => result.current.markInstalled('a', '1'))
@@ -37,11 +40,11 @@ describe('useGameLibrary', () => {
 
   it('is empty (no fake games) when the api is empty or failing', async () => {
     get.mockResolvedValue({ data: [] })
-    const a = renderHook(() => useGameLibrary())
+    const a = renderHook(() => useGameLibrary('s'))
     await waitFor(() => expect(a.result.current.loading).toBe(false))
     expect(a.result.current.games).toEqual([])
     get.mockRejectedValue(new Error('x'))
-    const b = renderHook(() => useGameLibrary())
+    const b = renderHook(() => useGameLibrary('s'))
     await waitFor(() => expect(b.result.current.loading).toBe(false))
     expect(b.result.current.games).toEqual([])
   })

@@ -5,6 +5,9 @@ import EditGamePage from '@/app/site/[slug]/(tenant)/games/[name]/edit/page'
 import api from '@/lib/api'
 import { st } from '../helpers/tenantPagesMocks'
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('next/navigation', () =>
   jest.requireActual('../helpers/tenantPagesMocks').navMock(),
 )
@@ -65,10 +68,12 @@ describe('tenant pages', () => {
     expect(put.mock.calls[0]).toEqual([
       '/api/gamedep/game/g',
       { displayName: 'Real Game', description: 'd' },
+      { params: { tenant_id: 7 } },
     ])
     expect(put.mock.calls[1]).toEqual([
       '/api/gamedep/game/g/tags',
       { tags: ['x'] },
+      { params: { tenant_id: 7 } },
     ])
   })
 })

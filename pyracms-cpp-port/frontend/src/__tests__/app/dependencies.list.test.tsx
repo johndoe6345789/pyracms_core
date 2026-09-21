@@ -3,6 +3,9 @@ import DepsPage from '@/app/site/[slug]/(tenant)/dependencies/page'
 import api from '@/lib/api'
 import { depRow as row } from '../helpers/depsPage'
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
   useParams: () => ({ slug: 's', name: 'sdl2' }),
@@ -26,7 +29,9 @@ describe('dependencies list page', () => {
     get.mockResolvedValue({ data: [row] })
     render(<DepsPage />)
     expect(await screen.findByText('SDL2')).toBeInTheDocument()
-    expect(get).toHaveBeenCalledWith('/api/gamedep/dep?limit=100')
+    expect(get).toHaveBeenCalledWith('/api/gamedep/dep?limit=100', {
+      params: { tenant_id: 7 },
+    })
     expect(screen.getByTestId('new-dep-btn')).toHaveAttribute(
       'href',
       '/site/s/dependencies/new',

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import api from '@/lib/api'
+import { useTenantId } from '@/hooks/useTenantId'
+import { tenantParams } from '@/lib/tenantParams'
 import type { GameDepItem } from '@/hooks/useGameDepList'
 import { filterGames, type LibraryFilter } from './libraryFilter'
 import { mapListItem } from '@/hooks/data/gameMappers'
@@ -12,7 +14,8 @@ export { mapListItem, mapDetail } from '@/hooks/data/gameMappers'
 export { filterGames }
 export type { LibraryFilter }
 
-export function useGameLibrary() {
+export function useGameLibrary(slug: string) {
+  const { tenantId, loading: tenantLoading } = useTenantId(slug)
   const [games, setGames] = useState<GameDepItem[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -22,17 +25,18 @@ export function useGameLibrary() {
   const [favs, setFavs] = useState<Record<string, string>>({})
 
   useEffect(() => {
+    if (tenantLoading) return
     setInstalled(installedStore.get())
     setFavs(favouriteStore.get())
     api
-      .get('/api/gamedep/game?limit=100')
+      .get('/api/gamedep/game?limit=100', { params: tenantParams(tenantId) })
       .then((res) => {
         const rows = Array.isArray(res.data) ? res.data : []
         setGames(rows.map(mapListItem))
       })
       .catch(() => setGames([]))
       .finally(() => setLoading(false))
-  }, [])
+  }, [tenantId, tenantLoading])
 
   const tags = useMemo(
     () => Array.from(new Set(games.flatMap((g) => g.tags))).sort(),

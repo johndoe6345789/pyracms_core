@@ -6,6 +6,9 @@ import { typeInto as type } from '../helpers/typeInto'
 
 const push = jest.fn()
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's' }),
@@ -33,11 +36,15 @@ describe('create game / dependency pages', () => {
     await waitFor(() =>
       expect(push).toHaveBeenCalledWith('/site/s/games/my-game'),
     )
-    expect(post).toHaveBeenCalledWith('/api/gamedep/game', {
-      name: 'my-game',
-      displayName: 'my-game',
-      description: 'fun',
-    })
+    expect(post).toHaveBeenCalledWith(
+      '/api/gamedep/game',
+      {
+        name: 'my-game',
+        displayName: 'my-game',
+        description: 'fun',
+      },
+      { params: { tenant_id: 7 } },
+    )
   })
   it('creates a dependency with a display name', async () => {
     post.mockResolvedValue({ data: {} })
@@ -51,6 +58,7 @@ describe('create game / dependency pages', () => {
     expect(post.mock.calls[0]).toEqual([
       '/api/gamedep/dep',
       { name: 'sdl2', displayName: 'SDL 2', description: '' },
+      { params: { tenant_id: 7 } },
     ])
   })
 })

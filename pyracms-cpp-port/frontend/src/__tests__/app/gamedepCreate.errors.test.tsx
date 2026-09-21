@@ -6,6 +6,9 @@ import { typeInto as type } from '../helpers/typeInto'
 
 const push = jest.fn()
 
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: 7, loading: false }),
+}))
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   useParams: () => ({ slug: 's' }),
