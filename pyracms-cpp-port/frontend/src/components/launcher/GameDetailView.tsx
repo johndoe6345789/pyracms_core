@@ -27,7 +27,11 @@ export default function GameDetailView(p: Props) {
   const d = p.detail
   return (
     <Box>
-      <Button startIcon={<ArrowBackOutlined />} onClick={p.onBack} sx={{ mb: 2 }}>
+      <Button
+        startIcon={<ArrowBackOutlined />}
+        onClick={p.onBack}
+        sx={{ mb: 2 }}
+      >
         All games
       </Button>
       <GameArt

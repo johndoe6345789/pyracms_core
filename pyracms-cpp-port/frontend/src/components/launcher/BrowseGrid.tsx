@@ -43,7 +43,9 @@ export default function BrowseGrid({ games, onSelect }: Props) {
               >
                 {g.description}
               </Typography>
-              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1.5 }}>
+              <Box
+                sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1.5 }}
+              >
                 {g.tags.slice(0, 3).map((t) => (
                   <Chip key={t} label={t} size="small" variant="outlined" />
                 ))}
