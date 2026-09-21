@@ -1,29 +1,26 @@
-import { Paper, Typography, Button } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { UploadOutlined } from '@mui/icons-material'
 import { useArchiveUpload } from '@/hooks/useArchiveUpload'
 import UploadStatus from './UploadStatus'
 
-export default function SourceUpload({
+/** File picker for a binary, with upload progress underneath. */
+export default function BinaryFilePick({
   tenantId,
 }: {
   tenantId?: number | null | undefined
 }) {
   const { progress, error, result, upload } = useArchiveUpload(tenantId)
   return (
-    <Paper variant="outlined" sx={{ p: 4, mb: 4, borderColor: 'divider' }}>
-      <Typography variant="h5" gutterBottom>
-        Upload Source
-      </Typography>
+    <Box>
       <Button
         variant="outlined"
         startIcon={<UploadOutlined />}
         component="label"
       >
-        Select Source Archive
+        Select Binary
         <input
           type="file"
           hidden
-          accept=".zip,.tar.gz,.tar.bz2,.7z"
           onChange={(e) => {
             const f = e.target.files?.[0]
             if (f) void upload(f)
@@ -31,11 +28,11 @@ export default function SourceUpload({
         />
       </Button>
       <UploadStatus
-        label="Source upload progress"
+        label="Binary upload progress"
         progress={progress}
         error={error}
         doneName={result?.filename}
       />
-    </Paper>
+    </Box>
   )
 }
