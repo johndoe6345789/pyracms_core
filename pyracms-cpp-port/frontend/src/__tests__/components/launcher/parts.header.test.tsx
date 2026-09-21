@@ -6,33 +6,25 @@ import { actionState } from '@/components/launcher/gameActionState'
 import { detail } from '../../helpers/launcherParts'
 
 describe('header and actions', () => {
-  it('switches views and opens the mobile drawer', () => {
-    const onView = jest.fn()
-    const onOpen = jest.fn()
-    render(
-      <LibraryHeader
-        mobile
-        view="browse"
-        onView={onView}
-        onOpenDrawer={onOpen}
-      />,
-    )
-    fireEvent.click(screen.getByText('Library'))
-    expect(onView).toHaveBeenCalledWith('library')
-    fireEvent.click(screen.getByLabelText('Open library'))
-    expect(onOpen).toHaveBeenCalled()
-  })
-
-  it('has no mobile button on desktop', () => {
-    render(
-      <LibraryHeader
-        mobile={false}
-        view="browse"
-        onView={jest.fn()}
-        onOpenDrawer={jest.fn()}
-      />,
-    )
-    expect(screen.queryByLabelText('Open library')).toBeNull()
+  it('reports filter, search and tag changes', () => {
+    const p = {
+      search: '',
+      onSearch: jest.fn(),
+      filter: 'all' as const,
+      onFilter: jest.fn(),
+      tags: ['arcade'],
+      tag: '',
+      onTag: jest.fn(),
+    }
+    render(<LibraryHeader {...p} />)
+    fireEvent.click(screen.getByText('Favourites'))
+    expect(p.onFilter).toHaveBeenCalledWith('favourites')
+    fireEvent.click(screen.getByText('arcade'))
+    expect(p.onTag).toHaveBeenCalledWith('arcade')
+    fireEvent.change(screen.getByLabelText('Search games'), {
+      target: { value: 'pong' },
+    })
+    expect(p.onSearch).toHaveBeenCalledWith('pong')
   })
 
   it('renders each primary label', () => {

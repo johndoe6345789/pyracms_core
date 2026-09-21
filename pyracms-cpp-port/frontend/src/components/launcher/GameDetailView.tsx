@@ -3,6 +3,7 @@ import {
   FavoriteBorderOutlined,
   FavoriteOutlined,
   EditOutlined,
+  ArrowBackOutlined,
 } from '@mui/icons-material'
 import Link from 'next/link'
 import type { GameDepDetailData } from '@/hooks/useGameDepDetail'
@@ -18,6 +19,7 @@ interface Props {
   onToggleFav: () => void
   onInstalled: (version: string) => void
   onUninstall: () => void
+  onBack: () => void
 }
 
 /** Cover, title, actions and info for the selected game. */
@@ -25,6 +27,9 @@ export default function GameDetailView(p: Props) {
   const d = p.detail
   return (
     <Box>
+      <Button startIcon={<ArrowBackOutlined />} onClick={p.onBack} sx={{ mb: 2 }}>
+        All games
+      </Button>
       <GameArt
         name={d.name}
         label={d.displayName}

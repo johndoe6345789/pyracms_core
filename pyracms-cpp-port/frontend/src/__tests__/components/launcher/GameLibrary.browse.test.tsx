@@ -44,10 +44,10 @@ describe('GameLibrary', () => {
     )
   })
 
-  it('selects the first game when switching to library', async () => {
+  it('opens a game from the grid', async () => {
     render(<GameLibrary slug="s" />)
     await waitFor(() => expect(grid().queryByText('Beta')).not.toBeNull())
-    fireEvent.click(screen.getByText('Library'))
+    fireEvent.click(grid().getByText('Beta'))
     await waitFor(() =>
       expect(screen.getByTestId('game-actions')).toBeInTheDocument(),
     )
