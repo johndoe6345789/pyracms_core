@@ -57,11 +57,14 @@ describe('Get the launcher entries', () => {
 
   it('games header shows the banner only with a download href', () => {
     const base = {
-      mobile: false,
-      view: 'browse',
-      onView: jest.fn(),
-      onOpenDrawer: jest.fn(),
-    } as const
+      search: '',
+      onSearch: jest.fn(),
+      filter: 'all' as const,
+      onFilter: jest.fn(),
+      tags: [],
+      tag: '',
+      onTag: jest.fn(),
+    }
     const { rerender } = render(<LibraryHeader {...base} />)
     expect(screen.queryByTestId('get-launcher-banner')).toBeNull()
     rerender(<LibraryHeader {...base} downloadHref="/site/d/download" />)

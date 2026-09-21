@@ -1,63 +1,40 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material'
-import { AddOutlined, MenuOutlined } from '@mui/icons-material'
+import { Box, Button, Typography } from '@mui/material'
+import { AddOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 import GetLauncherLink from './GetLauncherLink'
+import LibraryFilters from './LibraryFilters'
 
-export type LibraryView = 'library' | 'browse'
-
-interface Props {
-  mobile: boolean
-  view: LibraryView
-  onView: (v: LibraryView) => void
-  onOpenDrawer: () => void
+interface Props extends React.ComponentProps<typeof LibraryFilters> {
   /** Link to the create page; omitted for guests */
   newHref?: string | undefined
   /** Site download page; shows the 'Need Hypernucleus?' link */
   downloadHref?: string | undefined
 }
 
-/** Title row: mobile menu button, heading and Library/Browse toggle. */
-export default function LibraryHeader(p: Props) {
+/** Title, launcher link and filters above the games grid. */
+export default function LibraryHeader({ newHref, downloadHref, ...f }: Props) {
   return (
-    <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        {p.mobile && (
-          <IconButton aria-label="Open library" onClick={p.onOpenDrawer}>
-            <MenuOutlined />
-          </IconButton>
-        )}
-        <Typography variant="h5" component="h1" sx={{ flex: 1 }}>
+    <Box sx={{ mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+        <Typography variant="h4" component="h1" sx={{ flex: 1 }}>
           Games
         </Typography>
-        {p.newHref && (
+        {newHref && (
           <Button
             component={Link}
-            href={p.newHref}
-            size="small"
+            href={newHref}
             startIcon={<AddOutlined />}
             data-testid="new-game-btn"
           >
             New game
           </Button>
         )}
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={p.view}
-          onChange={(_, v) => v && p.onView(v)}
-        >
-          <ToggleButton value="library">Library</ToggleButton>
-          <ToggleButton value="browse">Browse</ToggleButton>
-        </ToggleButtonGroup>
       </Box>
-      {p.downloadHref && <GetLauncherLink href={p.downloadHref} />}
-    </>
+      <Typography color="text.secondary" sx={{ mb: 2 }}>
+        Download a game, install it with the Hypernucleus launcher and play.
+      </Typography>
+      {downloadHref && <GetLauncherLink href={downloadHref} />}
+      <LibraryFilters {...f} />
+    </Box>
   )
 }

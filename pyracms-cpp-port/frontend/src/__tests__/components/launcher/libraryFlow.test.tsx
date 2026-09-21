@@ -62,14 +62,9 @@ describe('GameLibrary install flow', () => {
     await waitFor(() => expect(screen.queryByText('Clear mark')).toBeNull())
   })
 
-  it('closes the mobile drawer with Escape', async () => {
-    mobile = true
-    render(<GameLibrary slug="s" />)
-    fireEvent.click(screen.getByLabelText('Open library'))
-    const side = await screen.findByTestId('library-sidebar')
-    fireEvent.keyDown(side, { key: 'Escape' })
-    await waitFor(() =>
-      expect(screen.queryByTestId('library-sidebar')).toBeNull(),
-    )
+  it('goes back to the grid from a game page', async () => {
+    render(<GameLibrary slug="s" initialName="a" />)
+    fireEvent.click(await screen.findByText('All games'))
+    expect(await screen.findByTestId('browse-grid')).toBeInTheDocument()
   })
 })

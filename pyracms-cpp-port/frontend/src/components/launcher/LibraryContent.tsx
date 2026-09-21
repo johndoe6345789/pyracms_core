@@ -1,9 +1,7 @@
 'use client'
 
-import { Typography } from '@mui/material'
 import type { useGameLibrary } from '@/hooks/useGameLibrary'
 import type { useGameDetail } from '@/hooks/useGameDetail'
-import type { LibraryView } from './LibraryHeader'
 import BrowseGrid from './BrowseGrid'
 import GameDetailView from './GameDetailView'
 
@@ -11,26 +9,19 @@ interface Props {
   slug: string
   lib: ReturnType<typeof useGameLibrary>
   detail: ReturnType<typeof useGameDetail>
-  view: LibraryView
   onSelect: (name: string) => void
+  onBack: () => void
 }
 
-/** Browse grid, selected game view or empty hint. */
+/** Games grid, or the selected game's page. */
 export default function LibraryContent({
   slug,
   lib,
   detail,
-  view,
   onSelect,
+  onBack,
 }: Props) {
-  if (view === 'browse')
-    return <BrowseGrid games={lib.visible} onSelect={onSelect} />
-  if (!detail)
-    return (
-      <Typography color="text.secondary">
-        Select a game from the library.
-      </Typography>
-    )
+  if (!detail) return <BrowseGrid games={lib.visible} onSelect={onSelect} />
   return (
     <GameDetailView
       slug={slug}
@@ -40,6 +31,7 @@ export default function LibraryContent({
       onToggleFav={() => lib.toggleFav(detail.name)}
       onInstalled={(v) => lib.markInstalled(detail.name, v)}
       onUninstall={() => lib.unmark(detail.name)}
+      onBack={onBack}
     />
   )
 }

@@ -32,22 +32,13 @@ describe('GameLibrary', () => {
     )
   })
 
-  it('uses a drawer on mobile', async () => {
-    mobile = true
-    render(<GameLibrary slug="s" />)
-    fireEvent.click(screen.getByLabelText('Open library'))
-    await waitFor(() =>
-      expect(screen.getByTestId('library-sidebar')).toBeInTheDocument(),
-    )
-  })
-
-  it('prompts when nothing is selected in library view', async () => {
+  it('shows an empty hint when the search matches nothing', async () => {
     get.mockResolvedValue({ data: [{ name: 'a', displayName: 'A' }] })
-    render(<GameLibrary slug="s" initialName="zzz" />)
+    render(<GameLibrary slug="s" />)
     await waitFor(() => expect(get).toHaveBeenCalled())
-    fireEvent.change(screen.getAllByLabelText('Search library')[0]!, {
+    fireEvent.change(screen.getByLabelText('Search games'), {
       target: { value: 'nomatch' },
     })
-    expect(screen.getByTestId('game-library')).toBeInTheDocument()
+    expect(await screen.findByText('No games match.')).toBeInTheDocument()
   })
 })

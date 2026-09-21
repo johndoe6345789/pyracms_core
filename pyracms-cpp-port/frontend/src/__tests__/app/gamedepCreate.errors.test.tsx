@@ -39,10 +39,13 @@ describe('create game / dependency pages', () => {
   })
   it('library header shows New game only when given a link', () => {
     const p = {
-      mobile: false,
-      view: 'browse' as const,
-      onView: jest.fn(),
-      onOpenDrawer: jest.fn(),
+      search: '',
+      onSearch: jest.fn(),
+      filter: 'all' as const,
+      onFilter: jest.fn(),
+      tags: [],
+      tag: '',
+      onTag: jest.fn(),
     }
     const { rerender } = render(<LibraryHeader {...p} />)
     expect(screen.queryByTestId('new-game-btn')).toBeNull()
