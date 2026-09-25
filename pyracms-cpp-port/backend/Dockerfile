@@ -16,8 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Conan 2
-RUN pip3 install --break-system-packages "conan==2.32.0" && conan profile detect
+# Install Conan 2 and Jinja2 (generates CMakeLists.txt below)
+RUN pip3 install --break-system-packages "conan==2.32.0" jinja2 \
+    && conan profile detect
 
 WORKDIR /app
 
@@ -27,11 +28,17 @@ RUN conan install . --output-folder=build --build=missing \
     -s compiler.cppstd=17 -s build_type=Release
 
 # Copy source files
-COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
 COPY sql/ ./sql/
+
+# CMakeLists.txt (and tests/CMakeLists.txt) aren't checked in -- they are
+# generated from cmake_templates/*.j2 by listing src/ and tests/, so they
+# can never drift from what's actually on disk (see generate_cmake.py).
+COPY generate_cmake.py ./
+COPY cmake_templates/ ./cmake_templates/
+RUN python3 generate_cmake.py
 
 # ---- Release build of the server ----
 FROM deps AS builder

@@ -17,3 +17,10 @@ id_rsa*
 # Python bytecode
 __pycache__/
 *.py[cod]
+
+# Generated from cmake_templates/*.j2 by generate_cmake.py (run by
+# Dockerfile and CI); never hand-edit, never commit -- that's what let
+# these drift from the templates before.
+/pyracms-cpp-port/backend/CMakeLists.txt
+/pyracms-cpp-port/backend/tests/CMakeLists.txt
+/pyracms-cpp-port/backend/cmake_config.json

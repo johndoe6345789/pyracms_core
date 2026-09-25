@@ -89,7 +89,12 @@ bun run prisma:generate
 
 ### 4. Build the Backend
 
+CMakeLists.txt isn't checked in -- it's generated from `cmake_templates/`
+by listing `src/` and `tests/`, so it can never drift from what's on disk:
+
 ```bash
+pip install jinja2
+python generate_cmake.py
 mkdir build
 cd build
 cmake ..
