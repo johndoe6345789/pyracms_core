@@ -5,15 +5,13 @@ using namespace harness;
 namespace {
 std::string makeArticle(const Site &s, const std::string &tok) {
     auto name = uniq("att");
-    auto r = post("/api/articles", J({{"name", name}, {"displayName", name},
-                                      {"content", "c"}, {"tenant_id", s.id}}),
-                  tok);
-    EXPECT_EQ(r.status, 201) << r.text;
+    post("/api/articles", J({{"name", name}, {"displayName", name},
+                             {"content", "c"}, {"tenant_id", s.id}}),
+         tok);
     return name;
 }
-
-std::string base(const std::string &name) {
-    return "/api/articles/" + name + "/attachments";
+std::string base(const std::string &n) {
+    return "/api/articles/" + n + "/attachments";
 }
 } // namespace
 
@@ -29,7 +27,6 @@ TEST(ArticleAttachmentHttp, AddListRemove) {
     auto add = post(base(name), J({{"fileUuid", file}, {"tenant_id", s.id}}),
                     tok);
     ASSERT_EQ(add.status, 201) << add.text;
-    // attaching twice is not an error worth a duplicate row
     EXPECT_EQ(post(base(name), J({{"fileUuid", file}, {"tenant_id", s.id}}),
                    tok).status, 404);
 

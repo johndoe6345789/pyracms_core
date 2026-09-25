@@ -19,17 +19,18 @@ export function ArticleActions({
     <Box
       sx={{
         display: 'flex',
-        gap: 1,
+        gap: 1.5,
+        flexWrap: 'wrap',
         mb: 4,
       }}
       data-testid="article-actions"
     >
       <Button
-        variant="outlined"
+        variant="contained"
         startIcon={<EditOutlined />}
         component={Link}
         href={`/site/${slug}` + `/articles/${name}/edit`}
-        size="small"
+        size="medium"
         data-testid="edit-article-btn"
         aria-label="Edit article"
       >
@@ -40,7 +41,9 @@ export function ArticleActions({
         startIcon={<HistoryOutlined />}
         component={Link}
         href={`/site/${slug}` + `/articles/${name}` + `/revisions`}
-        size="small"
+        size="medium"
+        color="secondary"
+        sx={{ borderWidth: 2, '&:hover': { borderWidth: 2 } }}
         data-testid="revisions-btn"
         aria-label={`View revisions ` + `(${revisionCount})`}
       >

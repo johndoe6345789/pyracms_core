@@ -1,6 +1,7 @@
 'use client'
 
 import { Box } from '@mui/material'
+import { ScrollOnShow } from '@/components/common/ScrollOnShow'
 import { SnippetCodeBlock } from './SnippetCodeBlock'
 import { SnippetHistoryButton } from './SnippetHistoryButton'
 import { ArticleTagChips } from '@/components/articles/ArticleTagChips'
@@ -46,7 +47,7 @@ export function SnippetReadView(p: Props) {
       )}
       <SnippetCodeBlock snippet={snippet} />
       {(running || result) && (
-        <Box sx={{ mb: 3 }}>
+        <ScrollOnShow trigger={running ? 'running' : result}>
           <CodeOutput
             stdout={result?.stdout}
             stderr={result?.stderr}
@@ -54,7 +55,7 @@ export function SnippetReadView(p: Props) {
             executionTime={result?.executionTime}
             isLoading={running}
           />
-        </Box>
+        </ScrollOnShow>
       )}
       <SnippetAttachments
         snippetId={snippet.id}

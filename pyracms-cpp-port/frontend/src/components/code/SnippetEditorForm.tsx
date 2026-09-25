@@ -1,6 +1,7 @@
 'use client'
 
 import { Alert, Box, Divider } from '@mui/material'
+import { ScrollOnShow } from '@/components/common/ScrollOnShow'
 import { SnippetEditorFields } from './SnippetEditorFields'
 import { CodeOutput } from './CodeOutput'
 import { SnippetEditorButtons } from './SnippetEditorButtons'
@@ -48,8 +49,8 @@ export function SnippetEditorForm({
         onCancel={onCancel}
       />
       {(running || result) && (
-        <>
-          <Divider />
+        <ScrollOnShow trigger={running ? 'running' : result}>
+          <Divider sx={{ mb: 2 }} />
           <CodeOutput
             stdout={result?.stdout}
             stderr={result?.stderr}
@@ -57,7 +58,7 @@ export function SnippetEditorForm({
             executionTime={result?.executionTime}
             isLoading={running}
           />
-        </>
+        </ScrollOnShow>
       )}
     </Box>
   )

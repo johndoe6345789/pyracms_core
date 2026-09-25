@@ -27,7 +27,7 @@ it('loads the article downloads', async () => {
   expect(result.current.items[0]?.filename).toBe('a.zip')
 })
 
-it('shows no downloads when the list fails, and waits for a tenant', async () => {
+it('shows nothing when the list fails and waits for a tenant', async () => {
   m.get.mockRejectedValue(new Error('x'))
   const { result } = renderHook(() => useArticleAttachments('a', 4))
   await waitFor(() => expect(m.get).toHaveBeenCalled())
