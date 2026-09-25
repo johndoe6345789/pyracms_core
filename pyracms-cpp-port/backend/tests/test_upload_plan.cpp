@@ -55,6 +55,8 @@ TEST(UploadPlan, PartPathsOnlyMatchTheRoute) {
 
 TEST(UploadPlan, PartsHaveTheirOwnRateBucket) {
     EXPECT_EQ(rateRuleFor("/api/files/uploads").name, "upload");
+    // bulk seeding used to trip the old 30-per-10-minutes cap
+    EXPECT_GE(rateRuleFor("/api/files").max, 300);
     EXPECT_EQ(rateRuleFor("/api/files/uploads/x/parts/1").name, "uploadpart");
     EXPECT_EQ(rateRuleFor("/api/files/abc").name, "download");
 }

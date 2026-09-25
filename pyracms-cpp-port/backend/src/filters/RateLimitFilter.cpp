@@ -24,16 +24,21 @@ RateRule rateRuleFor(const std::string &path) {
     if (path.rfind("/api/auth/oauth/", 0) == 0)
         return {"oauth", 20, 600};
     if (path == "/api/analytics/track")
-        return {"track", 120, 60};
+        return {"track", 600, 60};
+    // The capacity limits below are deliberately generous: the backend is
+    // native C++ on a multi-core host, and behind the tunnel every visitor
+    // can share one bucket (see clientIp), so a tight number is a site-wide
+    // cap. The credential limits above stay tight: they stop guessing, not
+    // load.
     if (path == "/api/files" || path == "/api/files/uploads")
-        return {"upload", 30, 600};
+        return {"upload", 600, 600};
     // Parts of a chunked upload: ~21 per GB, so its own generous bucket.
     if (path.rfind("/api/files/uploads/", 0) == 0)
-        return {"uploadpart", 600, 600};
+        return {"uploadpart", 3000, 600};
     // Anonymous game downloads: generous for a launcher fetching a
     // catalog's screenshots and resuming, hostile to scraping loops.
     if (path.rfind("/api/files/", 0) == 0)
-        return {"download", 300, 60};
+        return {"download", 1500, 60};
     if (path == "/api/tenants")
         return {"tenant", 10, 3600};
     if (path.rfind("/api/snippets/", 0) == 0 && endsWith(path, "/run"))
