@@ -7,6 +7,7 @@ import { galleryFileUrl } from '@/lib/galleryImage'
 export interface GalleryPicture {
   id: string
   title: string
+  description: string
   src: string
   cols: number
   rows: number
@@ -17,6 +18,7 @@ type Raw = Record<string, unknown>
 const mapPicture = (p: Raw, i: number): GalleryPicture => ({
   id: String(p.id),
   title: ((p.displayName || p.title) as string) || `Photo ${i + 1}`,
+  description: (p.description as string) || '',
   src: (p.url || p.thumbnailUrl || galleryFileUrl(p.fileUuid, true)) as string,
   cols: i % 5 === 0 ? 2 : 1,
   rows: i % 7 === 0 ? 2 : 1,
@@ -25,6 +27,7 @@ const mapPicture = (p: Raw, i: number): GalleryPicture => ({
 export interface AlbumOptions {
   isPrivate: boolean
   sortOrder: string
+  coverMode: string // chosen | random
   coverPictureId: number
 }
 
@@ -35,6 +38,7 @@ export function useGalleryAlbum(albumId: string) {
   const [options, setOptions] = useState<AlbumOptions>({
     isPrivate: false,
     sortOrder: 'newest',
+    coverMode: 'chosen',
     coverPictureId: 0,
   })
   const [pictures, setPictures] = useState<GalleryPicture[]>([])
@@ -55,6 +59,7 @@ export function useGalleryAlbum(albumId: string) {
         setOptions({
           isPrivate: Boolean(data.isPrivate),
           sortOrder: data.sortOrder || 'newest',
+          coverMode: data.coverMode || 'chosen',
           coverPictureId: Number(data.defaultPictureId) || 0,
         })
         setPictures((data.pictures || []).map(mapPicture))

@@ -3,9 +3,11 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   DriveFileMoveOutlined,
+  VisibilityOutlined,
 } from '@mui/icons-material'
 import { FileItem } from '@/hooks/useFileManager'
-import { fileDownloadUrl } from '@/lib/fileDownloadUrl'
+import { fileDownloadUrl, fileViewUrl } from '@/lib/fileDownloadUrl'
+import { canView } from '@/lib/fileKinds'
 
 interface Props {
   file: FileItem
@@ -17,6 +19,21 @@ interface Props {
 export default function FileCardActions({ file, onDelete, onMove }: Props) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+      {canView(file.name) && (
+        <Tooltip title="View">
+          <IconButton
+            size="small"
+            component="a"
+            href={fileViewUrl(file.uuid)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View file ${file.name}`}
+            data-testid={`view-file-${file.id}`}
+          >
+            <VisibilityOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title="Download">
         <IconButton
           size="small"

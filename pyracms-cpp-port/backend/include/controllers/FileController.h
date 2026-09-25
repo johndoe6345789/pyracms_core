@@ -15,6 +15,8 @@ class FileController : public drogon::HttpController<FileController> {
                   "pyracms::RateLimitFilter");
     ADD_METHOD_TO(FileController::thumbnail, "/api/files/{uuid}/thumbnail",
                   drogon::Get, "pyracms::RateLimitFilter");
+    ADD_METHOD_TO(FileController::view, "/api/files/{uuid}/view", drogon::Get,
+                  "pyracms::RateLimitFilter");
     ADD_METHOD_TO(FileController::remove, "/api/files/{uuid}", drogon::Delete,
                   "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(FileController::list, "/api/files", drogon::Get,
@@ -32,6 +34,10 @@ class FileController : public drogon::HttpController<FileController> {
 
     void
     thumbnail(const drogon::HttpRequestPtr &req,
+              std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+              const std::string &uuid);
+
+    void view(const drogon::HttpRequestPtr &req,
               std::function<void(const drogon::HttpResponsePtr &)> &&callback,
               const std::string &uuid);
 

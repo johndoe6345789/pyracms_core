@@ -28,7 +28,7 @@ export default function FileThumb({ file }: { file: FileItemLike }) {
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       ) : (
-        <FileIcon type={file.type} />
+        <FileIcon type={file.type} name={file.name} />
       )}
     </Box>
   )

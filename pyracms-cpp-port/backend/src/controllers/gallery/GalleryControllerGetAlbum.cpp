@@ -31,6 +31,7 @@ void GalleryController::getAlbum(
             result["pictureCount"] = detail->album.pictureCount;
             result["sortOrder"] = detail->album.sortOrder;
             result["coverFileUuid"] = detail->album.coverFileUuid;
+            result["coverMode"] = detail->album.coverMode;
 
             Json::Value pictures(Json::arrayValue);
             for (const auto &p : detail->pictures) {

@@ -34,6 +34,7 @@ void GalleryController::listAlbums(
                 item["pictureCount"] = a.pictureCount;
                 item["sortOrder"] = a.sortOrder;
                 item["coverFileUuid"] = a.coverFileUuid;
+                item["coverMode"] = a.coverMode;
                 result.append(item);
             }
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

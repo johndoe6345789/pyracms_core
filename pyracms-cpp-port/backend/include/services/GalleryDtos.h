@@ -17,6 +17,7 @@ struct GalleryAlbumDto {
     int pictureCount;
     std::string sortOrder;     // newest | oldest | title
     std::string coverFileUuid; // the cover picture's file, "" if none
+    std::string coverMode;     // chosen | random
 };
 
 struct GalleryPictureDto {

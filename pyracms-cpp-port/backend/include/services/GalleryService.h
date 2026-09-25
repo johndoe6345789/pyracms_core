@@ -30,11 +30,12 @@ class GalleryService {
     void getAlbum(const DbClientPtr &db, int albumId, AlbumDetailCallback cb);
     // isPrivate: -1 keep, 0/1 set. sortOrder "" keeps. coverId: -1 keeps,
     // 0 clears, else a picture of this album (others are ignored).
+    // coverMode "" keeps, else chosen or random.
     void updateAlbum(const DbClientPtr &db, int albumId,
                      const std::string &displayName,
                      const std::string &description, int isPrivate,
                      const std::string &sortOrder, int coverId,
-                     BoolCallback cb);
+                     const std::string &coverMode, BoolCallback cb);
     void deleteAlbum(const DbClientPtr &db, int albumId, BoolCallback cb);
     void addPicture(const DbClientPtr &db, int albumId,
                     const std::string &displayName,

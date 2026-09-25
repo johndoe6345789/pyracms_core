@@ -10,8 +10,9 @@ import { useGalleryAlbum } from '@/hooks/useGalleryAlbum'
 import { useAlbumUpload } from '@/hooks/useAlbumUpload'
 import { useSiteSession } from '@/hooks/useSiteSession'
 import { useCanManage } from '@/hooks/useCanManage'
-import AlbumManageDialogs from '@/components/gallery/AlbumManageDialogs'
-import type { ManageDialog } from '@/components/gallery/GalleryManageDialogs'
+import GalleryManageDialogs, {
+  type ManageDialog,
+} from '@/components/gallery/GalleryManageDialogs'
 import { useTenantId } from '@/hooks/useTenantId'
 
 export default function AlbumViewPage() {
@@ -19,7 +20,7 @@ export default function AlbumViewPage() {
   const slug = params.slug as string
   const albumId = params.albumId as string
   const router = useRouter()
-  const { albumName, albumDescription, ownerId, options, pictures, refresh } =
+  const { albumName, albumDescription, ownerId, pictures, refresh } =
     useGalleryAlbum(albumId)
   const [dialog, setDialog] = useState<ManageDialog>(null)
   const canManage = useCanManage(slug, ownerId)
@@ -44,18 +45,18 @@ export default function AlbumViewPage() {
         description={albumDescription}
         {...(canManage
           ? {
-              onEdit: () => setDialog('edit'),
+              onEdit: () =>
+                router.push(`/site/${slug}/gallery/${albumId}/edit`),
               onDelete: () => setDialog('delete'),
             }
           : {})}
       />
-      <AlbumManageDialogs
-        key={`${albumName}|${albumDescription}|${JSON.stringify(options)}`}
+      <GalleryManageDialogs
+        key={`${albumName}|${albumDescription}`}
+        kind="albums"
         id={albumId}
         name={albumName}
         description={albumDescription}
-        options={options}
-        pictures={pictures}
         open={dialog}
         onClose={() => setDialog(null)}
         onChanged={refresh}

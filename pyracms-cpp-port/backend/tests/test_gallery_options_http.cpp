@@ -42,3 +42,22 @@ TEST(GalleryOptions, AlbumOptionsAreValidatedAndOptional) {
     put(url, J({{"displayName", "N"}, {"defaultPictureId", 0}}), u);
     EXPECT_EQ(get(albumUrl(s, a), u).json["coverFileUuid"], "");
 }
+
+TEST(GalleryOptions, RandomCoverModeAndSetAsCoverSwitchesBack) {
+    REQUIRE_SERVER();
+    auto s = makeSite();
+    auto a = mkAlbum(s);
+    auto u = s.user.token;
+    EXPECT_EQ(put("/api/gallery/albums/" + a.id,
+                  J({{"displayName", "N"}, {"coverMode", "bogus"}}), u)
+                  .status, 400);
+    ASSERT_EQ(put("/api/gallery/albums/" + a.id,
+                  J({{"displayName", "N"}, {"coverMode", "random"}}), u)
+                  .status, 200);
+    auto g = get(albumUrl(s, a), u);
+    EXPECT_EQ(g.json["coverMode"].asString(), "random");
+    EXPECT_EQ(g.json["coverFileUuid"].asString(), a.uuid); // its only photo
+    ASSERT_EQ(put("/api/gallery/pictures/" + a.pic + "/default", J({}), u)
+                  .status, 200);
+    EXPECT_EQ(get(albumUrl(s, a), u).json["coverMode"].asString(), "chosen");
+}

@@ -27,7 +27,7 @@ it('shows the trail and goes back up or makes a folder', () => {
   expect(onNew).toHaveBeenCalled()
 })
 
-it('lists sub-folders to open or remove, and nothing when there are none', () => {
+it('lists sub-folders to open or remove; none means nothing', () => {
   const onOpen = jest.fn()
   const onRemove = jest.fn()
   const { container, rerender } = render(

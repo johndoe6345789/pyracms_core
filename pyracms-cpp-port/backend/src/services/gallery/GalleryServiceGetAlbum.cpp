@@ -1,4 +1,5 @@
 #include "services/DbError.h"
+#include "services/GalleryCoverSql.h"
 #include "services/GalleryService.h"
 
 namespace pyracms {
@@ -6,10 +7,8 @@ namespace pyracms {
 void GalleryService::getAlbum(const DbClientPtr &db, int albumId,
                               AlbumDetailCallback cb) {
     db->execSqlAsync(
-        "SELECT a.*, "
-        "(SELECT file_uuid FROM gallery_pictures "
-        "WHERE id = a.default_picture_id) AS cover_uuid, "
-        "COALESCE(p.cnt, 0) AS picture_count "
+        std::string("SELECT a.*, ") + kCoverUuidSql +
+            "COALESCE(p.cnt, 0) AS picture_count "
         "FROM gallery_albums a "
         "LEFT JOIN (SELECT album_id, COUNT(*) AS cnt FROM gallery_pictures "
         "GROUP BY album_id) p "
