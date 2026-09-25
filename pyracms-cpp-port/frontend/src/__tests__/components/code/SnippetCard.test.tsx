@@ -16,10 +16,12 @@ const props = {
 
 it('renders card details and links', () => {
   render(<SnippetCard {...props} />)
+  // The whole card body is the link now, not just the title text.
   expect(screen.getByTestId('snippet-link-5')).toHaveAttribute(
     'href',
     '/site/s/snippets/5',
   )
+  expect(screen.getByText('Hello')).toBeInTheDocument()
   expect(screen.getByText('3 runs')).toBeInTheDocument()
   expect(screen.getByText(/line5/)).toBeInTheDocument()
   expect(screen.queryByText(/line6/)).toBeNull()

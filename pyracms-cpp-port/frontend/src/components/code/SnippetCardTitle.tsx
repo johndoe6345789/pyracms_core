@@ -1,17 +1,17 @@
 'use client'
 
 import { Typography, Box, Chip } from '@mui/material'
-import Link from 'next/link'
 import { langColor } from '@/lib/snippets'
 
 interface Props {
-  id: string
   title: string
   language: string
-  href: string
 }
 
-export function SnippetCardTitle({ id, title, language, href }: Props) {
+// Plain text, not its own link: the card's whole body is the click target
+// now (see SnippetCard's CardActionArea), and a link nested inside another
+// link is both invalid HTML and a smaller target than the card it sits in.
+export function SnippetCardTitle({ title, language }: Props) {
   const color = langColor(language)
   return (
     <Box
@@ -24,15 +24,7 @@ export function SnippetCardTitle({ id, title, language, href }: Props) {
     >
       <Typography
         variant="subtitle1"
-        component={Link}
-        href={href}
-        data-testid={`snippet-link-${id}`}
-        sx={{
-          fontWeight: 600,
-          textDecoration: 'none',
-          color: 'text.primary',
-          '&:hover': { color: 'primary.main' },
-        }}
+        sx={{ fontWeight: 600, color: 'text.primary' }}
       >
         {title}
       </Typography>
