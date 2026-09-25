@@ -6,6 +6,8 @@ ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS parent_id INTEGER
 CREATE INDEX IF NOT EXISTS idx_menu_items_parent ON menu_items(parent_id);
 
 -- Items were only ever 'route' or 'url'; a folder is the third kind.
+-- (the table used to be called menus; older databases kept that name)
+ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS menus_type_check;
 ALTER TABLE menu_items DROP CONSTRAINT IF EXISTS menu_items_type_check;
 ALTER TABLE menu_items ADD CONSTRAINT menu_items_type_check
     CHECK (type IN ('route', 'url', 'folder'));
