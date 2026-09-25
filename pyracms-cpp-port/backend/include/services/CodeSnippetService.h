@@ -33,6 +33,16 @@ struct SnippetExecutionDto {
     std::string createdAt;
 };
 
+// A file attached to a snippet (e.g. the input a challenge's code reads
+// with open()), joined from `files` for the frontend to show/download it.
+struct SnippetAttachmentDto {
+    int id;
+    std::string fileUuid;
+    std::string filename;
+    std::string mimetype;
+    int64_t size;
+};
+
 class CodeSnippetService {
   public:
     using DbClientPtr = drogon::orm::DbClientPtr;
@@ -67,6 +77,16 @@ class CodeSnippetService {
     void recordExecution(const DbClientPtr &db, int snippetId, int userId,
                          const std::string &output, int exitCode,
                          int executionTimeMs, BoolCallback cb);
+
+    void listAttachments(
+        const DbClientPtr &db, int snippetId,
+        std::function<void(const std::vector<SnippetAttachmentDto> &)> cb);
+    // Owner-only: 0 rows affected/returned means not owned or not found,
+    // same convention as updateSnippet/deleteSnippet.
+    void addAttachment(const DbClientPtr &db, int snippetId, int userId,
+                       const std::string &fileUuid, BoolCallback cb);
+    void removeAttachment(const DbClientPtr &db, int snippetId,
+                          int attachmentId, int userId, BoolCallback cb);
 
   private:
     CodeSnippetDto rowToDto(const drogon::orm::Row &row);

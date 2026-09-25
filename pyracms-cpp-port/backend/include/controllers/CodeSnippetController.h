@@ -26,6 +26,12 @@ class CodeSnippetController
                   "pyracms::RateLimitFilter");
     ADD_METHOD_TO(CodeSnippetController::forkSnippet, "/api/snippets/{id}/fork",
                   drogon::Post, "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(CodeSnippetController::addAttachment,
+                  "/api/snippets/{id}/attachments", drogon::Post,
+                  "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(CodeSnippetController::removeAttachment,
+                  "/api/snippets/{id}/attachments/{attachmentId}",
+                  drogon::Delete, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 
     void listSnippets(
@@ -60,6 +66,16 @@ class CodeSnippetController
     forkSnippet(const drogon::HttpRequestPtr &req,
                 std::function<void(const drogon::HttpResponsePtr &)> &&callback,
                 const std::string &id);
+
+    void addAttachment(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+        const std::string &id);
+
+    void removeAttachment(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+        const std::string &id, const std::string &attachmentId);
 
   private:
     CodeSnippetService snippetService_;

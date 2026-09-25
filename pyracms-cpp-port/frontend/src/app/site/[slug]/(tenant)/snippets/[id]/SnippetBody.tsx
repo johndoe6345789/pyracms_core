@@ -48,10 +48,12 @@ export default function SnippetBody(p: Props) {
           isOwner={!!user && user.id === snippet.authorId}
           running={running}
           result={result}
+          tenantId={tenantId}
           onRun={() => run(id)}
           onFork={act.fork}
           onEdit={() => setEditing(true)}
           onDelete={() => setConfirmDel(true)}
+          onAttachmentsChanged={reload}
         />
       )}
       <CommentSection contentType="snippet" contentId={Number(id)} />

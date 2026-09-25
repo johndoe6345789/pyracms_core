@@ -314,6 +314,8 @@ set(LIB_SOURCES
 
     src/controllers/site/SiteSignupFinish.cpp
 
+    src/controllers/snippet/CodeSnippetControllerAddAttachment.cpp
+
     src/controllers/snippet/CodeSnippetControllerCreateSnippet.cpp
 
     src/controllers/snippet/CodeSnippetControllerDeleteSnippet.cpp
@@ -323,6 +325,8 @@ set(LIB_SOURCES
     src/controllers/snippet/CodeSnippetControllerGetSnippet.cpp
 
     src/controllers/snippet/CodeSnippetControllerListSnippets.cpp
+
+    src/controllers/snippet/CodeSnippetControllerRemoveAttachment.cpp
 
     src/controllers/snippet/CodeSnippetControllerRunSnippet.cpp
 
@@ -860,6 +864,8 @@ set(LIB_SOURCES
 
     src/services/seo/SeoServiceXmlEscape.cpp
 
+    src/services/snippet/CodeSnippetServiceAddAttachment.cpp
+
     src/services/snippet/CodeSnippetServiceCreateSnippet.cpp
 
     src/services/snippet/CodeSnippetServiceDeleteSnippet.cpp
@@ -868,9 +874,13 @@ set(LIB_SOURCES
 
     src/services/snippet/CodeSnippetServiceGetSnippet.cpp
 
+    src/services/snippet/CodeSnippetServiceListAttachments.cpp
+
     src/services/snippet/CodeSnippetServiceListSnippets.cpp
 
     src/services/snippet/CodeSnippetServiceRecordExecution.cpp
+
+    src/services/snippet/CodeSnippetServiceRemoveAttachment.cpp
 
     src/services/snippet/CodeSnippetServiceRowToDto.cpp
 

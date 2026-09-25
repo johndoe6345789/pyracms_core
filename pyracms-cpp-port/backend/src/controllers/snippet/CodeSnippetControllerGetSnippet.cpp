@@ -18,7 +18,7 @@ void CodeSnippetController::getSnippet(
         db, snippetId,
         effectiveScope(viewer.tenantId, req->getParameter("tenant_id")),
         viewer.userId,
-        [callback](const std::optional<CodeSnippetDto> &snippet) {
+        [this, db, callback](const std::optional<CodeSnippetDto> &snippet) {
             if (!snippet) {
                 auto resp =
                     drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
@@ -41,7 +41,25 @@ void CodeSnippetController::getSnippet(
             result["forkedFrom"] = snippet->forkedFrom;
             result["createdAt"] = snippet->createdAt;
             result["updatedAt"] = snippet->updatedAt;
-            callback(drogon::HttpResponse::newHttpJsonResponse(result));
+
+            snippetService_.listAttachments(
+                db, snippet->id,
+                [callback,
+                 result](const std::vector<SnippetAttachmentDto> &atts) {
+                    Json::Value r = result;
+                    Json::Value list(Json::arrayValue);
+                    for (const auto &a : atts) {
+                        Json::Value item;
+                        item["id"] = a.id;
+                        item["fileUuid"] = a.fileUuid;
+                        item["filename"] = a.filename;
+                        item["mimetype"] = a.mimetype;
+                        item["size"] = static_cast<Json::Int64>(a.size);
+                        list.append(item);
+                    }
+                    r["attachments"] = list;
+                    callback(drogon::HttpResponse::newHttpJsonResponse(r));
+                });
         });
 }
 
