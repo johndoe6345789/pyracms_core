@@ -13,7 +13,8 @@ void CodeSnippetService::listAttachments(
             std::vector<SnippetAttachmentDto> out;
             out.reserve(result.size());
             for (const auto &row : result) {
-                out.push_back({row["id"].as<int>(), row["uuid"].as<std::string>(),
+                out.push_back({row["id"].as<int>(),
+                               row["uuid"].as<std::string>(),
                                row["filename"].as<std::string>(),
                                row["mimetype"].as<std::string>(),
                                row["size"].as<int64_t>()});

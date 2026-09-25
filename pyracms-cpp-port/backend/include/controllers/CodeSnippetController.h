@@ -1,5 +1,6 @@
 #pragma once
 
+#include "controllers/HttpAliases.h"
 #include "services/CodeSnippetService.h"
 #include "services/DockerExecutionService.h"
 
@@ -14,68 +15,34 @@ class CodeSnippetController
     ADD_METHOD_TO(CodeSnippetController::listSnippets, "/api/snippets",
                   drogon::Get);
     ADD_METHOD_TO(CodeSnippetController::createSnippet, "/api/snippets",
-                  drogon::Post, "pyracms::JwtAuthFilter");
+                  drogon::Post, PYR_JWT);
     ADD_METHOD_TO(CodeSnippetController::getSnippet, "/api/snippets/{id}",
                   drogon::Get);
     ADD_METHOD_TO(CodeSnippetController::updateSnippet, "/api/snippets/{id}",
-                  drogon::Put, "pyracms::JwtAuthFilter");
+                  drogon::Put, PYR_JWT);
     ADD_METHOD_TO(CodeSnippetController::deleteSnippet, "/api/snippets/{id}",
-                  drogon::Delete, "pyracms::JwtAuthFilter");
+                  drogon::Delete, PYR_JWT);
     ADD_METHOD_TO(CodeSnippetController::runSnippet, "/api/snippets/{id}/run",
-                  drogon::Post, "pyracms::JwtAuthFilter",
-                  "pyracms::RateLimitFilter");
-    ADD_METHOD_TO(CodeSnippetController::forkSnippet, "/api/snippets/{id}/fork",
-                  drogon::Post, "pyracms::JwtAuthFilter");
+                  drogon::Post, PYR_JWT, PYR_RATE);
+    ADD_METHOD_TO(CodeSnippetController::forkSnippet,
+                  "/api/snippets/{id}/fork", drogon::Post, PYR_JWT);
     ADD_METHOD_TO(CodeSnippetController::addAttachment,
-                  "/api/snippets/{id}/attachments", drogon::Post,
-                  "pyracms::JwtAuthFilter");
+                  "/api/snippets/{id}/attachments", drogon::Post, PYR_JWT);
     ADD_METHOD_TO(CodeSnippetController::removeAttachment,
                   "/api/snippets/{id}/attachments/{attachmentId}",
-                  drogon::Delete, "pyracms::JwtAuthFilter");
+                  drogon::Delete, PYR_JWT);
     METHOD_LIST_END
 
-    void listSnippets(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback);
-
-    void createSnippet(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback);
-
-    void
-    getSnippet(const drogon::HttpRequestPtr &req,
-               std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-               const std::string &id);
-
-    void updateSnippet(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-        const std::string &id);
-
-    void deleteSnippet(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-        const std::string &id);
-
-    void
-    runSnippet(const drogon::HttpRequestPtr &req,
-               std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-               const std::string &id);
-
-    void
-    forkSnippet(const drogon::HttpRequestPtr &req,
-                std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-                const std::string &id);
-
-    void addAttachment(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-        const std::string &id);
-
-    void removeAttachment(
-        const drogon::HttpRequestPtr &req,
-        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-        const std::string &id, const std::string &attachmentId);
+    void listSnippets(HttpReq req, HttpCbRef callback);
+    void createSnippet(HttpReq req, HttpCbRef callback);
+    void getSnippet(HttpReq req, HttpCbRef callback, HttpStr id);
+    void updateSnippet(HttpReq req, HttpCbRef callback, HttpStr id);
+    void deleteSnippet(HttpReq req, HttpCbRef callback, HttpStr id);
+    void runSnippet(HttpReq req, HttpCbRef callback, HttpStr id);
+    void forkSnippet(HttpReq req, HttpCbRef callback, HttpStr id);
+    void addAttachment(HttpReq req, HttpCbRef callback, HttpStr id);
+    void removeAttachment(HttpReq req, HttpCbRef callback, HttpStr id,
+                          HttpStr attachmentId);
 
   private:
     CodeSnippetService snippetService_;
