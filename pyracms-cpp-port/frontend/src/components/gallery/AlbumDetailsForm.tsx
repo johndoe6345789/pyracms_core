@@ -1,19 +1,6 @@
-import {
-  Button,
-  FormControlLabel,
-  MenuItem,
-  Paper,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Button, Paper, TextField, Typography } from '@mui/material'
+import AlbumDisplayFields from './AlbumDisplayFields'
 import type { AlbumDetails } from '@/hooks/useAlbumEdit'
-
-const ORDERS = [
-  ['newest', 'Newest first'],
-  ['oldest', 'Oldest first'],
-  ['title', 'By title'],
-]
 
 interface Props {
   value: AlbumDetails
@@ -49,29 +36,7 @@ export default function AlbumDetailsForm({
         onChange={(e) => set({ description: e.target.value })}
         inputProps={{ 'data-testid': 'album-desc-input' }}
       />
-      <TextField
-        select
-        label="Photo order"
-        value={v.sortOrder}
-        onChange={(e) => set({ sortOrder: e.target.value })}
-        data-testid="album-sort"
-      >
-        {ORDERS.map(([value, label]) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
-        ))}
-      </TextField>
-      <FormControlLabel
-        label="Private (only you and admins can see this album)"
-        control={
-          <Switch
-            checked={v.isPrivate}
-            onChange={(e) => set({ isPrivate: e.target.checked })}
-            inputProps={{ 'aria-label': 'Private album' }}
-          />
-        }
-      />
+      <AlbumDisplayFields value={v} onChange={onChange} />
       <Button
         variant="contained"
         disabled={busy || !v.name.trim()}

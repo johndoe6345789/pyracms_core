@@ -1,5 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
+import { newDraft } from '@/lib/menuDraft'
 import { m } from '../../helpers/scopeApi'
 
 jest.mock(
@@ -52,16 +53,20 @@ it('tolerates api failures', async () => {
   m.put.mockRejectedValue(new Error('x'))
   m.delete.mockRejectedValue(new Error('x'))
   const { result } = await setup()
-  act(() => {
-    result.current.setNewName('N')
-    result.current.setNewRoute('/n')
-    result.current.setNewGroupName('g')
+  act(() => result.current.setNewGroupName('g'))
+  await act(async () => {
+    await result.current.save({ ...newDraft(), name: 'N', route: '/n' })
   })
-  act(() => result.current.handleAddItem())
   act(() => result.current.handleCreateGroup())
-  act(() => result.current.handleStartEdit(result.current.currentItems[0]!))
-  act(() => result.current.handleSaveEdit())
-  act(() => result.current.handleDelete(10))
+  await act(async () => {
+    await result.current.save(
+      { ...newDraft(), name: 'H', route: '/' },
+      result.current.currentItems[0]!.id,
+    )
+  })
+  await act(() => result.current.move(10, 1))
+  await act(() => result.current.remove(10))
+  expect(result.current.error).not.toBe('')
   m.get.mockImplementation((url: string) =>
     url.includes('items')
       ? Promise.reject(new Error('x'))

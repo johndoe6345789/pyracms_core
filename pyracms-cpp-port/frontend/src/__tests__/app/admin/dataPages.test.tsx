@@ -1,11 +1,5 @@
 import '../../helpers/scopeModuleMocks'
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  within,
-} from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminFilesPage from '@/app/site/[slug]/(admin)/admin/files/page'
 import AdminMenusPage from '@/app/site/[slug]/(admin)/admin/menus/page'
 import AdminUsersPage from '@/app/site/[slug]/(admin)/admin/users/page'
@@ -36,16 +30,20 @@ it('files page lists, uploads and deletes', async () => {
 
 it('menus page renders groups and adds an item', async () => {
   routeGet({ '/items': [], '/api/menu-groups': [{ id: 1, name: 'main' }] })
+  m.post.mockResolvedValue({ data: { id: 9 } })
   render(<AdminMenusPage />)
   await screen.findByText('main')
-  const box = (id: string, role = 'textbox') =>
-    within(screen.getByTestId(id)).getByRole(role)
-  fireEvent.change(box('menu-name-input'), { target: { value: 'N' } })
-  fireEvent.change(box('menu-route-input', 'combobox'), {
+  fireEvent.click(screen.getByTestId('add-link-btn'))
+  fireEvent.change(screen.getByTestId('menu-name-input'), {
+    target: { value: 'Newpage' },
+  })
+  fireEvent.change(screen.getByTestId('menu-target-input'), {
     target: { value: '/n' },
   })
-  fireEvent.click(screen.getByTestId('add-menu-item-btn'))
-  await screen.findByText('/n')
+  fireEvent.click(screen.getByTestId('menu-save-btn'))
+  await waitFor(() =>
+    expect(screen.getAllByText('Newpage').length).toBeGreaterThan(0),
+  )
   fireEvent.click(screen.getByRole('button', { name: /New Menu Group/ }))
   expect(screen.getByTestId('create-group-dialog')).toBeInTheDocument()
 })

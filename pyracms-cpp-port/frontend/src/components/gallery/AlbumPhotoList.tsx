@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { List, Paper, Typography } from '@mui/material'
 import AlbumPhotoRow from './AlbumPhotoRow'
-import GalleryDeleteDialog from './GalleryDeleteDialog'
-import GalleryEditDialog from './GalleryEditDialog'
+import AlbumPhotoDialogs from './AlbumPhotoDialogs'
 import type { GalleryPicture } from '@/hooks/useGalleryAlbum'
 import type { useAlbumEdit } from '@/hooks/useAlbumEdit'
 
@@ -48,33 +47,16 @@ export default function AlbumPhotoList({ pictures, coverId, edit }: Props) {
           />
         ))}
       </List>
-      <GalleryEditDialog
-        open={!!editing}
-        noun="photo"
-        name={title}
+      <AlbumPhotoDialogs
+        editing={editing}
+        deleting={deleting}
+        title={title}
         desc={desc}
-        busy={edit.busy}
-        err={null}
-        setName={setTitle}
+        setTitle={setTitle}
         setDesc={setDesc}
-        onClose={() => setEditing(null)}
-        onSave={() => {
-          if (editing) edit.editPicture(editing.id, title.trim(), desc)
-          setEditing(null)
-        }}
-      />
-      <GalleryDeleteDialog
-        open={!!deleting}
-        noun="photo"
-        name={deleting?.title ?? ''}
-        albums={false}
-        busy={edit.busy}
-        err={null}
-        onClose={() => setDeleting(null)}
-        onConfirm={() => {
-          if (deleting) edit.removePicture(deleting.id)
-          setDeleting(null)
-        }}
+        edit={edit}
+        onCloseEdit={() => setEditing(null)}
+        onCloseDelete={() => setDeleting(null)}
       />
     </Paper>
   )

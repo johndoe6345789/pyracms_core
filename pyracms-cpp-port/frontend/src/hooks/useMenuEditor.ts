@@ -3,17 +3,15 @@
 import { useState, useEffect } from 'react'
 import { SelectChangeEvent } from '@mui/material'
 import { MenuGroup, MenuItemRow, fetchMenuGroups } from './admin/menuData'
-import { useMenuItemEdit } from './admin/useMenuItemEdit'
-import { useMenuAddItem } from './admin/useMenuAddItem'
+import { useMenuItems } from './admin/useMenuItems'
 import { useMenuGroupCreate } from './admin/useMenuGroupCreate'
 
 export type { MenuGroup, MenuItemRow }
 
 /**
- * Hook that manages the full menu editor state including
- * CRUD operations for groups and items.
+ * The menu editor: the site's menu groups, the open group's items (add,
+ * edit, delete, re-order) and creating new groups.
  * @param tenantId - The active tenant ID, or null.
- * @returns State values and handlers for the editor UI.
  */
 export function useMenuEditor(tenantId: number | null) {
   const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
@@ -35,9 +33,7 @@ export function useMenuEditor(tenantId: number | null) {
   }, [tenantId])
 
   const currentGroup = menuGroups.find((g) => g.name === selectedGroup)
-  const currentItems = currentGroup?.items ?? []
-  const edit = useMenuItemEdit(selectedGroup, setMenuGroups)
-  const add = useMenuAddItem(currentGroup, selectedGroup, setMenuGroups)
+  const items = useMenuItems(currentGroup, selectedGroup, setMenuGroups)
   const create = useMenuGroupCreate(
     tenantId,
     menuGroups,
@@ -45,20 +41,20 @@ export function useMenuEditor(tenantId: number | null) {
     setSelectedGroup,
   )
 
-  const handleGroupChange = (e: SelectChangeEvent) => {
+  const handleGroupChange = (e: SelectChangeEvent) =>
     setSelectedGroup(e.target.value)
-    edit.handleCancelEdit()
-  }
 
   return {
     menuGroups,
     loading,
     selectedGroup,
-    currentItems,
+    currentItems: currentGroup?.items ?? [],
     handleGroupChange,
-    error: edit.editError || add.addError || create.groupError,
-    ...edit,
-    ...add,
+    error: items.error || create.groupError,
+    busy: items.busy,
+    save: items.save,
+    remove: items.remove,
+    move: items.move,
     ...create,
   }
 }

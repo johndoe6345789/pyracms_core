@@ -5,7 +5,7 @@ export const menuRow = (over: Partial<MenuItemRow> = {}): MenuItemRow => ({
   id: 1,
   name: 'a',
   route: '/a',
-  position: 0,
+  position: 1,
   permissions: 'public',
   type: 'route',
   parentId: 0,

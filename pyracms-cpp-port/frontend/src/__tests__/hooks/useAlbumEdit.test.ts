@@ -16,7 +16,7 @@ beforeEach(() => {
   m.delete.mockResolvedValue({})
 })
 
-it('saves details, cover mode and each photo action, then reloads', async () => {
+it('saves details, cover mode and photo actions, then reloads', async () => {
   const done = jest.fn()
   const { result } = renderHook(() => useAlbumEdit('3', done))
   await act(() => result.current.saveDetails(d))

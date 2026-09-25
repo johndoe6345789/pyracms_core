@@ -1,35 +1,37 @@
 'use client'
 
-import { Typography, Box } from '@mui/material'
+import { useParams } from 'next/navigation'
+import { Box, Typography } from '@mui/material'
+import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
+import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
+import MenuAddButtons from '@/components/admin/menus/MenuAddButtons'
+import MenuDeleteDialog from '@/components/admin/menus/MenuDeleteDialog'
+import MenuItemDialog from '@/components/admin/menus/MenuItemDialog'
+import MenuPreview from '@/components/admin/menus/MenuPreview'
+import MenuTree from '@/components/admin/menus/MenuTree'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { useMenuDialogs } from '@/hooks/admin/useMenuDialogs'
+import { useMenuTargets } from '@/hooks/admin/useMenuTargets'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
 import { useTenantId } from '@/hooks/useTenantId'
-import { useParams } from 'next/navigation'
-import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
-import MenuItemTable from '@/components/admin/MenuItemTable'
-import AddMenuItemCard from '@/components/admin/menus/AddMenuItemCard'
-import { ErrorAlert } from '@/components/common/ErrorAlert'
-import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
-
-const INTRO = [
-  'Your links along the top of the site, in your own words.',
-  'The group called "main" is shown (if there is none, the first group',
-  'with links). Stock pages such as Articles and Forum stay under Explore.',
-  'Each link can be public, for signed-in members, or for admins only.',
-]
 
 export default function AdminMenusPage() {
-  const params = useParams()
-  const slug = params.slug as string
+  const slug = useParams().slug as string
   const { tenantId } = useTenantId(slug)
   const editor = useMenuEditor(tenantId)
+  const targets = useMenuTargets(tenantId)
+  const ui = useMenuDialogs()
+  const items = editor.currentItems
+  const folders = items.filter((i) => i.type === 'folder')
 
   return (
     <Box data-testid="admin-menus-page">
       <Typography variant="h3" sx={{ mb: 1 }}>
         Menu Editor
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        {INTRO.join(' ')}
+      <Typography color="text.secondary" sx={{ mb: 3 }}>
+        The links along the top of your site. Group links into folders to make
+        dropdowns, and use the arrows to put them in order.
       </Typography>
       <ErrorAlert error={editor.error} testId="menu-editor-error" />
       <MenuGroupSelect
@@ -38,16 +40,38 @@ export default function AdminMenusPage() {
         onGroupChange={editor.handleGroupChange}
         onNewGroup={editor.handleOpenGroupDialog}
       />
-      <AddMenuItemCard editor={editor} />
-      <MenuItemTable
-        items={editor.currentItems}
-        editingId={editor.editingId}
-        editRow={editor.editRow}
-        onEditRowChange={editor.setEditRow}
-        onStartEdit={editor.handleStartEdit}
-        onSaveEdit={editor.handleSaveEdit}
-        onCancelEdit={editor.handleCancelEdit}
-        onDelete={editor.handleDelete}
+      <MenuAddButtons onLink={() => ui.addLink()} onFolder={ui.addFolder} />
+      <MenuPreview items={items} />
+      <MenuTree
+        items={items}
+        targets={targets}
+        busy={editor.busy}
+        onMove={editor.move}
+        onEdit={ui.edit}
+        onDelete={ui.setDeleting}
+        onAddInside={(f) => ui.addLink(f.id)}
+        onAdd={() => ui.addLink()}
+      />
+      {ui.dialog && (
+        <MenuItemDialog
+          key={ui.dialog.key}
+          title={ui.dialog.title}
+          initial={ui.dialog.draft}
+          editing={ui.dialog.editingId !== undefined}
+          folders={folders}
+          targets={targets}
+          slug={slug}
+          busy={editor.busy}
+          onClose={ui.close}
+          onSave={async (d) => {
+            if (await editor.save(d, ui.dialog?.editingId)) ui.close()
+          }}
+        />
+      )}
+      <MenuDeleteDialog
+        item={ui.deleting}
+        onConfirm={(id) => editor.remove(id)}
+        onClose={() => ui.setDeleting(null)}
       />
       <CreateGroupDialog editor={editor} />
     </Box>

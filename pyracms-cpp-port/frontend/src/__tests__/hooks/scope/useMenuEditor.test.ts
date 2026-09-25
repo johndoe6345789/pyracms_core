@@ -1,5 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { useMenuEditor } from '@/hooks/useMenuEditor'
+import { newDraft } from '@/lib/menuDraft'
 import { m } from '../../helpers/scopeApi'
 
 jest.mock(
@@ -38,42 +39,42 @@ it('loads groups and switches', async () => {
   expect(result.current.currentItems[0]).toMatchObject({
     position: 0,
     permissions: 'public',
+    type: 'route',
+    parentId: 0,
   })
-  act(() => result.current.handleStartEdit(result.current.currentItems[0]!))
   act(() =>
     result.current.handleGroupChange({ target: { value: 'foot' } } as never),
   )
   expect(result.current.selectedGroup).toBe('foot')
-  expect(result.current.editingId).toBeNull()
 })
 
 it('edits and deletes items', async () => {
   const { result } = await setup()
-  act(() => result.current.handleSaveEdit())
-  act(() => result.current.handleStartEdit(result.current.currentItems[0]!))
-  act(() =>
-    result.current.setEditRow({ ...result.current.editRow!, name: 'Z' }),
-  )
-  act(() => result.current.handleSaveEdit())
+  await act(async () => {
+    await result.current.save(
+      { ...newDraft(), name: 'Z', route: '/' },
+      result.current.currentItems[0]!.id,
+    )
+  })
   await waitFor(() => expect(result.current.currentItems[0]!.name).toBe('Z'))
-  act(() => result.current.handleDelete(10))
+  await act(() => result.current.remove(10))
   await waitFor(() => expect(result.current.currentItems).toHaveLength(0))
 })
 
-it('adds items', async () => {
+it('adds items at the end', async () => {
   const { result } = await setup()
-  act(() => result.current.handleAddItem())
-  act(() => {
-    result.current.setNewName('N')
-    result.current.setNewRoute('/n')
-    result.current.setNewPosition('3')
-    result.current.setNewPermissions('admin')
+  await act(async () => {
+    await result.current.save({
+      ...newDraft(),
+      name: 'N',
+      route: '/n',
+      permissions: 'admin',
+    })
   })
-  act(() => result.current.handleAddItem())
   await waitFor(() => expect(result.current.currentItems).toHaveLength(2))
   expect(result.current.currentItems[1]).toMatchObject({
     id: 50,
-    position: 3,
+    position: 1,
     permissions: 'admin',
   })
 })

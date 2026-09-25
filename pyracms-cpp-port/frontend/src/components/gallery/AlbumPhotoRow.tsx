@@ -1,9 +1,5 @@
-import { Box, Button, Chip, ListItem, Typography } from '@mui/material'
-import {
-  DeleteOutlined,
-  EditOutlined,
-  WallpaperOutlined,
-} from '@mui/icons-material'
+import { Box, Chip, ListItem, Typography } from '@mui/material'
+import AlbumPhotoActions from './AlbumPhotoActions'
 import type { GalleryPicture } from '@/hooks/useGalleryAlbum'
 
 interface Props {
@@ -47,39 +43,14 @@ export default function AlbumPhotoRow(p: Props) {
           {pic.description || 'No description'}
         </Typography>
       </Box>
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<WallpaperOutlined />}
-          disabled={p.disabled || p.isCover}
-          onClick={p.onSetCover}
-          data-testid={`set-cover-${pic.id}`}
-        >
-          Set as cover
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<EditOutlined />}
-          disabled={p.disabled}
-          onClick={p.onEdit}
-          data-testid={`edit-photo-${pic.id}`}
-        >
-          Edit
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          color="error"
-          startIcon={<DeleteOutlined />}
-          disabled={p.disabled}
-          onClick={p.onDelete}
-          data-testid={`delete-photo-${pic.id}`}
-        >
-          Delete
-        </Button>
-      </Box>
+      <AlbumPhotoActions
+        id={pic.id}
+        isCover={p.isCover}
+        disabled={p.disabled}
+        onSetCover={p.onSetCover}
+        onEdit={p.onEdit}
+        onDelete={p.onDelete}
+      />
     </ListItem>
   )
 }
