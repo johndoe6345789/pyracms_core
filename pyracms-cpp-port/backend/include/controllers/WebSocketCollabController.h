@@ -24,6 +24,11 @@ class WebSocketCollabController
     void handleConnectionClosed(
         const drogon::WebSocketConnectionPtr &wsConnPtr) override;
 
+    // A message another API process received for `room`: hand it to the
+    // connections held here.
+    static void deliverRemote(const std::string &room, bool binary,
+                              const std::string &payload);
+
   private:
     struct ConnectionContext {
         std::string room;

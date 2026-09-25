@@ -1,15 +1,20 @@
 import { Box, IconButton, Tooltip } from '@mui/material'
-import { DeleteOutlined, DownloadOutlined } from '@mui/icons-material'
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  DriveFileMoveOutlined,
+} from '@mui/icons-material'
 import { FileItem } from '@/hooks/useFileManager'
 import { fileDownloadUrl } from '@/lib/fileDownloadUrl'
 
 interface Props {
   file: FileItem
   onDelete: (file: FileItem) => void
+  onMove?: (file: FileItem) => void
 }
 
 /** Download (the API serves files as attachments) and delete. */
-export default function FileCardActions({ file, onDelete }: Props) {
+export default function FileCardActions({ file, onDelete, onMove }: Props) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
       <Tooltip title="Download">
@@ -24,6 +29,18 @@ export default function FileCardActions({ file, onDelete }: Props) {
           <DownloadOutlined fontSize="small" />
         </IconButton>
       </Tooltip>
+      {onMove && (
+        <Tooltip title="Move to folder">
+          <IconButton
+            size="small"
+            onClick={() => onMove(file)}
+            aria-label={`Move file ${file.name}`}
+            data-testid={`move-file-${file.id}`}
+          >
+            <DriveFileMoveOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title="Delete">
         <IconButton
           size="small"

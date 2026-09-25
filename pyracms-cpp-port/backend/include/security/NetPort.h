@@ -31,13 +31,16 @@ inline void netInit() {
 inline int netClose(int fd) { return closesocket(static_cast<SOCKET>(fd)); }
 
 // Send/receive timeout; Winsock takes milliseconds, POSIX a timeval.
-inline void netSetTimeout(int fd, int seconds) {
-    DWORD ms = static_cast<DWORD>(seconds) * 1000;
+inline void netSetTimeoutMs(int fd, int millis) {
+    DWORD ms = static_cast<DWORD>(millis);
     auto s = static_cast<SOCKET>(fd);
     setsockopt(s, SOL_SOCKET, SO_RCVTIMEO,
                reinterpret_cast<const char *>(&ms), sizeof ms);
     setsockopt(s, SOL_SOCKET, SO_SNDTIMEO,
                reinterpret_cast<const char *>(&ms), sizeof ms);
+}
+inline void netSetTimeout(int fd, int seconds) {
+    netSetTimeoutMs(fd, seconds * 1000);
 }
 #else
 using SsizeT = ssize_t;
@@ -45,12 +48,15 @@ using SsizeT = ssize_t;
 inline void netInit() {}
 inline int netClose(int fd) { return ::close(fd); }
 
-inline void netSetTimeout(int fd, int seconds) {
+inline void netSetTimeoutMs(int fd, int millis) {
     struct timeval tv;
-    tv.tv_sec = seconds;
-    tv.tv_usec = 0;
+    tv.tv_sec = millis / 1000;
+    tv.tv_usec = (millis % 1000) * 1000;
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+}
+inline void netSetTimeout(int fd, int seconds) {
+    netSetTimeoutMs(fd, seconds * 1000);
 }
 #endif
 

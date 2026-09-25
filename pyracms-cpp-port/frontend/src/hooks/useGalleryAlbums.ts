@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
+import { galleryFileUrl } from '@/lib/galleryImage'
 
 export interface GalleryAlbum {
   id: string
@@ -15,7 +16,8 @@ export interface GalleryAlbum {
 const mapAlbum = (a: Record<string, unknown>): GalleryAlbum => ({
   id: String(a.id),
   name: (a.displayName || a.name || '') as string,
-  coverImage: (a.defaultPictureUrl || '') as string,
+  coverImage:
+    (a.defaultPictureUrl as string) || galleryFileUrl(a.coverFileUuid, true),
   ownerId: typeof a.userId === 'number' ? a.userId : null,
   pictureCount: (a.pictureCount || 0) as number,
 })

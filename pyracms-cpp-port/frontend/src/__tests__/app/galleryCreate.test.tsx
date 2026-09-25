@@ -27,6 +27,8 @@ jest.mock('@/hooks/useSiteSession', () => ({
 }))
 
 const box = (id: string) => within(screen.getByTestId(id)).getByRole('textbox')
+const albumListCalls = () =>
+  m.get.mock.calls.filter((c) => c[0].includes('/api/gallery/albums')).length
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -55,7 +57,7 @@ it('creates an album and refreshes the list', async () => {
       tenantId: 1,
     }),
   )
-  await waitFor(() => expect(m.get).toHaveBeenCalledTimes(2))
+  await waitFor(() => expect(albumListCalls()).toBe(2))
 })
 
 it('reports failures and can be cancelled', async () => {

@@ -19,6 +19,7 @@ struct FileDto {
     int downloadCount;
     std::string sha256;
     int tenantId{0};               // 0 = platform site
+    std::string folder;            // path in the file manager, "" = top
     std::string storage{"local"};  // BlobStorage that holds the bytes
 };
 
@@ -42,9 +43,11 @@ class FileService {
     void deleteFile(const DbClientPtr &db, const std::string &uuid,
                     BoolCallback cb);
 
-    // scopeUser 0 = any uploader; scopeTenant < 0 = any site.
+    // scopeUser 0 = any uploader; scopeTenant < 0 = any site;
+    // folder "*" = any folder, else exactly that one ("" = the top).
     void listFiles(const DbClientPtr &db, int limit, int offset, int scopeUser,
-                   int scopeTenant, ListCallback cb);
+                   int scopeTenant, const std::string &folder,
+                   ListCallback cb);
 
     void incrementDownloadCount(const DbClientPtr &db, const std::string &uuid,
                                 BoolCallback cb);

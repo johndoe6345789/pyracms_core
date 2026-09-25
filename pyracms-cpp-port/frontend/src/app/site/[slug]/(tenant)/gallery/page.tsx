@@ -5,6 +5,8 @@ import { Container } from '@mui/material'
 import AlbumGrid from '@/components/gallery/AlbumGrid'
 import CreateAlbumDialog from '@/components/gallery/CreateAlbumDialog'
 import GalleryHeader from '@/components/gallery/GalleryHeader'
+import GalleryHero from '@/components/gallery/GalleryHero'
+import { useFeaturedPhoto } from '@/hooks/useFeaturedPhoto'
 import { useCreateAlbum } from '@/hooks/useCreateAlbum'
 import { useGalleryAlbums } from '@/hooks/useGalleryAlbums'
 import { useSiteSession } from '@/hooks/useSiteSession'
@@ -17,9 +19,11 @@ export default function GalleryPage() {
   const { albums, refresh } = useGalleryAlbums(tenantId)
   const signedIn = useSiteSession(slug)
   const create = useCreateAlbum(tenantId, refresh)
+  const featured = useFeaturedPhoto(tenantId)
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }} data-testid="gallery-page">
+      {featured && <GalleryHero photo={featured} slug={slug} />}
       <GalleryHeader
         canCreate={signedIn}
         onCreate={() => create.setOpen(true)}

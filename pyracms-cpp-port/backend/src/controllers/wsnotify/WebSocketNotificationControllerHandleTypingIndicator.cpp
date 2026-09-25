@@ -1,5 +1,6 @@
 #include "controllers/WebSocketNotificationController.h"
 #include "controllers/WsAuth.h"
+#include "services/cache/WsRelay.h"
 
 #include <drogon/drogon.h>
 #include <json/json.h>
@@ -34,6 +35,10 @@ void WebSocketNotificationController::handleTypingIndicator(
     msg["userId"] = userId;
     Json::StreamWriterBuilder writer;
     auto payload = Json::writeString(writer, msg);
+
+    // Subscribers held by other API processes
+    WsRelay::instance().publish("thread", std::to_string(threadId), false,
+                                payload);
 
     // Relay to all thread subscribers except the sender
     std::lock_guard<std::mutex> lock(connectionsMutex_);

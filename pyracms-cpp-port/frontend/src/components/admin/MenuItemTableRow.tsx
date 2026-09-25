@@ -1,4 +1,5 @@
 import { TableRow, TableCell, Typography } from '@mui/material'
+import { FolderOutlined } from '@mui/icons-material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 import { EditActions, ViewActions } from './MenuItemViewActions'
 import MenuItemEditCells from './MenuItemEditCells'
@@ -7,6 +8,7 @@ interface Props {
   item: MenuItemRow
   editing: boolean
   editRow: MenuItemRow | null
+  folders: MenuItemRow[]
   onEditRowChange: (
     updater: (prev: MenuItemRow | null) => MenuItemRow | null,
   ) => void
@@ -20,6 +22,7 @@ export default function MenuItemTableRow({
   item,
   editing,
   editRow,
+  folders,
   onEditRowChange,
   onStartEdit,
   onSaveEdit,
@@ -31,14 +34,23 @@ export default function MenuItemTableRow({
       {editing ? (
         <MenuItemEditCells
           editRow={editRow}
+          folders={folders}
           onEditRowChange={onEditRowChange}
         />
       ) : (
         <>
-          <TableCell>{item.name}</TableCell>
+          <TableCell sx={{ pl: item.parentId ? 5 : 2 }}>
+            {item.type === 'folder' && (
+              <FolderOutlined
+                fontSize="small"
+                sx={{ mr: 1, verticalAlign: 'middle' }}
+              />
+            )}
+            {item.name}
+          </TableCell>
           <TableCell>
             <Typography sx={{ fontFamily: 'monospace' }}>
-              {item.route}
+              {item.type === 'folder' ? 'Folder' : item.route}
             </Typography>
           </TableCell>
           <TableCell>{item.position}</TableCell>

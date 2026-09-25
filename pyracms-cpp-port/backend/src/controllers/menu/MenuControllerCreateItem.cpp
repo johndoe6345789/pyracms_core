@@ -30,10 +30,11 @@ void MenuController::createItem(
     auto type = (*json).get("type", "route").asString();
     int position = (*json).get("position", 0).asInt();
     auto permissions = (*json).get("permissions", "").asString();
+    int parentId = (*json).get("parentId", 0).asInt();
 
     auto db = drogon::app().getDbClient();
     menuService_.createMenuItem(db, name, routePath, url, type, id, position,
-                                permissions, scopeTenantOf(req),
+                                permissions, parentId, scopeTenantOf(req),
                                 boolReply(callback));
 }
 

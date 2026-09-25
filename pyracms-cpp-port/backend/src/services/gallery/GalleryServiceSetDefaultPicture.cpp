@@ -3,15 +3,21 @@
 
 namespace pyracms {
 
-void GalleryService::setDefaultPicture(const DbClientPtr &db, int albumId,
-                                       int pictureId, BoolCallback cb) {
+void GalleryService::setDefaultPicture(const DbClientPtr &db, int pictureId,
+                                       BoolCallback cb) {
     db->execSqlAsync(
-        "UPDATE gallery_albums SET default_picture_id = $1 WHERE id = $2",
-        [cb](const drogon::orm::Result &) { cb(true, ""); },
+        "UPDATE gallery_albums a SET default_picture_id = p.id "
+        "FROM gallery_pictures p WHERE p.id = $1 AND a.id = p.album_id",
+        [cb](const drogon::orm::Result &r) {
+            if (r.affectedRows() == 0)
+                cb(false, "Picture not found");
+            else
+                cb(true, "");
+        },
         [cb](const drogon::orm::DrogonDbException &e) {
             cb(false, dbError(e));
         },
-        pictureId, albumId);
+        pictureId);
 }
 
 } // namespace pyracms

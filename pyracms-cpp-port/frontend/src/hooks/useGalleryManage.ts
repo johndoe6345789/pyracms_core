@@ -28,6 +28,9 @@ export function useGalleryManage(kind: 'albums' | 'pictures', id: string) {
     clearError: () => setError(''),
     update: (displayName: string, description: string, done: () => void) =>
       run(() => api.put(url, { displayName, description }), done),
+    /** Album edit with the extra options (privacy, order, cover). */
+    updateAlbum: (body: Record<string, unknown>, done: () => void) =>
+      run(() => api.put(url, body), done),
     remove: (done: () => void) => run(() => api.delete(url), done),
   }
 }

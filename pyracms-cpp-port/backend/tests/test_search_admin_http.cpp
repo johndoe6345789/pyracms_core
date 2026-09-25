@@ -15,9 +15,11 @@ TEST(SearchAdminHttp, StatusCountsWhatShouldBeSearchable) {
     auto pub = uniq("pub");
     post("/api/articles", J({{"name", pub}, {"displayName", pub},
                              {"content", "c"}, {"tenant_id", s.id}}), tok);
-    post("/api/articles", J({{"name", uniq("draft")}, {"displayName", "d"},
+    auto draft = uniq("draft");
+    post("/api/articles", J({{"name", draft}, {"displayName", "d"},
                              {"content", "c"}, {"tenant_id", s.id}}), tok);
-    post("/api/articles/" + pub + "/publish", J({{"tenant_id", s.id}}), tok);
+    post("/api/articles/" + draft + "/unpublish", J({{"tenant_id", s.id}}),
+         tok);
     for (const char *vis : {"public", "private"})
         post("/api/snippets", J({{"title", "S"}, {"code", "x"},
                                  {"visibility", vis}, {"tenant_id", s.id}}),

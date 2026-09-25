@@ -29,12 +29,12 @@ export default function AddMenuItemCard({ editor }: { editor: Editor }) {
             onClick={editor.handleAddItem}
             disabled={
               !editor.newName.trim() ||
-              !editor.newRoute.trim() ||
-              !!validateRoute(editor.newRoute)
+              (editor.newType !== 'folder' &&
+                (!editor.newRoute.trim() || !!validateRoute(editor.newRoute)))
             }
             data-testid="add-menu-item-btn"
           >
-            Add Item
+            {editor.newType === 'folder' ? 'Add Folder' : 'Add Item'}
           </Button>
         </Box>
       </CardContent>

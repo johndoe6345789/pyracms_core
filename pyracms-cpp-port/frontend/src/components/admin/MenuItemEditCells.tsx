@@ -5,19 +5,24 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
-import RouteField from './menus/RouteField'
+import MenuItemEditRoute from './MenuItemEditRoute'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 
 type Updater = (fn: (p: MenuItemRow | null) => MenuItemRow | null) => void
 
 interface Props {
   editRow: MenuItemRow | null
+  folders: MenuItemRow[]
   onEditRowChange: Updater
 }
 
 const PERMS = ['public', 'authenticated', 'admin']
 
-export default function MenuItemEditCells({ editRow, onEditRowChange }: Props) {
+export default function MenuItemEditCells({
+  editRow,
+  folders,
+  onEditRowChange,
+}: Props) {
   const set = (patch: Partial<MenuItemRow>) =>
     onEditRowChange((p) => (p ? { ...p, ...patch } : p))
   return (
@@ -31,15 +36,7 @@ export default function MenuItemEditCells({ editRow, onEditRowChange }: Props) {
           onChange={(e) => set({ name: e.target.value })}
         />
       </TableCell>
-      <TableCell>
-        <RouteField
-          value={editRow?.route ?? ''}
-          onChange={(route) => set({ route })}
-          testId="route-input"
-          minWidth={260}
-          fullWidth
-        />
-      </TableCell>
+      <MenuItemEditRoute editRow={editRow} folders={folders} onChange={set} />
       <TableCell>
         <TextField
           size="small"

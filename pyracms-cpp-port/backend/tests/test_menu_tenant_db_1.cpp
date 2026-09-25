@@ -18,8 +18,8 @@ int makeGroup(const drogon::orm::DbClientPtr &db, int tenant) {
 
 BoolResult addItem(const drogon::orm::DbClientPtr &db, int group, int scope) {
     return awaitBool([&](auto cb) {
-        menus.createMenuItem(db, "Home", "/", "", "route", group, 0, "", scope,
-                             cb);
+        menus.createMenuItem(db, "Home", "/", "", "route", group, 0, "", 0,
+                             scope, cb);
     });
 }
 } // namespace

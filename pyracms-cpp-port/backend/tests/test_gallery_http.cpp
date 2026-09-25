@@ -49,8 +49,7 @@ TEST(GalleryHttp, PicturesVoteAndDefault) {
     EXPECT_EQ(put(pp, J({{"displayName", "P2"}, {"description", "z"}}), u)
                   .status, 200);
     EXPECT_EQ(put(pp, J({{"x", 1}}), u).status, 400);
-    EXPECT_EQ(put(pp + "/default", J({{"albumId", aid}}), u).status, 200);
-    EXPECT_EQ(put(pp + "/default", J({{"x", 1}}), u).status, 400);
+    EXPECT_EQ(put(pp + "/default", J({}), u).status, 200);
     EXPECT_EQ(post(pp + "/vote", J({{"isLike", true}}), s.admin.token)
                   .status, 200);
     EXPECT_EQ(post(pp + "/vote", J({{"x", 1}}), u).status, 400);

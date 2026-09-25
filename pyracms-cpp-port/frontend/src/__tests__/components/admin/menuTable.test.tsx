@@ -7,6 +7,8 @@ const item = (id: number) => ({
   route: `/r${id}`,
   position: id,
   permissions: 'admin',
+  type: 'route',
+  parentId: 0,
 })
 
 const props = () => ({

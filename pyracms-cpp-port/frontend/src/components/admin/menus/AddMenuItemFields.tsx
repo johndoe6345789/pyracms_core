@@ -6,6 +6,7 @@ import {
   MenuItem,
 } from '@mui/material'
 import RouteField from './RouteField'
+import MenuParentSelect from './MenuParentSelect'
 import type { useMenuEditor } from '@/hooks/useMenuEditor'
 
 type Editor = ReturnType<typeof useMenuEditor>
@@ -21,12 +22,34 @@ export default function AddMenuItemFields({ editor }: { editor: Editor }) {
         sx={{ minWidth: 150 }}
         data-testid="menu-name-input"
       />
-      <RouteField
-        value={editor.newRoute}
-        onChange={editor.setNewRoute}
-        testId="menu-route-input"
-        minWidth={300}
-      />
+      <FormControl size="small" sx={{ minWidth: 120 }}>
+        <InputLabel>Kind</InputLabel>
+        <Select
+          value={editor.newType}
+          label="Kind"
+          onChange={(e) => editor.setNewType(e.target.value)}
+          data-testid="menu-type-select"
+        >
+          <MenuItem value="route">Link</MenuItem>
+          <MenuItem value="folder">Folder</MenuItem>
+        </Select>
+      </FormControl>
+      {editor.newType === 'folder' ? null : (
+        <>
+          <RouteField
+            value={editor.newRoute}
+            onChange={editor.setNewRoute}
+            testId="menu-route-input"
+            minWidth={300}
+          />
+          <MenuParentSelect
+            folders={editor.currentItems.filter((i) => i.type === 'folder')}
+            value={editor.newParent}
+            onChange={editor.setNewParent}
+            testId="menu-parent-select"
+          />
+        </>
+      )}
       <TextField
         label="Position"
         size="small"

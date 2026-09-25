@@ -10,12 +10,13 @@ const item = (id: number, over: object = {}) => ({
   route: '/about',
   position: id,
   permissions: 'public',
+  type: 'route',
+  parentId: 0,
   ...over,
 })
 const guest = { signedIn: false, canAdmin: false }
 const member = { signedIn: true, canAdmin: false }
 const admin = { signedIn: true, canAdmin: true }
-
 describe('menuHref', () => {
   it.each([
     ['/', '/site/d'],

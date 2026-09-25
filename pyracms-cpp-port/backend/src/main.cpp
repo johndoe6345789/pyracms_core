@@ -33,13 +33,16 @@ int main() {
     app.setLogLevel(trantor::Logger::kInfo);
     app.addListener(host ? host : "0.0.0.0",
                     port_str ? std::stoi(port_str) : 8080);
-    app.setThreadNum(std::thread::hardware_concurrency());
+    // One event-loop thread per core unless SERVER_THREADS says otherwise;
+    // run several replicas of the process to use more than one machine.
+    app.setThreadNum(pyracms::serverThreadCount());
 
     // CORS, security headers, body limits, generic error handler
     pyracms::installHttpSecurity(app);
     pyracms::installFeatureGate(app);
     pyracms::createDbClientFromEnv();
     pyracms::initCacheAndSearch();
+    pyracms::startWsRelay();
     pyracms::startPublishTimer(app);
     pyracms::startUploadSweep(app);
     pyracms::startSearchIndexer(app);

@@ -22,10 +22,21 @@ const mapPicture = (p: Raw, i: number): GalleryPicture => ({
   rows: i % 7 === 0 ? 2 : 1,
 })
 
+export interface AlbumOptions {
+  isPrivate: boolean
+  sortOrder: string
+  coverPictureId: number
+}
+
 export function useGalleryAlbum(albumId: string) {
   const [albumName, setAlbumName] = useState('')
   const [albumDescription, setDescription] = useState('')
   const [ownerId, setOwnerId] = useState<number | null>(null)
+  const [options, setOptions] = useState<AlbumOptions>({
+    isPrivate: false,
+    sortOrder: 'newest',
+    coverPictureId: 0,
+  })
   const [pictures, setPictures] = useState<GalleryPicture[]>([])
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
@@ -41,6 +52,11 @@ export function useGalleryAlbum(albumId: string) {
         setAlbumName(data.displayName || data.name || '')
         setDescription(data.description || '')
         setOwnerId(typeof data.userId === 'number' ? data.userId : null)
+        setOptions({
+          isPrivate: Boolean(data.isPrivate),
+          sortOrder: data.sortOrder || 'newest',
+          coverPictureId: Number(data.defaultPictureId) || 0,
+        })
         setPictures((data.pictures || []).map(mapPicture))
       })
       .catch(() => {})
@@ -51,6 +67,7 @@ export function useGalleryAlbum(albumId: string) {
     albumName,
     albumDescription,
     ownerId,
+    options,
     pictures,
     loading,
     refresh,

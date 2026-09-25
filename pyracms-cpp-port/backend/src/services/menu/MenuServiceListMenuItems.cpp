@@ -5,7 +5,7 @@ namespace pyracms {
 void MenuService::listMenuItems(const DbClientPtr &db, int groupId,
                                 ItemListCallback cb) {
     db->execSqlAsync(
-        "SELECT * FROM menu_items WHERE group_id = $1 ORDER BY position",
+        "SELECT * FROM menu_items WHERE group_id = $1 ORDER BY position, id",
         [this, cb](const drogon::orm::Result &result) {
             std::vector<MenuItemDto> items;
             items.reserve(result.size());

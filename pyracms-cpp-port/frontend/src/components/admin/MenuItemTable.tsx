@@ -2,7 +2,6 @@ import {
   Table,
   TableBody,
   TableContainer,
-  TableHead,
   TableRow,
   TableCell,
   Paper,
@@ -10,6 +9,8 @@ import {
 } from '@mui/material'
 import { MenuItemRow } from '@/hooks/useMenuEditor'
 import MenuItemTableRow from './MenuItemTableRow'
+import MenuItemTableHead from './MenuItemTableHead'
+import { orderMenuItems } from '@/hooks/admin/menuData'
 
 interface MenuItemTableProps {
   items: MenuItemRow[]
@@ -24,10 +25,9 @@ interface MenuItemTableProps {
   onDelete: (id: number) => void
 }
 
-const HEADERS = ['Name', 'Route / URL', 'Position', 'Permissions']
-
 export default function MenuItemTable(p: MenuItemTableProps) {
   const { items } = p
+  const folders = items.filter((i) => i.type === 'folder')
   return (
     <TableContainer
       component={Paper}
@@ -35,18 +35,7 @@ export default function MenuItemTable(p: MenuItemTableProps) {
       sx={{ borderColor: 'divider' }}
     >
       <Table>
-        <TableHead>
-          <TableRow>
-            {HEADERS.map((h) => (
-              <TableCell key={h} sx={{ fontWeight: 700 }}>
-                {h}
-              </TableCell>
-            ))}
-            <TableCell sx={{ fontWeight: 700 }} align="right">
-              Actions
-            </TableCell>
-          </TableRow>
-        </TableHead>
+        <MenuItemTableHead />
         <TableBody>
           {items.length === 0 ? (
             <TableRow>
@@ -57,12 +46,13 @@ export default function MenuItemTable(p: MenuItemTableProps) {
               </TableCell>
             </TableRow>
           ) : (
-            items.map((item) => (
+            orderMenuItems(items).map((item) => (
               <MenuItemTableRow
                 key={item.id}
                 item={item}
                 editing={p.editingId === item.id}
                 editRow={p.editRow}
+                folders={folders}
                 onEditRowChange={p.onEditRowChange}
                 onStartEdit={p.onStartEdit}
                 onSaveEdit={p.onSaveEdit}

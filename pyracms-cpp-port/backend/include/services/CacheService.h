@@ -1,5 +1,7 @@
 #pragma once
 
+#include "services/cache/RedisPool.h"
+
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -39,14 +41,12 @@ class CacheService {
   private:
     CacheService() = default;
 
-    struct RedisContext;
-    std::unique_ptr<RedisContext> ctx_;
-    std::mutex mutex_;
-    bool connected_ = false;
+    std::unique_ptr<RedisPool> pool_;
+    bool connected_ = false; // Redis was reachable at start-up
     std::string host_;
     int port_ = 6379;
 
-    void reconnect();
+    // The reply's text ("" for nil, errors and an unreachable Redis).
     std::string execCommand(const std::vector<std::string> &args);
 };
 

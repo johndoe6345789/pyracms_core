@@ -14,6 +14,8 @@ MenuItemDto MenuService::rowToItemDto(const drogon::orm::Row &row) {
     dto.position = row["position"].as<int>();
     dto.permissions =
         row["permissions"].isNull() ? "" : row["permissions"].as<std::string>();
+    dto.parentId =
+        row["parent_id"].isNull() ? 0 : row["parent_id"].as<int>();
     return dto;
 }
 

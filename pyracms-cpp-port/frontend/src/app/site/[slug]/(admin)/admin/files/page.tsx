@@ -3,11 +3,15 @@
 import { Typography, Box } from '@mui/material'
 import { useFileManager } from '@/hooks/useFileManager'
 import { useTenantId } from '@/hooks/useTenantId'
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import UploadDropzone from '@/components/admin/UploadDropzone'
 import FileGrid from '@/components/admin/FileGrid'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
+import FolderControls from '@/components/admin/FolderControls'
+import MoveFileDialog from '@/components/admin/MoveFileDialog'
+import type { FileItem } from '@/hooks/useFileManager'
 
 export default function AdminFilesPage() {
   const params = useParams()
@@ -26,7 +30,9 @@ export default function AdminFilesPage() {
     handleDragLeave,
     handleDrop,
     uploadFiles,
+    dirs,
   } = useFileManager(tenantId)
+  const [moving, setMoving] = useState<FileItem | null>(null)
 
   return (
     <Box data-testid="admin-files-page">
@@ -34,9 +40,10 @@ export default function AdminFilesPage() {
         File Manager
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Upload and manage files across the platform.
+        Upload, organise into folders and manage your files.
       </Typography>
       <ErrorAlert error={error} testId="files-error" />
+      <FolderControls dirs={dirs} />
       <UploadDropzone
         dragOver={dragOver}
         onDragOver={handleDragOver}
@@ -44,7 +51,14 @@ export default function AdminFilesPage() {
         onDrop={handleDrop}
         onFilesSelected={uploadFiles}
       />
-      <FileGrid files={files} onDelete={handleDeleteClick} />
+      <FileGrid files={files} onDelete={handleDeleteClick} onMove={setMoving} />
+      <MoveFileDialog
+        key={moving?.uuid ?? 'none'}
+        file={moving}
+        folders={dirs.folders}
+        onClose={() => setMoving(null)}
+        onMove={(f, to) => dirs.move(f.uuid, to)}
+      />
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Delete File"

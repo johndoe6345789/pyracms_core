@@ -17,6 +17,7 @@ FileController::filesJson(const std::vector<FileDto> &files) {
         item["isPicture"] = f.isPicture;
         item["isVideo"] = f.isVideo;
         item["downloadCount"] = f.downloadCount;
+        item["folder"] = f.folder;
         result.append(item);
     }
     return drogon::HttpResponse::newHttpJsonResponse(result);

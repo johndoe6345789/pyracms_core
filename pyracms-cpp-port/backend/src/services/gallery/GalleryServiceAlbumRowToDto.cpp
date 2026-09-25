@@ -18,6 +18,9 @@ GalleryAlbumDto GalleryService::albumRowToDto(const drogon::orm::Row &row) {
                                : row["default_picture_id"].as<int>();
     dto.pictureCount =
         row["picture_count"].isNull() ? 0 : row["picture_count"].as<int>();
+    dto.sortOrder = row["sort_order"].as<std::string>();
+    dto.coverFileUuid =
+        row["cover_uuid"].isNull() ? "" : row["cover_uuid"].as<std::string>();
     return dto;
 }
 

@@ -1,5 +1,6 @@
 #include "controllers/WebSocketCollabController.h"
 #include "controllers/WsAuth.h"
+#include "services/cache/WsRelay.h"
 
 #include <drogon/drogon.h>
 #include <json/json.h>
@@ -32,6 +33,12 @@ void WebSocketCollabController::handleNewMessage(
             }
         }
     }
+
+    // ...and to the connections other API processes hold for this room
+    if (type != drogon::WebSocketMessageType::Ping)
+        WsRelay::instance().publish(
+            "collab", ctx->room, type == drogon::WebSocketMessageType::Binary,
+            message);
 
     if (type == drogon::WebSocketMessageType::Ping) {
         wsConnPtr->send("", drogon::WebSocketMessageType::Pong);

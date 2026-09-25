@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import api from '@/lib/api'
 import { validateRoute } from '@/lib/routeSuggest'
-import { toApiRoute } from '@/lib/menuRoute'
+import { menuItemBody } from '@/lib/menuItemPayload'
 import { useActionError } from '../useActionError'
 import { MenuGroup, MenuItemRow, SetGroups, updateGroupItems } from './menuData'
+import { useNewMenuItemForm } from './useNewMenuItemForm'
 import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
 
 /**
- * Add-item form state and submit handler.
+ * Add-item form state and submit handler (a link, or a folder that holds
+ * links).
  * @param currentGroup - The active group, if any.
  * @param selectedGroup - Name of the active group.
  * @param setMenuGroups - State setter for all groups.
@@ -19,56 +20,38 @@ export function useMenuAddItem(
   selectedGroup: string,
   setMenuGroups: SetGroups,
 ) {
-  const [newName, setNewName] = useState('')
-  const [newRoute, setNewRoute] = useState('')
-  const [newPosition, setNewPosition] = useState('')
-  const [newPermissions, setNewPermissions] = useState('public')
+  const { fields: f, reset } = useNewMenuItemForm()
   const { error: addError, setError, fail } = useActionError()
 
   const handleAddItem = () => {
-    const name = newName.trim()
-    const route = newRoute.trim()
-    if (!name || !route || !currentGroup || validateRoute(route)) return
-    const position = parseInt(newPosition, 10) || 0
-    const permissions = newPermissions
+    const name = f.newName.trim()
+    const route = f.newRoute.trim()
+    const folder = f.newType === 'folder'
+    if (!name || !currentGroup) return
+    if (!folder && (!route || validateRoute(route))) return
+    const item: Omit<MenuItemRow, 'id'> = {
+      name,
+      route: folder ? '' : route,
+      position: parseInt(f.newPosition, 10) || 0,
+      permissions: f.newPermissions,
+      type: f.newType,
+      parentId: folder ? 0 : f.newParent,
+    }
     setError('')
     api
-      .post(`/api/menu-groups/${currentGroup.id}/items`, {
-        name,
-        ...toApiRoute(route),
-        position,
-        permissions,
-      })
+      .post(`/api/menu-groups/${currentGroup.id}/items`, menuItemBody(item))
       .then((res) => {
         invalidateSiteMenu()
-        const item: MenuItemRow = {
-          id: res.data.id,
-          name,
-          route,
-          position,
-          permissions,
-        }
         setMenuGroups((prev) =>
-          updateGroupItems(prev, selectedGroup, (items) => [...items, item]),
+          updateGroupItems(prev, selectedGroup, (items) => [
+            ...items,
+            { ...item, id: res.data.id },
+          ]),
         )
-        setNewName('')
-        setNewRoute('')
-        setNewPosition('')
-        setNewPermissions('public')
+        reset()
       })
       .catch(fail('Could not add menu item'))
   }
 
-  return {
-    newName,
-    setNewName,
-    newRoute,
-    setNewRoute,
-    newPosition,
-    setNewPosition,
-    newPermissions,
-    setNewPermissions,
-    handleAddItem,
-    addError,
-  }
+  return { ...f, handleAddItem, addError }
 }

@@ -5,17 +5,12 @@ import { useMenuGroupCreate } from '@/hooks/admin/useMenuGroupCreate'
 import { useSettingAdd } from '@/hooks/admin/useSettingAdd'
 import { useFileUpload } from '@/hooks/admin/useFileUpload'
 import { m } from '../helpers/scopeApi'
+import { menuRow } from '../helpers/menuRow'
 
 jest.mock('@/lib/api', () => jest.requireActual('../helpers/apiMock').apiMock)
 const boom = { response: { data: { error: 'boom' } } }
 const set = jest.fn()
-const item = {
-  id: 1,
-  name: 'a',
-  route: '/a',
-  position: 0,
-  permissions: 'public',
-}
+const item = menuRow()
 const group = { id: 2, name: 'g', items: [item] }
 beforeEach(() => {
   jest.resetAllMocks()

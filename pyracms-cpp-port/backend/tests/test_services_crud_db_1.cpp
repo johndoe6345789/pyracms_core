@@ -67,7 +67,7 @@ TEST(MenuCrudDb, GroupsAndItemsList) {
     ASSERT_EQ(groups.size(), 1u);
     EXPECT_TRUE(awaitBool([&](auto cb) {
                     svc.createMenuItem(db, "Home", "/", "", "route",
-                                       groups[0].id, 0, "", t, cb);
+                                       groups[0].id, 0, "", 0, t, cb);
                 }).first);
     auto items = awaitValue<std::vector<MenuItemDto>>(
         [&](auto cb) { svc.listMenuItems(db, groups[0].id, cb); });

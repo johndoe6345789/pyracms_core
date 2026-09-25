@@ -6,7 +6,10 @@ namespace pyracms {
 void GalleryService::listAlbums(const DbClientPtr &db, int tenantId,
                                 AlbumListCallback cb) {
     db->execSqlAsync(
-        "SELECT a.*, COALESCE(p.cnt, 0) AS picture_count "
+        "SELECT a.*, "
+        "(SELECT file_uuid FROM gallery_pictures "
+        "WHERE id = a.default_picture_id) AS cover_uuid, "
+        "COALESCE(p.cnt, 0) AS picture_count "
         "FROM gallery_albums a "
         "LEFT JOIN (SELECT album_id, COUNT(*) AS cnt FROM gallery_pictures "
         "GROUP BY album_id) p "

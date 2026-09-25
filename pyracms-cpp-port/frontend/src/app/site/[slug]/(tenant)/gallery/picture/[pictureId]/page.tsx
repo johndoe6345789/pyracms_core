@@ -1,9 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Container, Button, Divider } from '@mui/material'
-import Link from 'next/link'
-import { ArrowBackOutlined } from '@mui/icons-material'
+import { Container, Divider, Snackbar } from '@mui/material'
+import BackToAlbumButton from '@/components/gallery/BackToAlbumButton'
 import PictureViewer from '@/components/gallery/PictureViewer'
 import ManagedPictureFooter from '@/components/gallery/ManagedPictureFooter'
 import PictureInfo from '@/components/gallery/PictureInfo'
@@ -23,7 +23,7 @@ export default function PictureViewPage() {
   const { picture, handleLike, handleDislike, handleSetCover, refresh } =
     useGalleryPicture(pictureId)
   const { error, guard } = useGuardedAction()
-
+  const [notice, setNotice] = useState('')
   if (!picture) return null
 
   const albumUrl = `/site/${slug}/gallery/${picture.albumId}`
@@ -37,16 +37,7 @@ export default function PictureViewPage() {
         albumName={picture.albumName}
         albumUrl={albumUrl}
       />
-      <Button
-        component={Link}
-        href={albumUrl}
-        startIcon={<ArrowBackOutlined />}
-        sx={{ mb: 3, color: 'text.secondary' }}
-        data-testid="back-to-album-btn"
-        aria-label="Back to album"
-      >
-        Back to album
-      </Button>
+      <BackToAlbumButton href={albumUrl} />
       <PictureViewer
         src={picture.src}
         title={picture.title}
@@ -65,9 +56,21 @@ export default function PictureViewPage() {
         picture={picture}
         onLike={() => guard(handleLike, VOTE_ERR)}
         onDislike={() => guard(handleDislike, VOTE_ERR)}
-        onSetCover={() => guard(handleSetCover, 'Failed to set cover')}
+        onSetCover={() =>
+          guard(async () => {
+            await handleSetCover()
+            setNotice('This picture is now the album cover')
+          }, 'Failed to set cover')
+        }
         onChanged={refresh}
         onDeleted={() => router.push(albumUrl)}
+      />
+      <Snackbar
+        open={!!notice}
+        autoHideDuration={3000}
+        onClose={() => setNotice('')}
+        message={notice}
+        data-testid="cover-notice"
       />
       {Number.isInteger(Number(pictureId)) && (
         <CommentSection contentType="picture" contentId={Number(pictureId)} />

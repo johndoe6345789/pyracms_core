@@ -5,7 +5,7 @@ import api from '@/lib/api'
 import { useActionError } from '../useActionError'
 import { MenuItemRow, SetGroups, updateGroupItems } from './menuData'
 import { invalidateSiteMenu } from '@/hooks/useSiteMenu'
-import { toApiRoute } from '@/lib/menuRoute'
+import { menuItemBody } from '@/lib/menuItemPayload'
 
 /** Inline edit and delete state for the items of the active group. */
 export function useMenuItemEdit(
@@ -28,15 +28,9 @@ export function useMenuItemEdit(
 
   const handleSaveEdit = () => {
     if (!editRow) return
-    const { name, route, position, permissions } = editRow
     setError('')
     api
-      .put(`/api/menus/${editRow.id}`, {
-        name,
-        ...toApiRoute(route),
-        position,
-        permissions,
-      })
+      .put(`/api/menus/${editRow.id}`, menuItemBody(editRow))
       .then(() => {
         invalidateSiteMenu()
         setMenuGroups((prev) =>

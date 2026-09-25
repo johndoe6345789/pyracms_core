@@ -18,6 +18,7 @@ FileDto FileService::rowToDto(const drogon::orm::Row &row) {
     if (!row["tenant_id"].isNull())
         dto.tenantId = row["tenant_id"].as<int>();
     dto.storage = row["storage"].as<std::string>();
+    dto.folder = row["folder"].as<std::string>();
     return dto;
 }
 

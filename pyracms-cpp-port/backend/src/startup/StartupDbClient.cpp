@@ -1,6 +1,30 @@
 #include "startup/Startup.h"
 
+#include <algorithm>
+#include <thread>
+
 namespace pyracms {
+
+static int envInt(const char *name, int fallback, int lo, int hi) {
+    const char *v = std::getenv(name);
+    if (!v || !*v)
+        return fallback;
+    try {
+        return std::clamp(std::stoi(v), lo, hi);
+    } catch (const std::exception &) {
+        return fallback;
+    }
+}
+
+int serverThreadCount() {
+    int cores = static_cast<int>(std::thread::hardware_concurrency());
+    return envInt("SERVER_THREADS", std::max(2, cores), 1, 256);
+}
+
+int dbPoolSize() {
+    return envInt("DB_POOL_SIZE", std::clamp(2 * serverThreadCount(), 8, 32),
+                  1, 64);
+}
 
 void createDbClientFromEnv() {
     const char *db_host = std::getenv("DB_HOST");
@@ -16,7 +40,7 @@ void createDbClientFromEnv() {
                                  db_name ? db_name : "pyracms", // databaseName
                                  db_user ? db_user : "pyracms", // userName
                                  db_pass ? db_pass : "pyracms", // password
-                                 4,                             // connectionNum
+                                 dbPoolSize(),                  // connections
                                  "",                            // filename
                                  "default",                     // name
                                  false,                         // isFast

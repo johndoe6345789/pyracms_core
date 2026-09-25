@@ -1,39 +1,13 @@
 #pragma once
 
+#include "services/GalleryDtos.h"
+
 #include <drogon/drogon.h>
 #include <functional>
 #include <optional>
 #include <string>
 
 namespace pyracms {
-
-struct GalleryAlbumDto {
-    int id;
-    std::string displayName;
-    std::string description;
-    std::string createdAt;
-    bool isPrivate;
-    bool isProtected;
-    int userId;
-    int defaultPictureId;
-    int pictureCount;
-};
-
-struct GalleryPictureDto {
-    int id;
-    std::string displayName;
-    std::string description;
-    std::string createdAt;
-    bool isPrivate;
-    int albumId;
-    std::string fileUuid;
-    int userId;
-};
-
-struct GalleryAlbumDetailDto {
-    GalleryAlbumDto album;
-    std::vector<GalleryPictureDto> pictures;
-};
 
 class GalleryService {
   public:
@@ -54,9 +28,13 @@ class GalleryService {
                      const std::string &description, int userId,
                      BoolCallback cb);
     void getAlbum(const DbClientPtr &db, int albumId, AlbumDetailCallback cb);
+    // isPrivate: -1 keep, 0/1 set. sortOrder "" keeps. coverId: -1 keeps,
+    // 0 clears, else a picture of this album (others are ignored).
     void updateAlbum(const DbClientPtr &db, int albumId,
                      const std::string &displayName,
-                     const std::string &description, BoolCallback cb);
+                     const std::string &description, int isPrivate,
+                     const std::string &sortOrder, int coverId,
+                     BoolCallback cb);
     void deleteAlbum(const DbClientPtr &db, int albumId, BoolCallback cb);
     void addPicture(const DbClientPtr &db, int albumId,
                     const std::string &displayName,
@@ -67,7 +45,8 @@ class GalleryService {
                        const std::string &displayName,
                        const std::string &description, BoolCallback cb);
     void deletePicture(const DbClientPtr &db, int pictureId, BoolCallback cb);
-    void setDefaultPicture(const DbClientPtr &db, int albumId, int pictureId,
+    // Makes the picture its own album's cover (no such picture = failure).
+    void setDefaultPicture(const DbClientPtr &db, int pictureId,
                            BoolCallback cb);
     void votePicture(const DbClientPtr &db, int pictureId, int userId,
                      bool isLike, BoolCallback cb);

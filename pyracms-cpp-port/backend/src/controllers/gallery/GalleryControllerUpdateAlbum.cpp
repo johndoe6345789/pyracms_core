@@ -29,9 +29,26 @@ void GalleryController::updateAlbum(
         return;
     }
 
+    // Optional extras; anything left out is kept as it is.
+    int isPrivate = (*json)["isPrivate"].isBool()
+                        ? ((*json)["isPrivate"].asBool() ? 1 : 0)
+                        : -1;
+    auto sortOrder = (*json).get("sortOrder", "").asString();
+    if (!sortOrder.empty() && sortOrder != "newest" && sortOrder != "oldest" &&
+        sortOrder != "title") {
+        auto bad = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+        (*bad->jsonObject())["error"] = "sortOrder must be newest, oldest "
+                                        "or title";
+        bad->setStatusCode(drogon::k400BadRequest);
+        return callback(bad);
+    }
+    int coverId = (*json)["defaultPictureId"].isIntegral()
+                      ? (*json)["defaultPictureId"].asInt()
+                      : -1;
+
     auto db = drogon::app().getDbClient();
     galleryService_.updateAlbum(
-        db, id, displayName, description,
+        db, id, displayName, description, isPrivate, sortOrder, coverId,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp =
