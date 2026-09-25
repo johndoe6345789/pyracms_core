@@ -13,12 +13,16 @@ constexpr size_t kMaxSnippetBytes = 100000;
 inline std::string snippetProblem(const Json::Value &j) {
     if (!j.isObject())
         return "JSON body required";
-    for (const char *k : {"title", "code", "language", "visibility"}) {
+    for (const char *k :
+         {"title", "code", "language", "visibility", "summary"}) {
         if (j.isMember(k) && !j[k].isString())
             return std::string(k) + " must be text";
     }
     if (j.isMember("title") && !isBoundedText(j["title"].asString(), 255))
         return "title is too long";
+    if (j.isMember("summary") &&
+        !isBoundedText(j["summary"].asString(), 500))
+        return "summary is too long";
     if (j.isMember("code") &&
         !isBoundedText(j["code"].asString(), kMaxSnippetBytes))
         return "code is too large (100 KB limit)";

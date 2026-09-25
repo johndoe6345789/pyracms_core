@@ -13,6 +13,8 @@ export const editor = (over: Partial<SnippetEditor> = {}): SnippetEditor => ({
   setCode: jest.fn(),
   language: 'python',
   setLanguage: jest.fn(),
+  summary: '',
+  setSummary: jest.fn(),
   savedId: null,
   saving: false,
   error: '',

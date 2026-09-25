@@ -40,4 +40,18 @@ struct SnippetAttachmentDto {
     int64_t size;
 };
 
+// One saved state of a snippet. `number` is 1-based and per snippet.
+struct SnippetRevisionDto {
+    int id;
+    int number;
+    int snippetId;
+    std::string title;
+    std::string code;
+    std::string language;
+    std::string summary;
+    int userId;
+    std::string authorUsername;
+    std::string createdAt;
+};
+
 } // namespace pyracms

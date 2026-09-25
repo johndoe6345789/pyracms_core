@@ -22,10 +22,14 @@ void CodeSnippetService::forkSnippet(
             auto language = result[0]["language"].as<std::string>();
 
             db->execSqlAsync(
-                "INSERT INTO code_snippets (tenant_id, author_id, title, code, "
-                "language, "
-                "visibility, forked_from) "
-                "VALUES ($1, $2, $3, $4, $5, 'public', $6) RETURNING id",
+                "WITH s AS (INSERT INTO code_snippets (tenant_id, author_id, "
+                "title, code, language, visibility, forked_from) "
+                "VALUES ($1, $2, $3, $4, $5, 'public', $6) "
+                "RETURNING id, title, code, language, author_id), "
+                "r AS (INSERT INTO snippet_revisions (snippet_id, title, "
+                "code, language, summary, user_id) SELECT id, title, code, "
+                "language, 'Forked from snippet ' || $6::text, author_id "
+                "FROM s) SELECT id FROM s",
                 [cb](const drogon::orm::Result &insertResult) {
                     int newId = insertResult[0]["id"].as<int>();
                     cb(true, newId, "");

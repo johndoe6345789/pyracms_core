@@ -4,6 +4,7 @@ import { Alert, Box, Divider, TextField } from '@mui/material'
 import { CodeEditor } from './CodeEditor'
 import { CodeOutput } from './CodeOutput'
 import { SnippetEditorButtons } from './SnippetEditorButtons'
+import { SnippetSummaryField } from './SnippetSummaryField'
 import { isRunnable } from '@/lib/snippets'
 import { useSnippetRun } from '@/hooks/useSnippetRun'
 import type { SnippetEditor } from '@/hooks/useSnippetEditor'
@@ -48,6 +49,7 @@ export function SnippetEditorForm({
         language={e.language}
         onLanguageChange={e.setLanguage}
       />
+      {e.savedId && <SnippetSummaryField editor={e} />}
       {e.error && <Alert severity="error">{e.error}</Alert>}
       <SnippetEditorButtons
         canRun={isRunnable(e.language)}

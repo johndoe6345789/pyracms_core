@@ -11,9 +11,13 @@ void CodeSnippetService::createSnippet(
         cb) {
 
     db->execSqlAsync(
-        "INSERT INTO code_snippets (tenant_id, author_id, title, code, "
-        "language, visibility) "
-        "VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+        "WITH s AS (INSERT INTO code_snippets (tenant_id, author_id, title, "
+        "code, language, visibility) "
+        "VALUES ($1, $2, $3, $4, $5, $6) "
+        "RETURNING id, title, code, language, author_id), "
+        "r AS (INSERT INTO snippet_revisions (snippet_id, title, code, "
+        "language, summary, user_id) SELECT id, title, code, language, "
+        "'Initial revision', author_id FROM s) SELECT id FROM s",
         [cb](const drogon::orm::Result &result) {
             int newId = result[0]["id"].as<int>();
             cb(true, newId, "");

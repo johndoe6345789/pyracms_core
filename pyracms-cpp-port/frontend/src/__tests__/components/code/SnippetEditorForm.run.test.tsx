@@ -30,3 +30,13 @@ it('labels the busy save button', () => {
   setup(editor({ saving: true }))
   expect(screen.getByText('Saving...')).toBeInTheDocument()
 })
+
+it('offers a change note only for an already saved snippet', () => {
+  const setSummary = jest.fn()
+  setup(editor({ savedId: '7', setSummary }))
+  fireEvent.change(
+    screen.getByTestId('snippet-summary-input').querySelector('input')!,
+    { target: { value: 'why' } },
+  )
+  expect(setSummary).toHaveBeenCalledWith('why')
+})

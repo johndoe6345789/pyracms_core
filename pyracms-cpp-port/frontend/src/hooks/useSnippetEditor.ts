@@ -10,6 +10,7 @@ export function useSnippetEditor(tenantId: number | null, initial?: Snippet) {
   const [title, setTitle] = useState(initial?.title ?? '')
   const [code, setCode] = useState(initial?.code ?? DEFAULT_CODE)
   const [language, setLanguage] = useState(initial?.language ?? 'python')
+  const [summary, setSummary] = useState('')
   const [savedId, setSavedId] = useState<string | null>(initial?.id ?? null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -23,10 +24,13 @@ export function useSnippetEditor(tenantId: number | null, initial?: Snippet) {
       code,
       language,
       visibility: initial?.visibility ?? 'public',
+      // what changed, for the history of an existing snippet
+      ...(savedId && summary.trim() ? { summary: summary.trim() } : {}),
     }
     try {
       if (savedId) {
         await api.put(`/api/snippets/${savedId}`, body)
+        setSummary('')
         return savedId
       }
       const res = await api.post('/api/snippets', {
@@ -60,6 +64,8 @@ export function useSnippetEditor(tenantId: number | null, initial?: Snippet) {
     setCode,
     language,
     setLanguage,
+    summary,
+    setSummary,
     savedId,
     saving,
     error,

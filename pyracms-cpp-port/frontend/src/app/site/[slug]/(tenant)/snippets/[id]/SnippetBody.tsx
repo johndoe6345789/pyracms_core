@@ -15,13 +15,14 @@ import type { RootState } from '@/store/store'
 interface Props {
   id: string
   tenantId: number | null
+  base: string
   snippet: NonNullable<ReturnType<typeof useSnippet>['snippet']>
   act: ReturnType<typeof useSnippetActions>
   reload: () => void
 }
 
 export default function SnippetBody(p: Props) {
-  const { id, tenantId, snippet, act, reload } = p
+  const { id, base, tenantId, snippet, act, reload } = p
   const { running, result, run } = useSnippetRun()
   const user = useSelector((s: RootState) => s.auth.user)
   const [editing, setEditing] = useState(false)
@@ -49,6 +50,7 @@ export default function SnippetBody(p: Props) {
           running={running}
           result={result}
           tenantId={tenantId}
+          historyHref={`${base}/${id}/revisions`}
           onRun={() => run(id)}
           onFork={act.fork}
           onEdit={() => setEditing(true)}

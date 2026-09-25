@@ -1,7 +1,8 @@
 'use client'
 
 import { Box } from '@mui/material'
-import { CodeEditor } from './CodeEditor'
+import { SnippetCodeBlock } from './SnippetCodeBlock'
+import { SnippetHistoryButton } from './SnippetHistoryButton'
 import { CodeOutput } from './CodeOutput'
 import { SnippetToolbar } from './SnippetToolbar'
 import { SnippetAttachments } from './SnippetAttachments'
@@ -13,6 +14,7 @@ interface Props {
   running: boolean
   result: RunResult | null
   tenantId: number | null
+  historyHref: string
   onRun: () => void
   onFork: () => void
   onEdit: () => void
@@ -22,11 +24,9 @@ interface Props {
 
 export function SnippetReadView(p: Props) {
   const { snippet, result, running } = p
-  const lines = snippet.code.split('\n').length
-  const height = `${Math.min(600, Math.max(120, lines * 19 + 20))}px`
   return (
     <>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
         <SnippetToolbar
           runnable={isRunnable(snippet.language)}
           running={running}
@@ -37,24 +37,9 @@ export function SnippetReadView(p: Props) {
           onEdit={p.onEdit}
           onDelete={p.onDelete}
         />
+        <SnippetHistoryButton href={p.historyHref} />
       </Box>
-      <Box
-        sx={{
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 1,
-          overflow: 'hidden',
-          mb: 3,
-        }}
-        data-testid="snippet-code-block"
-      >
-        <CodeEditor
-          value={snippet.code}
-          language={snippet.language}
-          readOnly
-          height={height}
-        />
-      </Box>
+      <SnippetCodeBlock snippet={snippet} />
       {(running || result) && (
         <Box sx={{ mb: 3 }}>
           <CodeOutput

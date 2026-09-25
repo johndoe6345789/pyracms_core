@@ -33,6 +33,7 @@ export default function ViewSnippetPage() {
       <SnippetHeader s={snippet} />
       <SnippetBody
         id={id}
+        base={base}
         tenantId={tenantId}
         snippet={snippet}
         act={act}

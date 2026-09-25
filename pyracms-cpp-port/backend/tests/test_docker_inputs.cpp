@@ -38,7 +38,7 @@ TEST(DockerInputsTest, OnlyPythonTakesInputsAndCapsApply) {
     ASSERT_EQ(kept.size(), 2u);
     EXPECT_EQ(kept[1].name, "c.txt");
     std::vector<RunInput> big = {
-        {"big.bin", std::string(Svc::kMaxInputBytes, 'a')}, {"s.txt", "1"}};
+        {"big.bin", std::string(Svc::kMaxInputBytes - 1, 'a')}, {"s.txt", "1"}};
     EXPECT_EQ(Svc::usableInputs("python", big).size(), 2u);
     big.push_back({"extra", "x"});
     EXPECT_EQ(Svc::usableInputs("python", big).size(), 2u);

@@ -20,7 +20,7 @@ TEST(SnippetCrudDb, CreateUpdateRunDelete) {
     ASSERT_TRUE(made.first);
     EXPECT_TRUE(awaitBool([&](auto cb) {
                     svc.updateSnippet(db, made.second, u, "T2", "c", "python",
-                                      "private", cb);
+                                      "private", "", cb);
                 }).first);
     EXPECT_TRUE(awaitBool([&](auto cb) {
                     svc.recordExecution(db, made.second, u, "out", 0, 5, cb);

@@ -7,6 +7,7 @@ import type { Revision } from '@/hooks/useRevisions'
 interface RevisionRowProps {
   rev: Revision
   isLatest: boolean
+  canRevert?: boolean
   onView: (rev: Revision) => void
   onRevert: (num: number) => void
 }
@@ -14,6 +15,7 @@ interface RevisionRowProps {
 export function RevisionRow({
   rev,
   isLatest,
+  canRevert = true,
   onView,
   onRevert,
 }: RevisionRowProps) {
@@ -40,7 +42,7 @@ export function RevisionRow({
           >
             View
           </Button>
-          {!isLatest && (
+          {!isLatest && canRevert && (
             <Button
               size="small"
               variant="outlined"

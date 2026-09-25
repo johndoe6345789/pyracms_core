@@ -31,6 +31,12 @@ class CodeSnippetController
     ADD_METHOD_TO(CodeSnippetController::removeAttachment,
                   "/api/snippets/{id}/attachments/{attachmentId}",
                   drogon::Delete, PYR_JWT);
+    ADD_METHOD_TO(CodeSnippetController::listRevisions,
+                  "/api/snippets/{id}/revisions", drogon::Get);
+    ADD_METHOD_TO(CodeSnippetController::getRevision,
+                  "/api/snippets/{id}/revisions/{number}", drogon::Get);
+    ADD_METHOD_TO(CodeSnippetController::revertToRevision,
+                  "/api/snippets/{id}/revert/{number}", drogon::Post, PYR_JWT);
     METHOD_LIST_END
 
     void listSnippets(HttpReq req, HttpCbRef callback);
@@ -43,6 +49,12 @@ class CodeSnippetController
     void addAttachment(HttpReq req, HttpCbRef callback, HttpStr id);
     void removeAttachment(HttpReq req, HttpCbRef callback, HttpStr id,
                           HttpStr attachmentId);
+
+    void listRevisions(HttpReq req, HttpCbRef callback, HttpStr id);
+    void getRevision(HttpReq req, HttpCbRef callback, HttpStr id,
+                     HttpStr number);
+    void revertToRevision(HttpReq req, HttpCbRef callback, HttpStr id,
+                          HttpStr number);
 
   private:
     CodeSnippetService snippetService_;

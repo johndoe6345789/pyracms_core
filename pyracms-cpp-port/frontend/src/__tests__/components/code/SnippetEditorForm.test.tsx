@@ -34,3 +34,8 @@ it('does not report a failed save', async () => {
   await waitFor(() => expect(e.save).toHaveBeenCalled())
   expect(onSaved).not.toHaveBeenCalled()
 })
+
+it('has no change note for a snippet that is not saved yet', () => {
+  setup()
+  expect(screen.queryByTestId('snippet-summary-input')).toBeNull()
+})

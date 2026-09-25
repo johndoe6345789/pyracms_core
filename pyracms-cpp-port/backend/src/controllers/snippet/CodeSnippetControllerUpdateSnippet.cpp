@@ -34,10 +34,11 @@ void CodeSnippetController::updateSnippet(
     auto code = (*json).get("code", "").asString();
     auto language = (*json).get("language", "python").asString();
     auto visibility = (*json).get("visibility", "public").asString();
+    auto summary = (*json).get("summary", "").asString();
     auto db = drogon::app().getDbClient();
 
     snippetService_.updateSnippet(
-        db, snippetId, userId, title, code, language, visibility,
+        db, snippetId, userId, title, code, language, visibility, summary,
         [callback](bool success, const std::string &error) {
             if (!success) {
                 auto resp =

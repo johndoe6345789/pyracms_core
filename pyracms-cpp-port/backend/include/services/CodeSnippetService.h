@@ -34,7 +34,8 @@ class CodeSnippetService {
     void updateSnippet(const DbClientPtr &db, int snippetId, int userId,
                        const std::string &title, const std::string &code,
                        const std::string &language,
-                       const std::string &visibility, BoolCallback cb);
+                       const std::string &visibility,
+                       const std::string &summary, BoolCallback cb);
     void deleteSnippet(const DbClientPtr &db, int snippetId, int userId,
                        BoolCallback cb);
     void forkSnippet(
@@ -54,6 +55,18 @@ class CodeSnippetService {
                        const std::string &fileUuid, BoolCallback cb);
     void removeAttachment(const DbClientPtr &db, int snippetId,
                           int attachmentId, int userId, BoolCallback cb);
+
+    // Newest first, at most `limit`.
+    void listRevisions(
+        const DbClientPtr &db, int snippetId, int limit,
+        std::function<void(const std::vector<SnippetRevisionDto> &)> cb);
+    void getRevision(
+        const DbClientPtr &db, int snippetId, int number,
+        std::function<void(const std::optional<SnippetRevisionDto> &)> cb);
+    // Author only. Copies revision `number` back onto the snippet and
+    // records that as a new revision (history is never rewritten).
+    void revertToRevision(const DbClientPtr &db, int snippetId, int number,
+                          int userId, BoolCallback cb);
 
   private:
     CodeSnippetDto rowToDto(const drogon::orm::Row &row);

@@ -69,3 +69,19 @@ it('explains save failures', async () => {
   })
   expect(result.current.error).toBe('Failed to save snippet.')
 })
+
+it('sends a summary only when updating, then clears it', async () => {
+  mock.put.mockResolvedValue({})
+  const initial = mapSnippet({ id: 5, title: 'A', code: 'c' })
+  const { result } = renderHook(() => useSnippetEditor(2, initial))
+  act(() => result.current.setSummary(' fix typo '))
+  await act(async () => {
+    await result.current.save()
+  })
+  expect(mock.put.mock.calls[0]?.[1]).toMatchObject({ summary: 'fix typo' })
+  expect(result.current.summary).toBe('')
+  await act(async () => {
+    await result.current.save()
+  })
+  expect(mock.put.mock.calls[1]?.[1]).not.toHaveProperty('summary')
+})

@@ -65,3 +65,11 @@ it('shows loading and not-found states', () => {
   rerender(<ViewSnippetPage />)
   expect(screen.getByTestId('snippet-not-found')).toBeInTheDocument()
 })
+
+it('links to the snippet history', () => {
+  render(<ViewSnippetPage />)
+  expect(screen.getByTestId('history-btn')).toHaveAttribute(
+    'href',
+    '/site/s/snippets/4/revisions',
+  )
+})
