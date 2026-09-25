@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import api from '@/lib/api'
 import { useTenantId } from '@/hooks/useTenantId'
+import { siteUrl } from '@/lib/searchUrl'
 import type { SearchResult } from './searchIcons'
 
 export function useGlobalSearch() {
@@ -48,14 +49,15 @@ export function useGlobalSearch() {
             d.map((i: Record<string, unknown>) => ({
               id: String(i.id),
               type: i.type || 'article',
-              title: i.title || '',
+              // the API sends {text, type, url}; older shapes sent title
+              title: i.title || i.text || '',
               snippet: i.snippet || '',
-              url: i.url || '#',
+              url: siteUrl(slug, String(i.url || '#')),
             })),
           )
         })
         .catch(() => setRes([]))
     }, 300)
-  }, [q, tenantId])
+  }, [q, tenantId, slug])
   return { open, setOpen, q, setQ, res }
 }

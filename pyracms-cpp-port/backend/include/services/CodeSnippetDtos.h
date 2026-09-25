@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace pyracms {
 
@@ -18,6 +19,7 @@ struct CodeSnippetDto {
     int forkedFrom;
     std::string createdAt;
     std::string updatedAt;
+    std::vector<std::string> tags;
 };
 
 struct SnippetExecutionDto {

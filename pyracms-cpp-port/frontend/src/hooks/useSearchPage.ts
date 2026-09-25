@@ -21,8 +21,10 @@ export function useSearchPage() {
   const [query, setQuery] = useState(initialQuery)
   const [activeType, setActiveType] = useState('all')
   const [page, setPage] = useState(1)
-  const { results, totalCount, facets, loading, performSearch } =
-    useSearchRun(tenantId)
+  const { results, totalCount, facets, loading, performSearch } = useSearchRun(
+    tenantId,
+    siteSlug,
+  )
 
   useEffect(() => {
     if (initialQuery) {

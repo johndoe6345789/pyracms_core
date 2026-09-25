@@ -33,7 +33,7 @@ describe('tag cloud hooks', () => {
           ? { data: { id: 8 } }
           : {
               data: [
-                { name: 'big', count: 10 },
+                { name: 'big', count: 10, articles: 7, snippets: 3 },
                 { name: 'sm', count: 5 },
               ],
             },
@@ -45,7 +45,7 @@ describe('tag cloud hooks', () => {
       weight: 1,
       fontSize: 40,
       height: 40,
-      href: '/site/demo/articles?tag=big',
+      href: '/site/demo/tags/big',
     })
     expect(result.current.items[1]!.fontSize).toBe(27.5)
   })

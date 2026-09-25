@@ -65,8 +65,6 @@ class ArticleService {
     void unpublishArticle(const DbClientPtr &db, int articleId,
                           BoolCallback cb);
     void publishDueArticles(const DbClientPtr &db, BoolCallback cb);
-    // Re-index (or drop) the article in the search engine after a change.
-    void refreshSearchIndex(const DbClientPtr &db, int articleId);
 
   private:
     ArticleDto rowToArticleDto(const drogon::orm::Row &row);

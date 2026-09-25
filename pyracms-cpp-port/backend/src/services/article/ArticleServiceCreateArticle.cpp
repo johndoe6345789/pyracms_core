@@ -1,7 +1,6 @@
 #include "services/ArticleService.h"
 #include "services/CacheService.h"
 #include "services/DbError.h"
-#include "services/ElasticsearchService.h"
 
 namespace pyracms {
 
@@ -24,16 +23,9 @@ void ArticleService::createArticle(const DbClientPtr &db, int tenantId,
                 "INSERT INTO article_revisions (article_id, content, summary, "
                 "user_id, created_at) "
                 "VALUES ($1, $2, 'Initial revision', $3, NOW())",
-                [tenantId, name, displayName, content, articleId,
-                 cb](const drogon::orm::Result &) {
+                [tenantId, name, cb](const drogon::orm::Result &) {
                     // Invalidate cache
                     CacheService::instance().invalidateArticle(tenantId, name);
-                    // Index in Elasticsearch
-                    if (ElasticsearchService::instance().isConfigured()) {
-                        ElasticsearchService::instance().indexArticle(
-                            tenantId, articleId, name, displayName, content,
-                            "");
-                    }
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {

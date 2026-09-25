@@ -16,6 +16,7 @@ export interface Snippet {
   forkedFrom: number
   visibility: string
   attachments: SnippetAttachment[]
+  tags: string[]
 }
 
 export interface RunResult {
@@ -38,6 +39,7 @@ export function mapSnippet(s: Record<string, unknown>): Snippet {
     runCount: Number(s.runCount ?? 0),
     forkedFrom: Number(s.forkedFrom ?? 0),
     visibility: String(s.visibility ?? 'public'),
+    tags: Array.isArray(s.tags) ? s.tags.map(String) : [],
     attachments: Array.isArray(s.attachments)
       ? s.attachments.map((a) => mapAttachment(a as Record<string, unknown>))
       : [],

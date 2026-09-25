@@ -3,6 +3,7 @@
 import { Box } from '@mui/material'
 import { SnippetCodeBlock } from './SnippetCodeBlock'
 import { SnippetHistoryButton } from './SnippetHistoryButton'
+import { ArticleTagChips } from '@/components/articles/ArticleTagChips'
 import { CodeOutput } from './CodeOutput'
 import { SnippetToolbar } from './SnippetToolbar'
 import { SnippetAttachments } from './SnippetAttachments'
@@ -15,6 +16,7 @@ interface Props {
   result: RunResult | null
   tenantId: number | null
   historyHref: string
+  siteSlug: string
   onRun: () => void
   onFork: () => void
   onEdit: () => void
@@ -39,6 +41,9 @@ export function SnippetReadView(p: Props) {
         />
         <SnippetHistoryButton href={p.historyHref} />
       </Box>
+      {snippet.tags.length > 0 && (
+        <ArticleTagChips tags={snippet.tags} searchSlug={p.siteSlug} />
+      )}
       <SnippetCodeBlock snippet={snippet} />
       {(running || result) && (
         <Box sx={{ mb: 3 }}>

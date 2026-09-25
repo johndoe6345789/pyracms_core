@@ -43,11 +43,19 @@ class SearchService {
     autocomplete(const DbClientPtr &db, int tenantId, const std::string &prefix,
                  int limit,
                  std::function<void(const std::vector<AutocompleteItem> &)> cb);
-
-    // Check if Elasticsearch is the active search engine
-    static bool useElasticsearch();
+    static bool useElasticsearch(); // Elasticsearch is the active engine
 
   private:
+    // PostgreSQL engines: the default, and the Elasticsearch fallback.
+    void searchPostgres(const DbClientPtr &db, int tenantId,
+                        const std::string &query, const std::string &type,
+                        int limit, int offset,
+                        std::function<void(const SearchResults &)> cb);
+    void autocompletePostgres(
+        const DbClientPtr &db, int tenantId, const std::string &prefix,
+        int limit,
+        std::function<void(const std::vector<AutocompleteItem> &)> cb);
+
     void searchArticles(
         const DbClientPtr &db, int tenantId, const std::string &tsQuery,
         int limit, int offset,

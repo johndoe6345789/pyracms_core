@@ -1,4 +1,5 @@
 #include "services/CodeSnippetService.h"
+#include "services/TagRules.h"
 
 namespace pyracms {
 
@@ -18,6 +19,7 @@ CodeSnippetDto CodeSnippetService::rowToDto(const drogon::orm::Row &row) {
         row["forked_from"].isNull() ? 0 : row["forked_from"].as<int>();
     dto.createdAt = row["created_at"].as<std::string>();
     dto.updatedAt = row["updated_at"].as<std::string>();
+    dto.tags = splitTagList(row["tag_list"].as<std::string>());
     return dto;
 }
 

@@ -4,6 +4,7 @@
 #include "storage/StorageConfig.h"
 
 #include <atomic>
+#include <chrono>
 #include <drogon/HttpClient.h>
 #include <memory>
 #include <mutex>
@@ -40,7 +41,9 @@ class S3Storage : public BlobStorage {
     using ReplyCb =
         std::function<void(BlobStatus, const drogon::HttpResponsePtr &)>;
     std::string objectPath(const BlobKey &k) const;
+    // A fresh connection when the last one sat idle or just failed.
     drogon::HttpClientPtr client();
+    void dropClient(const drogon::HttpClientPtr &dead);
     // `path` may carry a query; timeout 0 = the configured default.
     void send(drogon::HttpMethod m, const std::string &path,
               std::string body, ReplyCb cb, double timeout = 0);
@@ -52,6 +55,7 @@ class S3Storage : public BlobStorage {
     S3Endpoint ep_;
     std::mutex mu_;
     drogon::HttpClientPtr client_;
+    std::chrono::steady_clock::time_point lastUse_{};
     std::atomic<bool> bucketReady_{false};
 };
 

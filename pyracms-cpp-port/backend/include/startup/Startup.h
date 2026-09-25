@@ -9,5 +9,6 @@ void createDbClientFromEnv();
 void initCacheAndSearch();
 void startPublishTimer(drogon::HttpAppFramework &app);
 void startUploadSweep(drogon::HttpAppFramework &app);
+void startSearchIndexer(drogon::HttpAppFramework &app);
 
 } // namespace pyracms

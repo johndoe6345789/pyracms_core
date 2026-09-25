@@ -57,7 +57,7 @@ TEST(SnippetScopeDb, ListHidesPrivateFromOthers) {
     using Page = std::pair<std::vector<CodeSnippetDto>, int>;
     auto list = [&](int viewer) {
         return awaitValue<Page>([&](auto cb) {
-            svc.listSnippets(db, t, "", 0, viewer, 20, 0,
+            svc.listSnippets(db, t, "", 0, viewer, "", 20, 0,
                              [cb](const std::vector<CodeSnippetDto> &v, int n) {
                                  cb(Page{v, n});
                              });

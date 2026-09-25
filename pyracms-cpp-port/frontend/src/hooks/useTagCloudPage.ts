@@ -12,11 +12,13 @@ export interface TagCloudViewItem {
   height: number
   href: string
   name: string
+  articles: number
+  snippets: number
 }
 
-/** The articles carrying this tag (not a text search for its name). */
+/** The page listing everything carrying this tag. */
 function tagHref(slug: string, tag: string) {
-  return `/site/${slug}/articles?tag=${encodeURIComponent(tag)}`
+  return `/site/${slug}/tags/${encodeURIComponent(tag)}`
 }
 
 export function useTagCloudPage() {
@@ -34,6 +36,8 @@ export function useTagCloudPage() {
       height: 32 + weight * 8,
       href: tagHref(slug, tag.name),
       name: tag.name,
+      articles: tag.articles,
+      snippets: tag.snippets,
     }
   })
 

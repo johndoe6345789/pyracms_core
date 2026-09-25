@@ -2,6 +2,15 @@ import Link from 'next/link'
 import { Box } from '@mui/material'
 import type { TagCloudViewItem } from '@/hooks/useTagCloudPage'
 
+function usage(t: TagCloudViewItem) {
+  const parts = []
+  if (t.articles)
+    parts.push(`${t.articles} article${t.articles === 1 ? '' : 's'}`)
+  if (t.snippets)
+    parts.push(`${t.snippets} snippet${t.snippets === 1 ? '' : 's'}`)
+  return parts.join(', ')
+}
+
 /** A real tag cloud: common tags are bigger, bolder and stronger. */
 export default function TagCloudChips({
   items,
@@ -28,7 +37,7 @@ export default function TagCloudChips({
           <Link
             href={tag.href}
             data-testid={`tag-cloud-chip-${tag.name}`}
-            title={`${tag.count} article${tag.count === 1 ? '' : 's'}`}
+            title={usage(tag)}
             style={{
               fontSize: tag.fontSize,
               fontWeight: tag.weight > 0.6 ? 700 : 500,

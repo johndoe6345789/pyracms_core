@@ -16,12 +16,19 @@ export function useSnippets(tenantId: number | null) {
     if (!tenantId) return
     setLoading(true)
     setError(false)
-    api
-      .get(`/api/snippets?tenant_id=${tenantId}&limit=200`)
-      .then((res) => {
-        const items = res.data.items || []
-        setSnippets(items.map(mapSnippet))
-      })
+    // The API caps a page at 100, so walk the pages.
+    const all: Snippet[] = []
+    const page = async (offset: number): Promise<void> => {
+      const res = await api.get(
+        `/api/snippets?tenant_id=${tenantId}&limit=100&offset=${offset}`,
+      )
+      const items = res.data.items || []
+      all.push(...items.map(mapSnippet))
+      if (items.length === 100 && all.length < (res.data.total ?? 0))
+        return page(offset + 100)
+    }
+    page(0)
+      .then(() => setSnippets(all))
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [tenantId])

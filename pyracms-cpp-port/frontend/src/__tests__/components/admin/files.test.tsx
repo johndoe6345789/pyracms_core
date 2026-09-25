@@ -23,6 +23,13 @@ it('FileCard shows meta and deletes', () => {
   expect(onDelete).toHaveBeenCalledWith(file(1, 'text/plain'))
 })
 
+it('FileCard links each file to its download', () => {
+  render(<FileCard file={file(4, 'text/plain')} onDelete={jest.fn()} />)
+  const link = screen.getByTestId('download-file-4')
+  expect(link.getAttribute('href')).toMatch(/\/api\/files\/u4$/)
+  expect(link).toHaveAttribute('download', 'f4')
+})
+
 it('FileGrid renders cards', () => {
   render(
     <FileGrid files={[file(1, 'a/b'), file(2, 'a/b')]} onDelete={jest.fn()} />,

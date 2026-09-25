@@ -3,12 +3,8 @@
 import { Box, Chip } from '@mui/material'
 import Link from 'next/link'
 
-function searchHref(searchSlug: string, tag: string) {
-  const params = new URLSearchParams({
-    site: searchSlug,
-    q: tag,
-  })
-  return `/search?${params.toString()}`
+function tagHref(slug: string, tag: string) {
+  return `/site/${slug}/tags/${encodeURIComponent(tag)}`
 }
 
 interface ArticleTagChipsProps {
@@ -38,7 +34,7 @@ export function ArticleTagChips({
         <Chip
           key={tag}
           component={searchSlug ? Link : 'div'}
-          href={searchSlug ? searchHref(searchSlug, tag) : undefined}
+          href={searchSlug ? tagHref(searchSlug, tag) : undefined}
           clickable={Boolean(searchSlug)}
           label={tag}
           size="small"

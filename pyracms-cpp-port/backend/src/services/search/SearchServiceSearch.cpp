@@ -5,15 +5,23 @@ namespace pyracms {
 void SearchService::search(const DbClientPtr &db, int tenantId,
                            const std::string &query, const std::string &type,
                            int limit, int offset, SearchResultsCb cb) {
-    // Forum posts are never indexed in Elasticsearch: always use Postgres.
-    bool forumOnly = type == "forum_post" || type == "post";
     // GCOVR_EXCL_START (Elasticsearch/Redis glue: needs a live cluster)
-    if (useElasticsearch() && !forumOnly) {
-        esSearch(tenantId, query, type, limit, offset, cb);
+    if (useElasticsearch()) {
+        esSearch(tenantId, query, type == "post" ? "forum_post" : type, limit,
+                 offset, cb, [=]() {
+                     searchPostgres(db, tenantId, query, type, limit, offset,
+                                    cb);
+                 });
         return;
     }
     // GCOVR_EXCL_STOP
+    searchPostgres(db, tenantId, query, type, limit, offset, cb);
+}
 
+void SearchService::searchPostgres(const DbClientPtr &db, int tenantId,
+                                   const std::string &query,
+                                   const std::string &type, int limit,
+                                   int offset, SearchResultsCb cb) {
     // Fallback: PostgreSQL full-text search
     std::string tsQuery = toTsQuery(query);
     SearchResults empty;

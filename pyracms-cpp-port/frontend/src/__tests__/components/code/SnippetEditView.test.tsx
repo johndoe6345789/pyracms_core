@@ -18,6 +18,7 @@ const snippet = {
   code: 'x',
   language: 'python',
   visibility: 'public',
+  tags: [],
 } as unknown as Snippet
 
 describe('SnippetEditView', () => {

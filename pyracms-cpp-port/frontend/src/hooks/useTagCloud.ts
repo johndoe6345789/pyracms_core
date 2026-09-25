@@ -6,6 +6,8 @@ import api from '@/lib/api'
 export interface TagCloudItem {
   name: string
   count: number
+  articles: number
+  snippets: number
 }
 
 export function useTagCloud(tenantId: number | null) {
@@ -16,7 +18,7 @@ export function useTagCloud(tenantId: number | null) {
     if (!tenantId) return
     setLoading(true)
     api
-      .get(`/api/articles/tags/cloud?tenant_id=${tenantId}`)
+      .get(`/api/tags/cloud?tenant_id=${tenantId}`)
       .then((res) => setTags(res.data || []))
       .catch(() => setTags([]))
       .finally(() => setLoading(false))

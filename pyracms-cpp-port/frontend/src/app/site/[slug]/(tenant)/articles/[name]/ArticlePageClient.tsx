@@ -6,6 +6,7 @@ import { useArticle } from '@/hooks/useArticle'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useSiteSession } from '@/hooks/useSiteSession'
 import ArticleOwnerActions from '@/components/articles/ArticleOwnerActions'
+import { ArticleAttachments } from '@/components/articles/ArticleAttachments'
 import { ArticleContent } from '@/components/articles/ArticleContent'
 import { ArticleVoteButtons } from '@/components/articles/ArticleVoteButtons'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
@@ -48,6 +49,11 @@ export default function ArticlePageClient() {
               renderer={article.renderer}
             />
           </section>
+          <ArticleAttachments
+            name={name}
+            tenantId={tenantId}
+            canManage={signedIn}
+          />
           <Divider sx={{ mb: 3 }} />
           <section aria-label="Article voting">
             <ErrorAlert error={voteError} testId="article-vote-error" />

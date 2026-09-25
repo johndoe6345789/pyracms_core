@@ -11,14 +11,20 @@ namespace pyracms {
 void SearchService::autocomplete(
     const DbClientPtr &db, int tenantId, const std::string &prefix, int limit,
     std::function<void(const std::vector<AutocompleteItem> &)> cb) {
-
     // GCOVR_EXCL_START (Elasticsearch/Redis glue: needs a live cluster)
     if (useElasticsearch()) {
-        esAutocomplete(tenantId, prefix, limit, cb);
+        esAutocomplete(tenantId, prefix, limit, cb, [=]() {
+            autocompletePostgres(db, tenantId, prefix, limit, cb);
+        });
         return;
     }
     // GCOVR_EXCL_STOP
+    autocompletePostgres(db, tenantId, prefix, limit, cb);
+}
 
+void SearchService::autocompletePostgres(
+    const DbClientPtr &db, int tenantId, const std::string &prefix, int limit,
+    std::function<void(const std::vector<AutocompleteItem> &)> cb) {
     // Fallback: PostgreSQL prefix search
     // Escape LIKE wildcards so the caller's text is matched literally
     std::string likePattern;

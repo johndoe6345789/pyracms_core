@@ -43,16 +43,17 @@ std::string serialize(const Items &items) {
 } // namespace
 
 void esAutocomplete(int tenantId, const std::string &prefix, int limit,
-                    std::function<void(const Items &)> cb) {
+                    std::function<void(const Items &)> cb,
+                    std::function<void()> unavailable) {
     auto cacheKey = CacheService::autocompleteKey(tenantId, prefix);
     auto &cache = CacheService::instance();
     if (!cache.isConnected()) {
         ElasticsearchService::instance().autocomplete(tenantId, prefix, limit,
-                                                      cb);
+                                                      cb, unavailable);
         return;
     }
-    cache.get(cacheKey, [tenantId, prefix, limit, cb,
-                         cacheKey](const std::string &cached, bool found) {
+    cache.get(cacheKey, [tenantId, prefix, limit, cb, cacheKey,
+                         unavailable](const std::string &cached, bool found) {
         Items hit;
         if (found && parseCached(cached, hit)) {
             cb(hit);
@@ -64,7 +65,8 @@ void esAutocomplete(int tenantId, const std::string &prefix, int limit,
                 CacheService::instance().set(cacheKey, serialize(items), 30,
                                              [](bool) {});
                 cb(items);
-            });
+            },
+            unavailable);
     });
 }
 

@@ -9,17 +9,20 @@
 namespace pyracms {
 
 void esSearch(int tenantId, const std::string &query, const std::string &type,
-              int limit, int offset, SearchResultsCb cb) {
-    auto cacheKey = CacheService::searchKey(tenantId, query, type);
+              int limit, int offset, SearchResultsCb cb,
+              std::function<void()> unavailable) {
+    // Pages are cached separately (the key must not ignore limit/offset).
+    auto cacheKey = CacheService::searchKey(tenantId, query, type) + ":" +
+                    std::to_string(limit) + ":" + std::to_string(offset);
     auto &cache = CacheService::instance();
     if (!cache.isConnected()) {
         // No Redis - search ES directly
         ElasticsearchService::instance().search(tenantId, query, type, limit,
-                                                offset, cb);
+                                                offset, cb, unavailable);
         return;
     }
-    cache.get(cacheKey, [tenantId, query, type, limit, offset, cb,
-                         cacheKey](const std::string &cached, bool found) {
+    cache.get(cacheKey, [tenantId, query, type, limit, offset, cb, cacheKey,
+                         unavailable](const std::string &cached, bool found) {
         SearchResults hit;
         if (found && esParseCachedSearch(cached, hit)) {
             cb(hit);
@@ -32,7 +35,8 @@ void esSearch(int tenantId, const std::string &query, const std::string &type,
                 CacheService::instance().set(
                     cacheKey, esSerializeSearch(results), 60, [](bool) {});
                 cb(results);
-            });
+            },
+            unavailable);
     });
 }
 

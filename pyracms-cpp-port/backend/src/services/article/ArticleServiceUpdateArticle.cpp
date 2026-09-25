@@ -11,7 +11,7 @@ void ArticleService::updateArticle(const DbClientPtr &db, int tenantId,
     // Find the article first, then create a new revision
     db->execSqlAsync(
         "SELECT id FROM articles WHERE tenant_id = $1 AND name = $2",
-        [this, db, content, summary, userId,
+        [db, content, summary, userId,
          cb](const drogon::orm::Result &result) {
             if (result.empty()) {
                 cb(false, "Article not found");
@@ -22,8 +22,7 @@ void ArticleService::updateArticle(const DbClientPtr &db, int tenantId,
                 "INSERT INTO article_revisions (article_id, content, summary, "
                 "user_id, created_at) "
                 "VALUES ($1, $2, $3, $4, NOW())",
-                [this, db, articleId, cb](const drogon::orm::Result &) {
-                    refreshSearchIndex(db, articleId);
+                [cb](const drogon::orm::Result &) {
                     cb(true, "");
                 },
                 [cb](const drogon::orm::DrogonDbException &e) {

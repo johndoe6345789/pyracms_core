@@ -17,7 +17,8 @@ class CodeSnippetService {
         std::function<void(bool success, const std::string &error)>;
     void listSnippets(
         const DbClientPtr &db, int tenantId, const std::string &language,
-        int authorId, int viewerId, int limit, int offset,
+        int authorId, int viewerId, const std::string &tag, int limit,
+        int offset,
         std::function<void(const std::vector<CodeSnippetDto> &, int total)> cb);
     // scopeTenant 0 = any site. Private snippets: author (viewer) only.
     void

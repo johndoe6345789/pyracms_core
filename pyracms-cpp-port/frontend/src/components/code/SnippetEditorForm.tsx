@@ -1,10 +1,9 @@
 'use client'
 
-import { Alert, Box, Divider, TextField } from '@mui/material'
-import { CodeEditor } from './CodeEditor'
+import { Alert, Box, Divider } from '@mui/material'
+import { SnippetEditorFields } from './SnippetEditorFields'
 import { CodeOutput } from './CodeOutput'
 import { SnippetEditorButtons } from './SnippetEditorButtons'
-import { SnippetSummaryField } from './SnippetSummaryField'
 import { isRunnable } from '@/lib/snippets'
 import { useSnippetRun } from '@/hooks/useSnippetRun'
 import type { SnippetEditor } from '@/hooks/useSnippetEditor'
@@ -35,21 +34,7 @@ export function SnippetEditorForm({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <TextField
-        label="Title"
-        value={e.title}
-        onChange={(ev) => e.setTitle(ev.target.value)}
-        fullWidth
-        placeholder="Enter a title for your snippet..."
-        data-testid="snippet-title-input"
-      />
-      <CodeEditor
-        value={e.code}
-        onChange={e.setCode}
-        language={e.language}
-        onLanguageChange={e.setLanguage}
-      />
-      {e.savedId && <SnippetSummaryField editor={e} />}
+      <SnippetEditorFields editor={e} />
       {e.error && <Alert severity="error">{e.error}</Alert>}
       <SnippetEditorButtons
         canRun={isRunnable(e.language)}

@@ -1,15 +1,8 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import { DeleteOutlined } from '@mui/icons-material'
+import { Box, Card, CardContent, Typography } from '@mui/material'
 import { FileItem } from '@/hooks/useFileManager'
 import FileIcon from './FileIcon'
 import FileCardMeta from './FileCardMeta'
+import FileCardActions from './FileCardActions'
 
 interface FileCardProps {
   file: FileItem
@@ -57,19 +50,7 @@ export default function FileCard({ file, onDelete }: FileCardProps) {
           {file.name}
         </Typography>
         <FileCardMeta file={file} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip title="Delete">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => onDelete(file)}
-              aria-label={`Delete file ${file.name}`}
-              data-testid={`delete-file-${file.id}`}
-            >
-              <DeleteOutlined fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
+        <FileCardActions file={file} onDelete={onDelete} />
       </CardContent>
     </Card>
   )

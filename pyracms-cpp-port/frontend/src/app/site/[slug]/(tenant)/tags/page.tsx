@@ -14,7 +14,7 @@ export default function TagCloudPage() {
           Tags
         </Typography>
         <Typography color="text.secondary">
-          Browse article topics by tag.
+          Browse articles and code snippets by tag.
         </Typography>
       </Box>
 

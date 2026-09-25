@@ -8,11 +8,10 @@ void ArticleService::publishArticle(const DbClientPtr &db, int articleId,
     db->execSqlAsync(
         "UPDATE articles SET status = 'published', published_at = NOW(), "
         "scheduled_at = NULL WHERE id = $1",
-        [this, db, articleId, cb](const drogon::orm::Result &result) {
+        [cb](const drogon::orm::Result &result) {
             if (result.affectedRows() == 0) {
                 cb(false, "Article not found");
             } else {
-                refreshSearchIndex(db, articleId);
                 cb(true, "");
             }
         },

@@ -1,4 +1,5 @@
 #include "controllers/CodeSnippetController.h"
+#include "controllers/SnippetTagsJson.h"
 #include "filters/TenantGuard.h"
 #include "filters/TenantRules.h"
 #include "filters/Viewer.h"
@@ -41,6 +42,7 @@ void CodeSnippetController::getSnippet(
             result["forkedFrom"] = snippet->forkedFrom;
             result["createdAt"] = snippet->createdAt;
             result["updatedAt"] = snippet->updatedAt;
+            result["tags"] = snippetTagsJson(*snippet);
 
             snippetService_.listAttachments(
                 db, snippet->id,

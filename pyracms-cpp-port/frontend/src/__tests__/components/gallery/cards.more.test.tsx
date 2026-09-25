@@ -28,7 +28,9 @@ describe('gallery cards', () => {
         items={[
           {
             name: 'a',
-            count: 2,
+            count: 3,
+            articles: 2,
+            snippets: 1,
             weight: 0.5,
             href: '/t/a',
             fontSize: 12,
@@ -38,8 +40,8 @@ describe('gallery cards', () => {
       />,
     )
     const chip = screen.getByTestId('tag-cloud-chip-a')
-    expect(chip).toHaveTextContent('a2')
-    expect(chip).toHaveAttribute('title', '2 articles')
+    expect(chip).toHaveTextContent('a3')
+    expect(chip).toHaveAttribute('title', '2 articles, 1 snippet')
     expect(chip).toHaveAttribute('href', '/t/a')
   })
 })

@@ -62,8 +62,7 @@ public:
     static constexpr size_t kMaxCodeBytes = 100000;
     static constexpr size_t kMaxOutputBytes = 65536;
     static constexpr int kTimeoutSeconds = 30;
-    // In flight (each a thread waiting on the gateway); the gateway is what
-    // limits how many actually run at once, and queues the rest.
+    // In flight (threads waiting on the gateway, which queues the rest).
     static constexpr int kMaxConcurrent = 32;
     static constexpr size_t kMaxInputBytes = 8 * 1024 * 1024;
     static constexpr size_t kMaxInputFiles = 64;

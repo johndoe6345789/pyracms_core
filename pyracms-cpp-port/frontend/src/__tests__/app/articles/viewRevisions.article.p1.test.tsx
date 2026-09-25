@@ -68,7 +68,7 @@ it('article page renders and votes', async () => {
   )
   expect(screen.getByTestId('tag-chip-t')).toHaveAttribute(
     'href',
-    '/search?site=s&q=t',
+    '/site/s/tags/t',
   )
   expect(screen.queryByTestId('article-owner-actions')).toBeNull()
 })

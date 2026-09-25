@@ -1,4 +1,5 @@
 #include "controllers/CodeSnippetController.h"
+#include "controllers/SnippetTagsJson.h"
 #include "filters/TenantGuard.h"
 #include "filters/TenantRules.h"
 #include "filters/UserVisibility.h"
@@ -27,6 +28,9 @@ void CodeSnippetController::listSnippets(
     auto offsetStr = req->getParameter("offset");
     auto language = req->getParameter("language");
     auto authorStr = req->getParameter("author_id");
+    auto tag = req->getParameter("tag");
+    if (tag.size() > 64)
+        tag.clear();
     limit = clampLimit(limitStr, limit, 100);
     offset = clampOffset(offsetStr);
     if (!authorStr.empty())
@@ -35,7 +39,8 @@ void CodeSnippetController::listSnippets(
     auto db = drogon::app().getDbClient();
 
     snippetService_.listSnippets(
-        db, tenantId, language, authorId, viewerOf(req).userId, limit, offset,
+        db, tenantId, language, authorId, viewerOf(req).userId, tag, limit,
+        offset,
         [callback](const std::vector<CodeSnippetDto> &snippets, int total) {
             Json::Value result;
             result["total"] = total;
@@ -54,6 +59,7 @@ void CodeSnippetController::listSnippets(
                 item["forkedFrom"] = s.forkedFrom;
                 item["createdAt"] = s.createdAt;
                 item["updatedAt"] = s.updatedAt;
+                item["tags"] = snippetTagsJson(s);
                 result["items"].append(item);
             }
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

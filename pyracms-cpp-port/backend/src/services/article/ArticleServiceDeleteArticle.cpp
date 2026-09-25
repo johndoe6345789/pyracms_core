@@ -1,7 +1,6 @@
 #include "services/ArticleService.h"
 #include "services/DbError.h"
 #include "services/CacheService.h"
-#include "services/ElasticsearchService.h"
 
 namespace pyracms {
 
@@ -15,10 +14,6 @@ void ArticleService::deleteArticle(const DbClientPtr &db, int tenantId,
                 cb(false, "Article not found");
             } else {
                 CacheService::instance().invalidateArticle(tenantId, name);
-                if (ElasticsearchService::instance().isConfigured()) {
-                    ElasticsearchService::instance().deleteDocument(
-                        "pyracms_articles", result[0]["id"].as<int>());
-                }
                 cb(true, "");
             }
         },

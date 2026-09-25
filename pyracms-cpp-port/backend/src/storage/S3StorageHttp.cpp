@@ -21,13 +21,6 @@ std::string S3Storage::presignedUrl(const BlobKey &k, int expiresS) const {
                              sigv4UtcNow());
 }
 
-drogon::HttpClientPtr S3Storage::client() {
-    std::lock_guard<std::mutex> lock(mu_);
-    if (!client_)
-        client_ = drogon::HttpClient::newHttpClient(ep_.origin);
-    return client_;
-}
-
 // Transport problems are "unavailable"; anything the store answers with an
 // unexpected status is a backend error. Detail is logged, never returned.
 static BlobStatus classify(drogon::ReqResult r,
@@ -65,12 +58,16 @@ void S3Storage::send(drogon::HttpMethod m, const std::string &path,
         req->setContentTypeCode(drogon::CT_APPLICATION_OCTET_STREAM);
         req->setBody(std::move(body));
     }
-    client()->sendRequest(
+    auto conn = client();
+    conn->sendRequest(
         req,
-        [cb](drogon::ReqResult r, const drogon::HttpResponsePtr &resp) {
-            if (r != drogon::ReqResult::Ok)
+        [this, conn, cb](drogon::ReqResult r,
+                         const drogon::HttpResponsePtr &resp) {
+            if (r != drogon::ReqResult::Ok) {
                 LOG_WARN << "object store request failed: "
                          << drogon::to_string_view(r);
+                dropClient(conn);
+            }
             cb(classify(r, resp), resp);
         },
         timeout > 0 ? timeout : cfg_.timeoutS);

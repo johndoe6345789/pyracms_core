@@ -36,3 +36,13 @@ describe('fetchSearch', () => {
     expect(get.mock.calls[0][0]).toContain('tenant_id=3')
   })
 })
+
+it('puts hit urls under the site they were found on', async () => {
+  get.mockResolvedValue({
+    data: {
+      items: [{ id: 1, type: 'article', url: '/articles/x' }, { id: 2 }],
+    },
+  })
+  const r = await fetchSearch('q', '3', 'all', 1, 'rog')
+  expect(r.items.map((i) => i.url)).toEqual(['/site/rog/articles/x', ''])
+})

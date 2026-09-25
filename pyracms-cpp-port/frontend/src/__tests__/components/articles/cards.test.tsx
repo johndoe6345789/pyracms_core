@@ -58,7 +58,7 @@ it('ArticleTagChips renders plain and linked chips', () => {
   rerender(<ArticleTagChips tags={['a b']} searchSlug="s" color="primary" />)
   expect(screen.getByTestId('tag-chip-a b')).toHaveAttribute(
     'href',
-    '/search?site=s&q=a+b',
+    '/site/s/tags/a%20b',
   )
 })
 

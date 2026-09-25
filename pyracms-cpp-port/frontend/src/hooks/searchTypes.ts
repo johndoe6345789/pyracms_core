@@ -1,4 +1,5 @@
 import api from '@/lib/api'
+import { siteUrl } from '@/lib/searchUrl'
 
 export interface SearchResult {
   type: string
@@ -23,6 +24,7 @@ export async function fetchSearch(
   tenantId: string,
   type: string,
   pg: number,
+  slug = '',
 ): Promise<SearchResponse> {
   const params = new URLSearchParams({
     q,
@@ -33,7 +35,10 @@ export async function fetchSearch(
   })
   const res = await api.get(`/api/search?${params}`)
   return {
-    items: res.data.items || [],
+    items: (res.data.items || []).map((i: SearchResult) => ({
+      ...i,
+      url: siteUrl(slug, i.url ?? ''),
+    })),
     totalCount: res.data.totalCount || 0,
     facets: res.data.facets || {},
   }

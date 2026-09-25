@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { fetchSearch, type SearchResult } from './searchTypes'
 
 /** Runs searches for a tenant and holds the latest result state. */
-export function useSearchRun(tenantId: string) {
+export function useSearchRun(tenantId: string, siteSlug = '') {
   const [results, setResults] = useState<SearchResult[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [facets, setFacets] = useState<Record<string, number>>({})
@@ -20,7 +20,7 @@ export function useSearchRun(tenantId: string) {
       }
       setLoading(true)
       try {
-        const data = await fetchSearch(q, tenantId, type, pg)
+        const data = await fetchSearch(q, tenantId, type, pg, siteSlug)
         setResults(data.items)
         setTotalCount(data.totalCount)
         setFacets(data.facets)
@@ -29,7 +29,7 @@ export function useSearchRun(tenantId: string) {
       }
       setLoading(false)
     },
-    [tenantId],
+    [tenantId, siteSlug],
   )
 
   return { results, totalCount, facets, loading, performSearch }

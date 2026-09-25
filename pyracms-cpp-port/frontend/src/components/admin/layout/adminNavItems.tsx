@@ -12,6 +12,7 @@ import {
   PaletteOutlined,
   WebhookOutlined,
   HistoryOutlined,
+  ManageSearchOutlined,
 } from '@mui/icons-material'
 
 export interface AdminNavItem {
@@ -30,6 +31,7 @@ const ITEMS: [string, SvgIconComponent, string][] = [
   ['Styles', PaletteOutlined, '/styles'],
   ['Analytics', BarChartOutlined, '/analytics'],
   ['Webhooks', WebhookOutlined, '/webhooks'],
+  ['Search Indexing', ManageSearchOutlined, '/search'],
   ['Audit Log', HistoryOutlined, '/audit'],
   ['Backup', BackupOutlined, '/backup'],
 ]

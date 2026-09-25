@@ -51,6 +51,7 @@ export default function SnippetBody(p: Props) {
           result={result}
           tenantId={tenantId}
           historyHref={`${base}/${id}/revisions`}
+          siteSlug={base.split('/')[2] ?? ''}
           onRun={() => run(id)}
           onFork={act.fork}
           onEdit={() => setEditing(true)}
