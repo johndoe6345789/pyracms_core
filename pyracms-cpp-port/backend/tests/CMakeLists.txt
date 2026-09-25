@@ -217,6 +217,8 @@ set(TEST_SOURCES
 
     test_setup_http.cpp
 
+    test_snippet_attachment_http.cpp
+
     test_snippet_menu_http.cpp
 
     test_snippet_scope_db_1.cpp
