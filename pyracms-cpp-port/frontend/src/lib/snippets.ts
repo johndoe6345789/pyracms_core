@@ -2,6 +2,7 @@ import { dayOf } from './dates'
 import { mapAttachment, type SnippetAttachment } from './snippetAttachments'
 
 export type { SnippetAttachment }
+export { isRunnable, langColor } from './snippetLanguages'
 
 export interface Snippet {
   id: string
@@ -23,24 +24,6 @@ export interface RunResult {
   exitCode: number
   executionTime?: number
 }
-
-const RUNNABLE = ['python', 'javascript', 'cpp', 'rust', 'go', 'java', 'ruby']
-
-export const isRunnable = (language: string) => RUNNABLE.includes(language)
-
-const LANGUAGE_COLORS: Record<string, string> = {
-  python: '#3572A5',
-  javascript: '#f1e05a',
-  typescript: '#2b7489',
-  cpp: '#f34b7d',
-  rust: '#dea584',
-  go: '#00ADD8',
-  java: '#b07219',
-  ruby: '#701516',
-}
-
-export const langColor = (language: string) =>
-  LANGUAGE_COLORS[language] ?? '#6e7681'
 
 export function mapSnippet(s: Record<string, unknown>): Snippet {
   const created = String(s.createdAt ?? '')

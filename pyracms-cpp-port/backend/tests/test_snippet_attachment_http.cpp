@@ -26,6 +26,10 @@ TEST(SnippetAttachmentHttp, AddListRemove) {
     auto add = post("/api/snippets/" + id + "/attachments",
                     J({{"fileUuid", fileUuid}}), s.user.token);
     ASSERT_EQ(add.status, 201) << add.text;
+    // Run reads the attachment back from storage to stage it; with no
+    // docker in the test environment the run itself just reports failure.
+    EXPECT_EQ(post("/api/snippets/" + id + "/run",
+                   J({{"tenant_id", s.id}}), s.user.token).status, 200);
 
     auto got = get("/api/snippets/" + id + "?tenant_id=" +
                    std::to_string(s.id));

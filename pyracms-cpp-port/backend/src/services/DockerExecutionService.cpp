@@ -10,8 +10,8 @@ namespace pyracms {
 DockerExecutionService::DockerExecutionService() {
     languageImages_ = {
         {"python",     "pyracms-runner-python"},
-        {"javascript", "pyracms-runner-node"},
-        {"node",       "pyracms-runner-node"},
+        {"javascript", "pyracms-runner-node"}, {"node", "pyracms-runner-node"},
+        {"c",          "pyracms-runner-c"},
         {"cpp",        "pyracms-runner-cpp"},
         {"c++",        "pyracms-runner-cpp"},
         {"rust",       "pyracms-runner-rust"},
@@ -39,6 +39,7 @@ bool DockerExecutionService::isLanguageSupported(
 // sandboxes at once (each is a container on the host daemon).
 void DockerExecutionService::executeCode(
     const std::string &language, const std::string &code,
+    std::vector<RunInput> inputs,
     std::function<void(const ExecutionResult &)> cb) {
     static std::atomic<int> running{0};
     auto it = languageImages_.find(language);
@@ -55,11 +56,14 @@ void DockerExecutionService::executeCode(
         cb({1, "Too many runs in progress, try again shortly", 0});
         return;
     }
-    std::thread([image = it->second, code, cb]() {
+    auto staged = usableInputs(language, std::move(inputs));
+    std::thread([image = it->second, code, staged, cb]() {
         auto start = std::chrono::steady_clock::now();
         std::string output;
-        int exitCode = runArgv(buildArgv(image, code), kMaxOutputBytes,
+        std::string dir = staged.empty() ? "" : stageInputs(code, staged);
+        int exitCode = runArgv(buildArgv(image, code, dir), kMaxOutputBytes,
                                output);
+        removeInputs(dir);
         if (exitCode < 0) {
             exitCode = 1;
             output = "Failed to start the sandbox";

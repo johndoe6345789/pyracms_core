@@ -42,7 +42,7 @@ RateRule rateRuleFor(const std::string &path) {
     if (path == "/api/tenants")
         return {"tenant", 10, 3600};
     if (path.rfind("/api/snippets/", 0) == 0 && endsWith(path, "/run"))
-        return {"run", 10, 60};
+        return {"run", 300, 60};
     return {};
 }
 

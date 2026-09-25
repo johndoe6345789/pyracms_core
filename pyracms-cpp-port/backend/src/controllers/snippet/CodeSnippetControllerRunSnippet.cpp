@@ -2,6 +2,7 @@
 #include "filters/TenantGuard.h"
 #include "filters/TenantRules.h"
 #include "filters/Viewer.h"
+#include "services/SnippetInputs.h"
 
 namespace pyracms {
 
@@ -37,24 +38,29 @@ void CodeSnippetController::runSnippet(
                 return;
             }
 
-            dockerService_.executeCode(
-                snippet->language, snippet->code,
-                [this, db, snippetId, userId,
-                 callback](const ExecutionResult &execResult) {
-                    // Record the execution in the database
-                    snippetService_.recordExecution(
-                        db, snippetId, userId, execResult.output,
-                        execResult.exitCode, execResult.executionTimeMs,
-                        [execResult, callback](bool, const std::string &) {
-                            Json::Value result;
-                            result["exitCode"] = execResult.exitCode;
-                            result["output"] = execResult.output;
-                            result["executionTimeMs"] =
-                                execResult.executionTimeMs;
-                            callback(drogon::HttpResponse::newHttpJsonResponse(
-                                result));
-                        });
-                });
+            auto finish = [this, db, snippetId, userId,
+                           callback](const ExecutionResult &execResult) {
+                // Record the execution in the database
+                snippetService_.recordExecution(
+                    db, snippetId, userId, execResult.output,
+                    execResult.exitCode, execResult.executionTimeMs,
+                    [execResult, callback](bool, const std::string &) {
+                        Json::Value result;
+                        result["exitCode"] = execResult.exitCode;
+                        result["output"] = execResult.output;
+                        result["executionTimeMs"] = execResult.executionTimeMs;
+                        callback(
+                            drogon::HttpResponse::newHttpJsonResponse(result));
+                    });
+            };
+            // The snippet's attachments are its input files: staged into
+            // the sandbox so open("name.txt") finds them.
+            auto language = snippet->language;
+            auto code = snippet->code;
+            loadSnippetInputs(db, snippetId, [=](std::vector<RunInput> in) {
+                dockerService_.executeCode(language, code, std::move(in),
+                                           finish);
+            });
         });
 }
 
