@@ -20,6 +20,7 @@ interface RevisionTableProps {
   revisions: Revision[]
   latestRevision: number
   articleName?: string
+  renderer?: string
   tenantId?: number | null
   onRevert?: (n: number) => Promise<void>
 }
@@ -30,6 +31,7 @@ export function RevisionTable({
   revisions,
   latestRevision,
   articleName,
+  renderer = 'markdown',
   tenantId,
   onRevert,
 }: RevisionTableProps) {
@@ -68,7 +70,8 @@ export function RevisionTable({
         open={d.dlgOpen}
         onClose={() => d.setDlgOpen(false)}
         revision={d.viewRev}
-        sanitizedContent={d.content}
+        content={d.content}
+        renderer={renderer}
       />
       <RevertConfirmDialog
         revisionNumber={d.revertNum}

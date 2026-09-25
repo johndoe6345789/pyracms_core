@@ -3,6 +3,15 @@ import { renderBBCode } from '@/components/articles/bbcodeRenderer'
 import { RevisionViewDialog } from '@/components/articles/RevisionViewDialog'
 import { RevertConfirmDialog } from '@/components/articles/RevertConfirmDialog'
 
+jest.mock(
+  'react-markdown',
+  () => jest.requireActual('../../helpers/scopeMocks').markdownMock,
+)
+jest.mock(
+  'remark-gfm',
+  () => jest.requireActual('../../helpers/scopeMocks').gfmMock,
+)
+
 it('renderBBCode converts every tag', () => {
   const html = renderBBCode(
     '[b]b[/b][i]i[/i][u]u[/u][url=http://a]l[/url][url]http://b[/url]' +
@@ -33,16 +42,18 @@ it('revision dialogs render and close', () => {
       open
       onClose={jest.fn()}
       revision={rev}
-      sanitizedContent="<b>c</b>"
+      content="**c**"
+      renderer="markdown"
     />,
   )
-  expect(screen.getByTestId('revision-content').innerHTML).toContain('<b>')
+  expect(screen.getByTestId('article-content')).toHaveTextContent('c')
   rerender(
     <RevisionViewDialog
       open
       onClose={jest.fn()}
       revision={null}
-      sanitizedContent=""
+      content=""
+      renderer="markdown"
     />,
   )
   render(

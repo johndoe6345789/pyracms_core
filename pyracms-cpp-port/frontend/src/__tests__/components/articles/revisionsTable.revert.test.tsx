@@ -3,6 +3,15 @@ import { RevisionTable } from '@/components/articles/RevisionTable'
 import { revs } from '../../helpers/revisionsFixture'
 
 jest.mock(
+  'react-markdown',
+  () => jest.requireActual('../../helpers/scopeMocks').markdownMock,
+)
+jest.mock(
+  'remark-gfm',
+  () => jest.requireActual('../../helpers/scopeMocks').gfmMock,
+)
+
+jest.mock(
   '@/lib/api',
   () => jest.requireActual('../../helpers/apiMock').apiMock,
 )

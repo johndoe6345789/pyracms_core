@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { sanitizeHtml } from '@/lib/sanitize'
 import type { Revision } from '@/hooks/useRevisions'
 import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
@@ -24,7 +23,7 @@ export function useRevisionDialogs(
     api
       .get(url)
       .then((res) => {
-        setContent(sanitizeHtml(res.data.content || ''))
+        setContent(res.data.content || '')
         setViewRev(rev)
         setDlgOpen(true)
       })

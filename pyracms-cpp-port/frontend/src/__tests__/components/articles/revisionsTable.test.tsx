@@ -4,6 +4,15 @@ import { m } from '../../helpers/scopeApi'
 import { revs } from '../../helpers/revisionsFixture'
 
 jest.mock(
+  'react-markdown',
+  () => jest.requireActual('../../helpers/scopeMocks').markdownMock,
+)
+jest.mock(
+  'remark-gfm',
+  () => jest.requireActual('../../helpers/scopeMocks').gfmMock,
+)
+
+jest.mock(
   '@/lib/api',
   () => jest.requireActual('../../helpers/apiMock').apiMock,
 )
@@ -26,7 +35,7 @@ it('views a revision in a dialog', async () => {
   expect(screen.queryByTestId('revert-2')).toBeNull()
   fireEvent.click(screen.getByTestId('view-rev-1'))
   await waitFor(() =>
-    expect(screen.getByTestId('revision-content')).toHaveTextContent('rev'),
+    expect(screen.getByTestId('article-content')).toHaveTextContent('rev'),
   )
   fireEvent.click(screen.getByTestId('close-revision-dialog'))
 })
@@ -51,6 +60,6 @@ it('ignores view without name/tenant and on error', async () => {
   m.get.mockResolvedValue({ data: {} })
   fireEvent.click(screen.getByTestId('view-rev-1'))
   await waitFor(() =>
-    expect(screen.getByTestId('revision-content')).toBeInTheDocument(),
+    expect(screen.getByTestId('article-content')).toBeInTheDocument(),
   )
 })

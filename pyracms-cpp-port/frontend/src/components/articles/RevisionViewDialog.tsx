@@ -9,36 +9,33 @@ import {
   Typography,
 } from '@mui/material'
 import type { Revision } from '@/hooks/useRevisions'
-import { RevisionContent } from './RevisionContent'
+import { ArticleContent } from './ArticleContent'
 
 interface RevisionViewDialogProps {
   open: boolean
   onClose: () => void
   revision: Revision | null
-  /**
-   * Content MUST be sanitized with DOMPurify
-   * by the caller before passing here.
-   */
-  sanitizedContent: string
+  /** The revision's source text, shown the way the article itself is. */
+  content: string
+  renderer: string
 }
 
-/**
- * Displays a revision's pre-sanitized content
- * in a modal dialog. Caller is responsible for
- * DOMPurify sanitization of the content prop.
- */
+/** A past revision rendered like the real article (ArticleContent
+ * renders it and sanitises the HTML itself). */
 export function RevisionViewDialog({
   open,
   onClose,
   revision,
-  sanitizedContent,
+  content,
+  renderer,
 }: RevisionViewDialogProps) {
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
+      scroll="paper"
       aria-labelledby="view-rev-title"
     >
       <DialogTitle id="view-rev-title">
@@ -55,7 +52,7 @@ export function RevisionViewDialog({
         >
           {revision?.date}
         </Typography>
-        <RevisionContent html={sanitizedContent} />
+        <ArticleContent content={content} renderer={renderer} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} data-testid="close-revision-dialog">

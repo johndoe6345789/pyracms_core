@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { Container, Typography, Box } from '@mui/material'
+import { useArticle } from '@/hooks/useArticle'
 import { useRevisions } from '@/hooks/useRevisions'
 import { useTenantId } from '@/hooks/useTenantId'
 import { BackButton } from '@/components/common/BackButton'
@@ -13,6 +14,7 @@ export default function RevisionsPage() {
   const slug = params.slug as string
   const name = params.name as string
   const { tenantId } = useTenantId(slug)
+  const { article } = useArticle(name, tenantId)
   const { revisions, diffs, latestRevision, handleRevert } = useRevisions(
     name,
     tenantId,
@@ -41,6 +43,7 @@ export default function RevisionsPage() {
           revisions={revisions}
           latestRevision={latestRevision}
           articleName={name}
+          {...(article?.renderer ? { renderer: article.renderer } : {})}
           tenantId={tenantId}
           onRevert={handleRevert}
         />
