@@ -1,5 +1,7 @@
 #pragma once
 
+#include "services/CodeSnippetDtos.h"
+
 #include <drogon/drogon.h>
 #include <functional>
 #include <optional>
@@ -7,31 +9,6 @@
 #include <vector>
 
 namespace pyracms {
-
-struct CodeSnippetDto {
-    int id;
-    int tenantId;
-    int authorId;
-    std::string authorUsername;
-    std::string title;
-    std::string code;
-    std::string language;
-    std::string visibility;
-    int runCount;
-    int forkedFrom;
-    std::string createdAt;
-    std::string updatedAt;
-};
-
-struct SnippetExecutionDto {
-    int id;
-    int snippetId;
-    int userId;
-    std::string output;
-    int exitCode;
-    int executionTimeMs;
-    std::string createdAt;
-};
 
 class CodeSnippetService {
   public:
@@ -67,6 +44,16 @@ class CodeSnippetService {
     void recordExecution(const DbClientPtr &db, int snippetId, int userId,
                          const std::string &output, int exitCode,
                          int executionTimeMs, BoolCallback cb);
+
+    void listAttachments(
+        const DbClientPtr &db, int snippetId,
+        std::function<void(const std::vector<SnippetAttachmentDto> &)> cb);
+    // Owner-only: 0 rows affected/returned means not owned or not found,
+    // same convention as updateSnippet/deleteSnippet.
+    void addAttachment(const DbClientPtr &db, int snippetId, int userId,
+                       const std::string &fileUuid, BoolCallback cb);
+    void removeAttachment(const DbClientPtr &db, int snippetId,
+                          int attachmentId, int userId, BoolCallback cb);
 
   private:
     CodeSnippetDto rowToDto(const drogon::orm::Row &row);

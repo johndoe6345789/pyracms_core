@@ -1,4 +1,7 @@
 import { dayOf } from './dates'
+import { mapAttachment, type SnippetAttachment } from './snippetAttachments'
+
+export type { SnippetAttachment }
 
 export interface Snippet {
   id: string
@@ -11,6 +14,7 @@ export interface Snippet {
   runCount: number
   forkedFrom: number
   visibility: string
+  attachments: SnippetAttachment[]
 }
 
 export interface RunResult {
@@ -51,6 +55,9 @@ export function mapSnippet(s: Record<string, unknown>): Snippet {
     runCount: Number(s.runCount ?? 0),
     forkedFrom: Number(s.forkedFrom ?? 0),
     visibility: String(s.visibility ?? 'public'),
+    attachments: Array.isArray(s.attachments)
+      ? s.attachments.map((a) => mapAttachment(a as Record<string, unknown>))
+      : [],
   }
 }
 

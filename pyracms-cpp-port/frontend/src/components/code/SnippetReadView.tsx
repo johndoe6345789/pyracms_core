@@ -4,6 +4,7 @@ import { Box } from '@mui/material'
 import { CodeEditor } from './CodeEditor'
 import { CodeOutput } from './CodeOutput'
 import { SnippetToolbar } from './SnippetToolbar'
+import { SnippetAttachments } from './SnippetAttachments'
 import { isRunnable, type RunResult, type Snippet } from '@/lib/snippets'
 
 interface Props {
@@ -11,10 +12,12 @@ interface Props {
   isOwner: boolean
   running: boolean
   result: RunResult | null
+  tenantId: number | null
   onRun: () => void
   onFork: () => void
   onEdit: () => void
   onDelete: () => void
+  onAttachmentsChanged: () => void
 }
 
 export function SnippetReadView(p: Props) {
@@ -63,6 +66,13 @@ export function SnippetReadView(p: Props) {
           />
         </Box>
       )}
+      <SnippetAttachments
+        snippetId={snippet.id}
+        tenantId={p.tenantId}
+        attachments={snippet.attachments}
+        isOwner={p.isOwner}
+        onChanged={p.onAttachmentsChanged}
+      />
     </>
   )
 }
