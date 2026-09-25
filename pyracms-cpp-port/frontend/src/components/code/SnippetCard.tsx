@@ -1,10 +1,12 @@
 'use client'
 
-import { Card, CardContent } from '@mui/material'
+import { Card, CardActionArea, CardContent } from '@mui/material'
+import Link from 'next/link'
 import { SnippetCardTitle } from './SnippetCardTitle'
 import { SnippetCardMeta } from './SnippetCardMeta'
 import { SnippetPreview } from './SnippetPreview'
 import { SnippetCardActions } from './SnippetCardActions'
+import { cardSx, actionSx } from './snippetCardStyles'
 
 interface SnippetCardProps {
   id: string
@@ -39,30 +41,25 @@ export function SnippetCard({
   }
 
   return (
-    <Card
-      variant="outlined"
-      data-testid={`snippet-card-${id}`}
-      sx={{
-        borderColor: 'divider',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-      }}
-    >
-      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-        <SnippetCardTitle
-          id={id}
-          title={title}
-          language={language}
-          href={snippetUrl}
-        />
-        <SnippetPreview code={code} />
-        <SnippetCardMeta author={author} date={date} runCount={runCount} />
-      </CardContent>
+    <Card variant="outlined" data-testid={`snippet-card-${id}`} sx={cardSx}>
+      {/* Whole body is the link (bigger click target than the old title-only
+          link), so it lives outside the Fork/Share footer below. */}
+      <CardActionArea
+        component={Link}
+        href={snippetUrl}
+        data-testid={`snippet-link-${id}`}
+        aria-label={`View ${title}`}
+        sx={actionSx}
+      >
+        <CardContent sx={{ pb: 1 }}>
+          <SnippetCardTitle title={title} language={language} />
+          <SnippetPreview code={code} />
+          <SnippetCardMeta author={author} date={date} runCount={runCount} />
+        </CardContent>
+      </CardActionArea>
       <SnippetCardActions
         id={id}
         title={title}
-        href={snippetUrl}
         onFork={onFork}
         onShare={handleShare}
       />
