@@ -40,6 +40,12 @@ it('Enter searches the whole site, not the portal', () => {
   expect(push).toHaveBeenCalledWith('/site/rog/search?q=golf')
 })
 
+it('a search icon is there when the wide field is not', () => {
+  render(<GlobalSearch />)
+  fireEvent.click(screen.getByTestId('global-search-icon'))
+  expect(hook.setOpen).toHaveBeenCalledWith(true)
+})
+
 it('nothing quick still offers the full search', () => {
   render(<GlobalSearch />)
   expect(screen.getByText(/No quick matches/)).toBeInTheDocument()

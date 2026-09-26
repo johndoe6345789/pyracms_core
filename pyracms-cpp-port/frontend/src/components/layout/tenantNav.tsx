@@ -36,7 +36,7 @@ export function tenantSections(
   flags: FeatureFlags | null = null,
   ownerLinks: NavEntry[] = [],
 ): NavSection[] {
-  const explore = [...tenantModuleEntries(slug, flags), searchEntry()]
+  const explore = [...tenantModuleEntries(slug, flags), searchEntry(slug)]
   const sections: NavSection[] = ownerLinks.length
     ? [
         { title: 'Menu', items: [homeEntry(slug), ...ownerLinks] },

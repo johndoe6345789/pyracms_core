@@ -14,10 +14,10 @@ export const homeEntry = (slug: string): NavEntry => ({
   exact: true,
 })
 
-export const searchEntry = (): NavEntry => ({
+export const searchEntry = (slug: string): NavEntry => ({
   key: 'search',
   label: 'Search',
-  href: '/search',
+  href: `/site/${slug}/search`,
   icon: <SearchOutlined />,
   testId: 'search',
 })
@@ -51,7 +51,7 @@ export function exploreEntry(
     icon: <AppsOutlined />,
     children: [
       ...plain,
-      searchEntry(),
+      searchEntry(slug),
       ...groups,
       ...(canAdmin ? [adminEntry(slug)] : []),
     ],
