@@ -45,6 +45,13 @@ export const MARKDOWN_STYLES = {
   },
   '& th': { bgcolor: 'background.default', fontWeight: 600 },
   '& img': { maxWidth: '100%', height: 'auto' },
+  '& video': {
+    display: 'block',
+    maxWidth: '100%',
+    height: 'auto',
+    borderRadius: 1,
+    bgcolor: 'common.black',
+  },
   '& input[type="checkbox"]': { mr: 1 },
 }
 

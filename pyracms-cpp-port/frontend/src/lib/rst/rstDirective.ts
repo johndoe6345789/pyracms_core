@@ -18,6 +18,19 @@ function split(body: string[]) {
   return { opts, rest: body.slice(i).filter((l, j) => j > 0 || l.trim()) }
 }
 
+/** A native HTML5 player; anything a browser cannot play still gets a link. */
+function videoHtml(url: string, poster?: string): string {
+  const src = safeSrc(url)
+  if (!src) return ''
+  const art = poster ? safeSrc(poster) : undefined
+  const attrs = art ? ` poster="${esc(art)}"` : ''
+  return (
+    `<video controls preload="metadata" playsinline src="${esc(src)}"` +
+    `${attrs}>Your browser cannot play this video. ` +
+    `<a href="${esc(src)}">Download it</a></video>`
+  )
+}
+
 /**
  * One `.. name:: argument` directive as HTML. Unknown directives render
  * nothing: their source is not content.
@@ -35,6 +48,7 @@ export function rstDirective(
     const alt = esc(opts.alt ?? '')
     return `<img src="${esc(src)}" alt="${alt}" style="max-width:100%">`
   }
+  if (name === 'video') return videoHtml(arg.trim(), opts.poster)
   if (CODE.includes(name))
     return `<pre><code>${esc(rest.join('\n'))}</code></pre>`
   if (NOTES.includes(name)) {

@@ -49,4 +49,11 @@ export const HTML_STYLES = {
     color: 'text.secondary',
   },
   '& img': { maxWidth: '100%', height: 'auto' },
+  '& video': {
+    display: 'block',
+    maxWidth: '100%',
+    height: 'auto',
+    borderRadius: 1,
+    bgcolor: 'common.black',
+  },
 }
