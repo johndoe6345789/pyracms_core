@@ -19,6 +19,10 @@ TEST(SearchPlain, StripsMarkupLinksAndFileIds) {
     EXPECT_EQ(plain("# Title\n**bold** _it_ https://a.b/c d"),
               "Title bold it d");
     EXPECT_EQ(plain("a &nbsp; b"), "a b");
+    // Windows line endings, image options and table rules
+    EXPECT_EQ(plain("------\r\nTrainz\r\n------\r\n:alt: Tom\r\n:width: 6\r\n"
+                    "=====\r\nend"),
+              "Trainz end");
     EXPECT_EQ(plain(""), "");
 }
 

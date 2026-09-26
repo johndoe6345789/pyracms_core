@@ -7,14 +7,17 @@ CREATE OR REPLACE FUNCTION search_plain(t text) RETURNS text
 LANGUAGE sql IMMUTABLE AS $f$
 SELECT btrim(regexp_replace(regexp_replace(regexp_replace(regexp_replace(
        regexp_replace(regexp_replace(regexp_replace(regexp_replace(
+       regexp_replace(regexp_replace(
          COALESCE(t, ''),
+         '\r', '', 'g'),
          '(^|\n)[ \t]*\.\. [A-Za-z:-]+::[^\n]*', ' ', 'g'),
+         '(^|\n)[ \t]*:(alt|width|height|scale|align):[^\n]*', ' ', 'g'),
          '<[^>]*>', ' ', 'g'),
          '!?\[([^\]]*)\]\([^)]*\)', '\1', 'g'),
          '`([^`<]*)<[^>]*>`_+', '\1', 'g'),
          '(https?://|/api/files/)[^\s)>"'']+', ' ', 'g'),
          '(^|\n)[-=~#*^"+]{3,}[ \t]*(\n|$)', E'\n', 'g'),
-         '[*_`#>|]+|&[a-z]+;', ' ', 'g'),
+         '[*_`#>|]+|&[a-z]+;|[-=~^+]{3,}', ' ', 'g'),
          '\s+', ' ', 'g'))
 $f$;
 
@@ -86,7 +89,7 @@ END $$;
 -- The index holds the old markup-laden text: index everything again, once.
 CREATE TABLE IF NOT EXISTS search_flags (name TEXT PRIMARY KEY);
 WITH first AS (
-    INSERT INTO search_flags (name) VALUES ('210-reindex')
+    INSERT INTO search_flags (name) VALUES ('210-reindex-2')
     ON CONFLICT DO NOTHING RETURNING 1)
 INSERT INTO search_outbox (doc_type, doc_id)
 SELECT doc_type, doc_id FROM search_documents

@@ -35,6 +35,9 @@ export default function SearchDialog(p: Props) {
       e.preventDefault()
       setActive((a) => Math.max(a - 1, -1))
     } else if (e.key === 'Enter' && p.query.trim()) {
+      // else the trigger button, refocused as the dialog closes, would
+      // take this Enter as a click and reopen the dialog
+      e.preventDefault()
       const pick = p.results[active]
       if (pick) p.onSelect(pick)
       else p.onSearchPage()

@@ -31,7 +31,6 @@ RUN conan install . --output-folder=build --build=missing \
 COPY src/ ./src/
 COPY include/ ./include/
 COPY tests/ ./tests/
-COPY sql/ ./sql/
 
 # CMakeLists.txt (and tests/CMakeLists.txt) aren't checked in -- they are
 # generated from cmake_templates/*.j2 by listing src/ and tests/, so they
@@ -53,6 +52,7 @@ RUN cd build && cmake .. \
 # Builds pyracms_tests with gcov instrumentation. Running the image needs
 # PostgreSQL (compose profile "tests" wires it up).
 FROM deps AS tests
+COPY sql/ ./sql/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgtest-dev libgmock-dev gcovr postgresql-client \
     && rm -rf /var/lib/apt/lists/*
@@ -85,7 +85,7 @@ WORKDIR /app
 
 # Copy binary, migrations, and openapi spec
 COPY --from=builder /app/build/pyracms_server /app/
-COPY --from=builder /app/sql/ /app/sql/
+COPY sql/ /app/sql/
 COPY openapi.yaml /app/
 
 # Copy Conan shared libraries needed at runtime

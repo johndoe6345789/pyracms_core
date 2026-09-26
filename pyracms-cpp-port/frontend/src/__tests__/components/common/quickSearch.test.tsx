@@ -35,8 +35,9 @@ it('Enter searches the whole site, not the portal', () => {
   render(<GlobalSearch />)
   fireEvent.click(screen.getByTestId('global-search-trigger'))
   expect(hook.setOpen).toHaveBeenCalledWith(true)
-  fireEvent.keyDown(input(), { key: 'Enter' })
+  const enter = fireEvent.keyDown(input(), { key: 'Enter' })
   expect(push).toHaveBeenCalledWith('/site/rog/search?q=golf')
+  expect(enter).toBe(false) // default prevented: no stray click on the icon
 })
 
 it('a search icon is there when the wide field is not', () => {

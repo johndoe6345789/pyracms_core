@@ -20,6 +20,7 @@ export default function SearchDialogInput({
   return (
     <TextField
       inputRef={inputRef}
+      autoFocus
       fullWidth
       placeholder="Search this site..."
       value={query}
