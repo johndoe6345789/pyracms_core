@@ -5,10 +5,11 @@ import { SearchOutlined } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import SearchDialog from './SearchDialog'
+import { searchPagePath } from '@/lib/searchUrl'
 import { useGlobalSearch } from './useGlobalSearch'
 
 export function GlobalSearch() {
-  const { open, setOpen, q, setQ, res } = useGlobalSearch()
+  const { open, setOpen, q, setQ, res, loading, slug } = useGlobalSearch()
   const router = useRouter()
   const t = useTranslations('common')
   return (
@@ -38,6 +39,7 @@ export function GlobalSearch() {
         open={open}
         query={q}
         results={res}
+        loading={loading}
         onClose={() => setOpen(false)}
         onQueryChange={setQ}
         onSelect={(r) => {
@@ -46,7 +48,7 @@ export function GlobalSearch() {
         }}
         onSearchPage={() => {
           setOpen(false)
-          router.push('/search?q=' + encodeURIComponent(q))
+          router.push(searchPagePath(slug, { q: q.trim() }))
         }}
       />
     </>

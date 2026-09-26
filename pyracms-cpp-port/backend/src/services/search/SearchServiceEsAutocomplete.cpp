@@ -23,6 +23,7 @@ bool parseCached(const std::string &cached, Items &items) {
         ai.text = item["text"].asString();
         ai.type = item["type"].asString();
         ai.url = item["url"].asString();
+        ai.snippet = item["snippet"].asString();
         items.push_back(ai);
     }
     return true;
@@ -35,6 +36,7 @@ std::string serialize(const Items &items) {
         ji["text"] = item.text;
         ji["type"] = item.type;
         ji["url"] = item.url;
+        ji["snippet"] = item.snippet;
         cacheVal.append(ji);
     }
     Json::StreamWriterBuilder writer;

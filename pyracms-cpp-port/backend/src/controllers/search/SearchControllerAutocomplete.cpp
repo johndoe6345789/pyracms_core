@@ -39,6 +39,7 @@ void SearchController::autocomplete(
                 jsonItem["text"] = item.text;
                 jsonItem["type"] = item.type;
                 jsonItem["url"] = item.url;
+                jsonItem["snippet"] = item.snippet;
                 result.append(jsonItem);
             }
             callback(drogon::HttpResponse::newHttpJsonResponse(result));

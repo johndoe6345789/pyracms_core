@@ -1,17 +1,20 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
-import api from '@/lib/api'
 import { useTenantId } from '@/hooks/useTenantId'
-import { siteUrl } from '@/lib/searchUrl'
-import type { SearchResult } from './searchIcons'
+import { fetchSuggestions } from '@/lib/search/api'
+import type { Suggestion } from '@/lib/search/types'
 
+const DEBOUNCE_MS = 250
+
+/** The quick-search dialog: open with Cmd/Ctrl+K, suggestions as you type. */
 export function useGlobalSearch() {
   const slug = /^\/site\/([^/]+)/.exec(usePathname() ?? '')?.[1] ?? ''
   const { tenantId } = useTenantId(slug)
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
-  const [res, setRes] = useState<SearchResult[]>([])
-  const t = useRef<ReturnType<typeof setTimeout>>(null)
+  const [res, setRes] = useState<Suggestion[]>([])
+  const [loading, setLoading] = useState(false)
+
   const onKey = useCallback((e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault()
@@ -23,41 +26,34 @@ export function useGlobalSearch() {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onKey])
+
   useEffect(() => {
     if (!open) {
       setQ('')
       setRes([])
     }
   }, [open])
+
   useEffect(() => {
-    // Search is per site: without a resolved tenant there is nothing to query
-    if (q.length < 2 || !tenantId) {
+    // Search is per site: without a resolved tenant there is nothing to ask
+    if (q.trim().length < 2 || !tenantId) {
       setRes([])
+      setLoading(false)
       return
     }
-    if (t.current) clearTimeout(t.current)
-    t.current = setTimeout(() => {
-      const u =
-        '/api/search/autocomplete?q=' +
-        encodeURIComponent(q) +
-        `&tenant_id=${tenantId}`
-      api
-        .get(u)
-        .then((r) => {
-          const d = r.data.items || r.data || []
-          setRes(
-            d.map((i: Record<string, unknown>) => ({
-              id: String(i.id),
-              type: i.type || 'article',
-              // the API sends {text, type, url}; older shapes sent title
-              title: i.title || i.text || '',
-              snippet: i.snippet || '',
-              url: siteUrl(slug, String(i.url || '#')),
-            })),
-          )
-        })
-        .catch(() => setRes([]))
-    }, 300)
+    let live = true
+    setLoading(true)
+    const timer = setTimeout(() => {
+      fetchSuggestions(slug, tenantId, q.trim())
+        .then((r) => live && setRes(r))
+        .catch(() => live && setRes([]))
+        .finally(() => live && setLoading(false))
+    }, DEBOUNCE_MS)
+    return () => {
+      live = false
+      clearTimeout(timer)
+    }
   }, [q, tenantId, slug])
-  return { open, setOpen, q, setQ, res }
+
+  return { open, setOpen, q, setQ, res, loading, slug }
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "services/SearchTypes.h"
+
 #include <drogon/drogon.h>
 #include <functional>
 #include <map>
@@ -7,29 +9,6 @@
 #include <vector>
 
 namespace pyracms {
-
-struct SearchResultItem {
-    std::string type; // "article", "forum_post", "snippet", "gamedep"
-    int id;
-    std::string title;
-    std::string snippet; // highlighted excerpt
-    std::string url;
-    double rank;
-    std::string createdAt;
-};
-
-struct SearchResults {
-    std::vector<SearchResultItem> items;
-    int totalCount;
-    std::string query;
-    std::map<std::string, int> facets; // type -> count
-};
-
-struct AutocompleteItem {
-    std::string text;
-    std::string type;
-    std::string url;
-};
 
 class SearchService {
   public:

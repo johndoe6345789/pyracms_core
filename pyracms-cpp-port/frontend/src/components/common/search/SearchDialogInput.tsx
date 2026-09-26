@@ -8,25 +8,23 @@ interface Props {
   inputRef: Ref<HTMLInputElement>
   query: string
   onQueryChange: (q: string) => void
-  onSearchPage: () => void
+  onKeyDown: (e: React.KeyboardEvent) => void
 }
 
 export default function SearchDialogInput({
   inputRef,
   query,
   onQueryChange,
-  onSearchPage,
+  onKeyDown,
 }: Props) {
   return (
     <TextField
       inputRef={inputRef}
       fullWidth
-      placeholder="Search articles, posts..."
+      placeholder="Search this site..."
       value={query}
       onChange={(e) => onQueryChange(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' && query) onSearchPage()
-      }}
+      onKeyDown={onKeyDown}
       data-testid="search-dialog-input"
       InputProps={{
         startAdornment: (

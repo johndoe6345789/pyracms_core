@@ -1,48 +1,44 @@
 'use client'
 
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material'
-import { ICONS, COLORS, type SearchResult } from './searchIcons'
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import Marked from '@/components/search/Marked'
+import { kindOf } from '@/lib/search/kinds'
+import type { Suggestion } from '@/lib/search/types'
 
 interface Props {
-  r: SearchResult
-  onSelect: (r: SearchResult) => void
+  r: Suggestion
+  index: number
+  active: boolean
+  onSelect: (r: Suggestion) => void
 }
 
-export default function SearchResultRow({ r, onSelect }: Props) {
+/** One suggestion in the quick-search dialog. */
+export default function SearchResultRow({ r, index, active, onSelect }: Props) {
+  const kind = kindOf(r.type)
   return (
-    <ListItem
+    <ListItemButton
+      selected={active}
       onClick={() => onSelect(r)}
-      data-testid={`search-result-${r.id}`}
-      sx={{
-        cursor: 'pointer',
-        '&:hover': {
-          bgcolor: 'action.hover',
-        },
-        px: 2,
-        py: 1,
-      }}
+      data-testid={`search-result-${index}`}
+      sx={{ px: 2, py: 1, alignItems: 'flex-start' }}
     >
-      <ListItemIcon
-        sx={{
-          minWidth: 36,
-          color: COLORS[r.type],
-        }}
-      >
-        {ICONS[r.type]}
+      <ListItemIcon sx={{ minWidth: 36, mt: 0.5, color: kind.color }}>
+        {kind.icon}
       </ListItemIcon>
       <ListItemText
         primary={r.title}
-        secondary={
-          r.snippet.substring(0, 80) + (r.snippet.length > 80 ? '...' : '')
-        }
-        primaryTypographyProps={{
-          variant: 'body2',
-          fontWeight: 600,
-        }}
+        secondary={r.snippet ? <Marked text={r.snippet} /> : kind.label}
+        primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
         secondaryTypographyProps={{
           variant: 'caption',
+          sx: {
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          },
         }}
       />
-    </ListItem>
+    </ListItemButton>
   )
 }

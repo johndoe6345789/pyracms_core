@@ -1,56 +1,64 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { fireEvent } from '@testing-library/react'
+import { renderHook, act, waitFor, fireEvent } from '@testing-library/react'
 import { useGlobalSearch } from '@/components/common/search/useGlobalSearch'
-import api from '@/lib/api'
-import { usePathname } from 'next/navigation'
-import { useTenantId } from '@/hooks/useTenantId'
+import { fetchSuggestions } from '@/lib/search/api'
 
-jest.mock('@/lib/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn() },
+jest.mock('next/navigation', () => ({ usePathname: () => '/site/rog/x' }))
+let tenant: number | null = 6
+jest.mock('@/hooks/useTenantId', () => ({
+  useTenantId: () => ({ tenantId: tenant }),
 }))
-jest.mock('next/navigation', () => ({ usePathname: jest.fn() }))
-jest.mock('@/hooks/useTenantId', () => ({ useTenantId: jest.fn() }))
-const get = api.get as jest.Mock
-const path = usePathname as jest.Mock
-const tenant = useTenantId as jest.Mock
+jest.mock('@/lib/search/api')
+const fetchMock = fetchSuggestions as jest.Mock
+
 beforeEach(() => {
-  get.mockReset()
-  path.mockReturnValue('/site/demo/x')
-  tenant.mockReturnValue({ tenantId: 7 })
+  jest.resetAllMocks()
+  tenant = 6
 })
 
-describe('useGlobalSearch', () => {
-  it('opens with Ctrl+K and closes with Escape', () => {
-    const { result } = renderHook(() => useGlobalSearch())
-    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
-    expect(result.current.open).toBe(true)
-    fireEvent.keyDown(document, { key: 'Escape' })
-    expect(result.current.open).toBe(false)
-  })
+it('opens with Ctrl+K, closes with Escape and forgets the query', () => {
+  const { result } = renderHook(() => useGlobalSearch())
+  fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+  expect(result.current.open).toBe(true)
+  act(() => result.current.setQ('golf'))
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(result.current.open).toBe(false)
+  expect(result.current.q).toBe('')
+})
 
-  it('debounces, maps results and fills defaults', async () => {
-    jest.useFakeTimers()
-    get.mockResolvedValue({ data: { items: [{ id: 1, title: 'A' }, {}] } })
-    const { result } = renderHook(() => useGlobalSearch())
-    act(() => result.current.setQ('a'))
-    act(() => {
-      jest.advanceTimersByTime(400)
-    })
-    expect(get).not.toHaveBeenCalled()
-    act(() => result.current.setQ('ab'))
-    act(() => {
-      jest.advanceTimersByTime(400)
-    })
-    jest.useRealTimers()
-    await waitFor(() => expect(result.current.res).toHaveLength(2))
-    expect(result.current.res[1]).toMatchObject({
-      type: 'article',
-      url: '#',
-      title: '',
-    })
-    expect(get.mock.calls[0][0]).toBe(
-      '/api/search/autocomplete?q=ab&tenant_id=7',
-    )
+it('asks for suggestions once typing settles', async () => {
+  jest.useFakeTimers()
+  fetchMock.mockResolvedValue([{ title: 'A' }])
+  const { result } = renderHook(() => useGlobalSearch())
+  act(() => result.current.setQ('g'))
+  act(() => result.current.setQ('golf'))
+  act(() => {
+    jest.advanceTimersByTime(100)
   })
+  expect(fetchMock).not.toHaveBeenCalled()
+  act(() => {
+    jest.advanceTimersByTime(300)
+  })
+  jest.useRealTimers()
+  await waitFor(() => expect(result.current.res).toHaveLength(1))
+  expect(fetchMock).toHaveBeenCalledTimes(1)
+  expect(fetchMock).toHaveBeenCalledWith('rog', 6, 'golf')
+  expect(result.current.slug).toBe('rog')
+})
+
+it('a failing lookup leaves no suggestions; no site, no lookup', async () => {
+  jest.useFakeTimers()
+  fetchMock.mockRejectedValue(new Error('x'))
+  const { result, rerender } = renderHook(() => useGlobalSearch())
+  act(() => result.current.setQ('golf'))
+  act(() => {
+    jest.advanceTimersByTime(400)
+  })
+  jest.useRealTimers()
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.res).toEqual([])
+  tenant = null
+  fetchMock.mockClear()
+  rerender()
+  act(() => result.current.setQ('fish'))
+  expect(fetchMock).not.toHaveBeenCalled()
 })

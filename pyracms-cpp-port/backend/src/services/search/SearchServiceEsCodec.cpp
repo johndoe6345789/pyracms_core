@@ -26,6 +26,10 @@ bool esParseCachedSearch(const std::string &cached, SearchResults &results) {
         sri.url = item["url"].asString();
         sri.rank = item["rank"].asDouble();
         sri.createdAt = item["createdAt"].asString();
+        sri.titleMarked = item["titleMarked"].asString();
+        sri.author = item["author"].asString();
+        for (const auto &t : item["tags"])
+            sri.tags.push_back(t.asString());
         results.items.push_back(sri);
     }
     for (const auto &key : root["facets"].getMemberNames()) {
@@ -48,6 +52,11 @@ std::string esSerializeSearch(const SearchResults &results) {
         ji["url"] = item.url;
         ji["rank"] = item.rank;
         ji["createdAt"] = item.createdAt;
+        ji["titleMarked"] = item.titleMarked;
+        ji["author"] = item.author;
+        ji["tags"] = Json::Value(Json::arrayValue);
+        for (const auto &t : item.tags)
+            ji["tags"].append(t);
         cacheVal["items"].append(ji);
     }
     cacheVal["facets"] = Json::Value(Json::objectValue);

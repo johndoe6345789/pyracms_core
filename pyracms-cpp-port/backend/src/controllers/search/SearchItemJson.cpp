@@ -23,6 +23,11 @@ Json::Value searchItemJson(const SearchResultItem &item) {
     j["url"] = item.url;
     j["rank"] = item.rank;
     j["createdAt"] = item.createdAt;
+    j["titleMarked"] = item.titleMarked;
+    j["author"] = item.author;
+    j["tags"] = Json::Value(Json::arrayValue);
+    for (const auto &t : item.tags)
+        j["tags"].append(t);
     if (item.type == "forum_post") {
         j["postId"] = item.id;
         j["threadId"] = threadIdOf(item.url);

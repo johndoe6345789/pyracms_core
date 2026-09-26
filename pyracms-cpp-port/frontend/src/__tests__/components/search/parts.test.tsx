@@ -1,44 +1,50 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import FacetSidebar from '@/components/search/FacetSidebar'
-import { highlightMatch } from '@/components/search/highlightMatch'
-import { TYPE_CONFIG } from '@/components/search/facetConfig'
+import Marked from '@/components/search/Marked'
+import SearchBox from '@/components/search/SearchBox'
+import KindTabs from '@/components/search/KindTabs'
+import { MARK_CLOSE, MARK_OPEN } from '@/lib/search/marks'
 
-describe('highlightMatch', () => {
-  it('wraps matches in mark and escapes regex chars', () => {
-    expect(highlightMatch('a.b a.b', 'a.b')).toBe(
-      '<mark>a.b</mark> <mark>a.b</mark>',
-    )
-  })
-
-  it('sanitizes markup even without a highlight', () => {
-    expect(highlightMatch('<img src=x onerror=alert(1)>hi', '')).not.toContain(
-      'onerror',
-    )
-  })
-
-  it('strips scripts when highlighting', () => {
-    expect(highlightMatch('<script>x</script>ok', 'ok')).toBe('<mark>ok</mark>')
-  })
+it('shows matches as <mark> and never as HTML', () => {
+  const { container } = render(
+    <Marked text={`a ${MARK_OPEN}<b>golf</b>${MARK_CLOSE} c`} />,
+  )
+  expect(container.querySelector('mark')?.textContent).toBe('<b>golf</b>')
+  expect(container.querySelector('b')).toBeNull()
 })
 
-describe('FacetSidebar', () => {
-  it('switches type and disables empty facets', () => {
-    const onType = jest.fn()
-    render(
-      <FacetSidebar
-        facets={{ article: 3 }}
-        activeType="all"
-        onTypeChange={onType}
-        totalCount={3}
-      />,
-    )
-    fireEvent.click(screen.getByText('Articles'))
-    expect(onType).toHaveBeenCalledWith('article')
-    fireEvent.click(screen.getByText('All'))
-    expect(onType).toHaveBeenCalledWith('all')
-    expect(
-      screen.getByText('Snippets').closest('[role=button]'),
-    ).toHaveAttribute('aria-disabled', 'true')
-    expect(Object.keys(TYPE_CONFIG)).toHaveLength(4)
-  })
+it('search box submits, ignores blanks, clears and follows the URL', () => {
+  const onSubmit = jest.fn()
+  const { rerender } = render(<SearchBox value="golf" onSubmit={onSubmit} />)
+  const input = screen.getByTestId('search-input') as HTMLInputElement
+  fireEvent.submit(screen.getByTestId('search-box'))
+  expect(onSubmit).toHaveBeenCalledWith('golf')
+  fireEvent.click(screen.getByLabelText('Clear search'))
+  expect(input.value).toBe('')
+  fireEvent.submit(screen.getByTestId('search-box'))
+  expect(onSubmit).toHaveBeenCalledTimes(1)
+  rerender(<SearchBox value="trains" onSubmit={onSubmit} autoFocus />)
+  expect(input.value).toBe('trains')
+})
+
+it('kind tabs count each kind and pick one', () => {
+  const onChange = jest.fn()
+  render(
+    <KindTabs
+      facets={{ snippet: 2, article: 3, podcast: 1, album: 0 }}
+      active="article"
+      total={6}
+      onChange={onChange}
+    />,
+  )
+  expect(screen.getByTestId('kind-all')).toHaveTextContent('All 6')
+  expect(screen.getByTestId('kind-article')).toHaveTextContent('Articles 3')
+  expect(screen.getByTestId('kind-article')).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  expect(screen.queryByTestId('kind-album')).toBeNull() // nothing of that kind
+  fireEvent.click(screen.getByTestId('kind-podcast'))
+  expect(onChange).toHaveBeenCalledWith('podcast')
+  fireEvent.click(screen.getByTestId('kind-all'))
+  expect(onChange).toHaveBeenCalledWith('all')
 })
