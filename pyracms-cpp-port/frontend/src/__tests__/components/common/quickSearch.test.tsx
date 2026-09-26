@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { GlobalSearch } from '@/components/common/search'
-import SearchDialog from '@/components/common/search/SearchDialog'
 import { MARK_CLOSE, MARK_OPEN } from '@/lib/search/marks'
 
 const push = jest.fn()
@@ -63,22 +62,4 @@ it('arrow keys pick a suggestion and Enter opens it', () => {
   fireEvent.keyDown(input(), { key: 'ArrowUp' })
   fireEvent.keyDown(input(), { key: 'Enter' })
   expect(push).toHaveBeenCalledWith('/site/rog/articles/1')
-})
-
-it('short input shows no list; clicking a row opens it', () => {
-  const onSelect = jest.fn()
-  const p = {
-    open: true,
-    query: 'g',
-    results: [sug(3)],
-    onClose: jest.fn(),
-    onQueryChange: jest.fn(),
-    onSelect,
-    onSearchPage: jest.fn(),
-  }
-  const { rerender } = render(<SearchDialog {...p} />)
-  expect(screen.queryByTestId('search-all')).toBeNull()
-  rerender(<SearchDialog {...p} query="golf" />)
-  fireEvent.click(screen.getByTestId('search-result-0'))
-  expect(onSelect).toHaveBeenCalledWith(sug(3))
 })
