@@ -62,14 +62,11 @@ export function updateGroupItems(
 
 export type SetGroups = React.Dispatch<React.SetStateAction<MenuGroup[]>>
 
-/** Items in display order: top-level entries by position, each folder
- * followed by the links inside it. */
-export function orderMenuItems(items: MenuItemRow[]): MenuItemRow[] {
-  const by = (a: MenuItemRow, b: MenuItemRow) =>
-    a.position - b.position || a.id - b.id
-  const ids = new Set(items.map((i) => i.id))
-  const top = items.filter((i) => !i.parentId || !ids.has(i.parentId))
-  return [...top]
-    .sort(by)
-    .flatMap((i) => [i, ...items.filter((c) => c.parentId === i.id).sort(by)])
+/** Makes the site's menu ("main"): every site has exactly one top menu. */
+export async function createMenuGroup(
+  tenantId: number,
+  name = 'main',
+): Promise<MenuGroup> {
+  const res = await api.post('/api/menu-groups', { name, tenantId })
+  return { id: res.data.id, name, items: [] }
 }

@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { putSetting, deleteSetting } from '@/hooks/admin/settingsApi'
 import { useFeatureToggles } from '@/hooks/useFeatureToggles'
-import { useMenuGroupCreate } from '@/hooks/admin/useMenuGroupCreate'
+import { createMenuGroup } from '@/hooks/admin/menuData'
 import { useArticle } from '@/hooks/useArticle'
 import { m } from '../helpers/scopeApi'
 
@@ -32,12 +32,9 @@ it('feature toggles send tenantId', async () => {
   expect(m.put.mock.calls[0][1]).toMatchObject({ tenantId: 4 })
 })
 
-it('menu group create sends tenantId', () => {
-  const { result } = renderHook(() =>
-    useMenuGroupCreate(6, [], jest.fn(), jest.fn()),
-  )
-  act(() => result.current.setNewGroupName('Main'))
-  act(() => result.current.handleCreateGroup())
+it('menu group create sends tenantId', async () => {
+  m.post.mockResolvedValue({ data: { id: 3 } })
+  await createMenuGroup(6)
   expect(m.post.mock.calls[0][1]).toEqual({ name: 'main', tenantId: 6 })
 })
 

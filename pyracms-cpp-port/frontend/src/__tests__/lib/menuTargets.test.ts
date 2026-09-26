@@ -1,12 +1,5 @@
-import {
-  SECTIONS,
-  albumTarget,
-  matchTargets,
-  opensText,
-  pageTarget,
-  tagTarget,
-  targetTitle,
-} from '@/lib/menuTargets'
+import { SECTIONS, albumTarget, pageTarget, tagTarget } from '@/lib/menuTargets'
+import { matchTargets, opensText, targetTitle } from '@/lib/menuTargetSearch'
 
 const all = [
   ...SECTIONS,

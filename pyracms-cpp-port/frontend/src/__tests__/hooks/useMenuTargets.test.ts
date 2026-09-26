@@ -32,7 +32,7 @@ it('offers sections, pages, albums and tags', async () => {
   )
 })
 
-it('keeps the sections when everything else fails, and waits for a tenant', async () => {
+it('keeps the sections when everything fails; waits for a tenant', async () => {
   m.get.mockReset().mockRejectedValue(new Error('x'))
   const { result } = renderHook(() => useMenuTargets(2))
   await waitFor(() => expect(m.get).toHaveBeenCalled())

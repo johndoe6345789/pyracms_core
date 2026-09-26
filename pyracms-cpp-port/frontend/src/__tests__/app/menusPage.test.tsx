@@ -3,22 +3,12 @@ import Page from '@/app/site/[slug]/(admin)/admin/menus/page'
 import { menuRow } from '../helpers/menuRow'
 
 const editor = {
-  menuGroups: [{ id: 1, name: 'main', items: [] }],
-  selectedGroup: 'main',
   currentItems: [menuRow({ id: 5, name: 'Home', route: '/' })],
-  handleGroupChange: jest.fn(),
-  handleOpenGroupDialog: jest.fn(),
   error: '',
   busy: false,
   save: jest.fn().mockResolvedValue(true),
   remove: jest.fn(),
   move: jest.fn(),
-  groupDialogOpen: false,
-  handleCloseGroupDialog: jest.fn(),
-  newGroupName: '',
-  setNewGroupName: jest.fn(),
-  handleCreateGroup: jest.fn(),
-  groupError: '',
 }
 jest.mock('next/navigation', () => ({ useParams: () => ({ slug: 's' }) }))
 jest.mock('@/hooks/useTenantId', () => ({

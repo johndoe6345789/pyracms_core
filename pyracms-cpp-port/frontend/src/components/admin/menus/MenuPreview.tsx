@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Box, Button, Menu, MenuItem, Paper, Typography } from '@mui/material'
 import { ArrowDropDown } from '@mui/icons-material'
-import { siblingsOf } from '@/lib/menuDraft'
+import { siblingsOf } from '@/lib/menuOrder'
 import type { MenuItemRow } from '@/hooks/admin/menuData'
 
 /** A live picture of the top bar: folders open as dropdowns. */

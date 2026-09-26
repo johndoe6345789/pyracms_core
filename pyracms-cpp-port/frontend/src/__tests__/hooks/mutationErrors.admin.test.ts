@@ -1,5 +1,4 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useMenuGroupCreate } from '@/hooks/admin/useMenuGroupCreate'
 import { useSettingAdd } from '@/hooks/admin/useSettingAdd'
 import { useFileUpload } from '@/hooks/admin/useFileUpload'
 import { m } from '../helpers/scopeApi'
@@ -10,14 +9,6 @@ const set = jest.fn()
 beforeEach(() => {
   jest.resetAllMocks()
   set.mockReset()
-})
-
-it('menu group create surfaces a failure', async () => {
-  m.post.mockRejectedValue(boom)
-  const { result } = renderHook(() => useMenuGroupCreate(1, [], set, jest.fn()))
-  act(() => result.current.setNewGroupName('New'))
-  act(() => result.current.handleCreateGroup())
-  await waitFor(() => expect(result.current.groupError).toBe('boom'))
 })
 
 it('setting add surfaces a failure', async () => {

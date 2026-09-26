@@ -1,7 +1,8 @@
 import { Button, List, Paper, Typography } from '@mui/material'
 import MenuTreeRow from './MenuTreeRow'
-import { siblingsOf } from '@/lib/menuDraft'
-import { targetTitle, type MenuTarget } from '@/lib/menuTargets'
+import { siblingsOf } from '@/lib/menuOrder'
+import type { MenuTarget } from '@/lib/menuTargets'
+import { targetTitle } from '@/lib/menuTargetSearch'
 import type { MenuItemRow } from '@/hooks/admin/menuData'
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   onAddInside: (folder: MenuItemRow) => void
   onAdd: () => void
 }
+
+const folderNote = (n: number) => `Folder with ${n} link${n === 1 ? '' : 's'}`
 
 /** The menu as the visitor sees it: folders with their links indented. */
 export default function MenuTree(p: Props) {
@@ -38,7 +41,7 @@ export default function MenuTree(p: Props) {
         indent={indent}
         detail={
           i.type === 'folder'
-            ? `Folder with ${inside.length} link${inside.length === 1 ? '' : 's'}`
+            ? folderNote(inside.length)
             : targetTitle(p.targets, i.route)
         }
         first={at === 0}

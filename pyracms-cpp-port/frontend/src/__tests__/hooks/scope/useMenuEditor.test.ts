@@ -33,19 +33,14 @@ const setup = async () => {
   return h
 }
 
-it('loads groups and switches', async () => {
+it('loads the site menu (the main group)', async () => {
   const { result } = await setup()
-  expect(result.current.selectedGroup).toBe('main')
   expect(result.current.currentItems[0]).toMatchObject({
     position: 0,
     permissions: 'public',
     type: 'route',
     parentId: 0,
   })
-  act(() =>
-    result.current.handleGroupChange({ target: { value: 'foot' } } as never),
-  )
-  expect(result.current.selectedGroup).toBe('foot')
 })
 
 it('edits and deletes items', async () => {

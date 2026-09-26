@@ -2,8 +2,6 @@
 
 import { useParams } from 'next/navigation'
 import { Box, Typography } from '@mui/material'
-import MenuGroupSelect from '@/components/admin/MenuGroupSelect'
-import CreateGroupDialog from '@/components/admin/menus/CreateGroupDialog'
 import MenuAddButtons from '@/components/admin/menus/MenuAddButtons'
 import MenuDeleteDialog from '@/components/admin/menus/MenuDeleteDialog'
 import MenuItemDialog from '@/components/admin/menus/MenuItemDialog'
@@ -34,12 +32,6 @@ export default function AdminMenusPage() {
         dropdowns, and use the arrows to put them in order.
       </Typography>
       <ErrorAlert error={editor.error} testId="menu-editor-error" />
-      <MenuGroupSelect
-        menuGroups={editor.menuGroups}
-        selectedGroup={editor.selectedGroup}
-        onGroupChange={editor.handleGroupChange}
-        onNewGroup={editor.handleOpenGroupDialog}
-      />
       <MenuAddButtons onLink={() => ui.addLink()} onFolder={ui.addFolder} />
       <MenuPreview items={items} />
       <MenuTree
@@ -73,7 +65,6 @@ export default function AdminMenusPage() {
         onConfirm={(id) => editor.remove(id)}
         onClose={() => ui.setDeleting(null)}
       />
-      <CreateGroupDialog editor={editor} />
     </Box>
   )
 }

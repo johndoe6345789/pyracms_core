@@ -1,5 +1,5 @@
 import { menuItemBody } from '@/lib/menuItemPayload'
-import { orderMenuItems, type MenuItemRow } from '@/hooks/admin/menuData'
+import type { MenuItemRow } from '@/hooks/admin/menuData'
 
 const row = (id: number, over: Partial<MenuItemRow> = {}): MenuItemRow => ({
   id,
@@ -29,23 +29,5 @@ describe('menuItemBody', () => {
     expect(menuItemBody(row(2, { type: 'folder', parentId: 7 }))).toMatchObject(
       { routePath: '', url: '', type: 'folder', parentId: 0 },
     )
-  })
-})
-
-describe('orderMenuItems', () => {
-  it('puts each folder before its links, by position', () => {
-    const items = [
-      row(1, { type: 'folder', position: 5 }),
-      row(2, { parentId: 1, position: 2 }),
-      row(3, { parentId: 1, position: 1 }),
-      row(4, { position: 1 }),
-    ]
-    expect(orderMenuItems(items).map((i) => i.id)).toEqual([4, 1, 3, 2])
-  })
-
-  it('keeps a link whose folder is gone at the top', () => {
-    expect(orderMenuItems([row(1, { parentId: 9 })]).map((i) => i.id)).toEqual([
-      1,
-    ])
   })
 })

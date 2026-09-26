@@ -4,12 +4,8 @@ import { useState } from 'react'
 import { Autocomplete, TextField } from '@mui/material'
 import TargetOption from './TargetOption'
 import { ROUTE_FORMAT_HELP, validateRoute } from '@/lib/routeSuggest'
-import {
-  matchTargets,
-  opensText,
-  targetTitle,
-  type MenuTarget,
-} from '@/lib/menuTargets'
+import type { MenuTarget } from '@/lib/menuTargets'
+import { matchTargets, opensText, targetTitle } from '@/lib/menuTargetSearch'
 
 interface Props {
   value: string

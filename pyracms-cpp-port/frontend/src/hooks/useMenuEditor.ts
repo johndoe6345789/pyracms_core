@@ -1,60 +1,51 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SelectChangeEvent } from '@mui/material'
-import { MenuGroup, MenuItemRow, fetchMenuGroups } from './admin/menuData'
+import {
+  MenuGroup,
+  MenuItemRow,
+  createMenuGroup,
+  fetchMenuGroups,
+} from './admin/menuData'
 import { useMenuItems } from './admin/useMenuItems'
-import { useMenuGroupCreate } from './admin/useMenuGroupCreate'
+import { pickTopGroup } from './useSiteMenu'
 
 export type { MenuGroup, MenuItemRow }
 
 /**
- * The menu editor: the site's menu groups, the open group's items (add,
- * edit, delete, re-order) and creating new groups.
+ * The site's menu: its links and folders (add, edit, delete, re-order).
+ * There is one top menu per site (the group the site shows along the top);
+ * it is created the first time something is added.
  * @param tenantId - The active tenant ID, or null.
  */
 export function useMenuEditor(tenantId: number | null) {
   const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedGroup, setSelectedGroup] = useState('')
 
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
     fetchMenuGroups(tenantId)
-      .then((loaded) => {
-        setMenuGroups(loaded)
-        const first = loaded[0]
-        // Keep the user's choice if they already picked a group
-        if (first) setSelectedGroup((cur) => cur || first.name)
-      })
+      .then(setMenuGroups)
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [tenantId])
 
-  const currentGroup = menuGroups.find((g) => g.name === selectedGroup)
-  const items = useMenuItems(currentGroup, selectedGroup, setMenuGroups)
-  const create = useMenuGroupCreate(
-    tenantId,
-    menuGroups,
-    setMenuGroups,
-    setSelectedGroup,
-  )
-
-  const handleGroupChange = (e: SelectChangeEvent) =>
-    setSelectedGroup(e.target.value)
+  const group = pickTopGroup(menuGroups)
+  const items = useMenuItems(group, setMenuGroups, async () => {
+    if (!tenantId) throw new Error('No site')
+    const made = await createMenuGroup(tenantId)
+    setMenuGroups((prev) => [...prev, made])
+    return made
+  })
 
   return {
-    menuGroups,
     loading,
-    selectedGroup,
-    currentItems: currentGroup?.items ?? [],
-    handleGroupChange,
-    error: items.error || create.groupError,
+    currentItems: group?.items ?? [],
+    error: items.error,
     busy: items.busy,
     save: items.save,
     remove: items.remove,
     move: items.move,
-    ...create,
   }
 }

@@ -1,4 +1,5 @@
 import type { MenuItemRow } from '@/hooks/admin/menuData'
+import { validateRoute } from './routeSuggest'
 
 /** The add/edit form's fields. */
 export interface MenuDraft {
@@ -38,9 +39,8 @@ export const PERMISSIONS: [string, string][] = [
 export const permissionLabel = (value: string) =>
   PERMISSIONS.find(([v]) => v === value)?.[1] ?? value
 
-/** Siblings (same folder) in display order. */
-export function siblingsOf(items: MenuItemRow[], parentId: number) {
-  return items
-    .filter((i) => (i.parentId || 0) === parentId)
-    .sort((a, b) => a.position - b.position || a.id - b.id)
-}
+/** True when the draft cannot be saved yet (no name, or a link that is
+ * missing or malformed; folders have no link). */
+export const draftInvalid = (d: MenuDraft) =>
+  !d.name.trim() ||
+  (d.kind === 'route' && (!d.route.trim() || !!validateRoute(d.route.trim())))

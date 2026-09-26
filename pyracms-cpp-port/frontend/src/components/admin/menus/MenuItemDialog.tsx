@@ -12,8 +12,7 @@ import {
 import MenuKindToggle from './MenuKindToggle'
 import MenuPlacementFields from './MenuPlacementFields'
 import TargetField from './TargetField'
-import type { MenuDraft } from '@/lib/menuDraft'
-import { validateRoute } from '@/lib/routeSuggest'
+import { draftInvalid, type MenuDraft } from '@/lib/menuDraft'
 import type { MenuItemRow } from '@/hooks/admin/menuData'
 import type { MenuTarget } from '@/lib/menuTargets'
 
@@ -34,9 +33,6 @@ export default function MenuItemDialog(p: Props) {
   const [d, setD] = useState(p.initial)
   const set = (patch: Partial<MenuDraft>) => setD((o) => ({ ...o, ...patch }))
   const folder = d.kind === 'folder'
-  const route = d.route.trim()
-  const invalid =
-    !d.name.trim() || (!folder && (!route || !!validateRoute(route)))
   return (
     <Dialog open onClose={p.onClose} fullWidth maxWidth="sm">
       <DialogTitle>{p.title}</DialogTitle>
@@ -70,7 +66,7 @@ export default function MenuItemDialog(p: Props) {
         <Button onClick={p.onClose}>Cancel</Button>
         <Button
           variant="contained"
-          disabled={invalid || p.busy}
+          disabled={draftInvalid(d) || p.busy}
           onClick={() => p.onSave(d)}
           data-testid="menu-save-btn"
         >

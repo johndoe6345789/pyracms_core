@@ -33,31 +33,14 @@ beforeEach(() => {
   m.delete.mockResolvedValue({})
 })
 
-it('creates groups', async () => {
-  const { result } = await setup()
-  act(() => result.current.handleCreateGroup())
-  act(() => result.current.handleOpenGroupDialog())
-  expect(result.current.groupDialogOpen).toBe(true)
-  act(() => result.current.setNewGroupName('main'))
-  act(() => result.current.handleCreateGroup())
-  expect(m.post).not.toHaveBeenCalled()
-  act(() => result.current.setNewGroupName(' New Grp '))
-  act(() => result.current.handleCreateGroup())
-  await waitFor(() => expect(result.current.selectedGroup).toBe('new_grp'))
-  expect(result.current.groupDialogOpen).toBe(false)
-  act(() => result.current.handleCloseGroupDialog())
-})
-
 it('tolerates api failures', async () => {
   m.post.mockRejectedValue(new Error('x'))
   m.put.mockRejectedValue(new Error('x'))
   m.delete.mockRejectedValue(new Error('x'))
   const { result } = await setup()
-  act(() => result.current.setNewGroupName('g'))
   await act(async () => {
     await result.current.save({ ...newDraft(), name: 'N', route: '/n' })
   })
-  act(() => result.current.handleCreateGroup())
   await act(async () => {
     await result.current.save(
       { ...newDraft(), name: 'H', route: '/' },
@@ -75,4 +58,22 @@ it('tolerates api failures', async () => {
   await setup()
   m.get.mockRejectedValue(new Error('x'))
   await setup()
+})
+
+it('creates the menu on the first add when the site has none', async () => {
+  m.get.mockImplementation((url: string) =>
+    Promise.resolve({ data: url.includes('items') ? [] : [] }),
+  )
+  m.post.mockResolvedValueOnce({ data: { id: 8 } }).mockResolvedValue({
+    data: { id: 60 },
+  })
+  const { result } = await setup()
+  await act(async () => {
+    await result.current.save({ ...newDraft(), name: 'N', route: '/n' })
+  })
+  expect(m.post).toHaveBeenNthCalledWith(1, '/api/menu-groups', {
+    name: 'main',
+    tenantId: 1,
+  })
+  await waitFor(() => expect(result.current.currentItems).toHaveLength(1))
 })
