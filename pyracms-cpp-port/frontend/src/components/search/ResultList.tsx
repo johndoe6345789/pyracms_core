@@ -4,6 +4,7 @@ import ResultCard from './ResultCard'
 
 interface Props {
   slug: string
+  query: string
   hits: SearchHit[]
   total: number
   page: number
@@ -28,7 +29,13 @@ export default function ResultList(p: Props) {
   return (
     <Stack spacing={2} sx={{ opacity: p.loading ? 0.6 : 1 }}>
       {p.hits.map((h, i) => (
-        <ResultCard key={`${h.type}:${h.id}`} hit={h} index={i} slug={p.slug} />
+        <ResultCard
+          key={`${h.type}:${h.id}`}
+          hit={h}
+          index={i}
+          slug={p.slug}
+          query={p.query}
+        />
       ))}
       {pages > 1 && (
         <Pagination

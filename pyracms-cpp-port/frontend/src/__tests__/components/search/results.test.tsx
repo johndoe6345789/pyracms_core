@@ -45,6 +45,7 @@ it('a result without excerpt, tags or safe link still renders', () => {
 
 const list = (o = {}) => ({
   slug: 'rog',
+  query: 'golf',
   hits: [hit(), hit({ id: 2 })],
   total: 25,
   page: 2,

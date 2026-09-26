@@ -12,10 +12,11 @@ interface Props {
   hit: SearchHit
   index: number
   slug: string
+  query?: string
 }
 
 /** One search result, styled like the rest of the site. */
-export default function ResultCard({ hit, index, slug }: Props) {
+export default function ResultCard({ hit, index, slug, query }: Props) {
   const kind = kindOf(hit.type)
   return (
     <Card
@@ -70,7 +71,7 @@ export default function ResultCard({ hit, index, slug }: Props) {
             <Marked text={hit.snippet} />
           </Typography>
         )}
-        <ResultTags tags={hit.tags} slug={slug} />
+        <ResultTags tags={hit.tags} slug={slug} query={query ?? ''} />
       </Box>
     </Card>
   )

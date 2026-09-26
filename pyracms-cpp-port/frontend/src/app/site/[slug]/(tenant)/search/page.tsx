@@ -42,6 +42,7 @@ function SiteSearch({ slug }: { slug: string }) {
         {s.q !== '' && !none && (
           <ResultList
             slug={slug}
+            query={s.q}
             hits={s.data?.items ?? []}
             total={total}
             page={s.page}
