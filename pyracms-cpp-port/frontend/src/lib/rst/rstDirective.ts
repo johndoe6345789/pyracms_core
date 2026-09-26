@@ -18,15 +18,30 @@ function split(body: string[]) {
   return { opts, rest: body.slice(i).filter((l, j) => j > 0 || l.trim()) }
 }
 
-/** A native HTML5 player; anything a browser cannot play still gets a link. */
-function videoHtml(url: string, poster?: string): string {
+/** A native HTML5 player. `:webm:` adds a second format for browsers that
+ * cannot play the first; a plain download link is the last resort. */
+function videoHtml(url: string, opts: Record<string, string>): string {
   const src = safeSrc(url)
   if (!src) return ''
-  const art = poster ? safeSrc(poster) : undefined
-  const attrs = art ? ` poster="${esc(art)}"` : ''
+  const poster = opts.poster ? safeSrc(opts.poster) : undefined
+  const webm = opts.webm ? safeSrc(opts.webm) : undefined
+  // Only a file name says what a URL holds; /view links are sniffed.
+  const type = (u: string) =>
+    /\.mp4(\?|$)/i.test(u)
+      ? 'video/mp4'
+      : /\.webm(\?|$)/i.test(u)
+        ? 'video/webm'
+        : ''
+  const source = (u: string) => {
+    const t = type(u)
+    return `<source src="${esc(u)}"${t ? ` type="${t}"` : ''}>`
+  }
+  const inner = webm ? source(src) + source(webm) : ''
   return (
-    `<video controls preload="metadata" playsinline src="${esc(src)}"` +
-    `${attrs}>Your browser cannot play this video. ` +
+    `<video controls preload="metadata" playsinline` +
+    `${webm ? '' : ` src="${esc(src)}"`}` +
+    `${poster ? ` poster="${esc(poster)}"` : ''}>${inner}` +
+    `Your browser cannot play this video. ` +
     `<a href="${esc(src)}">Download it</a></video>`
   )
 }
@@ -48,7 +63,7 @@ export function rstDirective(
     const alt = esc(opts.alt ?? '')
     return `<img src="${esc(src)}" alt="${alt}" style="max-width:100%">`
   }
-  if (name === 'video') return videoHtml(arg.trim(), opts.poster)
+  if (name === 'video') return videoHtml(arg.trim(), opts)
   if (CODE.includes(name))
     return `<pre><code>${esc(rest.join('\n'))}</code></pre>`
   if (NOTES.includes(name)) {

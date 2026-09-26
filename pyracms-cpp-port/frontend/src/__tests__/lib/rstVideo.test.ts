@@ -20,6 +20,19 @@ describe('the video directive', () => {
     ).not.toContain('poster')
   })
 
+  it('offers a second format as <source> elements', () => {
+    const html = renderRst('.. video:: /f/a/view\n   :webm: /f/b/view\n')
+    expect(html).toContain('<source src="/f/a/view"><source src="/f/b/view">')
+    expect(html).not.toMatch(/<video[^>]* src=/)
+    expect(renderRst('.. video:: /a.mp4\n   :webm: /b.webm\n')).toContain(
+      '<source src="/a.mp4" type="video/mp4">' +
+        '<source src="/b.webm" type="video/webm">',
+    )
+    expect(renderRst('.. video:: /a.mp4\n   :webm: javascript:x\n')).toContain(
+      ' src="/a.mp4"',
+    )
+  })
+
   it('refuses unsafe sources and survives sanitising', () => {
     expect(renderRst('.. video:: javascript:alert(1)\n')).toBe('')
     const safe = sanitizeHtml(renderRst('.. video:: https://x.io/a.mp4\n'))
