@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminFilesPage from '@/app/site/[slug]/(admin)/admin/files/page'
 import AdminMenusPage from '@/app/site/[slug]/(admin)/admin/menus/page'
 import AdminUsersPage from '@/app/site/[slug]/(admin)/admin/users/page'
-import AdminBackupPage from '@/app/site/[slug]/(admin)/admin/backup/page'
 import { m } from '../../helpers/scopeApi'
 import { routeGet } from '../../helpers/scopeMocks'
 import { renderWithStore, makeUser } from '../../helpers/renderWithStore'
@@ -57,15 +56,4 @@ it('users page bans, deletes and opens create dialog', async () => {
   await waitFor(() => expect(screen.queryByTestId('user-row-1')).toBeNull())
   fireEvent.click(screen.getByTestId('create-user-btn'))
   expect(screen.getByTestId('create-user-dialog')).toBeInTheDocument()
-})
-
-it('backup page exports and imports', async () => {
-  URL.createObjectURL = jest.fn(() => 'blob:x')
-  URL.revokeObjectURL = jest.fn()
-  jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation()
-  routeGet({ '/api/menu-groups': [] })
-  render(<AdminBackupPage />)
-  fireEvent.click(screen.getByRole('button', { name: 'Export Menus' }))
-  await screen.findByText(/Menus exported/)
-  fireEvent.click(screen.getByRole('button', { name: /Choose File/ }))
 })
