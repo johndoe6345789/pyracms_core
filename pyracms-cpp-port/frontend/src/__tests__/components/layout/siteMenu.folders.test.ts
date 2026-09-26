@@ -8,6 +8,7 @@ const item = (id: number, over: object = {}) => ({
   permissions: 'public',
   type: 'route',
   parentId: 0,
+  icon: '',
   ...over,
 })
 
@@ -45,4 +46,20 @@ describe('menu folders', () => {
     })
     expect(orphan.map((e) => e.key)).toEqual(['menu-5'])
   })
+})
+
+it('gives an entry its icon, and none for a missing or unknown name', () => {
+  const view = { signedIn: false, canAdmin: false }
+  const [a, b, c] = menuEntries(
+    'demo',
+    [
+      item(1, { icon: 'TrainOutlined', position: 1 }),
+      item(2, { icon: 'NoSuchIcon', position: 2 }),
+      item(3, { position: 3 }),
+    ],
+    view,
+  )
+  expect(a?.icon).not.toBeNull()
+  expect(b?.icon).toBeNull()
+  expect(c?.icon).toBeNull()
 })

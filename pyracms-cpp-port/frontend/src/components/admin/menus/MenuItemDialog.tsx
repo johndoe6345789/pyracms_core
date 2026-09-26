@@ -9,6 +9,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material'
+import IconPicker from './IconPicker'
 import MenuKindToggle from './MenuKindToggle'
 import MenuPlacementFields from './MenuPlacementFields'
 import TargetField from './TargetField'
@@ -45,6 +46,7 @@ export default function MenuItemDialog(p: Props) {
           onChange={(e) => set({ name: e.target.value })}
           inputProps={{ maxLength: 128, 'data-testid': 'menu-name-input' }}
         />
+        <IconPicker value={d.icon} onChange={(icon) => set({ icon })} />
         {!folder && (
           <TargetField
             value={d.route}

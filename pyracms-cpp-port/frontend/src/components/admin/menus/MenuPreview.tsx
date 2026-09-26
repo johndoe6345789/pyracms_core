@@ -4,7 +4,13 @@ import { useState } from 'react'
 import { Box, Button, Menu, MenuItem, Paper, Typography } from '@mui/material'
 import { ArrowDropDown } from '@mui/icons-material'
 import { siblingsOf } from '@/lib/menuOrder'
+import { iconFor } from '@/lib/menuIcons'
 import type { MenuItemRow } from '@/hooks/admin/menuData'
+
+const iconOf = (name: string) => {
+  const found = iconFor(name)
+  return found ? <found.Icon /> : null
+}
 
 /** A live picture of the top bar: folders open as dropdowns. */
 export default function MenuPreview({ items }: { items: MenuItemRow[] }) {
@@ -21,13 +27,14 @@ export default function MenuPreview({ items }: { items: MenuItemRow[] }) {
             <Button
               key={i.id}
               size="small"
+              startIcon={iconOf(i.icon)}
               endIcon={<ArrowDropDown />}
               onClick={(e) => setOpen({ el: e.currentTarget, id: i.id })}
             >
               {i.name}
             </Button>
           ) : (
-            <Button key={i.id} size="small">
+            <Button key={i.id} size="small" startIcon={iconOf(i.icon)}>
               {i.name}
             </Button>
           ),
@@ -35,7 +42,11 @@ export default function MenuPreview({ items }: { items: MenuItemRow[] }) {
       </Box>
       <Menu anchorEl={open?.el} open={!!open} onClose={() => setOpen(null)}>
         {kids.length ? (
-          kids.map((k) => <MenuItem key={k.id}>{k.name}</MenuItem>)
+          kids.map((k) => (
+            <MenuItem key={k.id}>
+              {iconOf(k.icon)} {k.name}
+            </MenuItem>
+          ))
         ) : (
           <MenuItem disabled>Empty folder</MenuItem>
         )}

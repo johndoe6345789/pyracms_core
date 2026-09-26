@@ -41,7 +41,7 @@ it('previews a preset and offers the way back to the saved style', () => {
   )
 })
 
-it('shows no warning when nothing changed, and the previous style if any', () => {
+it('shows no warning when unchanged; the previous style if any', () => {
   const { rerender } = render(
     <StylePresets
       theme={DEFAULT_THEME}

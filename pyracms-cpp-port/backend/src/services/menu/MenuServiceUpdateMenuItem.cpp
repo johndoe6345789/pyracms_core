@@ -21,6 +21,7 @@ void MenuService::updateMenuItem(const DbClientPtr &db, int id,
     add("url", "url", false);
     add("type", "type", false);
     add("permissions", "permissions", false);
+    add("icon", "icon", false);
     add("groupId", "group_id", true);
     add("position", "position", true);
     // Moving into (or out of) a folder: 0 = the top level. The folder must

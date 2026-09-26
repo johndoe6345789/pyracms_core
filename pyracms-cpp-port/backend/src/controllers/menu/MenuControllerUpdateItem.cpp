@@ -2,6 +2,7 @@
 #include "controllers/MenuController.h"
 #include "filters/TenantGuard.h"
 #include "security/Validate.h"
+#include "security/IconName.h"
 
 namespace pyracms {
 
@@ -26,6 +27,11 @@ void MenuController::updateItem(
             return;
         }
     }
+    if (json->isMember("icon") &&
+        (!(*json)["icon"].isString() ||
+         !isSafeIconName((*json)["icon"].asString())))
+        return callback(
+            filterError("Invalid icon name", drogon::k400BadRequest));
     Json::Value upd = *json;
     // Scoped accounts may not move an item into another group
     if (scopeTenantOf(req) != 0)

@@ -12,6 +12,7 @@ const item = (id: number, over: object = {}) => ({
   permissions: 'public',
   type: 'route',
   parentId: 0,
+  icon: '',
   ...over,
 })
 const guest = { signedIn: false, canAdmin: false }
@@ -73,8 +74,7 @@ describe('menuEntries', () => {
 
   it('marks links that leave the site', () => {
     const [ext] = menuEntries('d', [item(1, { route: 'https://x.io' })], guest)
-    expect(ext?.external).toBe(true)
     const [own] = menuEntries('d', [item(1)], guest)
-    expect(own?.external).toBeUndefined()
+    expect([ext?.external, own?.external]).toEqual([true, undefined])
   })
 })

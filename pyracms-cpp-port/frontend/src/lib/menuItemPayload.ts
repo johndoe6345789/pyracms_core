@@ -9,6 +9,7 @@ export interface MenuItemFields {
   type: string
   /** id of the folder it is in, 0 = top level */
   parentId: number
+  icon: string
 }
 
 /** The request body for creating or saving a menu item. A folder has no
@@ -23,5 +24,6 @@ export function menuItemBody(f: MenuItemFields) {
     position: f.position,
     permissions: f.permissions,
     parentId: isFolder ? 0 : f.parentId,
+    icon: f.icon,
   }
 }

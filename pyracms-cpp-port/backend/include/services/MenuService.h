@@ -22,6 +22,7 @@ struct MenuItemDto {
     int position;
     std::string permissions;
     int parentId = 0; // the folder this item is in, 0 = top level
+    std::string icon; // Material icon name, "" = none
 };
 
 class MenuService {
@@ -54,7 +55,8 @@ class MenuService {
                         const std::string &routePath, const std::string &url,
                         const std::string &type, int groupId, int position,
                         const std::string &permissions, int parentId,
-                        int scopeTenant, BoolCallback cb);
+                        const std::string &icon, int scopeTenant,
+                        BoolCallback cb);
 
     void updateMenuItem(const DbClientPtr &db, int id,
                         const Json::Value &updates, int scopeTenant,

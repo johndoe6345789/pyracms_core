@@ -2,6 +2,7 @@
 #include "controllers/MenuController.h"
 #include "filters/TenantGuard.h"
 #include "security/Validate.h"
+#include "security/IconName.h"
 
 namespace pyracms {
 
@@ -31,10 +32,14 @@ void MenuController::createItem(
     int position = (*json).get("position", 0).asInt();
     auto permissions = (*json).get("permissions", "").asString();
     int parentId = (*json).get("parentId", 0).asInt();
+    auto icon = (*json).get("icon", "").asString();
+    if (!isSafeIconName(icon))
+        return callback(
+            filterError("Invalid icon name", drogon::k400BadRequest));
 
     auto db = drogon::app().getDbClient();
     menuService_.createMenuItem(db, name, routePath, url, type, id, position,
-                                permissions, parentId, scopeTenantOf(req),
+                                permissions, parentId, icon, scopeTenantOf(req),
                                 boolReply(callback));
 }
 

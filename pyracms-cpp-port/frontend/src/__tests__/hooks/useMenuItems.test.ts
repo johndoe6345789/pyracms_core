@@ -44,6 +44,7 @@ it('adds a link last in its folder and a folder without a link', async () => {
     position: 1,
     permissions: 'public',
     parentId: 3,
+    icon: '',
   })
   await act(async () => {
     await result.current.save({ ...newDraft('folder'), name: 'Dir' })

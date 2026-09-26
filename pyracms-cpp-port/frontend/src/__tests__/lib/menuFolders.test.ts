@@ -9,6 +9,7 @@ const row = (id: number, over: Partial<MenuItemRow> = {}): MenuItemRow => ({
   permissions: 'public',
   type: 'route',
   parentId: 0,
+  icon: '',
   ...over,
 })
 
@@ -22,6 +23,7 @@ describe('menuItemBody', () => {
       position: 1,
       permissions: 'public',
       parentId: 7,
+      icon: '',
     })
   })
 

@@ -1,32 +1,15 @@
-import { safeHref } from '@/lib/safeUrl'
+import { createElement } from 'react'
+import { menuHref, menuItemVisible, type MenuViewer } from './menuLinks'
+import { iconFor } from '@/lib/menuIcons'
+
+export { menuHref, menuItemVisible, type MenuViewer } from './menuLinks'
 import type { MenuItemRow } from '@/hooks/admin/menuData'
 import type { NavEntry } from './navTypes'
 
-export interface MenuViewer {
-  signedIn: boolean
-  canAdmin: boolean
-}
-
-/** May this visitor see an item with the given permission level? */
-export function menuItemVisible(permission: string, v: MenuViewer): boolean {
-  if (permission === 'public') return true
-  if (permission === 'authenticated') return v.signedIn
-  if (permission === 'admin') return v.canAdmin
-  return false
-}
-
-/**
- * Where a configured route leads. `/x` is a page on this site (`/` is its
- * home), `https://…` and `mailto:` go where they say; anything else that
- * could run script is refused (null).
- */
-export function menuHref(slug: string, route: string): string | null {
-  const r = route.trim()
-  if (r === '/') return `/site/${slug}`
-  if (r.startsWith('/') && !r.startsWith('//')) return `/site/${slug}${r}`
-  if (/^(https?:\/\/|mailto:)/i.test(r)) return safeHref(r) ?? null
-  if (!r || /^[a-z][a-z0-9+.-]*:/i.test(r) || r.startsWith('//')) return null
-  return `/site/${slug}/${r}`
+/** The icon element for a stored name, or null (none / unknown). */
+function iconNode(name: string) {
+  const found = iconFor(name)
+  return found ? createElement(found.Icon) : null
 }
 
 function linkEntry(slug: string, i: MenuItemRow): NavEntry[] {
@@ -38,7 +21,7 @@ function linkEntry(slug: string, i: MenuItemRow): NavEntry[] {
       key: `menu-${i.id}`,
       label: i.name.trim(),
       href,
-      icon: null,
+      icon: iconNode(i.icon),
       testId: `menu-link-${i.id}`,
       ...(external && { external: true }),
     },
@@ -70,7 +53,7 @@ export function menuEntries(
               key: `menu-${i.id}`,
               label: i.name.trim(),
               href: '',
-              icon: null,
+              icon: iconNode(i.icon),
               testId: `menu-folder-${i.id}`,
               children,
             },

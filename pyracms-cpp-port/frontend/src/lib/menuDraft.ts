@@ -9,6 +9,7 @@ export interface MenuDraft {
   /** folder it goes in, 0 = straight on the bar */
   parentId: number
   permissions: string
+  icon: string
 }
 
 export const newDraft = (
@@ -20,6 +21,7 @@ export const newDraft = (
   route: '',
   parentId,
   permissions: 'public',
+  icon: '',
 })
 
 export const draftOf = (i: MenuItemRow): MenuDraft => ({
@@ -28,6 +30,7 @@ export const draftOf = (i: MenuItemRow): MenuDraft => ({
   route: i.route,
   parentId: i.parentId,
   permissions: i.permissions,
+  icon: i.icon,
 })
 
 export const PERMISSIONS: [string, string][] = [

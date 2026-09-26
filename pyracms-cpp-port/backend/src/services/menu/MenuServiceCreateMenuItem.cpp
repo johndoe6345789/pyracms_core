@@ -8,12 +8,12 @@ void MenuService::createMenuItem(const DbClientPtr &db, const std::string &name,
                                  const std::string &url,
                                  const std::string &type, int groupId,
                                  int position, const std::string &permissions,
-                                 int parentId, int scopeTenant,
-                                 BoolCallback cb) {
+                                 int parentId, const std::string &icon,
+                                 int scopeTenant, BoolCallback cb) {
     db->execSqlAsync(
         "INSERT INTO menu_items (name, route_path, url, type, group_id, "
-        "position, permissions, parent_id) "
-        "SELECT $1, $2, $3, $4, g.id, $6, $7, NULLIF($9::int, 0) "
+        "position, permissions, parent_id, icon) "
+        "SELECT $1, $2, $3, $4, g.id, $6, $7, NULLIF($9::int, 0), $10::varchar "
         "FROM menu_groups g "
         "WHERE g.id = $5 AND ($8::int = 0 OR g.tenant_id = $8::int) "
         // the parent must be a top-level folder of this group, and folders
@@ -29,7 +29,7 @@ void MenuService::createMenuItem(const DbClientPtr &db, const std::string &name,
             cb(false, dbError(e));
         },
         name, routePath, url, type, groupId, position, permissions,
-        scopeTenant, parentId);
+        scopeTenant, parentId, icon);
 }
 
 } // namespace pyracms

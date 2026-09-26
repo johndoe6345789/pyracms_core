@@ -23,6 +23,7 @@ export function fieldsOf(
     route: d.kind === 'folder' ? '' : d.route.trim(),
     position: moved ? (last?.position ?? 0) + 1 : (old?.position ?? 1),
     permissions: d.permissions,
+    icon: d.icon,
     type: d.kind,
     parentId: d.kind === 'folder' ? 0 : d.parentId,
   }

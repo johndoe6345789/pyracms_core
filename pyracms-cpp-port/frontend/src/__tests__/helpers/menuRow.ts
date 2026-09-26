@@ -9,5 +9,6 @@ export const menuRow = (over: Partial<MenuItemRow> = {}): MenuItemRow => ({
   permissions: 'public',
   type: 'route',
   parentId: 0,
+  icon: '',
   ...over,
 })

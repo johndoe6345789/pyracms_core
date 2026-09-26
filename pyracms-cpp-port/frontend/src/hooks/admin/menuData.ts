@@ -11,6 +11,8 @@ export interface MenuItemRow {
   type: string
   /** the folder this item is in, 0 = top level */
   parentId: number
+  /** Material icon name shown beside it, '' = none */
+  icon: string
 }
 
 export interface MenuGroup {
@@ -29,6 +31,7 @@ function mapMenuItem(i: Record<string, unknown>): MenuItemRow {
     permissions: (i.permissions as string) || 'public',
     type: (i.type as string) || 'route',
     parentId: (i.parentId as number) || 0,
+    icon: (i.icon as string) || '',
   }
 }
 

@@ -2,6 +2,7 @@ import { Alert, Box, Typography } from '@mui/material'
 import StyleCard from './StyleCard'
 import { THEME_PRESETS, sameTheme } from './presets'
 import type { ThemeConfig } from './themeConfig'
+import { PRESET_GRID as grid } from './presetGrid'
 
 interface Props {
   theme: ThemeConfig
@@ -23,11 +24,6 @@ export default function StylePresets({
 }: Props) {
   const changed = !sameTheme(theme, saved)
   const anyChange = changed || unsaved
-  const grid = {
-    display: 'grid',
-    gap: 1.5,
-    gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
-  }
   return (
     <Box sx={{ mb: 4 }} data-testid="style-presets">
       <Typography variant="h6" component="h2" gutterBottom>

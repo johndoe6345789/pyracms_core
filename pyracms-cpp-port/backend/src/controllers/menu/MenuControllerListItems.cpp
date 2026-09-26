@@ -23,6 +23,7 @@ void MenuController::listItems(
                 item["position"] = i.position;
                 item["permissions"] = i.permissions;
                 item["parentId"] = i.parentId;
+                item["icon"] = i.icon;
                 result.append(item);
             }
             callback(drogon::HttpResponse::newHttpJsonResponse(result));
