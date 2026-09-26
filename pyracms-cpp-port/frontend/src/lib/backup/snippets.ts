@@ -1,20 +1,11 @@
 import api from '@/lib/api'
 import { attempt, fetchAllPages } from './pages'
+import {
+  restoreSnippet,
+  type Listed,
+  type SnippetRow as Row,
+} from './snippetRestore'
 import { emptyOutcome, type SectionDef } from './types'
-
-interface Row {
-  title: string
-  code: string
-  language: string
-  visibility: string
-  tags: string[]
-}
-
-interface Listed {
-  id: number
-  title: string
-  language: string
-}
 
 const listSnippets = (tenantId: number) =>
   fetchAllPages<Listed>(
@@ -51,14 +42,8 @@ export const snippetsSection: SectionDef = {
         (s) => s.title === r.title && s.language === r.language,
       )
       await attempt(out.failed, r.title, async () => {
-        const { tags, ...fields } = r
-        const body = { ...fields, tenant_id: tenantId }
-        let id = old?.id
-        if (id) await api.put(`/api/snippets/${id}`, body)
-        else id = (await api.post('/api/snippets', body)).data.id
-        await api.put(`/api/snippets/${id}/tags`, { tags })
-        if (old) out.updated++
-        else out.created++
+        const did = await restoreSnippet(r, old, tenantId)
+        out[did === 'unchanged' ? 'skipped' : did]++
       })
     }
     return out
