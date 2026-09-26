@@ -5,6 +5,7 @@ import {
   type SiteThemes,
 } from '@/components/admin/styles/siteThemes'
 import { lift } from './colorContrast'
+import { baseTheme } from './theme'
 
 export const THEME_KEY = 'site_theme'
 export const THEME_EVENT = 'site-theme-changed'
@@ -50,15 +51,24 @@ export function applySiteTheme(
   dark: boolean,
 ): Theme {
   const cfg = dark ? themes.dark : themes.light
-  return createTheme(base, {
+  // Built from the shared options, not layered on `base`: a theme made with
+  // cssVariables keeps its own colour variables, which would win over ours.
+  return createTheme({
+    ...baseTheme,
+    cssVariables: true,
     palette: {
+      mode: dark ? 'dark' : 'light',
       primary: { main: cfg.primaryColor },
       secondary: { main: cfg.secondaryColor },
       background: {
         default: cfg.backgroundColor,
         paper: dark ? lift(cfg.backgroundColor) : cfg.backgroundColor,
       },
-      text: { primary: cfg.textColor },
+      text: {
+        primary: cfg.textColor,
+        secondary: base.palette.text.secondary,
+      },
+      divider: base.palette.divider,
     },
     typography: { fontFamily: cfg.fontFamily },
     shape: { borderRadius: cfg.borderRadius },

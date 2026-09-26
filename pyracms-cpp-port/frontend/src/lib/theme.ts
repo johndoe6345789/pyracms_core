@@ -3,7 +3,7 @@
 import { createTheme, type ThemeOptions } from '@mui/material/styles'
 import { withMobile } from './mobileOverrides'
 
-const baseTheme: ThemeOptions = withMobile({
+export const baseTheme: ThemeOptions = withMobile({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: { fontWeight: 800, letterSpacing: '-0.025em' },
