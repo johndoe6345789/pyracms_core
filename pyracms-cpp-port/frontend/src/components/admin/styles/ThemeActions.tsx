@@ -1,6 +1,5 @@
 import { Box, Button } from '@mui/material'
 import {
-  SaveOutlined,
   RestoreOutlined,
   FileUploadOutlined,
   FileDownloadOutlined,
@@ -8,7 +7,6 @@ import {
 
 interface Props {
   onReset: () => void
-  onSave: () => void
   onExport: () => void
   onImport: () => void
 }
@@ -21,14 +19,7 @@ export default function ThemeActions(p: Props) {
         startIcon={<RestoreOutlined />}
         onClick={p.onReset}
       >
-        Reset
-      </Button>
-      <Button
-        variant="contained"
-        startIcon={<SaveOutlined />}
-        onClick={p.onSave}
-      >
-        Save
+        Reset this look to default
       </Button>
       <Button
         variant="outlined"

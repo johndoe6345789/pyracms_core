@@ -22,6 +22,7 @@ jest.mock(
 )
 jest.mock('react-colorful', () => ({
   HexColorPicker: () => <i />,
+  HexColorInput: () => <i />,
 }))
 
 beforeAll(stubResizeObserver)
@@ -44,7 +45,9 @@ it('style editor resets, saves, exports and imports', () => {
   render(<StyleEditorPage />)
   fireEvent.click(screen.getByRole('button', { name: 'Export JSON' }))
   fireEvent.click(screen.getByRole('button', { name: 'Import JSON' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Reset this look to default' }),
+  )
   expect(click).toHaveBeenCalledTimes(2)
   fireEvent.click(screen.getByTestId('swatch-Primary Color'))
   click.mockRestore()

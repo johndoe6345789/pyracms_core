@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import ColorPickerField from '@/components/admin/styles/ColorPickerField'
-import ThemeActions from '@/components/admin/styles/ThemeActions'
 import ThemeControls from '@/components/admin/styles/ThemeControls'
 import ThemePreview from '@/components/admin/styles/ThemePreview'
 import { DEFAULT_THEME } from '@/components/admin/styles/themeConfig'
@@ -9,47 +8,59 @@ jest.mock('react-colorful', () => ({
   HexColorPicker: ({ onChange }: { onChange: (c: string) => void }) => (
     <button data-testid="picker" onClick={() => onChange('#000')} />
   ),
+  HexColorInput: ({
+    onChange,
+    ...rest
+  }: {
+    onChange: (c: string) => void
+    'aria-label': string
+  }) => (
+    <input
+      aria-label={rest['aria-label']}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  ),
 }))
 
-it('ColorPickerField toggles the picker and emits', () => {
+it('ColorPickerField opens a picker, a hex box and ready colours', () => {
   const onChange = jest.fn()
-  render(<ColorPickerField label="L" color="#fff" onChange={onChange} />)
+  render(
+    <ColorPickerField
+      label="L"
+      help="Used for x"
+      color="#fff"
+      onChange={onChange}
+    />,
+  )
+  expect(screen.getByText('Used for x')).toBeInTheDocument()
   expect(screen.queryByTestId('picker')).toBeNull()
   fireEvent.click(screen.getByTestId('swatch-L'))
   fireEvent.click(screen.getByTestId('picker'))
   expect(onChange).toHaveBeenCalledWith('#000')
-  fireEvent.change(screen.getByLabelText('L'), { target: { value: '#111' } })
+  fireEvent.change(screen.getByLabelText('L hex'), {
+    target: { value: '#111' },
+  })
   expect(onChange).toHaveBeenCalledWith('#111')
+  fireEvent.click(screen.getByLabelText('Use #c62828'))
+  expect(onChange).toHaveBeenCalledWith('#c62828')
 })
 
-it('ThemeActions fire callbacks', () => {
-  const p = {
-    onReset: jest.fn(),
-    onExport: jest.fn(),
-    onImport: jest.fn(),
-    onSave: jest.fn(),
-  }
-  render(<ThemeActions {...p} />)
-  for (const n of ['Save', 'Reset', 'Export JSON', 'Import JSON']) {
-    fireEvent.click(screen.getByRole('button', { name: n }))
-  }
-  Object.values(p).forEach((f) => expect(f).toHaveBeenCalled())
-})
-
-it('ThemeControls updates colors, font and sliders', () => {
+it('ThemeControls updates colors, font, sliders and shows contrast', () => {
   const update = jest.fn()
   render(<ThemeControls theme={DEFAULT_THEME} update={update} />)
   fireEvent.click(screen.getByTestId('swatch-Primary Color'))
   fireEvent.click(screen.getByTestId('picker'))
   expect(update).toHaveBeenCalledWith('primaryColor', '#000')
-  fireEvent.mouseDown(screen.getByRole('combobox'))
-  fireEvent.click(screen.getByRole('option', { name: 'Inter' }))
+  fireEvent.click(screen.getByTestId('font-Inter'))
   expect(update).toHaveBeenCalledWith('fontFamily', 'Inter, sans-serif')
-  const sliders = screen.getAllByRole('slider')
+  const sliders = screen.getAllByRole('slider', { hidden: true })
   fireEvent.change(sliders[0]!, { target: { value: 12 } })
   fireEvent.change(sliders[1]!, { target: { value: 10 } })
   expect(update).toHaveBeenCalledWith('borderRadius', 12)
   expect(update).toHaveBeenCalledWith('spacing', 10)
+  expect(screen.getByTestId('contrast-Text on background')).toHaveTextContent(
+    'AAA',
+  )
 })
 
 it('ThemePreview renders', () => {

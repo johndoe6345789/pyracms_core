@@ -39,3 +39,22 @@ it('picks an icon and extension label by kind', () => {
   rerender(<FileIcon type="application/pdf" />)
   expect(screen.getByTestId('file-icon-pdf')).toBeInTheDocument()
 })
+
+it('opens the viewer from the thumbnail when the card has View', () => {
+  const { rerender } = render(
+    <FileCard
+      file={{ ...file(6, 'image/png'), name: 'a.png' }}
+      onDelete={jest.fn()}
+    />,
+  )
+  const link = screen.getByTestId('file-thumb-link-u6')
+  expect(link.getAttribute('href')).toMatch(/\/api\/files\/u6\/view$/)
+  expect(link).toHaveAttribute('target', '_blank')
+  rerender(
+    <FileCard
+      file={{ ...file(6, 'application/zip'), name: 'a.zip' }}
+      onDelete={jest.fn()}
+    />,
+  )
+  expect(screen.queryByTestId('file-thumb-link-u6')).toBeNull()
+})

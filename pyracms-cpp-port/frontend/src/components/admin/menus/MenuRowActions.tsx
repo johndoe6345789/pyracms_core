@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { Box, IconButton, Tooltip } from '@mui/material'
+import { Box } from '@mui/material'
+import Act, { type ActProps } from './MenuRowAct'
 import {
   AddOutlined,
   ArrowDownwardOutlined,
@@ -7,32 +7,6 @@ import {
   DeleteOutlined,
   EditOutlined,
 } from '@mui/icons-material'
-
-interface ActProps {
-  label: string
-  id: string
-  disabled?: boolean
-  onClick: () => void
-  children: ReactNode
-}
-
-function Act(p: ActProps) {
-  return (
-    <Tooltip title={p.label}>
-      <span>
-        <IconButton
-          size="small"
-          aria-label={p.label}
-          disabled={p.disabled ?? false}
-          onClick={p.onClick}
-          data-testid={p.id}
-        >
-          {p.children}
-        </IconButton>
-      </span>
-    </Tooltip>
-  )
-}
 
 interface Props {
   id: number
@@ -48,43 +22,56 @@ interface Props {
 
 /** Add-inside (folders), move up/down, edit and delete for one entry. */
 export default function MenuRowActions(p: Props) {
+  const acts: (ActProps & { show?: boolean })[] = [
+    {
+      show: !!p.onAddInside,
+      label: `Add a link to ${p.name}`,
+      id: `add-in-${p.id}`,
+      onClick: () => p.onAddInside?.(),
+      children: <AddOutlined fontSize="small" />,
+    },
+    {
+      label: 'Move up',
+      id: `up-${p.id}`,
+      disabled: p.first || p.disabled,
+      onClick: () => p.onMove(-1),
+      children: <ArrowUpwardOutlined fontSize="small" />,
+    },
+    {
+      label: 'Move down',
+      id: `down-${p.id}`,
+      disabled: p.last || p.disabled,
+      onClick: () => p.onMove(1),
+      children: <ArrowDownwardOutlined fontSize="small" />,
+    },
+    {
+      label: `Edit ${p.name}`,
+      id: `edit-${p.id}`,
+      onClick: p.onEdit,
+      children: <EditOutlined fontSize="small" />,
+    },
+    {
+      label: `Delete ${p.name}`,
+      id: `delete-${p.id}`,
+      onClick: p.onDelete,
+      children: <DeleteOutlined fontSize="small" />,
+    },
+  ]
   return (
     <Box sx={{ display: 'flex' }}>
-      {p.onAddInside && (
-        <Act
-          label={`Add a link to ${p.name}`}
-          id={`add-in-${p.id}`}
-          onClick={p.onAddInside}
-        >
-          <AddOutlined fontSize="small" />
-        </Act>
-      )}
-      <Act
-        label="Move up"
-        id={`up-${p.id}`}
-        disabled={p.first || p.disabled}
-        onClick={() => p.onMove(-1)}
-      >
-        <ArrowUpwardOutlined fontSize="small" />
-      </Act>
-      <Act
-        label="Move down"
-        id={`down-${p.id}`}
-        disabled={p.last || p.disabled}
-        onClick={() => p.onMove(1)}
-      >
-        <ArrowDownwardOutlined fontSize="small" />
-      </Act>
-      <Act label={`Edit ${p.name}`} id={`edit-${p.id}`} onClick={p.onEdit}>
-        <EditOutlined fontSize="small" />
-      </Act>
-      <Act
-        label={`Delete ${p.name}`}
-        id={`delete-${p.id}`}
-        onClick={p.onDelete}
-      >
-        <DeleteOutlined fontSize="small" />
-      </Act>
+      {acts
+        .filter((a) => a.show !== false)
+        .map((a) => (
+          <Act
+            key={a.id}
+            label={a.label}
+            id={a.id}
+            disabled={a.disabled ?? false}
+            onClick={a.onClick}
+          >
+            {a.children}
+          </Act>
+        ))}
     </Box>
   )
 }

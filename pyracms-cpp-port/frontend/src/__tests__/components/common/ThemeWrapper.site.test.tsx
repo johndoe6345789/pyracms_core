@@ -7,6 +7,7 @@ import { announceSiteTheme } from '@/hooks/useSiteTheme'
 import authReducer from '@/store/slices/authSlice'
 import uiReducer, { setColorMode } from '@/store/slices/uiSlice'
 import { DEFAULT_THEME } from '@/components/admin/styles/themeConfig'
+import { DEFAULT_DARK_THEME } from '@/components/admin/styles/siteThemes'
 import api from '@/lib/api'
 
 let path = '/site/wrap/x'
@@ -46,6 +47,7 @@ function show() {
 it('applies the saved site theme, then a freshly saved one', async () => {
   get.mockResolvedValue({
     data: {
+      // the old single-theme format still applies (as the light look)
       value: JSON.stringify({ ...DEFAULT_THEME, primaryColor: '#123456' }),
     },
   })
@@ -55,7 +57,10 @@ it('applies the saved site theme, then a freshly saved one', async () => {
   )
   expect(get).toHaveBeenCalledWith('/api/settings/site_theme?tenant_id=3')
   act(() =>
-    announceSiteTheme('wrap', { ...DEFAULT_THEME, primaryColor: '#abcdef' }),
+    announceSiteTheme('wrap', {
+      light: { ...DEFAULT_THEME, primaryColor: '#abcdef' },
+      dark: DEFAULT_DARK_THEME,
+    }),
   )
   expect(screen.getByTestId('c')).toHaveTextContent('#abcdef')
 })

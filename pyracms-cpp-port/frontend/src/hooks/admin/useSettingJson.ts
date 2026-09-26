@@ -16,6 +16,8 @@ export function useSettingJson<T>(
   fallback: T,
 ) {
   const [value, setValue] = useState<T>(fallback)
+  // the last version loaded from (or written to) the server
+  const [original, setOriginal] = useState<T>(fallback)
   const [saved, setSaved] = useState(false)
   const { error, setError, fail } = useActionError()
 
@@ -25,7 +27,10 @@ export function useSettingJson<T>(
       .get(`/api/settings/${key}?tenant_id=${tenantId}`)
       .then((r) => {
         const v = parse(String(r.data?.value ?? ''))
-        if (v) setValue(v)
+        if (v) {
+          setValue(v)
+          setOriginal(v)
+        }
       })
       .catch(() => {})
   }, [tenantId, key, parse])
@@ -40,6 +45,7 @@ export function useSettingJson<T>(
     setSaved(false)
     try {
       await putSetting(key, JSON.stringify(value), tenantId)
+      setOriginal(value)
       setSaved(true)
       return true
     } catch (e) {
@@ -48,5 +54,11 @@ export function useSettingJson<T>(
     }
   }
 
-  return { value, edit, save, saved, error }
+  /** Throw away unsaved changes: back to what is stored. */
+  const revert = () => {
+    setSaved(false)
+    setValue(original)
+  }
+
+  return { value, original, edit, revert, save, saved, error }
 }

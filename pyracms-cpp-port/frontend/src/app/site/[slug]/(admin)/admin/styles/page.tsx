@@ -1,70 +1,67 @@
 'use client'
 
-import { useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { Alert, Container, Typography, Grid } from '@mui/material'
+import { Box, Container, Grid } from '@mui/material'
 import ThemeActions from '@/components/admin/styles/ThemeActions'
 import ThemeControls from '@/components/admin/styles/ThemeControls'
+import StylePresets from '@/components/admin/styles/StylePresets'
 import ThemePreview from '@/components/admin/styles/ThemePreview'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
+import StyleHeader from '@/components/admin/styles/StyleHeader'
+import StyleModeTabs from '@/components/admin/styles/StyleModeTabs'
+import { sameThemes } from '@/components/admin/styles/presets'
 import {
-  DEFAULT_THEME,
-  exportTheme,
-  importTheme,
-  type ThemeConfig,
-} from '@/components/admin/styles/themeConfig'
+  DEFAULT_THEMES,
+  exportThemes,
+  importThemes,
+} from '@/components/admin/styles/siteThemes'
+import { useStyleEditor } from '@/hooks/admin/useStyleEditor'
 import { useTenantId } from '@/hooks/useTenantId'
-import { useSettingJson } from '@/hooks/admin/useSettingJson'
-import { announceSiteTheme } from '@/hooks/useSiteTheme'
-import { THEME_KEY, parseSiteTheme } from '@/lib/siteTheme'
 
 export default function StyleEditorPage() {
   const slug = useParams().slug as string
   const { tenantId } = useTenantId(slug)
-  const {
-    value: theme,
-    edit,
-    save,
-    saved,
-    error,
-  } = useSettingJson(tenantId, THEME_KEY, parseSiteTheme, DEFAULT_THEME)
-
-  const update = useCallback(
-    (key: keyof ThemeConfig, value: string | number) => {
-      edit((prev) => ({ ...prev, [key]: value }))
-    },
-    [edit],
-  )
-  const onSave = async () => {
-    if (await save()) announceSiteTheme(slug, theme)
-  }
+  const st = useStyleEditor(slug, tenantId)
+  const theme = st.theme
+  const unsaved = !sameThemes(st.themes, st.saved)
+  const other = st.mode === 'light' ? 'dark' : 'light'
 
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 } }}>
-      <Typography variant="h3" component="h1" gutterBottom>
-        Style Editor
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Customize your site theme and appearance.
-      </Typography>
-      <ErrorAlert error={error} testId="theme-error" />
-      {saved && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Theme saved.
-        </Alert>
-      )}
+      <StyleHeader
+        unsaved={unsaved}
+        saved={st.justSaved}
+        onSave={st.save}
+        onUndo={() => st.edit(st.saved)}
+      />
+      <ErrorAlert error={st.error} testId="theme-error" />
+      <StyleModeTabs
+        mode={st.mode}
+        onMode={st.setMode}
+        onCopyToOther={() =>
+          st.edit({ ...st.themes, [other]: st.themes[st.mode] })
+        }
+      />
+      <StylePresets
+        theme={theme}
+        saved={st.saved[st.mode]}
+        previous={st.previous?.[st.mode] ?? null}
+        unsaved={unsaved}
+        onPick={st.editMode}
+      />
       <ThemeActions
-        onReset={() => edit(DEFAULT_THEME)}
-        onSave={onSave}
-        onExport={() => exportTheme(theme)}
-        onImport={() => importTheme(edit)}
+        onReset={() => st.editMode(DEFAULT_THEMES[st.mode])}
+        onExport={() => exportThemes(st.themes)}
+        onImport={() => importThemes(st.edit)}
       />
       <Grid container spacing={3}>
         <Grid item xs={12} md={5}>
-          <ThemeControls theme={theme} update={update} />
+          <ThemeControls theme={theme} update={st.update} />
         </Grid>
         <Grid item xs={12} md={7}>
-          <ThemePreview theme={theme} />
+          <Box sx={{ position: 'sticky', top: 16 }}>
+            <ThemePreview theme={theme} />
+          </Box>
         </Grid>
       </Grid>
     </Container>

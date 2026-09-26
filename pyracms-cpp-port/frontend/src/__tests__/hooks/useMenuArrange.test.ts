@@ -25,7 +25,7 @@ beforeEach(() => {
   m.delete.mockResolvedValue({})
 })
 
-it('moves an item by renumbering its level, and stops at the ends', async () => {
+it('moves an item by renumbering its level; stops at the ends', async () => {
   const { result } = hook()
   await act(() => result.current.move(2, -1))
   expect(m.put).toHaveBeenCalledWith('/api/menus/2', { position: 1 })
