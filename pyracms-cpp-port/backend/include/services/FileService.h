@@ -20,6 +20,7 @@ struct FileDto {
     std::string sha256;
     int tenantId{0};               // 0 = platform site
     std::string folder;            // path in the file manager, "" = top
+    std::string visibility{"public"}; // or "authenticated" (signed in only)
     std::string storage{"local"};  // BlobStorage that holds the bytes
 };
 
@@ -39,6 +40,9 @@ class FileService {
                     const std::string &storage = "local");
 
     void getFile(const DbClientPtr &db, const std::string &uuid, Callback cb);
+
+    void setVisibility(const DbClientPtr &db, const std::string &uuid,
+                       const std::string &visibility, BoolCallback cb);
 
     void deleteFile(const DbClientPtr &db, const std::string &uuid,
                     BoolCallback cb);

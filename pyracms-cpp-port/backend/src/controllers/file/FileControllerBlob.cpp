@@ -8,25 +8,6 @@
 
 namespace pyracms {
 
-// Game/dep content follows the page's visibility (public: anyone,
-// private/draft: managers only, else 404 - never a hint it exists);
-// every other file keeps the uuid-capability rules.
-void withFileAccess(const drogon::HttpRequestPtr &req,
-                    const drogon::orm::DbClientPtr &db,
-                    const std::string &uuid,
-                    const std::function<void(const drogon::HttpResponsePtr &)>
-                        &callback,
-                    std::function<void()> allowed) {
-    auto v = viewerOf(req);
-    gdFileAccess(db, uuid, v.userId, v.tenantId,
-                 [callback, allowed](GdFileAccess a) {
-                     if (a == GdFileAccess::Denied)
-                         return callback(filterError(
-                             "File not found", drogon::k404NotFound));
-                     allowed();
-                 });
-}
-
 void loadBlob(const BlobStorePtr &store, const BlobKey &key, BlobLoadCb cb) {
     if (auto p = store->path(key)) {
         std::error_code ec;

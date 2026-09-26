@@ -1,51 +1,33 @@
 import { Box, IconButton, Tooltip } from '@mui/material'
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  DriveFileMoveOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material'
-import { FileItem } from '@/hooks/useFileManager'
-import { fileDownloadUrl, fileViewUrl } from '@/lib/fileDownloadUrl'
-import { canView } from '@/lib/fileKinds'
+import { DeleteOutlined, DriveFileMoveOutlined } from '@mui/icons-material'
+import type { FileItem, Visibility } from '@/hooks/useFileManager'
+import FileOpenActions from './FileOpenActions'
+import VisibilityAction from './VisibilityAction'
 
 interface Props {
   file: FileItem
   onDelete: (file: FileItem) => void
   onMove?: (file: FileItem) => void
+  onVisibility?: (file: FileItem, visibility: Visibility) => void
+  /** signed-link query for a signed-in-only file */
+  link?: string
+  /** false while that link is still being fetched */
+  ready?: boolean
 }
 
 /** Download (the API serves files as attachments) and delete. */
-export default function FileCardActions({ file, onDelete, onMove }: Props) {
+export default function FileCardActions({
+  file,
+  onDelete,
+  onMove,
+  onVisibility,
+  link = '',
+  ready = true,
+}: Props) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
-      {canView(file.name) && (
-        <Tooltip title="View">
-          <IconButton
-            size="small"
-            component="a"
-            href={fileViewUrl(file.uuid)}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`View file ${file.name}`}
-            data-testid={`view-file-${file.id}`}
-          >
-            <VisibilityOutlined fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      )}
-      <Tooltip title="Download">
-        <IconButton
-          size="small"
-          component="a"
-          href={fileDownloadUrl(file.uuid)}
-          download={file.name}
-          aria-label={`Download file ${file.name}`}
-          data-testid={`download-file-${file.id}`}
-        >
-          <DownloadOutlined fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      <FileOpenActions file={file} link={link} ready={ready} />
+      {onVisibility && <VisibilityAction file={file} onChange={onVisibility} />}
       {onMove && (
         <Tooltip title="Move to folder">
           <IconButton

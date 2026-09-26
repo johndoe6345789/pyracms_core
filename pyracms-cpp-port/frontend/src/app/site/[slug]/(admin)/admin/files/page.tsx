@@ -1,12 +1,13 @@
 'use client'
 
-import { Typography, Box } from '@mui/material'
+import { Box } from '@mui/material'
 import { useFileManager } from '@/hooks/useFileManager'
 import { useTenantId } from '@/hooks/useTenantId'
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import UploadDropzone from '@/components/admin/UploadDropzone'
 import FileGrid from '@/components/admin/FileGrid'
+import FilesHeader from '@/components/admin/FilesHeader'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import ConfirmDialog from '@/components/admin/ConfirmDialog'
 import FolderControls from '@/components/admin/FolderControls'
@@ -30,18 +31,14 @@ export default function AdminFilesPage() {
     handleDragLeave,
     handleDrop,
     uploadFiles,
+    setVisibility,
     dirs,
   } = useFileManager(tenantId)
   const [moving, setMoving] = useState<FileItem | null>(null)
 
   return (
     <Box data-testid="admin-files-page">
-      <Typography variant="h3" sx={{ mb: 1 }}>
-        File Manager
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Upload, organise into folders and manage your files.
-      </Typography>
+      <FilesHeader />
       <ErrorAlert error={error} testId="files-error" />
       <FolderControls dirs={dirs} />
       <UploadDropzone
@@ -51,7 +48,12 @@ export default function AdminFilesPage() {
         onDrop={handleDrop}
         onFilesSelected={uploadFiles}
       />
-      <FileGrid files={files} onDelete={handleDeleteClick} onMove={setMoving} />
+      <FileGrid
+        files={files}
+        onDelete={handleDeleteClick}
+        onMove={setMoving}
+        onVisibility={setVisibility}
+      />
       <MoveFileDialog
         key={moving?.uuid ?? 'none'}
         file={moving}

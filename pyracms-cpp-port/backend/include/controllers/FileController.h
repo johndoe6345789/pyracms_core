@@ -21,6 +21,11 @@ class FileController : public drogon::HttpController<FileController> {
                   "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
     ADD_METHOD_TO(FileController::list, "/api/files", drogon::Get,
                   "pyracms::JwtAuthFilter");
+    ADD_METHOD_TO(FileController::setVisibility,
+                  "/api/files/{uuid}/visibility", drogon::Put,
+                  "pyracms::JwtAuthFilter", "pyracms::OwnerFilter");
+    ADD_METHOD_TO(FileController::link, "/api/files/{uuid}/link",
+                  drogon::Post, "pyracms::JwtAuthFilter");
     METHOD_LIST_END
 
     void
@@ -44,6 +49,17 @@ class FileController : public drogon::HttpController<FileController> {
     void remove(const drogon::HttpRequestPtr &req,
                 std::function<void(const drogon::HttpResponsePtr &)> &&callback,
                 const std::string &uuid);
+
+    // Body {"visibility": "public" | "authenticated"}.
+    void setVisibility(
+        const drogon::HttpRequestPtr &req,
+        std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+        const std::string &uuid);
+
+    // A signed link (exp + sig query) that opens the file for a while.
+    void link(const drogon::HttpRequestPtr &req,
+              std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+              const std::string &uuid);
 
     void list(const drogon::HttpRequestPtr &req,
               std::function<void(const drogon::HttpResponsePtr &)> &&callback);

@@ -19,6 +19,7 @@ FileDto FileService::rowToDto(const drogon::orm::Row &row) {
         dto.tenantId = row["tenant_id"].as<int>();
     dto.storage = row["storage"].as<std::string>();
     dto.folder = row["folder"].as<std::string>();
+    dto.visibility = row["visibility"].as<std::string>();
     return dto;
 }
 

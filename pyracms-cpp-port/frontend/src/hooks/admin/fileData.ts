@@ -1,5 +1,8 @@
 import { dayOf } from '@/lib/dates'
 
+/** Who may open a file: anyone with the link, or signed-in users only. */
+export type Visibility = 'public' | 'authenticated'
+
 export interface FileItem {
   id: number
   name: string
@@ -8,6 +11,8 @@ export interface FileItem {
   downloads: number
   uploadedAt: string
   uuid: string
+  /** absent means public */
+  visibility?: Visibility
 }
 
 /** Formats a byte count as B, KB, or MB. */
@@ -28,6 +33,7 @@ export function mapFileRecord(f: Record<string, unknown>): FileItem {
     downloads: (f.downloadCount as number) || 0,
     uploadedAt: createdAt,
     uuid: (f.uuid as string) || '',
+    visibility: f.visibility === 'authenticated' ? 'authenticated' : 'public',
   }
 }
 
@@ -44,5 +50,6 @@ export function fileFromUpload(
     downloads: 0,
     uploadedAt: new Date().toISOString().split('T')[0] ?? '',
     uuid: (f.uuid as string) || '',
+    visibility: 'public',
   }
 }

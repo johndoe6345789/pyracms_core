@@ -2,12 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
-import { FileItem, formatFileSize, mapFileRecord } from './admin/fileData'
+import {
+  FileItem,
+  Visibility,
+  formatFileSize,
+  mapFileRecord,
+} from './admin/fileData'
 import { useFileUpload } from './admin/useFileUpload'
 import { useFolders } from './admin/useFolders'
-import { useActionError } from './useActionError'
+import { useFileVisibility } from './admin/useFileVisibility'
+import { useFileDelete } from './admin/useFileDelete'
 
-export type { FileItem }
+export type { FileItem, Visibility }
 export { formatFileSize }
 
 /**
@@ -19,12 +25,11 @@ export { formatFileSize }
 export function useFileManager(tenantId: number | null) {
   const [files, setFiles] = useState<FileItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
   const [tick, setTick] = useState(0)
-  const del = useActionError()
   const dirs = useFolders(tenantId, () => setTick((t) => t + 1))
   const upload = useFileUpload(tenantId, setFiles, dirs.folder)
+  const vis = useFileVisibility(setFiles)
+  const del = useFileDelete(setFiles)
 
   useEffect(() => {
     if (!tenantId) return
@@ -39,39 +44,17 @@ export function useFileManager(tenantId: number | null) {
       .finally(() => setLoading(false))
   }, [tenantId, dirs.folder, tick])
 
-  const handleDeleteClick = (file: FileItem) => {
-    setSelectedFile(file)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false)
-    setSelectedFile(null)
-  }
-
-  const handleDeleteConfirm = () => {
-    const target = selectedFile
-    handleDeleteCancel()
-    if (!target) return
-    del.setError('')
-    api
-      .delete(`/api/files/${target.uuid}`)
-      .then(() => {
-        setFiles((prev) => prev.filter((f) => f.id !== target.id))
-      })
-      .catch(del.fail(`Could not delete ${target.name}`))
-  }
-
   return {
     files,
     loading,
-    deleteDialogOpen,
-    selectedFile,
-    error: del.error || upload.uploadError || dirs.error,
+    deleteDialogOpen: del.deleteDialogOpen,
+    selectedFile: del.selectedFile,
+    error: del.error || upload.uploadError || dirs.error || vis.visibilityError,
+    setVisibility: vis.setVisibility,
     dirs,
-    handleDeleteClick,
-    handleDeleteConfirm,
-    handleDeleteCancel,
+    handleDeleteClick: del.handleDeleteClick,
+    handleDeleteConfirm: del.handleDeleteConfirm,
+    handleDeleteCancel: del.handleDeleteCancel,
     ...upload,
   }
 }
