@@ -8,14 +8,13 @@ using namespace harness;
 // A files row owned by `a` on site `tenant` (no bytes needed).
 inline std::string mkFile(const Acct &a, int tenant,
                           const std::string &mime = "video/mp4") {
-    auto uuid = drogon::utils::getUuid();
     bool pic = mime.rfind("image/", 0) == 0;
-    testDb()->execSqlSync(
+    auto r = testDb()->execSqlSync(
         "INSERT INTO files (filename, uuid, size, mimetype, is_picture, "
-        "is_video, user_id, tenant_id) VALUES ($1, $1, 10, $2, $3, $4, "
-        "$5, $6)",
-        uuid, mime, pic, !pic, a.id, tenant);
-    return uuid;
+        "is_video, user_id, tenant_id) SELECT u, u, 10, $1, $2, $3, $4, $5 "
+        "FROM (SELECT gen_random_uuid()::text AS u) g RETURNING uuid",
+        mime, pic, !pic, a.id, tenant);
+    return r[0]["uuid"].as<std::string>();
 }
 
 // Uploads a video as `a` and returns its id ("" on failure).

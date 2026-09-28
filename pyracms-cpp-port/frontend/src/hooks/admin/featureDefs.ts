@@ -30,6 +30,13 @@ export const FEATURE_DEFS: Omit<Feature, 'enabled'>[] = [
       'slideshows, and lightbox support.',
   },
   {
+    id: 'videos',
+    name: 'Videos',
+    description:
+      'Video uploads with a player, likes, comments ' +
+      'and channels people can subscribe to.',
+  },
+  {
     id: 'code_snippets',
     name: 'Code Snippets',
     description:

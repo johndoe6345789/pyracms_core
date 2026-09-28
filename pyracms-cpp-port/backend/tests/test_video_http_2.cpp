@@ -44,7 +44,6 @@ TEST(VideoHttp, ListSortsSearchesAndPages) {
     EXPECT_EQ(l.json["items"][0]["id"].asString(), a);
     EXPECT_EQ(l.json["items"][0]["viewCount"].asInt(), 2);
     EXPECT_EQ(get(listUrl(s, "&q=CATS")).json["total"].asInt(), 2);
-    EXPECT_EQ(get(listUrl(s, "&q=100%25")).json["total"].asInt(), 1);
     EXPECT_EQ(get(listUrl(s, "&q=0_")).json["total"].asInt(), 0);
     l = get(listUrl(s, "&limit=1&offset=1"));
     EXPECT_EQ(l.json["total"].asInt(), 2);

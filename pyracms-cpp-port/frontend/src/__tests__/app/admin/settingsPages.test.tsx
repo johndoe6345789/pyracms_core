@@ -57,5 +57,5 @@ it('features page toggles and saves', async () => {
   fireEvent.click(await screen.findByTestId('feature-toggle-articles'))
   fireEvent.click(screen.getByTestId('save-features-btn'))
   await screen.findByText(/saved successfully/)
-  expect(m.put).toHaveBeenCalledTimes(5)
+  expect(m.put).toHaveBeenCalledTimes(6)
 })

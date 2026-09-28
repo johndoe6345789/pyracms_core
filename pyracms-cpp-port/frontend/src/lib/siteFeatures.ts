@@ -10,6 +10,7 @@ export const FEATURE_IDS = [
   'articles',
   'forum',
   'gallery',
+  'videos',
   'code_snippets',
   'hypernucleus',
 ] as const
@@ -21,6 +22,7 @@ export const ALL_ON: FeatureFlags = {
   articles: true,
   forum: true,
   gallery: true,
+  videos: true,
   code_snippets: true,
   hypernucleus: true,
 }
