@@ -24,6 +24,7 @@ TEST(FeatureGateHttp, DisabledFeaturesAreClosedPerSite) {
     for (auto c : {Case{"articles", "/api/articles"},
                    Case{"forum", "/api/forum/categories"},
                    Case{"gallery", "/api/gallery/albums"},
+                   Case{"videos", "/api/videos"},
                    Case{"code_snippets", "/api/snippets"},
                    Case{"hypernucleus", "/api/gamedep/game"}}) {
         setFeature(s, c.id, "false");

@@ -20,6 +20,7 @@ inline std::string featureOfPath(const std::string &path) {
         {"/api/articles", "articles"},
         {"/api/forum", "forum"},
         {"/api/gallery", "gallery"},
+        {"/api/videos", "videos"},
         {"/api/snippets", "code_snippets"},
         {"/api/gamedep", "hypernucleus"},
         {"/api/outputs", "hypernucleus"},

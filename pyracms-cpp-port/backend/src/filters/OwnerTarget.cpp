@@ -22,6 +22,8 @@ Target targetOf(const std::string &path) {
         return {Resource::Webhook, seg[2]};
     if (seg[1] == "files")
         return {Resource::File, seg[2]};
+    if (seg[1] == "videos")
+        return {Resource::Video, seg[2]};
     if (seg[1] == "gallery" && seg.size() >= 4) {
         if (seg[2] == "albums")
             return {Resource::Album, seg[3]};

@@ -10,7 +10,7 @@ namespace pyracms {
 // Who may change a row that belongs to someone. Pure and unit-tested.
 // tokenTenant 0 = platform account (may reach any site).
 
-enum class Resource { None, Article, Album, Picture, Webhook, File };
+enum class Resource { None, Article, Album, Picture, Webhook, File, Video };
 
 // A resource located from the request path, e.g. /api/articles/{name}/x.
 struct Target {
@@ -26,7 +26,8 @@ struct OwnedRow {
     bool siteOwner{false}; // actor owns the site this row lives in
 };
 
-// Articles, albums, pictures: the author, a moderator or a site owner.
+// Articles, albums, pictures, videos: the author, a moderator or a site
+// owner.
 // Webhooks: site administrators and site owners only.
 // Files: the uploader, an administrator or the owner of that site.
 inline bool writeAllowed(Resource kind, int role, int actorId,
