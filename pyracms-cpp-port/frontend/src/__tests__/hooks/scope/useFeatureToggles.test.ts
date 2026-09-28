@@ -22,7 +22,7 @@ it('loads, toggles, saves', async () => {
   act(() => result.current.handleToggle('articles'))
   act(() => result.current.handleSave())
   await waitFor(() => expect(result.current.snackbarOpen).toBe(true))
-  expect(m.put).toHaveBeenCalledTimes(5)
+  expect(m.put).toHaveBeenCalledTimes(6)
   act(() => result.current.handleCloseSnackbar())
   expect(result.current.snackbarOpen).toBe(false)
 })

@@ -3,6 +3,7 @@ import {
   ArticleOutlined,
   ForumOutlined,
   PhotoLibraryOutlined,
+  SmartDisplayOutlined,
   CodeOutlined,
   LocalOfferOutlined,
 } from '@mui/icons-material'
@@ -17,6 +18,7 @@ export const NAV_ITEMS = [
   item('Articles', 'articles', ArticleOutlined),
   item('Forum', 'forum', ForumOutlined),
   item('Gallery', 'gallery', PhotoLibraryOutlined),
+  item('Videos', 'videos', SmartDisplayOutlined),
   item('Code', 'snippets', CodeOutlined),
   item('Tags', 'tags', LocalOfferOutlined),
 ]

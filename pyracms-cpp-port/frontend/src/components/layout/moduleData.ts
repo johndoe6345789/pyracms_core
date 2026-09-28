@@ -2,6 +2,7 @@ import {
   ArticleOutlined,
   ForumOutlined,
   PhotoLibraryOutlined,
+  SmartDisplayOutlined,
   RocketLaunchOutlined,
   CodeOutlined,
   LocalOfferOutlined,
@@ -38,6 +39,13 @@ export const MODULES: ModuleInfo[] = [
     icon: PhotoLibraryOutlined,
     description: 'Browse image galleries and upload your own photos.',
     color: '#10b981',
+  },
+  {
+    key: 'videos',
+    label: 'Videos',
+    icon: SmartDisplayOutlined,
+    description: 'Watch, upload and discuss videos, and follow channels.',
+    color: '#dc2626',
   },
   {
     key: 'games',
