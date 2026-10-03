@@ -27,14 +27,45 @@ export default function PortalPage() {
   if (configLoading) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Loading...
+        <Box sx={{ textAlign: 'center' }}>
+          <div>Loading domain config...</div>
+          <div style={{ fontSize: '12px', marginTop: '10px', color: '#666' }}>
+            {typeof window !== 'undefined' && (
+              <>Domain: {window.location.hostname}</>
+            )}
+          </div>
+        </Box>
+      </Box>
+    )
+  }
+
+  // Show debug info if there's an error
+  if (configError) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+        <Box sx={{ textAlign: 'center', backgroundColor: '#fee', padding: 2, borderRadius: 1 }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>Error loading domain config</div>
+          <div style={{ fontSize: '14px', marginBottom: '10px' }}>{configError}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>
+            Open browser console (F12) to see more details
+          </div>
+        </Box>
       </Box>
     )
   }
 
   // If single-site mode, the redirect above will handle it
   if (config?.displayMode === 'single') {
-    return null
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <div>Redirecting to {config.slug}...</div>
+          <div style={{ fontSize: '12px', marginTop: '10px', color: '#666' }}>
+            (displayMode: {config.displayMode})
+          </div>
+        </Box>
+      </Box>
+    )
   }
 
   // Multi-site mode: show splash screen with all sites
