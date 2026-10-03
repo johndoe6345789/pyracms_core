@@ -22,80 +22,74 @@ void DomainController::siteForDomain(HttpReq req, HttpCbRef callback) {
 
     auto db = drogon::app().getDbClient();
 
-    // First, fetch the routing mode from platform settings
+    // Query: Get domain config + site info
+    // Per-domain display_mode:
+    //   'single': show only this domain's bound site
+    //   'multi': show all available sites (splash screen)
     db->execSqlAsync(
-        "SELECT value FROM platform_settings WHERE key = 'domain_routing_mode'",
-        [db, host, callback](const drogon::orm::Result &modeRows) {
-            std::string routingMode = "multi-domain";
-            if (!modeRows.empty()) {
-                routingMode = modeRows[0]["value"].as<std::string>();
+        "SELECT t.id, t.slug, t.display_name, t.description, t.owner_id, "
+        "       t.created_at, td.display_mode, td.display_mode_description "
+        "FROM tenants t "
+        "LEFT JOIN tenant_domains td ON t.id = td.tenant_id "
+        "WHERE td.domain = $1 OR t.primary_domain = $1 "
+        "LIMIT 1",
+        [db, host, callback](const drogon::orm::Result &rows) {
+            if (rows.empty()) {
+                // Domain not found
+                Json::Value result;
+                result["domainFound"] = false;
+                result["domain"] = host;
+                callback(drogon::HttpResponse::newHttpJsonResponse(result));
+                return;
             }
 
-            if (routingMode == "single-domain") {
-                // Single-domain mode: return all sites, indicate domain routing is disabled
+            auto row = rows[0];
+            std::string displayMode = row["display_mode"].isNull()
+                ? "single"
+                : row["display_mode"].as<std::string>();
+
+            if (displayMode == "multi") {
+                // Multi-site mode on this domain: return all sites
                 db->execSqlAsync(
-                    "SELECT id, slug, display_name, description, owner_id, created_at, "
-                    "       primary_domain FROM tenants ORDER BY slug",
-                    [callback, host](const drogon::orm::Result &rows) {
+                    "SELECT id, slug, display_name, description, owner_id, created_at "
+                    "FROM tenants ORDER BY slug",
+                    [callback, host, displayMode](const drogon::orm::Result &siteRows) {
                         Json::Value result;
-                        result["routingMode"] = "single-domain";
+                        result["domainFound"] = true;
                         result["domain"] = host;
-                        result["sites"] = Json::arrayValue;
-                        for (const auto &row : rows) {
+                        result["displayMode"] = displayMode;
+                        result["allSites"] = Json::arrayValue;
+
+                        for (const auto &siteRow : siteRows) {
                             Json::Value site;
-                            site["id"] = row["id"].as<int>();
-                            site["slug"] = row["slug"].as<std::string>();
-                            site["displayName"] = row["display_name"].as<std::string>();
-                            site["description"] = row["description"].as<std::string>();
-                            site["primaryDomain"] = row["primary_domain"].as<std::string>();
-                            result["sites"].append(site);
+                            site["id"] = siteRow["id"].as<int>();
+                            site["slug"] = siteRow["slug"].as<std::string>();
+                            site["displayName"] = siteRow["display_name"].as<std::string>();
+                            site["description"] = siteRow["description"].as<std::string>();
+                            result["allSites"].append(site);
                         }
                         callback(drogon::HttpResponse::newHttpJsonResponse(result));
                     },
                     [callback](const drogon::orm::DrogonDbException &) {
-                        auto resp =
-                            drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
                         (*resp->jsonObject())["error"] = "Database error";
                         resp->setStatusCode(drogon::k500InternalServerError);
                         callback(resp);
                     });
             } else {
-                // Multi-domain mode: map this domain to a specific site
-                db->execSqlAsync(
-                    "SELECT t.id, t.slug, t.display_name, t.description, t.owner_id, "
-                    "       t.created_at "
-                    "FROM tenants t "
-                    "LEFT JOIN tenant_domains td ON t.id = td.tenant_id "
-                    "WHERE td.domain = $1 OR t.primary_domain = $1 "
-                    "LIMIT 1",
-                    [callback, host](const drogon::orm::Result &rows) {
-                        Json::Value result;
-                        result["routingMode"] = "multi-domain";
-                        result["domain"] = host;
-                        if (rows.empty()) {
-                            result["siteFound"] = false;
-                            callback(drogon::HttpResponse::newHttpJsonResponse(result));
-                            return;
-                        }
-
-                        auto row = rows[0];
-                        result["siteFound"] = true;
-                        result["id"] = row["id"].as<int>();
-                        result["slug"] = row["slug"].as<std::string>();
-                        result["displayName"] = row["display_name"].as<std::string>();
-                        result["description"] = row["description"].as<std::string>();
-                        result["ownerId"] = row["owner_id"].as<int>();
-                        result["createdAt"] = row["created_at"].as<std::string>();
-                        callback(drogon::HttpResponse::newHttpJsonResponse(result));
-                    },
-                    [callback](const drogon::orm::DrogonDbException &) {
-                        auto resp =
-                            drogon::HttpResponse::newHttpJsonResponse(Json::Value{});
-                        (*resp->jsonObject())["error"] = "Database error";
-                        resp->setStatusCode(drogon::k500InternalServerError);
-                        callback(resp);
-                    },
-                    host);
+                // Single-site mode on this domain: return only this site
+                Json::Value result;
+                result["domainFound"] = true;
+                result["domain"] = host;
+                result["displayMode"] = displayMode;
+                result["siteFound"] = true;
+                result["id"] = row["id"].as<int>();
+                result["slug"] = row["slug"].as<std::string>();
+                result["displayName"] = row["display_name"].as<std::string>();
+                result["description"] = row["description"].as<std::string>();
+                result["ownerId"] = row["owner_id"].as<int>();
+                result["createdAt"] = row["created_at"].as<std::string>();
+                callback(drogon::HttpResponse::newHttpJsonResponse(result));
             }
         },
         [callback](const drogon::orm::DrogonDbException &) {
@@ -103,7 +97,8 @@ void DomainController::siteForDomain(HttpReq req, HttpCbRef callback) {
             (*resp->jsonObject())["error"] = "Database error";
             resp->setStatusCode(drogon::k500InternalServerError);
             callback(resp);
-        });
+        },
+        host);
 }
 
 void DomainController::listAllSites(HttpReq req, HttpCbRef callback) {
