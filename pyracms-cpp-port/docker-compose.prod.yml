@@ -71,7 +71,9 @@ services:
     <<: *hardened
     ports: !reset []
     networks: [data]
-    cap_add: [SETGID, SETUID, CHOWN]
+    # Start as the image's redis user: as root, the entrypoint's chown
+    # `find` can't enter the 0700 appendonlydir without DAC_READ_SEARCH.
+    user: "999:1000"
     read_only: true
     tmpfs:
       - /tmp
