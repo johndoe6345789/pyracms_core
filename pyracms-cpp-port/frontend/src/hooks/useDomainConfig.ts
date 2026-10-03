@@ -7,7 +7,12 @@ export interface DomainConfig {
   slug?: string
   displayName?: string
   description?: string
-  allSites?: Array<{ id: number; slug: string; displayName: string; description: string }>
+  allSites?: Array<{
+    id: number
+    slug: string
+    displayName: string
+    description: string
+  }>
   siteFound?: boolean
 }
 
@@ -27,18 +32,26 @@ export function useDomainConfig() {
         })
 
         if (!response.ok) {
-          throw new Error(`API returned ${response.status}: ${response.statusText}`)
+          throw new Error(
+            `API returned ${response.status}: ${response.statusText}`
+          )
         }
 
         const data = await response.json()
         console.log('[useDomainConfig] API Response:', data)
         setConfig(data)
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to fetch domain config'
+        const message =
+          err instanceof Error ? err.message : 'Failed to fetch domain config'
         console.error('[useDomainConfig] Error:', message)
         setError(message)
         // Fallback: treat as multi-site
-        setConfig({ domain: '', domainFound: false, displayMode: 'multi', allSites: [] })
+        setConfig({
+          domain: '',
+          domainFound: false,
+          displayMode: 'multi',
+          allSites: [],
+        })
       } finally {
         setLoading(false)
       }
