@@ -20,7 +20,7 @@ ON CONFLICT (domain) DO NOTHING;
 
 -- Josheeb site (josheeb.net)
 INSERT INTO tenants (slug, display_name, description, primary_domain)
-VALUES ('josheeb', 'Josheeb', 'Josheeb\'s Personal Site', 'josheeb.net')
+VALUES ('josheeb', 'Josheeb', 'Josheeb Personal Site', 'josheeb.net')
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO tenant_domains (tenant_id, domain)

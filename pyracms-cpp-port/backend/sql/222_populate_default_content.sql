@@ -64,18 +64,18 @@ FROM tenants WHERE slug = 'josheeb'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO article_revisions (article_id, content, summary)
-SELECT a.id, '# Josheeb''s Site
+SELECT a.id, '# Josheeb Site
 
-Welcome to my personal PyRACMS site. Here you''ll find my thoughts, projects, and contributions.
+Welcome to my personal PyRACMS site. Here you will find my thoughts, projects, and contributions.
 
-## What''s Here
+## Whats Here
 - Blog posts and articles
 - Project documentation
 - Community discussions
 - Photo galleries
 - And more!
 
-Feel free to explore and connect!', 'Welcome to Josheeb''s Site'
+Feel free to explore and connect!', 'Welcome to Josheeb Site'
 FROM articles a
 JOIN tenants t ON a.tenant_id = t.id
 WHERE t.slug = 'josheeb' AND a.name = 'home'
