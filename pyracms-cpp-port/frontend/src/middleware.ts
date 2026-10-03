@@ -49,10 +49,9 @@ export async function middleware(request: NextRequest) {
   }
   if (!hit.slug) return NextResponse.next()
 
-  // The CapRover hop rewrites X-Forwarded-Proto to "http"; public domains
-  // are HSTS-only, so only local hosts keep plain http.
-  const local = /^(localhost|127\.|\[?::1)/.test(host)
-  const proto = local ? 'http' : 'https'
+  const proto =
+    request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() ||
+    request.nextUrl.protocol.replace(':', '')
   const target = `${proto}://${hostHeader}/site/${encodeURIComponent(hit.slug)}`
   return NextResponse.redirect(target, 302)
 }
