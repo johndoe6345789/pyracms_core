@@ -49,6 +49,6 @@ export function tenantSections(
 
 export const TENANT_FOOTER = {
   label: 'Back to Portal',
-  href: '/',
+  href: '/?all',
   icon: <ArrowBackOutlined />,
 }
