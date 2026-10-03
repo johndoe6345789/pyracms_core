@@ -13,11 +13,12 @@ import { useDomainConfig } from '@/hooks/useDomainConfig'
 export default function PortalPage() {
   const router = useRouter()
   const { sites, loading: sitesLoading } = useTenantList()
-  const { config, loading: configLoading } = useDomainConfig()
+  const { config, loading: configLoading, error: configError } = useDomainConfig()
 
   // If this domain is bound to a single site, redirect to that site
   useEffect(() => {
     if (config && !configLoading && config.displayMode === 'single' && config.slug) {
+      console.log(`[PortalPage] Redirecting to /site/${config.slug}`)
       router.push(`/site/${config.slug}`)
     }
   }, [config, configLoading, router])
