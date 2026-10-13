@@ -55,6 +55,17 @@ def q(v):
     return "'" + str(v).replace("\x00", "").replace("'", "''") + "'"
 
 
+def ts_exact(value, fallback=None):
+    """A revision's own date, kept as it is. The old site chose the current revision by the latest
+    date, and many revisions carry placeholder dates (years 1008-1274), so the order of those dates
+    matters: replacing them made every revision tie and the wrong one show as current."""
+    try:
+        d = datetime.fromisoformat(str(value or fallback))
+        return q("%04d-%02d-%02d %02d:%02d:%02d+00" % (d.year, d.month, d.day, d.hour, d.minute, d.second))
+    except ValueError:
+        return "NOW()"
+
+
 def ts(value, fallback=None):
     """Old naive timestamps are UTC. Placeholder dates (year 1178) fall back."""
     for v in (value, fallback):
@@ -176,17 +187,18 @@ class Importer:
         for p in self.db.execute("SELECT * FROM articlepage ORDER BY id"):
             revs = self.db.execute("SELECT * FROM articlerevision WHERE page_id=? ORDER BY id", (p["id"],)).fetchall()
             renderer = RENDERERS.get(p["renderer_id"], "markdown")
+            real = sorted(r["created"] for r in revs if str(r["created"])[:4] >= "2000")
+            first = ts(p["created"], real[0] if real else None) if not real else ts(real[0])
             self.insert_mapped("article", p["id"], "articles",
                 ["tenant_id", "name", "display_name", "is_private", "hide_display_name", "user_id", "renderer_id", "renderer_name",
                  "view_count", "created_at", "status", "published_at"],
                 [authors, q(p["name"]), q(p["display_name"] or p["name"]), q(bool(p["private"])), q(bool(p["hide_display_name"])),
                  mapped("user", p["user_id"]), f"(SELECT id FROM article_renderers WHERE name = {q(renderer.upper())})", q(renderer),
-                 q(p["view_count"] or 0), ts(p["created"], revs[0]["created"] if revs else None), "'published'",
-                 ts(p["created"], revs[0]["created"] if revs else None)])
+                 q(p["view_count"] or 0), first, "'published'", first])
             for r in revs:
                 self.emit("INSERT INTO article_revisions (article_id, content, summary, user_id, created_at) VALUES "
                           f"({mapped('article', p['id'])}, {q(self.rewrite(r['article'] or ''))}, {q(r['summary'] or '')}, "
-                          f"{mapped('user', r['user_id'])}, {ts(r['created'], p['created'])})")
+                          f"{mapped('user', r['user_id'])}, {ts_exact(r['created'], p['created'])})")
             for t in self.db.execute("SELECT name FROM articletags WHERE page_id=?", (p["id"],)):
                 self.emit(f"INSERT INTO article_tags (name, article_id) VALUES ({q(t['name'])}, {mapped('article', p['id'])})")
 
