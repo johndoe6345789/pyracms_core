@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import api from '@/lib/api'
+import { fetchAllArticles } from '@/lib/fetchAllArticles'
 import { mapSnippet, type Snippet } from '@/lib/snippets'
 
 export interface TaggedArticle {
@@ -20,13 +21,10 @@ export function useTagContent(tenantId: number | null, tag: string) {
     const q = `tenant_id=${tenantId}&tag=${encodeURIComponent(tag)}&limit=100`
     setLoading(true)
     Promise.all([
-      api.get(`/api/articles?${q}`).catch(() => ({ data: [] })),
+      fetchAllArticles(tenantId, tag).catch(() => []),
       api.get(`/api/snippets?${q}`).catch(() => ({ data: {} })),
     ])
-      .then(([a, s]) => {
-        const rows: Record<string, unknown>[] = Array.isArray(a.data)
-          ? a.data
-          : a.data?.items || []
+      .then(([rows, s]) => {
         setArticles(
           rows.map((r) => ({
             name: String(r.name ?? ''),
