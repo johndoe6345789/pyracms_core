@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import api from '@/lib/api'
+import { fetchAllArticles } from '@/lib/fetchAllArticles'
 import { dayOf } from '@/lib/dates'
 
 export interface ArticleSummary {
@@ -50,12 +50,8 @@ export function useArticles(tenantId: number | null, tag = '') {
   useEffect(() => {
     if (!tenantId) return
     setLoading(true)
-    api
-      .get(
-        `/api/articles?tenant_id=${tenantId}` +
-          (tag ? `&tag=${encodeURIComponent(tag)}` : ''),
-      )
-      .then((res) => setAllArticles((res.data || []).map(mapSummary)))
+    fetchAllArticles(tenantId, tag)
+      .then((rows) => setAllArticles(rows.map(mapSummary)))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [tenantId, tag])
