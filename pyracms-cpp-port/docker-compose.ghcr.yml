@@ -190,7 +190,7 @@ services:
         condition: service_healthy
 
   objectstore:
-    image: ghcr.io/johndoe6345789/object-store:latest@sha256:0bc19d893dcc14e2a9504091147e4b2d3a3fe2c8efa340b9a3cd7a7e07809a1e
+    image: ghcr.io/johndoe6345789/object-store:latest@sha256:9b9d97304a02866cca58796d8ed9fd1ce1b9de0310176fa36cc55698a04f3668
     environment:
       PGHOST: postgres
       PGPORT: 5432
