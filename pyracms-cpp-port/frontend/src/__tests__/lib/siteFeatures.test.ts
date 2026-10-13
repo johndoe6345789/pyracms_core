@@ -8,7 +8,8 @@ import {
 describe('flagsFromSettings', () => {
   it('enables everything when nothing is set', () => {
     expect(flagsFromSettings([])).toEqual(ALL_ON)
-    expect(FEATURE_IDS).toHaveLength(5)
+    expect(FEATURE_IDS).toHaveLength(6)
+    expect(FEATURE_IDS).toContain('videos')
   })
 
   it('turns off only an explicit "false"', () => {

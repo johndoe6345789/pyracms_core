@@ -7,8 +7,9 @@ import type { FeatureFlags } from '@/lib/siteFeatures'
 import type { NavEntry, NavSection } from './navTypes'
 
 /**
- * The stock modules of a site (Articles, Forum, Gallery, Hypernucleus, Code,
- * Tags). `flags` hides the ones the site switched off (null = show all).
+ * The stock modules of a site (Articles, Forum, Gallery, Videos,
+ * Hypernucleus, Code, Tags). `flags` hides the ones the site switched off
+ * (null = show all).
  */
 export function tenantModuleEntries(
   slug: string,
@@ -21,7 +22,7 @@ export function tenantModuleEntries(
     icon: item.icon,
     ...(MODULE_FEATURE[item.path] && { feature: MODULE_FEATURE[item.path] }),
   }))
-  const at = modules.findIndex((m) => m.key === 'gallery') + 1
+  const at = modules.findIndex((m) => m.key === 'videos') + 1
   modules.splice(at, 0, hypernucleusEntry(slug))
   return filterNavByFeatures(modules, flags)
 }

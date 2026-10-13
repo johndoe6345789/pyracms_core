@@ -32,6 +32,8 @@ describe('site menu features', () => {
 
   it('drops Hypernucleus with all its children when off', () => {
     expect(keys(off('hypernucleus'))).not.toContain('hypernucleus')
+    expect(keys(null)).toContain('videos')
+    expect(keys(off('videos'))).not.toContain('videos')
   })
 
   it('keeps a group while a child feature is on, drops it when none', () => {

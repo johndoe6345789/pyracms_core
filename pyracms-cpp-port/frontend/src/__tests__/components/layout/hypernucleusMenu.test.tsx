@@ -12,7 +12,8 @@ describe('Hypernucleus site menu', () => {
     expect(l).toContain('Hypernucleus')
     expect(l).not.toContain('Games')
     expect(l).not.toContain('Dependencies')
-    expect(l.indexOf('Hypernucleus')).toBe(l.indexOf('Gallery') + 1)
+    expect(l.indexOf('Videos')).toBe(l.indexOf('Gallery') + 1)
+    expect(l.indexOf('Hypernucleus')).toBe(l.indexOf('Videos') + 1)
   })
 
   it('links Games, Dependencies and the client download', () => {

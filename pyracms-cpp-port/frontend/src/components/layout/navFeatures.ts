@@ -10,6 +10,7 @@ export const MODULE_FEATURE: Record<string, FeatureId> = {
   articles: 'articles',
   forum: 'forum',
   gallery: 'gallery',
+  videos: 'videos',
   snippets: 'code_snippets',
   games: 'hypernucleus',
   dependencies: 'hypernucleus',

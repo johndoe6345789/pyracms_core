@@ -28,6 +28,11 @@ static const char *sqlFor(Resource kind) {
                "$3::int) AS site_owner FROM gallery_pictures p "
                "JOIN gallery_albums a ON a.id = p.album_id "
                "WHERE p.id = $1::int AND $2::int >= 0";
+    case Resource::Video:
+        return "SELECT COALESCE(v.user_id, 0) AS owner_id, v.tenant_id, "
+               "EXISTS (SELECT 1 FROM tenants t WHERE t.id = v.tenant_id "
+               "AND t.owner_id = $3::int) AS site_owner FROM videos v "
+               "WHERE v.id = $1::int AND $2::int >= 0";
     case Resource::Webhook:
         return "SELECT 0 AS owner_id, w.tenant_id, EXISTS (SELECT 1 FROM "
                "tenants t WHERE t.id = w.tenant_id AND t.owner_id = "

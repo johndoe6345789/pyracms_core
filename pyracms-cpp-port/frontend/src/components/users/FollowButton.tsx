@@ -9,7 +9,17 @@ import api from '@/lib/api'
 import { apiErrorMessage } from '@/lib/apiError'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 
-export function FollowButton({ userId }: { userId: number }) {
+interface Props {
+  userId: number
+  followLabel?: string
+  unfollowLabel?: string
+}
+
+export function FollowButton({
+  userId,
+  followLabel = 'Follow',
+  unfollowLabel = 'Unfollow',
+}: Props) {
   const [following, setFollowing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -55,7 +65,7 @@ export function FollowButton({ userId }: { userId: number }) {
         disabled={loading}
         startIcon={following ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
       >
-        {following ? 'Unfollow' : 'Follow'}
+        {following ? unfollowLabel : followLabel}
       </Button>
       <ErrorAlert error={error} testId="follow-error" mb={0} />
     </>

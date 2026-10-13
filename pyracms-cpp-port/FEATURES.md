@@ -107,6 +107,21 @@
 - `PUT /api/gallery/pictures/{id}/default` — set as album cover
 - `POST /api/gallery/pictures/{id}/vote` — vote on picture (upsert)
 
+### Videos (7 endpoints, feature toggle `videos`)
+YouTube-style video library. Videos are uploaded MP4/WebM files with an
+optional poster picture; comments use `/api/comments/video/{id}` and
+"Subscribe" is following the uploader.
+- `GET /api/videos` — list public videos (`tenant_id`, `user_id`, `q`,
+  `sort=newest|popular`, `limit`, `offset`); own channel includes
+  unlisted/private
+- `POST /api/videos` — publish an uploaded video (title, description,
+  thumbnail, duration, visibility public/unlisted/private)
+- `GET /api/videos/{id}` — watch page data (counts a view, my vote)
+- `PUT /api/videos/{id}` — edit (uploader, moderator or site owner)
+- `DELETE /api/videos/{id}` — delete (and its comments)
+- `POST /api/videos/{id}/vote` — like/dislike, returns the tally
+- `DELETE /api/videos/{id}/vote` — take a vote back
+
 ### File Management (5 endpoints)
 - `POST /api/files` — upload file (multipart)
 - `GET /api/files/{uuid}` — download file

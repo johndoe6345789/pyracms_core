@@ -5,6 +5,7 @@ import { useTagCloudPage } from '@/hooks/useTagCloudPage'
 const SECTIONS = [
   ['Articles', 'articles'],
   ['Photo galleries', 'gallery'],
+  ['Videos', 'videos'],
   ['Code snippets', 'snippets'],
   ['Forum', 'forum'],
   ['All tags', 'tags'],
