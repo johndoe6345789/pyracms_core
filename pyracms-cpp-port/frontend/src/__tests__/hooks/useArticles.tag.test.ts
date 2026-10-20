@@ -16,14 +16,16 @@ describe('useArticles', () => {
   it('lists everything without a tag', async () => {
     renderHook(() => useArticles(4))
     await waitFor(() => expect(get).toHaveBeenCalled())
-    expect(get).toHaveBeenCalledWith('/api/articles?tenant_id=4')
+    expect(get).toHaveBeenCalledWith(
+      '/api/articles?tenant_id=4&limit=100&offset=0',
+    )
   })
 
   it('asks for the tag, encoded, when one is given', async () => {
     renderHook(() => useArticles(4, 'c++ & more'))
     await waitFor(() => expect(get).toHaveBeenCalled())
     expect(get).toHaveBeenCalledWith(
-      '/api/articles?tenant_id=4&tag=c%2B%2B%20%26%20more',
+      '/api/articles?tenant_id=4&limit=100&offset=0&tag=c%2B%2B%20%26%20more',
     )
   })
 
@@ -34,6 +36,8 @@ describe('useArticles', () => {
     await waitFor(() => expect(get).toHaveBeenCalledTimes(1))
     rerender({ t: 'b' })
     await waitFor(() => expect(get).toHaveBeenCalledTimes(2))
-    expect(get).toHaveBeenLastCalledWith('/api/articles?tenant_id=4&tag=b')
+    expect(get).toHaveBeenLastCalledWith(
+      '/api/articles?tenant_id=4&limit=100&offset=0&tag=b',
+    )
   })
 })
